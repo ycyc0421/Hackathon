@@ -5,8 +5,7 @@
  * 用法：node docs/schema/validate.mjs
  * 退出码：全部通过为 0，有任一失败为 1（可用于 CI 或提交前检查）
  *
- * 意义：C/F 说"我按契约实现了"时，把他们的真实返回丢进来跑一遍就能验证，
- * 不必靠人逐字段比对。
+ * 用途：验证后端返回是否符合契约，无需人工逐字段比对。
  */
 
 import { readFileSync, readdirSync } from 'node:fs'
