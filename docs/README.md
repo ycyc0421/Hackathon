@@ -6,7 +6,7 @@
 | [`数据契约.md`](数据契约.md) | 前后端交换的数据格式。可读形式的约定说明 |
 | [`schema/`](schema/) | 同一份约定的可机器校验形式（JSON Schema） |
 | [`fixtures/`](fixtures/) | 示例数据，可直接供前端使用 |
-| [`待确认事项.md`](待确认事项.md) | 需 C（数据）、F（后端）决定的事项 |
+| [`待确认事项.md`](待确认事项.md) | 需数据侧、后端侧决定的事项。数据侧部分见 [issue #3](https://github.com/ycyc0421/Hackathon/issues/3) |
 
 ## 契约的两种形式
 
