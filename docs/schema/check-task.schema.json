@@ -1,0 +1,500 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ycyc0421/Hackathon/schema/check-task.schema.json",
+  "title": "CheckTask",
+  "description": "一个检查任务。GET /api/v1/checks/{task_id} 的返回体。",
+  "type": "object",
+  "required": [
+    "task_id",
+    "status",
+    "created_at",
+    "finished_at",
+    "input",
+    "documents",
+    "extractions",
+    "comparisons",
+    "risks",
+    "summary",
+    "errors"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "任务唯一标识"
+    },
+    "status": {
+      "$ref": "#/$defs/TaskStatus"
+    },
+    "created_at": {
+      "$ref": "#/$defs/Timestamp"
+    },
+    "finished_at": {
+      "oneOf": [{ "$ref": "#/$defs/Timestamp" }, { "type": "null" }],
+      "description": "未完成时为 null"
+    },
+    "input": { "$ref": "#/$defs/TaskInput" },
+    "documents": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Document" }
+    },
+    "extractions": {
+      "type": "array",
+      "description": "第 1 层：每个文件的抽取结果。全部文件处理失败时为空数组",
+      "items": { "$ref": "#/$defs/Extraction" }
+    },
+    "comparisons": {
+      "type": "array",
+      "description": "第 2 层：跨文件比对结果",
+      "items": { "$ref": "#/$defs/Comparison" }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Risk" }
+    },
+    "summary": { "$ref": "#/$defs/Summary" },
+    "errors": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/TaskError" }
+    }
+  },
+
+  "$defs": {
+    "Timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$",
+      "description": "ISO 8601，必须带时区"
+    },
+
+    "TaskStatus": {
+      "type": "string",
+      "description": "COMPLETED 与 PARTIAL 必须分开：前者是全部分析完成，后者是有文件失败但其余出了结果",
+      "enum": ["PENDING", "RUNNING", "COMPLETED", "PARTIAL", "FAILED"]
+    },
+
+    "TaskInput": {
+      "type": "object",
+      "required": ["destination_country"],
+      "additionalProperties": false,
+      "properties": {
+        "destination_country": {
+          "type": "string",
+          "pattern": "^[A-Z]{2}$",
+          "description": "ISO 3166-1 alpha-2"
+        },
+        "destination_country_name": { "type": "string" },
+        "trade_mode": { "type": ["string", "null"] },
+        "declared_currency": {
+          "type": ["string", "null"],
+          "pattern": "^[A-Z]{3}$"
+        },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+
+    "DocType": {
+      "type": ["string", "null"],
+      "description": "判不出来给 null",
+      "enum": [
+        "COMMERCIAL_INVOICE",
+        "PACKING_LIST",
+        "BILL_OF_LADING",
+        "CUSTOMS_DECLARATION",
+        "CERTIFICATE_OF_ORIGIN",
+        "INSURANCE_POLICY",
+        "OTHER",
+        null
+      ]
+    },
+
+    "Document": {
+      "type": "object",
+      "required": [
+        "file_id",
+        "file_name",
+        "file_type",
+        "doc_type",
+        "process_status",
+        "page_count",
+        "error_message"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "file_id": { "type": "string" },
+        "file_name": { "type": "string" },
+        "file_type": {
+          "type": "string",
+          "enum": ["PDF", "IMAGE", "EDI", "OTHER"]
+        },
+        "doc_type": { "$ref": "#/$defs/DocType" },
+        "process_status": {
+          "type": "string",
+          "description": "逐文件处理状态。FAILED 的文件必须同时出现在 task.errors 里",
+          "enum": ["UPLOADED", "PARSING", "EXTRACTED", "FAILED", "UNSUPPORTED"]
+        },
+        "page_count": { "type": ["integer", "null"], "minimum": 1 },
+        "error_message": {
+          "type": ["string", "null"],
+          "description": "人类可读的失败原因，直接展示给用户"
+        }
+      }
+    },
+
+    "ParseMethod": {
+      "type": ["string", "null"],
+      "enum": ["TEXT_LAYER", "OCR", "EDI_PARSE", null]
+    },
+
+    "FieldStatus": {
+      "type": "string",
+      "description": "该字段在某一份文件里的状态。NOT_IN_DOC 与 MISSING_IN_DOC 必须分开：前者是这份单证按规则本就没有该字段（正常），后者是应该有但没找到（异常）",
+      "enum": [
+        "EXTRACTED",
+        "LOW_CONFIDENCE",
+        "NOT_IN_DOC",
+        "MISSING_IN_DOC",
+        "UNRECOGNIZED",
+        "NORMALIZE_FAILED"
+      ]
+    },
+
+    "BBox": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        { "type": "null" }
+      ],
+      "description": "[x, y, width, height]，坐标系由 bbox_unit 说明"
+    },
+
+    "Field": {
+      "type": "object",
+      "required": [
+        "field_key",
+        "label",
+        "raw_text",
+        "raw_value",
+        "normalized_value",
+        "unit",
+        "confidence",
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "field_key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "归一后的通用字段名，跨文件一致"
+        },
+        "label": {
+          "type": "string",
+          "description": "中文显示名。前端不维护 field_key → 中文名的映射，一律读这个"
+        },
+        "raw_text": {
+          "type": ["string", "null"],
+          "description": "原文片段，原样保留不清洗"
+        },
+        "raw_value": { "type": ["string", "null"] },
+        "normalized_value": {
+          "type": ["string", "number", "boolean", "null"],
+          "description": "归一后的值。归一失败给 null，不要给原字符串"
+        },
+        "unit": { "type": ["string", "null"] },
+        "confidence": {
+          "oneOf": [
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "null" }
+          ],
+          "description": "给不出来给 null，不要给假的 1.0"
+        },
+        "status": { "$ref": "#/$defs/FieldStatus" },
+        "page": { "type": ["integer", "null"], "minimum": 1 },
+        "bbox": { "$ref": "#/$defs/BBox" },
+        "bbox_unit": {
+          "type": ["string", "null"],
+          "enum": ["PX", "RELATIVE", null],
+          "description": "PX = 渲染后图像的像素坐标；RELATIVE = 0~1 相对坐标"
+        }
+      },
+      "allOf": [
+        {
+          "description": "抽出值的状态下 normalized_value 必须有值",
+          "if": {
+            "properties": { "status": { "enum": ["EXTRACTED", "LOW_CONFIDENCE"] } },
+            "required": ["status"]
+          },
+          "then": { "properties": { "normalized_value": { "not": { "type": "null" } } } }
+        },
+        {
+          "description": "NOT_IN_DOC / MISSING_IN_DOC / UNRECOGNIZED 三种情况下不应给 normalized_value",
+          "if": {
+            "properties": {
+              "status": { "enum": ["NOT_IN_DOC", "MISSING_IN_DOC", "UNRECOGNIZED"] }
+            },
+            "required": ["status"]
+          },
+          "then": { "properties": { "normalized_value": { "type": "null" } } }
+        }
+      ]
+    },
+
+    "Extraction": {
+      "type": "object",
+      "required": ["file_id", "doc_type", "fields"],
+      "additionalProperties": false,
+      "properties": {
+        "file_id": { "type": "string" },
+        "doc_type": { "$ref": "#/$defs/DocType" },
+        "parse_method": { "$ref": "#/$defs/ParseMethod" },
+        "fields": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Field" }
+        }
+      }
+    },
+
+    "ValueType": {
+      "type": "string",
+      "enum": ["NUMBER", "MONEY", "CODE", "STRING", "DATE"]
+    },
+
+    "ComparisonStatus": {
+      "type": "string",
+      "description": "跨文件比对结论。NOT_CHECKED 必须返回：省略它等于让用户以为检查过了",
+      "enum": [
+        "MATCH",
+        "CONFLICT",
+        "MISSING_IN_SOME",
+        "NOT_CHECKED",
+        "UNRECOGNIZED",
+        "SINGLE_SOURCE"
+      ]
+    },
+
+    "Severity": {
+      "type": "string",
+      "enum": ["INFO", "WARNING", "ERROR"]
+    },
+
+    "ComparisonValue": {
+      "type": "object",
+      "required": ["file_id", "file_name", "raw_value", "normalized_value", "field_status"],
+      "additionalProperties": false,
+      "properties": {
+        "file_id": { "type": "string" },
+        "file_name": { "type": "string" },
+        "raw_value": { "type": ["string", "null"] },
+        "normalized_value": {
+          "type": ["string", "number", "boolean", "null"]
+        },
+        "field_status": { "$ref": "#/$defs/FieldStatus" },
+        "page": { "type": ["integer", "null"], "minimum": 1 },
+        "bbox": { "$ref": "#/$defs/BBox" }
+      }
+    },
+
+    "Comparison": {
+      "type": "object",
+      "required": [
+        "comparison_id",
+        "field_key",
+        "label",
+        "value_type",
+        "unit",
+        "status",
+        "canonical_value",
+        "severity",
+        "values"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "comparison_id": { "type": "string" },
+        "field_key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "label": { "type": "string" },
+        "value_type": { "$ref": "#/$defs/ValueType" },
+        "unit": { "type": ["string", "null"] },
+        "status": { "$ref": "#/$defs/ComparisonStatus" },
+        "canonical_value": {
+          "type": ["string", "number", "boolean", "null"],
+          "description": "始终为 null。系统不判断哪份文件是对的"
+        },
+        "severity": { "$ref": "#/$defs/Severity" },
+        "rule_id": { "type": ["string", "null"] },
+        "note": { "type": ["string", "null"] },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ComparisonValue" }
+        }
+      },
+      "allOf": [
+        {
+          "description": "canonical_value 必须保持 null",
+          "properties": { "canonical_value": { "type": "null" } }
+        },
+        {
+          "description": "CONFLICT 至少要有两个不同的归一值",
+          "if": {
+            "properties": { "status": { "const": "CONFLICT" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "values": {
+                "minItems": 2
+              },
+              "severity": { "enum": ["WARNING", "ERROR"] }
+            }
+          }
+        },
+        {
+          "description": "SINGLE_SOURCE 只能有一个值条目",
+          "if": {
+            "properties": { "status": { "const": "SINGLE_SOURCE" } },
+            "required": ["status"]
+          },
+          "then": { "properties": { "values": { "maxItems": 1 } } }
+        },
+        {
+          "description": "NOT_CHECKED 必须给出 note 说明为什么没校验",
+          "if": {
+            "properties": { "status": { "const": "NOT_CHECKED" } },
+            "required": ["status"]
+          },
+          "then": { "properties": { "note": { "type": "string", "minLength": 1 } } }
+        }
+      ]
+    },
+
+    "RiskType": {
+      "type": "string",
+      "enum": [
+        "MISSING_CERTIFICATE",
+        "HS_CLASSIFICATION",
+        "RULE_UNCOVERED",
+        "OTHER"
+      ]
+    },
+
+    "Risk": {
+      "type": "object",
+      "required": [
+        "risk_id",
+        "type",
+        "severity",
+        "title",
+        "detail",
+        "related_field_keys",
+        "related_file_ids",
+        "destination_country",
+        "rule_id",
+        "rule_source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "risk_id": { "type": "string" },
+        "type": { "$ref": "#/$defs/RiskType" },
+        "severity": { "$ref": "#/$defs/Severity" },
+        "title": { "type": "string" },
+        "detail": {
+          "type": "string",
+          "description": "展开说明，须包含依据：哪条规则、哪个字段触发"
+        },
+        "related_field_keys": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "related_file_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "destination_country": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[A-Z]{2}$" },
+            { "type": "null" }
+          ]
+        },
+        "rule_id": {
+          "type": ["string", "null"],
+          "description": "规则编号。为 null 时前端显示为『模型建议，未经规则校验』"
+        },
+        "rule_source": { "type": ["string", "null"] }
+      }
+    },
+
+    "Summary": {
+      "type": "object",
+      "required": [
+        "document_count",
+        "field_count",
+        "conflict_count",
+        "missing_count",
+        "risk_count",
+        "unrecognized_count"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "document_count": { "type": "integer", "minimum": 0 },
+        "field_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "所有 extractions[].fields 的条目总数"
+        },
+        "conflict_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "comparisons 中 status 为 CONFLICT 的条数"
+        },
+        "missing_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "comparisons 中 status 为 MISSING_IN_SOME 的条数"
+        },
+        "risk_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "risks 的条数"
+        },
+        "unrecognized_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "comparisons 中 status 为 UNRECOGNIZED 的条数"
+        }
+      }
+    },
+
+    "ErrorLevel": {
+      "type": "string",
+      "enum": ["FATAL", "ERROR", "WARNING"]
+    },
+
+    "TaskError": {
+      "type": "object",
+      "required": ["code", "message", "level"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "description": "稳定的英文错误码，前端据此做特殊处理"
+        },
+        "message": {
+          "type": "string",
+          "description": "中文说明，直接展示"
+        },
+        "level": { "$ref": "#/$defs/ErrorLevel" },
+        "file_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

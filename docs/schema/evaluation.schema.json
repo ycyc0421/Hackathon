@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ycyc0421/Hackathon/schema/evaluation.schema.json",
+  "title": "Evaluation",
+  "description": "评测结果。GET /api/v1/evaluation/latest 的返回体。设计上就支持『尚未评测』，避免看板被迫填假数字。",
+  "type": "object",
+  "required": ["status", "dataset_version", "sample_count", "model_version", "metrics", "run_at"],
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["NOT_RUN", "RUNNING", "DONE", "FAILED"]
+    },
+    "dataset_version": {
+      "type": ["string", "null"],
+      "description": "金标集版本标识，如 golden-v1"
+    },
+    "sample_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "model_version": { "type": ["string", "null"] },
+    "metrics": {
+      "oneOf": [
+        { "$ref": "#/$defs/Metrics" },
+        { "type": "null" }
+      ],
+      "description": "status 非 DONE 时为 null"
+    },
+    "error_breakdown": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        { "type": "null" }
+      ],
+      "description": "错例分类计数，键为分类名"
+    },
+    "run_at": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"
+        },
+        { "type": "null" }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "description": "只有 DONE 才能有 metrics",
+      "if": {
+        "properties": { "status": { "enum": ["NOT_RUN", "RUNNING", "FAILED"] } },
+        "required": ["status"]
+      },
+      "then": { "properties": { "metrics": { "type": "null" } } }
+    },
+    {
+      "description": "NOT_RUN 时不应有样本数和运行时间",
+      "if": {
+        "properties": { "status": { "const": "NOT_RUN" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "run_at": { "type": "null" },
+          "metrics": { "type": "null" }
+        }
+      }
+    }
+  ],
+
+  "$defs": {
+    "PRF": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "precision": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "recall": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "f1": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+      },
+      "description": "指标口径需与提供评测结果的一方确认，此处不预设阈值，也不设目标值"
+    },
+
+    "Metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "field_extraction": { "$ref": "#/$defs/PRF" },
+        "conflict_detection": { "$ref": "#/$defs/PRF" },
+        "risk_hint": { "$ref": "#/$defs/PRF" }
+      }
+    }
+  }
+}

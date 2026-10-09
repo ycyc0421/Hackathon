@@ -1,0 +1,87 @@
+{
+  "_comment": "示例：装箱单的抽取结果。演示『正常抽出』『低可信度』『本就不该有该字段』。",
+
+  "file_id": "f2",
+  "doc_type": "PACKING_LIST",
+  "parse_method": "TEXT_LAYER",
+  "fields": [
+    {
+      "field_key": "packages",
+      "label": "件数",
+      "raw_text": "TOTAL: SAY ONE HUNDRED AND TWENTY (120) CARTONS ONLY",
+      "raw_value": "120 CARTONS",
+      "normalized_value": 120,
+      "unit": "CARTON",
+      "confidence": 0.96,
+      "status": "EXTRACTED",
+      "page": 1,
+      "bbox": [180, 420, 240, 24],
+      "bbox_unit": "PX"
+    },
+    {
+      "field_key": "gross_weight",
+      "label": "毛重",
+      "raw_text": "G.W.: 2,400.00 KGS",
+      "raw_value": "2,400.00 KGS",
+      "normalized_value": 2400.0,
+      "unit": "KGS",
+      "confidence": 0.94,
+      "status": "EXTRACTED",
+      "page": 1,
+      "bbox": [180, 446, 200, 24],
+      "bbox_unit": "PX"
+    },
+    {
+      "field_key": "net_weight",
+      "label": "净重",
+      "raw_text": "N.W.: 2,100.00 KGS",
+      "raw_value": "2,100.00 KGS",
+      "normalized_value": 2100.0,
+      "unit": "KGS",
+      "confidence": 0.94,
+      "status": "EXTRACTED",
+      "page": 1,
+      "bbox": [180, 472, 200, 24],
+      "bbox_unit": "PX"
+    },
+    {
+      "field_key": "volume",
+      "label": "体积",
+      "raw_text": "MEAS.: 12.500 CBM",
+      "raw_value": "12.500 CBM",
+      "normalized_value": 12.5,
+      "unit": "CBM",
+      "confidence": 0.91,
+      "status": "EXTRACTED",
+      "page": 1,
+      "bbox": [180, 498, 180, 24],
+      "bbox_unit": "PX"
+    },
+    {
+      "field_key": "description",
+      "label": "货物描述",
+      "raw_text": "CERAMIC MUG, 350ML, WHITE GLAZE",
+      "raw_value": "CERAMIC MUG, 350ML, WHITE GLAZE",
+      "normalized_value": "陶瓷马克杯 350ml 白釉",
+      "unit": null,
+      "confidence": 0.62,
+      "status": "LOW_CONFIDENCE",
+      "page": 1,
+      "bbox": [180, 300, 320, 24],
+      "bbox_unit": "PX"
+    },
+    {
+      "field_key": "total_amount",
+      "label": "总金额",
+      "raw_text": null,
+      "raw_value": null,
+      "normalized_value": null,
+      "unit": null,
+      "confidence": null,
+      "status": "NOT_IN_DOC",
+      "page": null,
+      "bbox": null,
+      "bbox_unit": null
+    }
+  ]
+}

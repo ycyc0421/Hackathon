@@ -1,0 +1,13 @@
+{
+  "name": "cross-border-doc-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "数据契约的 JSON Schema 与校验脚本",
+  "scripts": {
+    "validate": "node docs/schema/validate.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1"
+  }
+}
