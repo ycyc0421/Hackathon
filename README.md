@@ -31,7 +31,7 @@
 ```
 docs/
 ├── 数据契约.md          前后端数据格式约定
-├── 待确认事项.md        待 C、F 确认的事项
+├── 待确认事项.md        待数据侧、后端侧确认的事项
 ├── schema/              契约的可机器校验形式（JSON Schema）
 ├── fixtures/            示例数据
 └── README.md            文档索引
@@ -80,7 +80,7 @@ npm run build    # 产出 dist/
 | 后端接口 | 尚未提供 |
 | 金标集与评测 | 尚未提供 |
 
-契约中尚有两项未确定，影响前端结构，见 [`docs/待确认事项.md`](docs/待确认事项.md)：`field_key` 的命名是否与数据库一致，以及一票货含多个品名时的返回结构。需数据侧确认的事项已在 [issue #3](https://github.com/ycyc0421/Hackathon/issues/3) 中列出。
+契约中尚有两项未确定，影响前端结构，见 [`docs/待确认事项.md`](docs/待确认事项.md)：`field_key` 的命名是否与数据库一致，以及一票货含多个品名时的返回结构。待确认事项已开 issue 跟踪：需数据侧确认的见 [#3](https://github.com/ycyc0421/Hackathon/issues/3)，需后端侧确认的见 [#4](https://github.com/ycyc0421/Hackathon/issues/4)。
 
 ## 参与
 

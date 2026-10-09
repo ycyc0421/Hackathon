@@ -6,7 +6,7 @@
 | [`数据契约.md`](数据契约.md) | 前后端交换的数据格式。可读形式的约定说明 |
 | [`schema/`](schema/) | 同一份约定的可机器校验形式（JSON Schema） |
 | [`fixtures/`](fixtures/) | 示例数据，可直接供前端使用 |
-| [`待确认事项.md`](待确认事项.md) | 需数据侧、后端侧决定的事项。数据侧部分见 [issue #3](https://github.com/ycyc0421/Hackathon/issues/3) |
+| [`待确认事项.md`](待确认事项.md) | 需数据侧、后端侧决定的事项。前者见 [issue #3](https://github.com/ycyc0421/Hackathon/issues/3)，后者见 [issue #4](https://github.com/ycyc0421/Hackathon/issues/4) |
 
 ## 契约的两种形式
 
@@ -31,4 +31,4 @@
 - `field_key` 的完整取值清单（需 C 确认与数据库字段一致）
 - 多品名场景下 `comparisons[]` 的结构（当前按单品名设计）
 
-见 [`待确认事项.md`](待确认事项.md) 中给 C 的 #3、#5。
+见 [`待确认事项.md`](待确认事项.md) 第二节第 1、2 项。
