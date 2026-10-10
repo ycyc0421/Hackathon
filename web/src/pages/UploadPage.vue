@@ -18,6 +18,7 @@ import EmptyState from '../components/EmptyState.vue'
 const task = inject('task')
 const taskError = inject('taskError')
 const isRunning = inject('isRunning')
+const sourceFiles = inject('sourceFiles')
 
 // 目的国列表为演示用。后端（issue #4）确认当前规则覆盖美/德/荷/法/英，
 // 均为未经核实的演示规则，正式合规结论不能据此得出。
@@ -149,6 +150,8 @@ function clearAll() {
   notes.value = ''
   localErrors.value = []
   scanWarnings.value = new Set()
+  // 「查看原文」依赖这份映射，文件清了映射也要清
+  sourceFiles.clear()
 }
 
 function sizeText(bytes) {
@@ -211,6 +214,10 @@ const skeletonRows = computed(() => Math.max(files.value.length, 2))
 
 async function submit() {
   if (!canSubmit.value) return
+
+  // 提交即把当前文件写入 App 层映射：diff 页「查看原文」按文件名从这里取 File。
+  // mock 场景 files 为空（mock 不经真实上传），映射随之清空，按钮自然不渲染。
+  sourceFiles.setAll(files.value)
 
   localErrors.value = []
   taskError.value = null
