@@ -11,6 +11,10 @@
     "destination_country_name": "德国"
   },
 
+  "items": [
+    {"item_id": "item_001", "display_name": "陶瓷马克杯", "description": "CERAMIC MUG 350ML WHITE", "line_no": 1}
+  ],
+
   "documents": [
     {"file_id": "f1", "file_name": "商业发票-INV20261012.pdf", "file_type": "PDF", "doc_type": "COMMERCIAL_INVOICE", "process_status": "EXTRACTED", "page_count": 1, "error_message": null},
     {"file_id": "f2", "file_name": "装箱单-PL20261012.pdf", "file_type": "PDF", "doc_type": "PACKING_LIST", "process_status": "EXTRACTED", "page_count": 1, "error_message": null},
@@ -23,12 +27,12 @@
       "doc_type": "COMMERCIAL_INVOICE",
       "parse_method": "OCR",
       "fields": [
-        {"field_key": "invoice_no", "label": "发票号", "raw_text": "INVOICE NO. INV-2026-1012", "raw_value": "INV-2026-1012", "normalized_value": "INV-2026-1012", "unit": null, "confidence": 0.98, "status": "EXTRACTED", "page": 1, "bbox": [420, 180, 260, 22], "bbox_unit": "PX"},
-        {"field_key": "hs_code", "label": "HS 编码", "raw_text": "HS CODE: 6911.10.00", "raw_value": "6911.10.00", "normalized_value": "6911100000", "unit": null, "confidence": 0.89, "status": "EXTRACTED", "page": 1, "bbox": [80, 326, 200, 22], "bbox_unit": "PX"},
-        {"field_key": "packages", "label": "件数", "raw_text": "SAY ONE HUNDRED (100) CARTONS", "raw_value": "100 CARTONS", "normalized_value": 100, "unit": "CARTON", "confidence": 0.71, "status": "LOW_CONFIDENCE", "page": 1, "bbox": [80, 506, 260, 22], "bbox_unit": "PX"},
-        {"field_key": "total_amount", "label": "总金额", "raw_text": "TOTAL: USD 12,500.00", "raw_value": "USD 12,500.00", "normalized_value": 12500.0, "unit": "USD", "confidence": 0.95, "status": "EXTRACTED", "page": 1, "bbox": [80, 480, 240, 22], "bbox_unit": "PX"},
-        {"field_key": "gross_weight", "label": "毛重", "raw_text": "G.W. *********", "raw_value": null, "normalized_value": null, "unit": null, "confidence": null, "status": "UNRECOGNIZED", "page": 1, "bbox": [80, 532, 200, 22], "bbox_unit": "PX"},
-        {"field_key": "net_weight", "label": "净重", "raw_text": null, "raw_value": null, "normalized_value": null, "unit": null, "confidence": null, "status": "MISSING_IN_DOC", "page": null, "bbox": null, "bbox_unit": null}
+        {"field_key": "invoice_no", "label": "发票号", "raw_text": "INVOICE NO. INV-2026-1012", "raw_value": "INV-2026-1012", "normalized_value": "INV-2026-1012", "unit": null, "confidence": 0.98, "status": "EXTRACTED", "page": 1, "bbox": [420, 180, 260, 22], "bbox_unit": "PX", "item_id": null},
+        {"field_key": "hs_code", "label": "HS 编码", "raw_text": "HS CODE: 6911.10.00", "raw_value": "6911.10.00", "normalized_value": "6911100000", "unit": null, "confidence": 0.89, "status": "EXTRACTED", "page": 1, "bbox": [80, 326, 200, 22], "bbox_unit": "PX", "item_id": "item_001", "line_no": 1},
+        {"field_key": "packages", "label": "件数", "raw_text": "SAY ONE HUNDRED (100) CARTONS", "raw_value": "100 CARTONS", "normalized_value": 100, "unit": "CARTON", "confidence": 0.71, "status": "LOW_CONFIDENCE", "page": 1, "bbox": [80, 506, 260, 22], "bbox_unit": "PX", "item_id": "item_001", "line_no": 1},
+        {"field_key": "total_amount", "label": "总金额", "raw_text": "TOTAL: USD 12,500.00", "raw_value": "USD 12,500.00", "normalized_value": 12500.0, "unit": "USD", "confidence": 0.95, "status": "EXTRACTED", "page": 1, "bbox": [80, 480, 240, 22], "bbox_unit": "PX", "item_id": "item_001", "line_no": 1},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "G.W. *********", "raw_value": null, "normalized_value": null, "unit": null, "confidence": null, "status": "UNRECOGNIZED", "page": 1, "bbox": [80, 532, 200, 22], "bbox_unit": "PX", "item_id": "item_001", "line_no": 1},
+        {"field_key": "net_weight", "label": "净重", "raw_text": null, "raw_value": null, "normalized_value": null, "unit": null, "confidence": null, "status": "MISSING_IN_DOC", "page": null, "bbox": null, "bbox_unit": null, "item_id": "item_001", "line_no": 1}
       ]
     },
     {
@@ -36,10 +40,10 @@
       "doc_type": "PACKING_LIST",
       "parse_method": "TEXT_LAYER",
       "fields": [
-        {"field_key": "packages", "label": "件数", "raw_text": "TOTAL: SAY ONE HUNDRED AND TWENTY (120) CARTONS ONLY", "raw_value": "120 CARTONS", "normalized_value": 120, "unit": "CARTON", "confidence": 0.96, "status": "EXTRACTED", "page": 1, "bbox": [180, 420, 240, 24], "bbox_unit": "PX"},
-        {"field_key": "gross_weight", "label": "毛重", "raw_text": "G.W.: 2,400.00 KGS", "raw_value": "2,400.00 KGS", "normalized_value": 2400.0, "unit": "KGS", "confidence": 0.94, "status": "EXTRACTED", "page": 1, "bbox": [180, 446, 200, 24], "bbox_unit": "PX"},
-        {"field_key": "net_weight", "label": "净重", "raw_text": "N.W.: 2,100.00 KGS", "raw_value": "2,100.00 KGS", "normalized_value": 2100.0, "unit": "KGS", "confidence": 0.94, "status": "EXTRACTED", "page": 1, "bbox": [180, 472, 200, 24], "bbox_unit": "PX"},
-        {"field_key": "volume", "label": "体积", "raw_text": "MEAS. 未知", "raw_value": "未知", "normalized_value": null, "unit": null, "confidence": 0.44, "status": "NORMALIZE_FAILED", "page": 1, "bbox": [180, 498, 180, 24], "bbox_unit": "PX"}
+        {"field_key": "packages", "label": "件数", "raw_text": "TOTAL: SAY ONE HUNDRED AND TWENTY (120) CARTONS ONLY", "raw_value": "120 CARTONS", "normalized_value": 120, "unit": "CARTON", "confidence": 0.96, "status": "EXTRACTED", "page": 1, "bbox": [180, 420, 240, 24], "bbox_unit": "PX", "item_id": "item_001", "line_no": 1},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "G.W.: 2,400.00 KGS", "raw_value": "2,400.00 KGS", "normalized_value": 2400.0, "unit": "KGS", "confidence": 0.94, "status": "EXTRACTED", "page": 1, "bbox": [180, 446, 200, 24], "bbox_unit": "PX", "item_id": "item_001", "line_no": 1},
+        {"field_key": "net_weight", "label": "净重", "raw_text": "N.W.: 2,100.00 KGS", "raw_value": "2,100.00 KGS", "normalized_value": 2100.0, "unit": "KGS", "confidence": 0.94, "status": "EXTRACTED", "page": 1, "bbox": [180, 472, 200, 24], "bbox_unit": "PX", "item_id": "item_001", "line_no": 1},
+        {"field_key": "volume", "label": "体积", "raw_text": "MEAS. 未知", "raw_value": "未知", "normalized_value": null, "unit": null, "confidence": 0.44, "status": "NORMALIZE_FAILED", "page": 1, "bbox": [180, 498, 180, 24], "bbox_unit": "PX", "item_id": "item_001", "line_no": 1}
       ]
     }
   ],
