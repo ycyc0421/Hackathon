@@ -19,18 +19,17 @@ npm run build    # 产出 dist/
 
 ## 部署
 
-### Cloudflare Pages（推荐）
+### Cloudflare Workers（当前方案）
+
+根目录的 `wrangler.toml` 已配置 Workers + Assets 绑定。推送到 `main` 分支时 GitHub Actions 自动部署（见 `.github/workflows/deploy.yml`）。
 
 手动部署：
 
 ```sh
-npm run build
-npx wrangler pages deploy dist --project-name=hackathon-doc-check
+# 仓库根目录
+cd web && npm run build && cd ..
+npx wrangler deploy
 ```
-
-首次部署会提示创建项目，后续推送会生成预览 URL。
-
-CI 部署：PR 提交后 GitHub Actions 自动部署预览环境。
 
 ### 其他静态托管
 
@@ -58,7 +57,7 @@ src/
 │   ├── index.js        数据访问层
 │   ├── labels.js       状态枚举中文文案
 │   └── formatters.js   字段渲染
-├── components/         StatusBadge、NoticeBar
+├── components/         StatusBadge、NoticeBar、EmptyState、SkeletonBlock、ErrorBoundary
 ├── pages/              UploadPage、DiffPage、ReportPage、EvalPage
 ├── mock/               示例数据
 └── styles.css          全局样式
