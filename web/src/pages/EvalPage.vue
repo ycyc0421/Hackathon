@@ -10,6 +10,7 @@ import { ref, computed, onMounted } from 'vue'
 import { getEvaluation, USE_MOCK, ApiError } from '../api/index.js'
 import { formatTime } from '../api/formatters.js'
 import NoticeBar from '../components/NoticeBar.vue'
+import SkeletonBlock from '../components/SkeletonBlock.vue'
 
 const evaluation = ref(null)
 const loading = ref(false)
@@ -71,9 +72,23 @@ const errorBreakdown = computed(() => {
 
     <NoticeBar v-if="error" tone="bad" title="读取评测结果失败" :detail="error" />
 
+    <!-- 首次读取中：按"本次评测信息 + 指标表"的形状占位 -->
+    <template v-if="loading && !evaluation">
+      <section class="card" aria-hidden="true">
+        <SkeletonBlock width="140px" height="18px" />
+        <div class="skeleton-meta-grid">
+          <SkeletonBlock v-for="i in 4" :key="i" height="36px" />
+        </div>
+      </section>
+      <section class="card" aria-hidden="true">
+        <SkeletonBlock width="80px" height="18px" />
+        <SkeletonBlock v-for="i in 3" :key="i" height="30px" />
+      </section>
+    </template>
+
     <!-- 尚未评测：这是默认状态，不是异常 -->
     <NoticeBar
-      v-if="isNotRun && !error"
+      v-if="isNotRun && !error && !loading"
       tone="info"
       title="尚未评测"
       detail="尚无真实评测结果。本页在取得数据前不展示任何指标，以免与实际能力不符。"
