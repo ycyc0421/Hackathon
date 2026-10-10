@@ -74,8 +74,8 @@
 
     "TaskStatus": {
       "type": "string",
-      "description": "COMPLETED 与 PARTIAL 必须分开：前者是全部分析完成，后者是有文件失败但其余出了结果",
-      "enum": ["PENDING", "RUNNING", "COMPLETED", "PARTIAL", "FAILED"]
+      "description": "PROCESSING 即处理中。COMPLETED 与 PARTIAL 必须分开：前者是全部分析完成，后者是有文件失败但其余出了结果",
+      "enum": ["PENDING", "PROCESSING", "COMPLETED", "PARTIAL", "FAILED"]
     },
 
     "TaskInput": {
@@ -377,6 +377,10 @@
         "severity": { "$ref": "#/$defs/Severity" },
         "rule_id": { "type": ["string", "null"] },
         "note": { "type": ["string", "null"] },
+        "suggested_action": {
+          "type": ["string", "null"],
+          "description": "发现该问题后的处理建议，由后端/规则侧给出；null 表示无可靠建议。后端只指出差异、不指定哪份文件正确，建议不得代替结论"
+        },
         "values": {
           "type": "array",
           "minItems": 1,
@@ -474,7 +478,11 @@
           "type": ["string", "null"],
           "description": "规则编号。为 null 时前端显示为『模型建议，未经规则校验』"
         },
-        "rule_source": { "type": ["string", "null"] }
+        "rule_source": { "type": ["string", "null"] },
+        "suggested_action": {
+          "type": ["string", "null"],
+          "description": "发现该风险后的处理建议，由后端/规则侧给出；null 表示无可靠建议。合规风险提示不代替结论，未经核实的合规规则不给确定的申报指令"
+        }
       }
     },
 
