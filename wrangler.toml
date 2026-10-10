@@ -1,0 +1,11 @@
+name = "hackathon-doc-check"
+main = "worker/index.js"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "web/dist"
+
+# 自定义域名配置
+# DNS 已配置：hackathon-demo.ychome.net CNAME -> hackathon-doc-check.liuyi3113929638.workers.dev
+# 需要在 Cloudflare Dashboard 手动绑定 Worker 到该域名：
+# Workers & Pages → hackathon-doc-check → Settings → Triggers → Custom Domains → Add hackathon-demo.ychome.net
