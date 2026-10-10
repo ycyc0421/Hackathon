@@ -9,6 +9,7 @@ jobs:
   deploy:
     name: 部署到 Cloudflare Worker
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       deployments: write
