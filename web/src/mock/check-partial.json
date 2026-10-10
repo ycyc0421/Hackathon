@@ -1,0 +1,176 @@
+{
+  "_comment": "示例：含『文件处理失败 + 未识别 + 未校验 + 该有但没找到』的任务。用来验证页面不会把这些情况显示成『通过』。这是最该被演示、也最容易被做错的状态。",
+
+  "task_id": "tsk_20261012_0002",
+  "status": "PARTIAL",
+  "created_at": "2026-10-12T15:10:00+08:00",
+  "finished_at": "2026-10-12T15:10:26+08:00",
+
+  "input": {
+    "destination_country": "DE",
+    "destination_country_name": "德国"
+  },
+
+  "documents": [
+    {"file_id": "f1", "file_name": "商业发票-INV20261012.pdf", "file_type": "PDF", "doc_type": "COMMERCIAL_INVOICE", "process_status": "EXTRACTED", "page_count": 1, "error_message": null},
+    {"file_id": "f2", "file_name": "装箱单-PL20261012.pdf", "file_type": "PDF", "doc_type": "PACKING_LIST", "process_status": "EXTRACTED", "page_count": 1, "error_message": null},
+    {"file_id": "f3", "file_name": "提单-扫描件.jpg", "file_type": "IMAGE", "doc_type": null, "process_status": "FAILED", "page_count": 1, "error_message": "图像分辨率过低（412×580），无法识别版式"}
+  ],
+
+  "extractions": [
+    {
+      "file_id": "f1",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "parse_method": "OCR",
+      "fields": [
+        {"field_key": "invoice_no", "label": "发票号", "raw_text": "INVOICE NO. INV-2026-1012", "raw_value": "INV-2026-1012", "normalized_value": "INV-2026-1012", "unit": null, "confidence": 0.98, "status": "EXTRACTED", "page": 1, "bbox": [420, 180, 260, 22], "bbox_unit": "PX"},
+        {"field_key": "hs_code", "label": "HS 编码", "raw_text": "HS CODE: 6911.10.00", "raw_value": "6911.10.00", "normalized_value": "6911100000", "unit": null, "confidence": 0.89, "status": "EXTRACTED", "page": 1, "bbox": [80, 326, 200, 22], "bbox_unit": "PX"},
+        {"field_key": "packages", "label": "件数", "raw_text": "SAY ONE HUNDRED (100) CARTONS", "raw_value": "100 CARTONS", "normalized_value": 100, "unit": "CARTON", "confidence": 0.71, "status": "LOW_CONFIDENCE", "page": 1, "bbox": [80, 506, 260, 22], "bbox_unit": "PX"},
+        {"field_key": "total_amount", "label": "总金额", "raw_text": "TOTAL: USD 12,500.00", "raw_value": "USD 12,500.00", "normalized_value": 12500.0, "unit": "USD", "confidence": 0.95, "status": "EXTRACTED", "page": 1, "bbox": [80, 480, 240, 22], "bbox_unit": "PX"},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "G.W. *********", "raw_value": null, "normalized_value": null, "unit": null, "confidence": null, "status": "UNRECOGNIZED", "page": 1, "bbox": [80, 532, 200, 22], "bbox_unit": "PX"},
+        {"field_key": "net_weight", "label": "净重", "raw_text": null, "raw_value": null, "normalized_value": null, "unit": null, "confidence": null, "status": "MISSING_IN_DOC", "page": null, "bbox": null, "bbox_unit": null}
+      ]
+    },
+    {
+      "file_id": "f2",
+      "doc_type": "PACKING_LIST",
+      "parse_method": "TEXT_LAYER",
+      "fields": [
+        {"field_key": "packages", "label": "件数", "raw_text": "TOTAL: SAY ONE HUNDRED AND TWENTY (120) CARTONS ONLY", "raw_value": "120 CARTONS", "normalized_value": 120, "unit": "CARTON", "confidence": 0.96, "status": "EXTRACTED", "page": 1, "bbox": [180, 420, 240, 24], "bbox_unit": "PX"},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "G.W.: 2,400.00 KGS", "raw_value": "2,400.00 KGS", "normalized_value": 2400.0, "unit": "KGS", "confidence": 0.94, "status": "EXTRACTED", "page": 1, "bbox": [180, 446, 200, 24], "bbox_unit": "PX"},
+        {"field_key": "net_weight", "label": "净重", "raw_text": "N.W.: 2,100.00 KGS", "raw_value": "2,100.00 KGS", "normalized_value": 2100.0, "unit": "KGS", "confidence": 0.94, "status": "EXTRACTED", "page": 1, "bbox": [180, 472, 200, 24], "bbox_unit": "PX"},
+        {"field_key": "volume", "label": "体积", "raw_text": "MEAS. 未知", "raw_value": "未知", "normalized_value": null, "unit": null, "confidence": 0.44, "status": "NORMALIZE_FAILED", "page": 1, "bbox": [180, 498, 180, 24], "bbox_unit": "PX"}
+      ]
+    }
+  ],
+
+  "comparisons": [
+    {
+      "comparison_id": "cmp_1",
+      "field_key": "packages",
+      "label": "件数",
+      "value_type": "NUMBER",
+      "unit": "CARTON",
+      "status": "CONFLICT",
+      "canonical_value": null,
+      "severity": "ERROR",
+      "rule_id": "CROSS_CHECK_001",
+      "note": "提单未能处理，本次比对未包含提单数据。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261012.pdf", "raw_value": "100 CARTONS", "normalized_value": 100, "field_status": "LOW_CONFIDENCE", "page": 1, "bbox": [80, 506, 260, 22]},
+        {"file_id": "f2", "file_name": "装箱单-PL20261012.pdf", "raw_value": "120 CARTONS", "normalized_value": 120, "field_status": "EXTRACTED", "page": 1, "bbox": [180, 420, 240, 24]},
+        {"file_id": "f3", "file_name": "提单-扫描件.jpg", "raw_value": null, "normalized_value": null, "field_status": "UNRECOGNIZED", "page": null, "bbox": null}
+      ]
+    },
+    {
+      "comparison_id": "cmp_2",
+      "field_key": "gross_weight",
+      "label": "毛重",
+      "value_type": "NUMBER",
+      "unit": "KGS",
+      "status": "MISSING_IN_SOME",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": "CROSS_CHECK_001",
+      "note": "商业发票中该字段未能识别，无法完成比对。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261012.pdf", "raw_value": null, "normalized_value": null, "field_status": "UNRECOGNIZED", "page": 1, "bbox": [80, 532, 200, 22]},
+        {"file_id": "f2", "file_name": "装箱单-PL20261012.pdf", "raw_value": "2,400.00 KGS", "normalized_value": 2400.0, "field_status": "EXTRACTED", "page": 1, "bbox": [180, 446, 200, 24]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_3",
+      "field_key": "net_weight",
+      "label": "净重",
+      "value_type": "NUMBER",
+      "unit": "KGS",
+      "status": "MISSING_IN_SOME",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": "CROSS_CHECK_001",
+      "note": "商业发票按规则应包含净重，但文件中未找到。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261012.pdf", "raw_value": null, "normalized_value": null, "field_status": "MISSING_IN_DOC", "page": null, "bbox": null},
+        {"file_id": "f2", "file_name": "装箱单-PL20261012.pdf", "raw_value": "2,100.00 KGS", "normalized_value": 2100.0, "field_status": "EXTRACTED", "page": 1, "bbox": [180, 472, 200, 24]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_4",
+      "field_key": "volume",
+      "label": "体积",
+      "value_type": "NUMBER",
+      "unit": "CBM",
+      "status": "UNRECOGNIZED",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": null,
+      "note": "装箱单中该字段归一失败（原文为『未知』），无法参与比对。",
+      "values": [
+        {"file_id": "f2", "file_name": "装箱单-PL20261012.pdf", "raw_value": "未知", "normalized_value": null, "field_status": "NORMALIZE_FAILED", "page": 1, "bbox": [180, 498, 180, 24]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_5",
+      "field_key": "hs_code",
+      "label": "HS 编码",
+      "value_type": "CODE",
+      "unit": null,
+      "status": "NOT_CHECKED",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": null,
+      "note": "当前未配置德国陶瓷制品的归类规则，该编码未经校验，请人工确认。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261012.pdf", "raw_value": "6911.10.00", "normalized_value": "6911100000", "field_status": "EXTRACTED", "page": 1, "bbox": [80, 326, 200, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_6",
+      "field_key": "total_amount",
+      "label": "总金额",
+      "value_type": "MONEY",
+      "unit": "USD",
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有商业发票提供该字段，且提单处理失败，无法交叉比对。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261012.pdf", "raw_value": "USD 12,500.00", "normalized_value": 12500.0, "field_status": "EXTRACTED", "page": 1, "bbox": [80, 480, 240, 22]}
+      ]
+    }
+  ],
+
+  "risks": [
+    {
+      "risk_id": "rsk_1",
+      "type": "MISSING_CERTIFICATE",
+      "severity": "WARNING",
+      "title": "目的国为德国，未在本票文件中找到原产地证明",
+      "detail": "依据规则 DE-IMP-004：申报目的地为德国的货物，随附单证中应包含原产地证明。本票文件均未识别到该单证。",
+      "related_field_keys": ["hs_code", "destination_country"],
+      "related_file_ids": [],
+      "destination_country": "DE",
+      "rule_id": "DE-IMP-004",
+      "rule_source": "团队配置的目的国规则集 v1"
+    }
+  ],
+
+  "summary": {
+    "document_count": 3,
+    "field_count": 10,
+    "conflict_count": 1,
+    "missing_count": 2,
+    "risk_count": 1,
+    "unrecognized_count": 1
+  },
+
+  "errors": [
+    {
+      "code": "DOC_PARSE_FAILED",
+      "message": "提单-扫描件.jpg 解析失败：图像分辨率过低（412×580），无法识别版式",
+      "level": "ERROR",
+      "file_ids": ["f3"]
+    }
+  ]
+}

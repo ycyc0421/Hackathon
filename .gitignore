@@ -7,3 +7,12 @@ __pycache__/
 # 本地开发规范与助手上下文，不进仓库
 AGENTS.md
 CLAUDE.md
+
+# 私有目录与文档
+.private/
+.tools/
+校园黑客松-*.json
+校园黑客松-*.md
+校园黑客松-*.csv
+给Claude的交接文档-*.md
+项目要求与D分工.md
