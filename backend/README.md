@@ -33,7 +33,14 @@ backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --hos
 行序不一致时优先按货号、其次按描述对齐；无法可靠对齐时给 `NOT_CHECKED`，不猜测一致或冲突。
 `suggested_action` 只提供可执行的核对建议，不指定哪份文件正确；无可靠建议时为 `null`。
 
-## 项目结构
+## 结果判读与前端联调
+
+- 对外结果中，`items[]` 是商品目录；`extractions[].fields[]` 的商品级字段和 `comparisons[]` 用 `item_id` 关联它，票级字段的 `item_id` 为 `null`。后端内部虽有单文件商品行与对齐状态，对外 Schema 不直接返回 `line_items[]` 或 `alignment_status`。提单只有整票汇总时，不要求它提供商品行。
+- 行可靠对应后才比较商品级字段；只有一份文件提供某商品行时，对应字段最多给 `SINGLE_SOURCE`；多份文件有疑似行却无法可靠对应时给 `NOT_CHECKED`，并在 `note` 说明原因。单品名票的 `items[]` 可以为空，票级字段仍可比对。
+- `MATCH` 只表示**参与比对的已识别值一致**，不是整票合规通过。`NOT_CHECKED`、`UNRECOGNIZED`、`SINGLE_SOURCE` 和解析失败都不能当作一致；前端应展示状态、来源文件、原值及 `note`。`suggested_action` 是核对建议，不代替结论。
+- 有文件解析失败时，该文件进入 `errors[]`，任务可能为 `PARTIAL` 或 `FAILED`；前端需按任务状态显示失败。表格疑似多品名却无法可靠切行时，后端给 `MULTI_LINE_ITEMS_SUSPECTED` 警告并降级，不把猜出的行当成确定结果。
+
+- ## 项目结构
 
 ```text
 backend/
