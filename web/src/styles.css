@@ -217,14 +217,6 @@ body {
   border-color: var(--info);
   color: var(--info);
 }
-  color: var(--info);
-}
-
-.notice.tone-ok {
-  background: var(--success-bg);
-  border-color: var(--success);
-  color: var(--success);
-}
 
 .notice.tone-warn {
   background: var(--warning-bg);
@@ -363,40 +355,101 @@ body {
   color: var(--text-muted);
 }
 
-.input {
-  padding: 6px 10px;
+/* ---------- 表单输入框 ---------- */
+
+.input,
+select,
+textarea {
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: #fff;
+  background: white;
   color: var(--text-body);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  transition: border-color var(--duration-fast) var(--ease),
+              box-shadow var(--duration-fast) var(--ease);
+  min-height: 40px;
 }
 
-.input:focus {
-  outline: 2px solid var(--info);
-  outline-offset: -1px;
+.input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--border-hover);
+}
+
+.input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--color-primary) l c h / 0.1);
+}
+
+.input.error {
+  border-color: var(--danger);
+}
+
+.input.error:focus {
+  box-shadow: 0 0 0 3px oklch(from var(--danger) l c h / 0.1);
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+  padding-right: var(--space-8);
 }
 
 .actions {
   display: flex;
-  gap: 10px;
-  margin-top: 18px;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
 }
 
+/* ---------- 按钮 ---------- */
+
 .btn {
-  padding: 7px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: #fff;
+  background: white;
   color: var(--text-body);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: var(--leading-tight);
   cursor: pointer;
+  transition: background var(--duration-fast) var(--ease),
+              border-color var(--duration-fast) var(--ease),
+              transform var(--duration-instant) var(--ease);
+  min-height: 36px;
 }
 
 .btn:hover:not(:disabled) {
-  background: var(--gray-100);
+  background: var(--gray-50);
+  border-color: var(--border-hover);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .btn:disabled {
@@ -407,16 +460,23 @@ body {
 .btn.primary {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: #fff;
+  color: white;
 }
 
 .btn.primary:hover:not(:disabled) {
-  background: #163d75;
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.btn.primary:active:not(:disabled) {
+  background: var(--color-primary-active);
+  border-color: var(--color-primary-active);
 }
 
 .btn.small {
-  padding: 4px 12px;
-  font-size: 12px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  min-height: 28px;
 }
 
 .link-btn {
@@ -425,9 +485,18 @@ body {
   padding: 0;
   color: var(--color-primary);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--text-sm);
   cursor: pointer;
   text-decoration: underline;
+  transition: color var(--duration-fast) var(--ease);
+}
+
+.link-btn:hover:not(:disabled) {
+  color: var(--color-primary-hover);
+}
+
+.link-btn:active:not(:disabled) {
+  color: var(--color-primary-active);
 }
 
 /* ---------- 任务状态 ---------- */
@@ -603,34 +672,49 @@ body {
   font-size: 13px;
 }
 
+/* ---------- 表格（差异比对）---------- */
+
 .cmp-table {
   width: 100%;
-  margin-top: 10px;
+  margin-top: var(--space-3);
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .cmp-table th {
   text-align: left;
-  padding: 6px 10px;
+  padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
   color: var(--text-muted);
-  font-weight: 500;
-  font-size: 12px;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .cmp-table td {
-  padding: 7px 10px;
+  padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--border);
   vertical-align: top;
+  line-height: var(--leading-normal);
 }
 
 .cmp-table tr:last-child td {
   border-bottom: none;
 }
 
-.row-odd {
-  background: #fcfcfd;
+.cmp-table tbody tr {
+  transition: background var(--duration-fast) var(--ease);
+}
+
+.cmp-table tbody tr:nth-child(odd) {
+  background: var(--gray-50);
+}
+
+.cmp-table tbody tr:hover {
+  background: var(--gray-100);
 }
 
 .cell-file {
@@ -640,24 +724,26 @@ body {
 
 .cell-value {
   font-weight: 600;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
 .cell-raw {
   color: var(--text-muted);
-  font-family: 'JetBrainsMono Nerd Font', 'DejaVu Sans Mono', monospace;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   word-break: break-all;
 }
 
 .cell-empty {
   color: var(--text-muted);
+  font-style: italic;
 }
 
 .cmp-foot {
-  margin-top: 8px;
+  margin-top: var(--space-2);
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .cmp-foot.muted {
@@ -827,29 +913,46 @@ body {
 
 /* ---------- 评测页 ---------- */
 
+/* ---------- 评测页表格 ---------- */
+
 .metric-table {
   width: 100%;
-  margin-top: 12px;
+  margin-top: var(--space-3);
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .metric-table th {
   text-align: left;
-  padding: 8px 10px;
+  padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
   color: var(--text-muted);
-  font-weight: 500;
-  font-size: 12px;
+  font-weight: 600;
+  font-size: var(--text-sm);
 }
 
 .metric-table td {
-  padding: 9px 10px;
+  padding: var(--space-2) var(--space-3);
   border-bottom: 1px solid var(--border);
 }
 
+.metric-table tbody tr {
+  transition: background var(--duration-fast) var(--ease);
+}
+
+.metric-table tbody tr:nth-child(odd) {
+  background: var(--gray-50);
+}
+
+.metric-table tbody tr:hover {
+  background: var(--gray-100);
+}
+
 .metric-table .num {
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .err-breakdown {
