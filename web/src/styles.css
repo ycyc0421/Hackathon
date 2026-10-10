@@ -882,6 +882,58 @@ select {
   font-size: 13px;
 }
 
+/* ---------- 空状态 ---------- */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.empty-state-icon {
+  font-size: var(--text-3xl);
+  line-height: 1;
+}
+
+.empty-state-title {
+  margin-top: var(--space-3);
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.empty-state-detail {
+  margin: var(--space-2) 0 0;
+  max-width: 520px;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.empty-state-extra {
+  margin-top: var(--space-4);
+}
+
+.empty-state-retry {
+  margin-top: var(--space-4);
+}
+
+.empty-state.tone-ok .empty-state-title {
+  color: var(--success);
+}
+
+.empty-state.tone-bad .empty-state-title {
+  color: var(--danger);
+}
+
+.empty-state.tone-info .empty-state-title {
+  color: var(--text-body);
+}
+
 /* ---------- 报告页 ---------- */
 
 .meta-grid {

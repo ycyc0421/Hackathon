@@ -18,6 +18,7 @@ import {
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
+import EmptyState from '../components/EmptyState.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
@@ -181,13 +182,22 @@ const severityOf = severity
           </li>
         </ul>
 
-        <p v-else class="empty">
-          当前筛选下没有条目。切到「全部」可查看一致字段。
-        </p>
+        <EmptyState
+          v-else
+          tone="info"
+          icon="🔎"
+          title="当前筛选下没有条目"
+          detail="切到「全部」可查看一致字段。"
+        />
       </section>
 
       <section v-else class="card">
-        <p class="empty">后端未返回任何比对结果。</p>
+        <EmptyState
+          tone="info"
+          icon="📭"
+          title="后端未返回任何比对结果"
+          detail="本次任务没有产出可比对的字段。如需人工确认，请查看「报告」页。"
+        />
       </section>
     </template>
   </div>

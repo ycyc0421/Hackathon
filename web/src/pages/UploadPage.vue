@@ -12,6 +12,7 @@ import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES } from '../api/labels.js
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
+import EmptyState from '../components/EmptyState.vue'
 
 const task = inject('task')
 const taskError = inject('taskError')
@@ -314,6 +315,15 @@ function docStatus(d) {
       </div>
     </section>
 
+    <!-- 初始引导：尚未创建过检查时，说明支持什么、怎么开始 -->
+    <EmptyState
+      v-if="!isRunning && !task && !taskError"
+      tone="info"
+      icon="📄"
+      title="尚未上传单证"
+      :detail="`把同一票货物的发票、箱单、提单等单证拖到上方虚线框，选好目的国后点「开始检查」。支持 ${UPLOAD_LIMITS.accept.split(',').join(' / ')}，单个不超过 ${UPLOAD_LIMITS.maxFileSizeMB}MB，最多 ${UPLOAD_LIMITS.maxFiles} 份。`"
+    />
+
     <!-- 任务状态 -->
     <section v-if="isRunning || task || taskError" class="card">
       <h2 class="card-title">任务状态</h2>
@@ -323,7 +333,7 @@ function docStatus(d) {
         <p class="notice-detail">{{ taskError.message }}</p>
         <p v-if="taskErrorInfo.hint" class="notice-detail">{{ taskErrorInfo.hint }}</p>
         <div class="actions">
-          <button class="btn small" @click="submit">重试</button>
+          <button class="btn small" :disabled="!canSubmit" @click="submit">重试</button>
         </div>
       </NoticeBar>
 
