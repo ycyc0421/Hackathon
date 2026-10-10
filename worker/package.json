@@ -2,8 +2,5 @@
   "name": "hackathon-worker",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "dependencies": {
-    "@cloudflare/kv-asset-handler": "^0.3.4"
-  }
+  "type": "module"
 }

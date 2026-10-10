@@ -2,8 +2,10 @@ name = "hackathon-doc-check"
 main = "worker/index.js"
 compatibility_date = "2024-01-01"
 
-[site]
-bucket = "web/dist"
+# 使用 Assets 绑定代替旧的 [site] 配置
+[[assets]]
+binding = "ASSETS"
+directory = "web/dist"
 
 # 自定义域名配置
 # DNS 已配置：hackathon-demo.ychome.net CNAME -> hackathon-doc-check.liuyi3113929638.workers.dev

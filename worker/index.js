@@ -1,5 +1,3 @@
-import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
-
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url)
@@ -13,35 +11,16 @@ export default {
 
     // 静态文件服务
     try {
-      return await getAssetFromKV(
-        {
-          request,
-          waitUntil: ctx.waitUntil.bind(ctx),
-        },
-        {
-          ASSET_NAMESPACE: env.__STATIC_CONTENT,
-          ASSET_MANIFEST: __STATIC_CONTENT_MANIFEST,
-        }
-      )
+      // 使用 env.ASSETS 绑定来获取静态资源
+      return await env.ASSETS.fetch(request)
     } catch (e) {
-      // 404 时返回 index.html（SPA 路由）
-      if (e.status === 404) {
-        try {
-          return await getAssetFromKV(
-            {
-              request: new Request(`${url.origin}/index.html`, request),
-              waitUntil: ctx.waitUntil.bind(ctx),
-            },
-            {
-              ASSET_NAMESPACE: env.__STATIC_CONTENT,
-              ASSET_MANIFEST: __STATIC_CONTENT_MANIFEST,
-            }
-          )
-        } catch (err) {
-          return new Response('Not found', { status: 404 })
-        }
+      // 出错时返回 index.html（SPA 路由降级）
+      try {
+        const indexRequest = new Request(`${url.origin}/index.html`, request)
+        return await env.ASSETS.fetch(indexRequest)
+      } catch (err) {
+        return new Response('Not found', { status: 404 })
       }
-      return new Response('Error', { status: 500 })
     }
   },
 }
