@@ -60,6 +60,59 @@ export const ERROR_LEVEL = {
   WARNING: { text: '警告', tone: 'muted' },
 }
 
+/**
+ * 请求层错误（ApiError.kind）的提示文案。kind 集合见 api/index.js。
+ * title 给页面做标题，hint 解释原因与建议动作。
+ * UNKNOWN 是兜底：非 ApiError 的异常不该静默吞掉，但也不对客暴露原始报错。
+ */
+export const API_ERROR_KIND = {
+  NETWORK: {
+    text: '网络连接失败',
+    tone: 'bad',
+    title: '上传失败：网络连接异常',
+    hint: '前端未收到后端响应。请确认服务已启动、网络与代理配置正确，然后重试。',
+  },
+  SERVER: {
+    text: '服务端错误',
+    tone: 'bad',
+    title: '服务端处理失败',
+    hint: '后端返回了错误。请稍后重试；若持续出现，请把错误信息提供给后端同学排查。',
+  },
+  PARSE: {
+    text: '响应格式异常',
+    tone: 'bad',
+    title: '后端返回了无法识别的内容',
+    hint: '响应不是合法的 JSON，多半是后端或代理出了问题，请联系后端同学排查。',
+  },
+  TIMEOUT: {
+    text: '处理超时',
+    tone: 'bad',
+    title: '等待超时',
+    hint: '等待时间超过上限。后端可能仍在处理，可稍后重试。',
+  },
+  CANCELED: {
+    text: '已取消',
+    tone: 'muted',
+    title: '操作已取消',
+    hint: '',
+  },
+  UNKNOWN: {
+    text: '未知错误',
+    tone: 'bad',
+    title: '发生了未预期的错误',
+    hint: '请刷新页面重试；若持续出现，请联系开发同学排查。',
+  },
+}
+
+/** 上传相关失败的三类文案：文件过大 / 格式不支持 / 网络失败 */
+export const UPLOAD_ERROR_TEXT = {
+  FILE_TOO_LARGE: (name, limitMB, actualText) =>
+    `文件过大：${name}（${actualText}）超过单文件上限 ${limitMB}MB。请压缩或拆分后重试。`,
+  UNSUPPORTED_FORMAT: (names, accept) =>
+    `格式不支持：${names}。当前仅支持 ${accept} 格式的单证。`,
+  NETWORK: '上传失败：网络连接异常，请检查网络后重试。',
+}
+
 /** 安全取值：契约新增枚举值时不让页面崩 */
 export function lookup(table, key, fallback = '未知') {
   return table[key] ?? { text: fallback, tone: 'muted' }

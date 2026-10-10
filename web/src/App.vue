@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, provide } from 'vue'
 import { USE_MOCK } from './api/index.js'
+import ErrorBoundary from './components/ErrorBoundary.vue'
 import UploadPage from './pages/UploadPage.vue'
 import DiffPage from './pages/DiffPage.vue'
 import ReportPage from './pages/ReportPage.vue'
@@ -39,8 +40,9 @@ function isLocked(key) {
 </script>
 
 <template>
-  <div class="app">
-    <header class="topbar">
+  <ErrorBoundary>
+    <div class="app">
+      <header class="topbar">
       <div class="brand">
         <span class="brand-mark">单证校验</span>
         <span class="brand-sub">跨境物流 · 交叉比对与合规提示</span>
@@ -70,9 +72,10 @@ function isLocked(key) {
       <component :is="current" />
     </main>
 
-    <footer class="footer">
-      <span>契约草案 v0.1 · 未冻结</span>
-      <span v-if="task" class="task-ref">任务 {{ task.task_id }}</span>
-    </footer>
-  </div>
+      <footer class="footer">
+        <span>契约草案 v0.1 · 未冻结</span>
+        <span v-if="task" class="task-ref">任务 {{ task.task_id }}</span>
+      </footer>
+    </div>
+  </ErrorBoundary>
 </template>

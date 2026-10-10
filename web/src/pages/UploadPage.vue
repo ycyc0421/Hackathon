@@ -7,7 +7,8 @@
  */
 import { ref, computed, inject } from 'vue'
 import { createCheck, pollCheck, validateFiles, ApiError, UPLOAD_LIMITS, USE_MOCK } from '../api/index.js'
-import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
+import { taskStatus, processStatus, formatTime, formatDuration, describeApiError } from '../api/formatters.js'
+import { API_ERROR_KIND, UPLOAD_ERROR_TEXT } from '../api/labels.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 
@@ -30,6 +31,11 @@ const localErrors = ref([])
 const dragActive = ref(false)
 const fileInput = ref(null)
 
+/** 轮询超过 90s 未结束时显示"处理时间较长"，但不停止等待 */
+const slowHint = ref(false)
+/** 请求层自动重试进行中（网络错误 / 5xx），显示"正在重连" */
+const retryHint = ref(false)
+
 const canSubmit = computed(() => files.value.length > 0 && !isRunning.value)
 
 const acceptedTypes = computed(() =>
@@ -48,7 +54,10 @@ function addFiles(list) {
   const rejected = incoming.filter((f) => !isAccepted(f))
   if (rejected.length) {
     localErrors.value.push(
-      `格式不支持：${rejected.map((f) => f.name).join('、')}。支持 ${UPLOAD_LIMITS.accept}`
+      UPLOAD_ERROR_TEXT.UNSUPPORTED_FORMAT(
+        rejected.map((f) => f.name).join('、'),
+        UPLOAD_LIMITS.accept
+      )
     )
   }
 
@@ -88,25 +97,41 @@ function sizeText(bytes) {
   return mb >= 1 ? `${mb.toFixed(1)} MB` : `${(bytes / 1024).toFixed(0)} KB`
 }
 
+/** 网络错误 / 5xx 触发自动重试时的提示开关。只在真正进入重试时才亮起 */
+function onAutoRetry() {
+  retryHint.value = true
+}
+
 async function submit() {
   if (!canSubmit.value) return
 
   localErrors.value = []
   taskError.value = null
   task.value = null
+  slowHint.value = false
+  retryHint.value = false
   isRunning.value = true
 
   try {
-    const created = await createCheck({
-      files: files.value,
-      destinationCountry: country.value,
-      notes: notes.value,
-    })
+    const created = await createCheck(
+      {
+        files: files.value,
+        destinationCountry: country.value,
+        notes: notes.value,
+      },
+      { onRetry: onAutoRetry }
+    )
 
     const result = await pollCheck(created.task_id, {
       onTick: (t) => {
         task.value = t
+        // 拿到一次响应说明重试结束了（如果之前在重试）
+        retryHint.value = false
       },
+      onSlow: () => {
+        slowHint.value = true
+      },
+      onRetry: onAutoRetry,
     })
 
     task.value = result
@@ -122,6 +147,16 @@ async function submit() {
 }
 
 const statusInfo = computed(() => (task.value ? taskStatus(task.value.status) : null))
+
+/** taskError 的分类展示：标题、语气、建议动作统一由 labels.js 的 API_ERROR_KIND 决定 */
+const taskErrorInfo = computed(() => {
+  if (!taskError.value) return null
+  if (taskError.value.kind === 'UNKNOWN') {
+    return { tone: API_ERROR_KIND.UNKNOWN.tone, title: API_ERROR_KIND.UNKNOWN.title, hint: API_ERROR_KIND.UNKNOWN.hint }
+  }
+  const entry = API_ERROR_KIND[taskError.value.kind] ?? API_ERROR_KIND.UNKNOWN
+  return { tone: entry.tone, title: entry.title, hint: entry.hint }
+})
 const duration = computed(() =>
   task.value ? formatDuration(task.value.created_at, task.value.finished_at) : null
 )
@@ -214,19 +249,14 @@ function docStatus(d) {
     <section v-if="isRunning || task || taskError" class="card">
       <h2 class="card-title">任务状态</h2>
 
-      <!-- 失败：显式呈现，绝不显示为通过 -->
-      <NoticeBar
-        v-if="taskError"
-        tone="bad"
-        :title="`检查未能完成：${taskError.message}`"
-        :detail="
-          taskError.kind === 'NETWORK'
-            ? '前端未收到后端响应。请确认服务已启动、代理配置正确。'
-            : taskError.kind === 'TIMEOUT'
-              ? '等待超过 90 秒。后端可能仍在处理，可稍后重试。'
-              : '请将上述信息提供给后端同学排查。'
-        "
-      />
+      <!-- 失败：显式呈现，绝不显示为通过。标题/说明统一来自 labels.js 的分类文案 -->
+      <NoticeBar v-if="taskError" :tone="taskErrorInfo.tone" :title="taskErrorInfo.title">
+        <p class="notice-detail">{{ taskError.message }}</p>
+        <p v-if="taskErrorInfo.hint" class="notice-detail">{{ taskErrorInfo.hint }}</p>
+        <div class="actions">
+          <button class="btn small" @click="submit">重试</button>
+        </div>
+      </NoticeBar>
 
       <template v-else-if="task">
         <div class="status-row">
@@ -270,6 +300,10 @@ function docStatus(d) {
       <div v-else class="processing">
         <div class="spinner" />
         <span>正在解析与比对…</span>
+        <p v-if="retryHint" class="processing-hint">网络异常，正在自动重连…</p>
+        <p v-else-if="slowHint" class="processing-hint">
+          处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
+        </p>
       </div>
     </section>
   </div>
