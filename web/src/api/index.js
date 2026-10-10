@@ -7,7 +7,15 @@
  * 契约见 docs/数据契约.md 与 docs/schema/check-task.schema.json
  */
 
-import { USE_MOCK, API_BASE, POLL_INTERVAL_MS, POLL_MAX_ATTEMPTS } from './config.js'
+import {
+  USE_MOCK,
+  API_BASE,
+  POLL_INTERVAL_MS,
+  POLL_MAX_ATTEMPTS,
+  RETRY_MAX_ATTEMPTS,
+  RETRY_BASE_DELAY_MS,
+  SLOW_POLL_MS,
+} from './config.js'
 import completedSample from '../mock/check-completed.json'
 import partialSample from '../mock/check-partial.json'
 
@@ -17,7 +25,7 @@ export class ApiError extends Error {
   constructor(message, { kind = 'SERVER', code = null, status = null } = {}) {
     super(message)
     this.name = 'ApiError'
-    this.kind = kind // NETWORK | PARSE | SERVER | TIMEOUT
+    this.kind = kind // NETWORK | PARSE | SERVER | TIMEOUT | CANCELED
     this.code = code
     this.status = status
   }
@@ -48,7 +56,8 @@ function nextMockSample() {
 
 // —— 真实实现 ——
 
-async function request(path, options = {}) {
+/** 单次请求。失败时抛 ApiError，kind 标出失败在哪一环 */
+async function requestOnce(path, options = {}) {
   let res
   try {
     res = await fetch(`${API_BASE}${path}`, options)
@@ -79,6 +88,36 @@ async function request(path, options = {}) {
   }
 }
 
+/**
+ * 值得重试的失败：连接层错误（NETWORK）和服务端 5xx。
+ * 这两类通常是瞬时的（冷启动、网关抖动）；4xx 是请求本身的问题，重试无意义。
+ */
+function isRetryable(e) {
+  return e instanceof ApiError && (e.kind === 'NETWORK' || (e.kind === 'SERVER' && e.status >= 500))
+}
+
+/**
+ * 带重试的请求。最多 RETRY_MAX_ATTEMPTS 次尝试，间隔按 1s / 2s / 4s 指数退避。
+ * onRetry 供页面显示"正在重试"之类的提示；signal 供取消。
+ * 重试用尽后抛出最后一次的错误，页面按它的 kind 分类提示。
+ */
+async function request(path, options = {}, { onRetry, signal } = {}) {
+  let lastError
+  for (let attempt = 1; attempt <= RETRY_MAX_ATTEMPTS; attempt += 1) {
+    if (signal?.aborted) throw new ApiError('已取消', { kind: 'CANCELED' })
+    try {
+      return await requestOnce(path, options)
+    } catch (e) {
+      lastError = e
+      const canRetry = isRetryable(e) && attempt < RETRY_MAX_ATTEMPTS
+      if (!canRetry) throw e
+      onRetry?.(attempt, RETRY_MAX_ATTEMPTS, e)
+      await sleep(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1))
+    }
+  }
+  throw lastError
+}
+
 // —— 对外接口 ——
 
 /**
@@ -86,7 +125,7 @@ async function request(path, options = {}) {
  * @param {{ files: File[], destinationCountry: string, notes?: string }} input
  * @returns {Promise<{ task_id: string, status: string }>}
  */
-export async function createCheck({ files, destinationCountry, notes }) {
+export async function createCheck({ files, destinationCountry, notes }, { onRetry, signal } = {}) {
   if (USE_MOCK) {
     await sleep(400)
     return {
@@ -101,43 +140,52 @@ export async function createCheck({ files, destinationCountry, notes }) {
   form.append('destination_country', destinationCountry)
   if (notes) form.append('notes', notes)
 
-  return request('/checks', { method: 'POST', body: form })
+  return request('/checks', { method: 'POST', body: form }, { onRetry, signal })
 }
 
 /**
- * 查询任务状态与结果。轮询与取最终结果共用这一个接口。
+ * 查询任务状态与结果。取一次结果用这个；轮询请用 pollCheck。
  * @returns {Promise<object>} CheckTask
  */
-export async function getCheck(taskId) {
+export async function getCheck(taskId, { onRetry, signal } = {}) {
   if (USE_MOCK) {
     await sleep(500)
     const sample = nextMockSample()
     sample.task_id = taskId
     return sample
   }
-  return request(`/checks/${encodeURIComponent(taskId)}`)
+  return request(`/checks/${encodeURIComponent(taskId)}`, {}, { onRetry, signal })
 }
 
 /**
  * 轮询直到任务结束。
  *
- * 三个终止条件：拿到终态、超时、调用方通过 signal 取消。
+ * 终止条件：拿到终态、达到轮询上限、调用方通过 signal 取消。
+ * 超过 SLOW_POLL_MS（90 秒）未结束时通过 onSlow 提示"处理时间较长"，
+ * 但继续等待——不把它当失败，让后端有机会跑完大文件。
  * 超时和失败都抛 ApiError，由页面决定怎么显示——绝不返回一个空结果，
  * 否则页面会把它渲染成"检查完成，没有问题"。
  *
  * @param {string} taskId
- * @param {{ onTick?: (task: object) => void, signal?: AbortSignal }} options
+ * @param {{ onTick?: (task: object) => void, onSlow?: () => void, onRetry?: Function, signal?: AbortSignal }} options
  */
-export async function pollCheck(taskId, { onTick, signal } = {}) {
+export async function pollCheck(taskId, { onTick, onSlow, onRetry, signal } = {}) {
   const TERMINAL = ['COMPLETED', 'PARTIAL', 'FAILED']
+  const startedAt = Date.now()
+  let slowNotified = false
 
   for (let i = 0; i < POLL_MAX_ATTEMPTS; i += 1) {
-    if (signal?.aborted) throw new ApiError('已取消', { kind: 'TIMEOUT' })
+    if (signal?.aborted) throw new ApiError('已取消', { kind: 'CANCELED' })
 
-    const task = await getCheck(taskId)
+    const task = await request(`/checks/${encodeURIComponent(taskId)}`, {}, { onRetry, signal })
     onTick?.(task)
 
     if (TERMINAL.includes(task.status)) return task
+
+    if (!slowNotified && Date.now() - startedAt > SLOW_POLL_MS) {
+      slowNotified = true
+      onSlow?.()
+    }
 
     await sleep(USE_MOCK ? 300 : POLL_INTERVAL_MS)
   }
@@ -149,7 +197,7 @@ export async function pollCheck(taskId, { onTick, signal } = {}) {
  * 评测结果。契约第四节第 10 项未定，拿不到就给 NOT_RUN。
  * 页面据此显示"尚未评测"，不填任何数字。
  */
-export async function getEvaluation() {
+export async function getEvaluation(options = {}) {
   if (USE_MOCK) {
     await sleep(200)
     return {
@@ -164,7 +212,7 @@ export async function getEvaluation() {
   }
 
   try {
-    return await request('/evaluation/latest')
+    return await request('/evaluation/latest', {}, options)
   } catch (e) {
     // 接口还没做属于预期内。降级为"尚未评测"，但把原因留着便于排查
     if (e.status === 404) {
