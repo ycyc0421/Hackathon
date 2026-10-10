@@ -57,6 +57,40 @@ const visible = computed(() => {
   }
 })
 
+/** 商品目录。后端没返回 items（或为空）时降级为扁平列表，行为与之前一致 */
+const items = computed(() => task.value?.items ?? [])
+
+/** 整票级比对（item_id 为 null）以及找不到对应商品的 item_id 都归到这一组 */
+const SHIPMENT_GROUP_KEY = '__shipment__'
+
+/**
+ * 按商品分组的比对列表。
+ * - 有 items：按 items 顺序每组一段，整票字段排在最后；
+ * - 没有 items：单一匿名分组，不渲染分组头，DOM 与之前的扁平列表一致。
+ * 分组基于筛选后的 visible，筛选对所有分组生效，空分组不显示。
+ */
+const groups = computed(() => {
+  const list = visible.value
+  if (!items.value.length) {
+    return [{ key: '__all__', title: '', list }]
+  }
+  const byItem = new Map(items.value.map((it) => [it.item_id, { key: it.item_id, title: it.display_name || it.item_id, list: [] }]))
+  const shipment = { key: SHIPMENT_GROUP_KEY, title: '整票字段', list: [] }
+  for (const c of list) {
+    const g = c.item_id != null ? byItem.get(c.item_id) : null
+    ;(g ?? shipment).list.push(c)
+  }
+  const out = [...byItem.values()].filter((g) => g.list.length)
+  if (shipment.list.length) out.push(shipment)
+  return out
+})
+
+/**
+ * 只有一个分组时不显示分组头：单品名且没有整票字段时和现在长得一样；
+ * 多品名、或单品名同时存在整票字段时才需要分组头做区分。
+ */
+const showGroupTitle = computed(() => groups.value.length > 1 || items.value.length > 1)
+
 function fileStatusOf(v) {
   return fieldStatus(v.field_status)
 }
@@ -135,52 +169,59 @@ const severityOf = severity
           「未校验」指当前规则集未覆盖该字段，并非表示没有问题。
         </p>
 
-        <ul v-if="visible.length" class="cmp-list">
-          <li v-for="c in visible" :key="c.comparison_id" class="cmp-item">
-            <div class="cmp-head">
-              <div class="cmp-title">
-                <span class="cmp-label">{{ c.label }}</span>
-                <span class="cmp-key">{{ c.field_key }}</span>
-              </div>
-              <div class="cmp-badges">
-                <StatusBadge :status="severityOf(c.severity)" />
-                <StatusBadge :status="comparisonStatus(c.status)" />
-              </div>
-            </div>
+        <template v-if="visible.length">
+          <div v-for="g in groups" :key="g.key" class="cmp-group">
+            <h3 v-if="showGroupTitle" class="cmp-group-title">
+              {{ g.title }} <span class="cmp-group-num">{{ g.list.length }}</span>
+            </h3>
+            <ul class="cmp-list">
+              <li v-for="c in g.list" :key="c.comparison_id" class="cmp-item">
+                <div class="cmp-head">
+                  <div class="cmp-title">
+                    <span class="cmp-label">{{ c.label }}</span>
+                    <span class="cmp-key">{{ c.field_key }}</span>
+                  </div>
+                  <div class="cmp-badges">
+                    <StatusBadge :status="severityOf(c.severity)" />
+                    <StatusBadge :status="comparisonStatus(c.status)" />
+                  </div>
+                </div>
 
-            <p v-if="c.note" class="cmp-note">{{ c.note }}</p>
+                <p v-if="c.note" class="cmp-note">{{ c.note }}</p>
 
-            <table class="cmp-table">
-              <thead>
-                <tr>
-                  <th>来源文件</th>
-                  <th>值</th>
-                  <th>原文</th>
-                  <th>状态</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="v in c.values" :key="v.file_id" :class="{ 'row-odd': v.field_status !== 'EXTRACTED' }">
-                  <td class="cell-file">{{ v.file_name }}</td>
-                  <td class="cell-value">
-                    <template v-if="v.normalized_value !== null && v.normalized_value !== undefined">
-                      {{ valueText(v, c) }}
-                    </template>
-                    <span v-else class="cell-empty">—</span>
-                  </td>
-                  <td class="cell-raw">
-                    <template v-if="showsRaw(v, c)">{{ v.raw_value }}</template>
-                    <span v-else class="cell-empty">—</span>
-                  </td>
-                  <td><StatusBadge :status="fileStatusOf(v)" /></td>
-                </tr>
-              </tbody>
-            </table>
+                <table class="cmp-table">
+                  <thead>
+                    <tr>
+                      <th>来源文件</th>
+                      <th>值</th>
+                      <th>原文</th>
+                      <th>状态</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="v in c.values" :key="v.file_id" :class="{ 'row-odd': v.field_status !== 'EXTRACTED' }">
+                      <td class="cell-file">{{ v.file_name }}</td>
+                      <td class="cell-value">
+                        <template v-if="v.normalized_value !== null && v.normalized_value !== undefined">
+                          {{ valueText(v, c) }}
+                        </template>
+                        <span v-else class="cell-empty">—</span>
+                      </td>
+                      <td class="cell-raw">
+                        <template v-if="showsRaw(v, c)">{{ v.raw_value }}</template>
+                        <span v-else class="cell-empty">—</span>
+                      </td>
+                      <td><StatusBadge :status="fileStatusOf(v)" /></td>
+                    </tr>
+                  </tbody>
+                </table>
 
-            <div v-if="c.rule_id" class="cmp-foot">依据规则 {{ c.rule_id }}</div>
-            <div v-else class="cmp-foot muted">未经规则校验</div>
-          </li>
-        </ul>
+                <div v-if="c.rule_id" class="cmp-foot">依据规则 {{ c.rule_id }}</div>
+                <div v-else class="cmp-foot muted">未经规则校验</div>
+              </li>
+            </ul>
+          </div>
+        </template>
 
         <EmptyState
           v-else

@@ -17,6 +17,10 @@
     {"file_id": "f3", "file_name": "提单-BL20261012.pdf", "file_type": "PDF", "doc_type": "BILL_OF_LADING", "process_status": "EXTRACTED", "page_count": 2, "error_message": null}
   ],
 
+  "items": [
+    {"item_id": "item_001", "display_name": "陶瓷马克杯", "description": "陶瓷马克杯 350ml 白釉（CERAMIC MUG 350ML WHITE）", "line_no": 1}
+  ],
+
   "extractions": [
     {
       "file_id": "f1",
@@ -64,6 +68,7 @@
     {
       "comparison_id": "cmp_1",
       "field_key": "packages",
+      "item_id": "item_001",
       "label": "件数",
       "value_type": "NUMBER",
       "unit": "CARTON",
@@ -81,6 +86,7 @@
     {
       "comparison_id": "cmp_2",
       "field_key": "gross_weight",
+      "item_id": "item_001",
       "label": "毛重",
       "value_type": "NUMBER",
       "unit": "KGS",
@@ -97,6 +103,7 @@
     {
       "comparison_id": "cmp_3",
       "field_key": "description",
+      "item_id": "item_001",
       "label": "货物描述",
       "value_type": "STRING",
       "unit": null,
@@ -113,6 +120,7 @@
     {
       "comparison_id": "cmp_4",
       "field_key": "total_amount",
+      "item_id": "item_001",
       "label": "总金额",
       "value_type": "MONEY",
       "unit": "USD",
@@ -128,6 +136,7 @@
     {
       "comparison_id": "cmp_5",
       "field_key": "shipment_date",
+      "item_id": null,
       "label": "装运日期",
       "value_type": "DATE",
       "unit": null,
@@ -144,6 +153,7 @@
     {
       "comparison_id": "cmp_6",
       "field_key": "hs_code",
+      "item_id": "item_001",
       "label": "HS 编码",
       "value_type": "CODE",
       "unit": null,

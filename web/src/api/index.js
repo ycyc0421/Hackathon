@@ -237,7 +237,11 @@ export async function pollCheck(taskId, { onTick, onSlow, onRetry, signal } = {}
   for (let i = 0; i < POLL_MAX_ATTEMPTS; i += 1) {
     if (signal?.aborted) throw new ApiError('已取消', { kind: 'CANCELED' })
 
-    const task = await request(`/checks/${encodeURIComponent(taskId)}`, {}, { onRetry, signal })
+    // mock 下没有真实后端，直接走 getCheck 的 mock 分支拿样例；
+    // 否则请求会打到 dev server 的 SPA 回退上，拿到 HTML 报 PARSE 错误
+    const task = USE_MOCK
+      ? await getCheck(taskId, { signal })
+      : await request(`/checks/${encodeURIComponent(taskId)}`, {}, { onRetry, signal })
     onTick?.(task)
 
     if (TERMINAL.includes(task.status)) return task
