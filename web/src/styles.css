@@ -807,6 +807,23 @@ select {
   font-size: 12px;
 }
 
+/* 按商品分组时的分组标题；单分组不渲染标题，样式与扁平列表一致 */
+.cmp-group-title {
+  margin: 20px 0 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.cmp-group-num {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
 .cmp-list {
   margin: 16px 0 0;
   padding: 0;

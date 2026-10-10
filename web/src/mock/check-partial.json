@@ -17,6 +17,10 @@
     {"file_id": "f3", "file_name": "提单-扫描件.jpg", "file_type": "IMAGE", "doc_type": null, "process_status": "FAILED", "page_count": 1, "error_message": "图像分辨率过低（412×580），无法识别版式"}
   ],
 
+  "items": [
+    {"item_id": "item_001", "display_name": "陶瓷马克杯", "description": "陶瓷马克杯 350ml 白釉（CERAMIC MUG 350ML WHITE）", "line_no": 1}
+  ],
+
   "extractions": [
     {
       "file_id": "f1",
@@ -48,6 +52,7 @@
     {
       "comparison_id": "cmp_1",
       "field_key": "packages",
+      "item_id": "item_001",
       "label": "件数",
       "value_type": "NUMBER",
       "unit": "CARTON",
@@ -65,6 +70,7 @@
     {
       "comparison_id": "cmp_2",
       "field_key": "gross_weight",
+      "item_id": "item_001",
       "label": "毛重",
       "value_type": "NUMBER",
       "unit": "KGS",
@@ -81,6 +87,7 @@
     {
       "comparison_id": "cmp_3",
       "field_key": "net_weight",
+      "item_id": "item_001",
       "label": "净重",
       "value_type": "NUMBER",
       "unit": "KGS",
@@ -97,6 +104,7 @@
     {
       "comparison_id": "cmp_4",
       "field_key": "volume",
+      "item_id": "item_001",
       "label": "体积",
       "value_type": "NUMBER",
       "unit": "CBM",
@@ -112,6 +120,7 @@
     {
       "comparison_id": "cmp_5",
       "field_key": "hs_code",
+      "item_id": "item_001",
       "label": "HS 编码",
       "value_type": "CODE",
       "unit": null,
@@ -127,6 +136,7 @@
     {
       "comparison_id": "cmp_6",
       "field_key": "total_amount",
+      "item_id": "item_001",
       "label": "总金额",
       "value_type": "MONEY",
       "unit": "USD",
