@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { USE_MOCK } from './api/index.js'
+import { USE_MOCK, listMockScenarios, setMockScenario } from './api/index.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import UploadPage from './pages/UploadPage.vue'
 import DiffPage from './pages/DiffPage.vue'
@@ -15,6 +15,20 @@ const PAGES = [
 ]
 
 const active = ref('upload')
+
+/** mock 场景选择。key → 中文名只用于展示，场景数据以 api 层注册表为准 */
+const SCENARIO_NAMES = {
+  'single-item': '单品名 · 有冲突',
+  'partial-fail': '单品名 · 部分失败',
+  'multi-item': '双品名 · 分组',
+  clean: '全部一致',
+}
+const mockScenarios = listMockScenarios()
+const mockScenario = ref('single-item')
+
+function onScenarioChange() {
+  setMockScenario(mockScenario.value)
+}
 
 /** 当前检查任务。由上传页写入，差异页和报告页读取 */
 const task = ref(null)
@@ -110,8 +124,18 @@ watch(active, updateIndicator)
         <span class="tab-indicator" :style="indicatorStyle" aria-hidden="true" />
       </nav>
 
-      <div v-if="USE_MOCK" class="mock-flag" title="前端正在使用本地示例数据，未连接后端">
-        示例数据
+      <div v-if="USE_MOCK" class="mock-tools">
+        <span class="mock-flag" title="前端正在使用本地示例数据，未连接后端">示例数据</span>
+        <select
+          v-model="mockScenario"
+          class="mock-scenario-select"
+          title="选择示例场景，下次提交检查时生效"
+          @change="onScenarioChange"
+        >
+          <option v-for="key in mockScenarios" :key="key" :value="key">
+            {{ SCENARIO_NAMES[key] ?? key }}
+          </option>
+        </select>
       </div>
     </header>
 

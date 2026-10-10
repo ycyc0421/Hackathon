@@ -18,6 +18,8 @@ import {
 } from './config.js'
 import completedSample from '../mock/check-completed.json'
 import partialSample from '../mock/check-partial.json'
+import multiItemSample from '../mock/check-multi-item.json'
+import cleanSample from '../mock/check-clean.json'
 
 // —— 统一的错误类型：页面按 kind 区分展示方式 ——
 
@@ -33,8 +35,28 @@ export class ApiError extends Error {
 
 // —— mock 实现 ——
 
-const MOCK_SAMPLES = [completedSample, partialSample]
-let mockRunCount = 0
+/**
+ * mock 场景按 key 注册。演示时需要稳定重复同一场景，
+ * 所以不能按提交次数轮换——由顶栏的场景选择器指定。
+ */
+const MOCK_SAMPLES = {
+  'single-item': completedSample, // 单品名 · 1 处数量冲突
+  'partial-fail': partialSample, // 单品名 · 一份文件处理失败
+  'multi-item': multiItemSample, // 双品名 · 冲突/一致/不适用混合
+  clean: cleanSample, // 全部一致 · 零风险
+}
+
+let mockScenario = 'single-item'
+
+/** 指定 mock 场景。key 不存在时忽略，避免选择器外的调用把场景打坏 */
+export function setMockScenario(key) {
+  if (MOCK_SAMPLES[key]) mockScenario = key
+}
+
+/** 已注册的场景 key 列表，供选择器渲染选项 */
+export function listMockScenarios() {
+  return Object.keys(MOCK_SAMPLES)
+}
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
@@ -44,14 +66,9 @@ function stripComment(obj) {
   return rest
 }
 
-/**
- * mock 依次返回两个样例，便于演示"正常路径"和"异常路径"两种状态。
- * 第一次跑查 completed，第二次跑查 partial，之后循环。
- */
+/** 返回当前选定场景的深拷贝，调用方改 task_id 不会污染样例 */
 function nextMockSample() {
-  const sample = MOCK_SAMPLES[mockRunCount % MOCK_SAMPLES.length]
-  mockRunCount += 1
-  return stripComment(JSON.parse(JSON.stringify(sample)))
+  return stripComment(JSON.parse(JSON.stringify(MOCK_SAMPLES[mockScenario])))
 }
 
 // —— 真实实现 ——
