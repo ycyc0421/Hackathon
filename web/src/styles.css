@@ -519,6 +519,14 @@ select {
   align-items: center;
   gap: 10px;
   color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.processing-hint {
+  width: 100%;
+  margin: 4px 0 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
 }
 
 .spinner {
