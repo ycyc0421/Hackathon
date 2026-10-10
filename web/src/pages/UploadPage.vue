@@ -328,97 +328,106 @@ function docStatus(d) {
     <section v-if="isRunning || task || taskError" class="card">
       <h2 class="card-title">任务状态</h2>
 
-      <!-- 失败：显式呈现，绝不显示为通过。标题/说明统一来自 labels.js 的分类文案 -->
-      <NoticeBar v-if="taskError" :tone="taskErrorInfo.tone" :title="taskErrorInfo.title">
-        <p class="notice-detail">{{ taskError.message }}</p>
-        <p v-if="taskErrorInfo.hint" class="notice-detail">{{ taskErrorInfo.hint }}</p>
-        <div class="actions">
-          <button class="btn small" :disabled="!canSubmit" @click="submit">重试</button>
-        </div>
-      </NoticeBar>
-
-      <template v-else-if="task">
-        <div class="status-row">
-          <StatusBadge :status="statusInfo" />
-          <span class="status-meta">任务 {{ task.task_id }}</span>
-          <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
-          <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
-        </div>
-
-        <!-- 部分成功：最容易做成静默忽略的状态 -->
-        <NoticeBar
-          v-if="task.status === 'PARTIAL'"
-          tone="warn"
-          title="本次检查未包含全部文件"
-          :detail="`${failedDocs.length} 份文件未能处理成功。以下比对结果缺少这些文件的数据，不代表它们一致。`"
-        />
-
-        <NoticeBar
-          v-if="task.status === 'FAILED'"
-          tone="bad"
-          title="检查失败"
-          detail="未产生任何比对结果。请检查文件格式后重试。"
-        />
-
-        <ul class="doc-list">
-          <li v-for="d in task.documents" :key="d.file_id" class="doc-item">
-            <div class="doc-main">
-              <span class="doc-name">{{ d.file_name }}</span>
-              <span v-if="d.error_message" class="doc-error">{{ d.error_message }}</span>
+      <!-- 三类状态在同一区域淡出→淡入，切换时标题与卡片保持不动 -->
+      <Transition name="fade" mode="out-in">
+        <!-- 失败：显式呈现，绝不显示为通过。标题/说明统一来自 labels.js 的分类文案 -->
+        <div v-if="taskError" key="error" class="task-status-body">
+          <NoticeBar :tone="taskErrorInfo.tone" :title="taskErrorInfo.title">
+            <p class="notice-detail">{{ taskError.message }}</p>
+            <p v-if="taskErrorInfo.hint" class="notice-detail">{{ taskErrorInfo.hint }}</p>
+            <div class="actions">
+              <button class="btn small" :disabled="!canSubmit" @click="submit">重试</button>
             </div>
-            <StatusBadge :status="docStatus(d)" />
-          </li>
-        </ul>
-
-        <p v-if="task.status === 'COMPLETED' || task.status === 'PARTIAL'" class="next-hint">
-          已生成比对结果，切到「差异」页查看。
-        </p>
-      </template>
-
-      <!-- 处理中：分阶段进度 + 上传百分比 + 已等待时长 + 骨架屏 -->
-      <div v-else class="processing-block">
-        <ol class="stage-row">
-          <li
-            v-for="(s, i) in TASK_STAGES"
-            :key="s.key"
-            class="stage-item"
-            :class="{ done: i < stageIndex, active: i === stageIndex }"
-          >
-            <span class="stage-dot" aria-hidden="true" />
-            <span class="stage-text">{{ s.text }}</span>
-          </li>
-        </ol>
-
-        <div v-if="phase === 'uploading'" class="upload-progress">
-          <div class="progress-track">
-            <div
-              class="progress-fill"
-              :style="{ width: `${uploadPercent ?? 0}%` }"
-              role="progressbar"
-              :aria-valuenow="uploadPercent ?? 0"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            />
-          </div>
-          <span class="progress-num">
-            {{ uploadPercent === null ? '上传中…' : `${uploadPercent}%` }}
-          </span>
+          </NoticeBar>
         </div>
 
-        <div class="wait-line">已等待 {{ elapsedText }}</div>
+        <div v-else-if="task" key="result" class="task-status-body">
+          <div class="status-row">
+            <StatusBadge :status="statusInfo" />
+            <span class="status-meta">任务 {{ task.task_id }}</span>
+            <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
+            <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
+          </div>
 
-        <p v-if="retryHint" class="processing-hint">网络异常，正在自动重连…</p>
-        <p v-else-if="slowHint" class="processing-hint">
-          处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
-        </p>
+          <!-- 部分成功：最容易做成静默忽略的状态 -->
+          <NoticeBar
+            v-if="task.status === 'PARTIAL'"
+            tone="warn"
+            title="本次检查未包含全部文件"
+            :detail="`${failedDocs.length} 份文件未能处理成功。以下比对结果缺少这些文件的数据，不代表它们一致。`"
+          />
 
-        <ul class="doc-list skeleton-list" aria-hidden="true">
-          <li v-for="i in skeletonRows" :key="i" class="doc-item">
-            <SkeletonBlock width="42%" height="13px" />
-            <SkeletonBlock width="56px" height="20px" />
-          </li>
-        </ul>
-      </div>
+          <NoticeBar
+            v-if="task.status === 'FAILED'"
+            tone="bad"
+            title="检查失败"
+            detail="未产生任何比对结果。请检查文件格式后重试。"
+          />
+
+          <ul class="doc-list">
+            <li v-for="d in task.documents" :key="d.file_id" class="doc-item">
+              <div class="doc-main">
+                <span class="doc-name">{{ d.file_name }}</span>
+                <span v-if="d.error_message" class="doc-error">{{ d.error_message }}</span>
+              </div>
+              <StatusBadge :status="docStatus(d)" />
+            </li>
+          </ul>
+
+          <p v-if="task.status === 'COMPLETED' || task.status === 'PARTIAL'" class="next-hint">
+            已生成比对结果，切到「差异」页查看。
+          </p>
+        </div>
+
+        <!-- 处理中：分阶段进度 + 上传百分比 + 已等待时长 + 骨架屏 -->
+        <div v-else key="processing" class="task-status-body">
+          <div class="stage-header">
+            <ol class="stage-row">
+              <li
+                v-for="(s, i) in TASK_STAGES"
+                :key="s.key"
+                class="stage-item"
+                :class="{ done: i < stageIndex, active: i === stageIndex }"
+              >
+                <span class="stage-dot" aria-hidden="true" />
+                <span class="stage-text">{{ s.text }}</span>
+              </li>
+            </ol>
+            <span class="wait-line">已等待 {{ elapsedText }}</span>
+          </div>
+
+          <!-- 进度条只在上传阶段存在；结束时高度收起而不是瞬间消失 -->
+          <div class="upload-progress-wrap" :class="{ collapsed: phase !== 'uploading' }">
+            <div class="upload-progress">
+              <div class="progress-track">
+                <div
+                  class="progress-fill"
+                  :style="{ width: `${uploadPercent ?? 0}%` }"
+                  role="progressbar"
+                  :aria-valuenow="uploadPercent ?? 0"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                />
+              </div>
+              <span class="progress-num">
+                {{ uploadPercent === null ? '上传中…' : `${uploadPercent}%` }}
+              </span>
+            </div>
+          </div>
+
+          <p v-if="retryHint" class="processing-hint">网络异常，正在自动重连…</p>
+          <p v-else-if="slowHint" class="processing-hint">
+            处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
+          </p>
+
+          <ul class="doc-list skeleton-list" aria-hidden="true">
+            <li v-for="i in skeletonRows" :key="i" class="doc-item">
+              <SkeletonBlock width="42%" height="13px" />
+              <SkeletonBlock width="56px" height="20px" />
+            </li>
+          </ul>
+        </div>
+      </Transition>
     </section>
   </div>
 </template>
