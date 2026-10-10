@@ -15,6 +15,19 @@ export const TASK_STATUS = {
   FAILED: { text: '处理失败', tone: 'bad' },
 }
 
+/**
+ * 任务分阶段进度。契约里没有显式的 stage 字段（schema 的 TaskStatus 只有五种），
+ * 上传页按 task.status 与逐文件 process_status 推断当前处于哪一阶段，
+ * 文案集中在这一张表里，与其他状态文案同一出处。
+ * 顺序即步骤顺序，页面按 key 在数组里的下标判断"进行到第几步"。
+ */
+export const TASK_STAGES = [
+  { key: 'QUEUED', text: '排队中' },
+  { key: 'PARSING', text: '解析文件中' },
+  { key: 'COMPARING', text: '交叉比对中' },
+  { key: 'FINISHED', text: '已生成结果' },
+]
+
 export const PROCESS_STATUS = {
   UPLOADED: { text: '已收到', tone: 'muted' },
   PARSING: { text: '解析中', tone: 'running' },
