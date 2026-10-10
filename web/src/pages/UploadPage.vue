@@ -18,12 +18,14 @@ const task = inject('task')
 const taskError = inject('taskError')
 const isRunning = inject('isRunning')
 
-// 目的国列表为演示用。契约第四节第 3 项未定实际支持范围，需后端侧确认。
+// 目的国列表为演示用。后端（issue #4）确认当前规则覆盖美/德/荷/法/英，
+// 均为未经核实的演示规则，正式合规结论不能据此得出。
 const COUNTRIES = [
+  { code: 'US', name: '美国' },
   { code: 'DE', name: '德国' },
   { code: 'NL', name: '荷兰' },
-  { code: 'US', name: '美国' },
-  { code: 'JP', name: '日本' },
+  { code: 'FR', name: '法国' },
+  { code: 'GB', name: '英国' },
 ]
 
 const files = ref([])
@@ -149,7 +151,7 @@ const stageIndex = computed(() => {
   const t = task.value
   if (!t) return 0
   if (t.status === 'PENDING') return 0
-  if (t.status === 'RUNNING') {
+  if (t.status === 'PROCESSING') {
     const docs = t.documents ?? []
     if (docs.length && docs.every((d) => d.process_status === 'EXTRACTED')) return 2
     return 1
@@ -287,6 +289,7 @@ function docStatus(d) {
           <select v-model="country" class="input">
             <option v-for="c in COUNTRIES" :key="c.code" :value="c.code">{{ c.name }}</option>
           </select>
+          <span class="field-label">规则覆盖范围为演示配置，未经核实，不作为正式合规结论。</span>
         </label>
 
         <label class="field field-grow">
