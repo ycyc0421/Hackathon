@@ -514,10 +514,66 @@ select {
   font-size: 12px;
 }
 
-.processing {
+/* ---------- 加载状态：分阶段进度 / 上传进度 / 骨架屏 ---------- */
+
+.processing-block {
+  animation: fade-in var(--duration-base) var(--ease);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 分阶段进度：颜色+文字组合区分阶段，不只靠颜色 */
+.stage-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.stage-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-disabled);
+  font-size: var(--text-sm);
+}
+
+.stage-item:not(:last-child)::after {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 var(--space-2);
+}
+
+.stage-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-300);
+  flex: none;
+}
+
+.stage-item.active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.stage-item.active .stage-dot {
+  background: var(--color-primary);
+}
+
+.stage-item.done {
   color: var(--text-muted);
   flex-wrap: wrap;
 }
@@ -529,19 +585,49 @@ select {
   color: var(--text-muted);
 }
 
-.spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--border);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+.stage-item.done .stage-dot {
+  background: var(--success);
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* 上传进度条 */
+.upload-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  transition: width var(--duration-fast) var(--ease);
+}
+
+.progress-num {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  min-width: 44px;
+  text-align: right;
+}
+
+.wait-line {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-3);
+}
+
+.skeleton-list .doc-item {
+  justify-content: space-between;
 }
 
 .doc-list {

@@ -5,12 +5,13 @@
  * 目的国暂由用户选择。契约第四节第 3 项未定「由用户选还是从文件识别」，
  * 这里按用户选择实现——可控，演示时不依赖抽取准确率。
  */
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, onBeforeUnmount } from 'vue'
 import { createCheck, pollCheck, validateFiles, ApiError, UPLOAD_LIMITS, USE_MOCK } from '../api/index.js'
 import { taskStatus, processStatus, formatTime, formatDuration, describeApiError } from '../api/formatters.js'
-import { API_ERROR_KIND, UPLOAD_ERROR_TEXT } from '../api/labels.js'
+import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES } from '../api/labels.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
+import SkeletonBlock from '../components/SkeletonBlock.vue'
 
 const task = inject('task')
 const taskError = inject('taskError')
@@ -35,6 +36,14 @@ const fileInput = ref(null)
 const slowHint = ref(false)
 /** 请求层自动重试进行中（网络错误 / 5xx），显示"正在重连" */
 const retryHint = ref(false)
+
+// —— 进度展示状态 ——
+// phase：idle 无任务；uploading 正在传文件；processing 已创建任务、轮询中
+const phase = ref('idle')
+const uploadPercent = ref(null)
+const startedAt = ref(null)
+const now = ref(Date.now())
+let clockTimer = null
 
 const canSubmit = computed(() => files.value.length > 0 && !isRunning.value)
 
@@ -102,6 +111,54 @@ function onAutoRetry() {
   retryHint.value = true
 }
 
+function startClock() {
+  startedAt.value = Date.now()
+  now.value = Date.now()
+  clockTimer = setInterval(() => {
+    now.value = Date.now()
+  }, 1000)
+}
+
+function stopClock() {
+  if (clockTimer) {
+    clearInterval(clockTimer)
+    clockTimer = null
+  }
+}
+
+onBeforeUnmount(stopClock)
+
+/** 已等待时长文案。只展示真实流逝的时间，不做任何预计（后端没有给 ETA 数据） */
+const elapsedText = computed(() => {
+  if (!startedAt.value) return ''
+  const totalSec = Math.max(0, Math.floor((now.value - startedAt.value) / 1000))
+  if (totalSec < 60) return `${totalSec} 秒`
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  return `${m} 分 ${s} 秒`
+})
+
+/**
+ * 推断当前处于哪个阶段，返回 TASK_STAGES 的下标。
+ * 契约没有显式 stage 字段，按任务状态与逐文件 process_status 推断；
+ * -1 表示任务尚未创建（还在上传文件）。
+ */
+const stageIndex = computed(() => {
+  if (phase.value === 'uploading') return -1
+  const t = task.value
+  if (!t) return 0
+  if (t.status === 'PENDING') return 0
+  if (t.status === 'RUNNING') {
+    const docs = t.documents ?? []
+    if (docs.length && docs.every((d) => d.process_status === 'EXTRACTED')) return 2
+    return 1
+  }
+  return TASK_STAGES.length - 1
+})
+
+/** 骨架屏行数与已选文件数一致，占位形状贴近真实列表 */
+const skeletonRows = computed(() => Math.max(files.value.length, 2))
+
 async function submit() {
   if (!canSubmit.value) return
 
@@ -111,6 +168,9 @@ async function submit() {
   slowHint.value = false
   retryHint.value = false
   isRunning.value = true
+  phase.value = 'uploading'
+  uploadPercent.value = null
+  startClock()
 
   try {
     const created = await createCheck(
@@ -119,8 +179,15 @@ async function submit() {
         destinationCountry: country.value,
         notes: notes.value,
       },
-      { onRetry: onAutoRetry }
+      {
+        onRetry: onAutoRetry,
+        onUploadProgress: (p) => {
+          uploadPercent.value = p
+        },
+      }
     )
+
+    phase.value = 'processing'
 
     const result = await pollCheck(created.task_id, {
       onTick: (t) => {
@@ -143,6 +210,8 @@ async function submit() {
         : { message: e?.message ?? '未知错误', kind: 'UNKNOWN' }
   } finally {
     isRunning.value = false
+    phase.value = 'idle'
+    stopClock()
   }
 }
 
@@ -296,14 +365,49 @@ function docStatus(d) {
         </p>
       </template>
 
-      <!-- 处理中 -->
-      <div v-else class="processing">
-        <div class="spinner" />
-        <span>正在解析与比对…</span>
+      <!-- 处理中：分阶段进度 + 上传百分比 + 已等待时长 + 骨架屏 -->
+      <div v-else class="processing-block">
+        <ol class="stage-row">
+          <li
+            v-for="(s, i) in TASK_STAGES"
+            :key="s.key"
+            class="stage-item"
+            :class="{ done: i < stageIndex, active: i === stageIndex }"
+          >
+            <span class="stage-dot" aria-hidden="true" />
+            <span class="stage-text">{{ s.text }}</span>
+          </li>
+        </ol>
+
+        <div v-if="phase === 'uploading'" class="upload-progress">
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              :style="{ width: `${uploadPercent ?? 0}%` }"
+              role="progressbar"
+              :aria-valuenow="uploadPercent ?? 0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            />
+          </div>
+          <span class="progress-num">
+            {{ uploadPercent === null ? '上传中…' : `${uploadPercent}%` }}
+          </span>
+        </div>
+
+        <div class="wait-line">已等待 {{ elapsedText }}</div>
+
         <p v-if="retryHint" class="processing-hint">网络异常，正在自动重连…</p>
         <p v-else-if="slowHint" class="processing-hint">
           处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
         </p>
+
+        <ul class="doc-list skeleton-list" aria-hidden="true">
+          <li v-for="i in skeletonRows" :key="i" class="doc-item">
+            <SkeletonBlock width="42%" height="13px" />
+            <SkeletonBlock width="56px" height="20px" />
+          </li>
+        </ul>
       </div>
     </section>
   </div>
