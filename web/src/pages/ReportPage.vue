@@ -10,6 +10,7 @@ import { formatTime, formatDuration, riskType, severity } from '../api/formatter
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
+import EmptyState from '../components/EmptyState.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
@@ -34,6 +35,14 @@ const failedDocs = computed(
 /** 未经规则校验的风险与规则命中的风险分开显示，可信度不同 */
 const ruledRisks = computed(() => (task.value?.risks ?? []).filter((r) => r.rule_id))
 const suggestedRisks = computed(() => (task.value?.risks ?? []).filter((r) => !r.rule_id))
+
+/**
+ * 「没有风险提示」正向空状态仅在有成功结果且确实零风险时显示。
+ * FAILED 时不显示——任务失败与"没有风险"是两回事（AGENTS.md 降级原则）。
+ */
+const showNoRisk = computed(
+  () => task.value && task.value.status !== 'FAILED' && (task.value.risks ?? []).length === 0
+)
 
 const duration = computed(() =>
   task.value ? formatDuration(task.value.created_at, task.value.finished_at) : null
@@ -140,7 +149,13 @@ const severityOf = severity
             <p v-if="c.note" class="issue-note">{{ c.note }}</p>
           </li>
         </ul>
-        <p v-else class="empty">没有需要人工处理的条目。</p>
+        <EmptyState
+          v-else
+          tone="ok"
+          icon="✅"
+          title="没有需要人工处理的条目"
+          detail="所有字段在各文件间一致。"
+        />
 
         <p v-if="matched.length" class="foot-note">
           另有 {{ matched.length }} 个字段在各文件间一致，未列出。
@@ -176,6 +191,15 @@ const severityOf = severity
           </li>
         </ul>
       </section>
+
+      <!-- 有成功结果且确实零风险时给出正向反馈，避免显示成空白表格 -->
+      <EmptyState
+        v-if="showNoRisk"
+        tone="ok"
+        icon="✅"
+        title="没有风险提示"
+        detail="本次检查未发现需要提示的风险项。"
+      />
 
       <section v-if="task.errors?.length" class="card">
         <h2 class="card-title">错误记录</h2>
