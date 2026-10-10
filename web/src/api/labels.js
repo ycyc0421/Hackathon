@@ -127,6 +127,23 @@ export const UPLOAD_ERROR_TEXT = {
   NETWORK: '上传失败：网络连接异常，请检查网络后重试。',
 }
 
+/**
+ * PDF 文本层预检测的警告文案（只警告、不阻止提交）。
+ * 检测是本地启发式（见 src/pdfTextLayer.js），可能误判，所以措辞用「可能」，
+ * 并明确告诉用户仍可提交。
+ */
+export const SCAN_WARNING = {
+  /** 文件名旁的行内标记 */
+  badge: '⚠ 可能无法识别',
+  /** 行内标记的悬浮完整说明 */
+  badgeTitle:
+    '未检测到此 PDF 的文本层，可能是扫描件。当前后端仅能处理带文本层的 PDF，提交后这份文件可能解析失败。此结果为本地启发式检测，可能有误。',
+  /** 汇总提示条 */
+  title: '部分文件可能无法解析',
+  detail: (n) =>
+    `${n} 份文件可能不含文本层（扫描件）。当前后端仅能处理带文本层的 PDF，提交后这些文件可能解析失败；其余文件不受影响，仍可正常提交。`,
+}
+
 /** 安全取值：契约新增枚举值时不让页面崩 */
 export function lookup(table, key, fallback = '未知') {
   return table[key] ?? { text: fallback, tone: 'muted' }

@@ -8,7 +8,8 @@
 import { ref, computed, inject, onBeforeUnmount } from 'vue'
 import { createCheck, pollCheck, validateFiles, ApiError, UPLOAD_LIMITS, USE_MOCK } from '../api/index.js'
 import { taskStatus, processStatus, formatTime, formatDuration, describeApiError } from '../api/formatters.js'
-import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES } from '../api/labels.js'
+import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '../api/labels.js'
+import { detectPdfTextLayer } from '../pdfTextLayer.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -35,6 +36,16 @@ const localErrors = ref([])
 const dragActive = ref(false)
 const fileInput = ref(null)
 
+/**
+ * PDF 文本层预检测命中的文件集合，key 与去重键一致（`${name}:${size}`）。
+ * 只存判定为 'no-text' 的；'unknown'（查不了）一律静默，不进入集合。
+ * 检测针对用户选的真实文件，与 USE_MOCK 开关无关。
+ */
+const scanWarnings = ref(new Set())
+
+/** 命中预检测的文件数，供汇总提示条使用 */
+const scanWarnCount = computed(() => scanWarnings.value.size)
+
 /** 轮询超过 90s 未结束时显示"处理时间较长"，但不停止等待 */
 const slowHint = ref(false)
 /** 请求层自动重试进行中（网络错误 / 5xx），显示"正在重连" */
@@ -59,6 +70,28 @@ function isAccepted(file) {
   return acceptedTypes.value.includes(ext)
 }
 
+function isPdf(file) {
+  return file.name.split('.').pop()?.toUpperCase() === 'PDF'
+}
+
+function fileKey(f) {
+  return `${f.name}:${f.size}`
+}
+
+/**
+ * 对单个 PDF 做文本层预检测。只警告、不阻止：
+ * - 命中 'no-text' → 加入 scanWarnings，界面显示警告
+ * - 'text' / 'unknown' → 从集合移除（unknown 静默降级，绝不误报）
+ */
+async function scanOne(file) {
+  const result = await detectPdfTextLayer(file)
+  const key = fileKey(file)
+  const next = new Set(scanWarnings.value)
+  if (result === 'no-text') next.add(key)
+  else next.delete(key)
+  scanWarnings.value = next
+}
+
 function addFiles(list) {
   localErrors.value = []
   const incoming = Array.from(list)
@@ -75,12 +108,18 @@ function addFiles(list) {
 
   const accepted = incoming.filter(isAccepted)
   // 同名文件去重，避免重复上传造成"件数不一致"的假象
-  const seen = new Set(files.value.map((f) => `${f.name}:${f.size}`))
-  const fresh = accepted.filter((f) => !seen.has(`${f.name}:${f.size}`))
+  const seen = new Set(files.value.map(fileKey))
+  const fresh = accepted.filter((f) => !seen.has(fileKey(f)))
   files.value = [...files.value, ...fresh]
 
   const problems = validateFiles(files.value)
   if (problems.length) localErrors.value.push(...problems)
+
+  // 只对 PDF 做文本层预检测，图片（本来就没有文本层）不检测。
+  // 异步后台跑，不阻塞文件进入列表；检测失败在 detectPdfTextLayer 内部降级为 unknown。
+  for (const f of fresh) {
+    if (isPdf(f)) scanOne(f)
+  }
 }
 
 function onDrop(e) {
@@ -94,14 +133,22 @@ function onPick(e) {
 }
 
 function removeFile(index) {
+  const removed = files.value[index]
   files.value = files.value.filter((_, i) => i !== index)
   localErrors.value = []
+  // 同步清理预检测记录，避免残留警告指向已移除的文件
+  if (removed && scanWarnings.value.has(fileKey(removed))) {
+    const next = new Set(scanWarnings.value)
+    next.delete(fileKey(removed))
+    scanWarnings.value = next
+  }
 }
 
 function clearAll() {
   files.value = []
   notes.value = ''
   localErrors.value = []
+  scanWarnings.value = new Set()
 }
 
 function sizeText(bytes) {
@@ -278,6 +325,12 @@ function docStatus(d) {
       <ul v-if="files.length" class="file-list">
         <li v-for="(f, i) in files" :key="`${f.name}-${i}`" class="file-item">
           <span class="file-name">{{ f.name }}</span>
+          <span
+            v-if="scanWarnings.has(`${f.name}:${f.size}`)"
+            class="scan-warn"
+            :title="SCAN_WARNING.badgeTitle"
+            >{{ SCAN_WARNING.badge }}</span
+          >
           <span class="file-size">{{ sizeText(f.size) }}</span>
           <button class="link-btn" @click="removeFile(i)">移除</button>
         </li>
@@ -307,6 +360,14 @@ function docStatus(d) {
           <li v-for="(e, i) in localErrors" :key="i">{{ e }}</li>
         </ul>
       </NoticeBar>
+
+      <!-- 扫描件预检测警告：只提示，不影响 canSubmit，用户仍可提交 -->
+      <NoticeBar
+        v-if="scanWarnCount"
+        tone="warn"
+        :title="SCAN_WARNING.title"
+        :detail="SCAN_WARNING.detail(scanWarnCount)"
+      />
 
       <div class="actions">
         <button class="btn primary" :disabled="!canSubmit" @click="submit">
