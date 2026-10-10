@@ -1286,3 +1286,21 @@ select {
 .eb-count {
   font-variant-numeric: tabular-nums;
 }
+
+/* ============================================================
+ * PDF 文本层预检测警告（UploadPage 扫描件提示）
+ * 命中「疑似无文本层」时文件名旁的行内标记
+ * ============================================================ */
+.scan-warn {
+  display: inline-block;
+  margin-left: var(--space-2, 8px);
+  padding: 1px 6px;
+  border: 1px solid var(--warning);
+  border-radius: 4px;
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  cursor: help; /* title 属性里有完整说明，提示用户可以悬浮查看 */
+}
