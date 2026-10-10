@@ -968,6 +968,113 @@ select {
   font-style: italic;
 }
 
+/* ---------- 并排对照展开面板（ComparePane）---------- */
+
+/* 卡片头部整行可点：展开/收起并排对照 */
+.cmp-head-toggle {
+  cursor: pointer;
+  user-select: none;
+  border-radius: var(--radius-sm);
+}
+
+.cmp-head-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cmp-chevron {
+  display: inline-block;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  transition: transform var(--duration-fast) var(--ease);
+}
+
+.cmp-chevron.open {
+  transform: rotate(90deg);
+}
+
+/* 多于两份文件时列自动换行平铺，保持可读 */
+.compare-pane {
+  margin-top: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.compare-col {
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  background: var(--surface-raised);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* 值与其他列不同的那一列才强调：中性列保持默认边框，不渲染成"有问题" */
+.compare-col.divergent {
+  border-left-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.compare-file {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.compare-value-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.compare-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: var(--text-base);
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.compare-value.empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.compare-page {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.compare-raw {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  word-break: break-all;
+}
+
+.compare-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.compare-foot .link-btn {
+  font-size: var(--text-xs);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
 .empty {
   margin: 16px 0 0;
   color: var(--text-muted);
@@ -1319,7 +1426,8 @@ select {
   .risk-item,
   .cmp-item,
   .doc-item,
-  .doc-chip {
+  .doc-chip,
+  .compare-col {
     break-inside: avoid;
   }
 }

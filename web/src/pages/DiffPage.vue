@@ -19,6 +19,7 @@ import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import EmptyState from '../components/EmptyState.vue'
+import ComparePane from '../components/ComparePane.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
@@ -110,6 +111,23 @@ function showsRaw(v, comparison) {
 const severityOf = severity
 
 /**
+ * 并排对照面板的展开状态，key 为 comparison_id，可同时展开多张卡片。
+ * 用 Set 的替换赋值触发更新；展开状态不持久化，切页重挂载后收起，与锚点跳转互不干扰。
+ */
+const expanded = ref(new Set())
+
+function toggleExpand(c) {
+  const next = new Set(expanded.value)
+  if (next.has(c.comparison_id)) next.delete(c.comparison_id)
+  else next.add(c.comparison_id)
+  expanded.value = next
+}
+
+function isExpanded(c) {
+  return expanded.value.has(c.comparison_id)
+}
+
+/**
  * 报告页「在差异页查看」的锚点：页面随切页重挂载，挂载时消费一次。
  * 目标条目必然在「需关注」集合里（报告页问题条目的过滤条件与 problemStatuses 等价），
  * 先切筛选再等渲染，滚动到位后短暂高亮。
@@ -196,8 +214,18 @@ onMounted(async () => {
             </h3>
             <ul class="cmp-list">
               <li v-for="c in g.list" :id="`cmp-${c.comparison_id}`" :key="c.comparison_id" class="cmp-item">
-                <div class="cmp-head">
+                <div
+                  class="cmp-head cmp-head-toggle"
+                  role="button"
+                  tabindex="0"
+                  :aria-expanded="isExpanded(c)"
+                  :title="isExpanded(c) ? '收起并排对照' : '展开并排对照'"
+                  @click="toggleExpand(c)"
+                  @keydown.enter.prevent="toggleExpand(c)"
+                  @keydown.space.prevent="toggleExpand(c)"
+                >
                   <div class="cmp-title">
+                    <span class="cmp-chevron" :class="{ open: isExpanded(c) }" aria-hidden="true">▶</span>
                     <span class="cmp-label">{{ c.label }}</span>
                     <span class="cmp-key">{{ c.field_key }}</span>
                   </div>
@@ -235,6 +263,9 @@ onMounted(async () => {
                     </tr>
                   </tbody>
                 </table>
+
+                <!-- 就地展开的并排对照：几份文件的值摆在一起看差异，不遮挡列表 -->
+                <ComparePane v-if="isExpanded(c)" :comparison="c" />
 
                 <div v-if="c.rule_id" class="cmp-foot">依据规则 {{ c.rule_id }}</div>
                 <div v-else class="cmp-foot muted">未经规则校验</div>

@@ -54,6 +54,24 @@ provide('pendingAnchor', pendingAnchor)
 provide('navigate', { go })
 
 /**
+ * 用户上传的 File 对象映射，key 为 file.name，value 为 File。
+ * File 对象只在浏览器内存里；上传页提交时写入，差异页「查看原文」用它拼 objectURL。
+ * mock 场景不经过真实上传，映射为空，「查看原文」按钮随之不渲染（降级，不伪造）。
+ * 写入（提交/清空）必然早于结果渲染，按钮显隐在渲染时按 key 现查，
+ * 不需要逐个 key 的响应式追踪，普通 Map 即可。
+ */
+const sourceFiles = new Map()
+provide('sourceFiles', {
+  get: (name) => sourceFiles.get(name) ?? null,
+  /** 整批替换：每次提交新检查时以当前选择的文件为准 */
+  setAll: (files) => {
+    sourceFiles.clear()
+    for (const f of files ?? []) sourceFiles.set(f.name, f)
+  },
+  clear: () => sourceFiles.clear(),
+})
+
+/**
  * 评测数据缓存提升到 App 层：
  * 切页时 EvalPage 会卸载重挂载，缓存留在 provide 里，
  * 重挂载时直接复用，不再每次切页都重新请求一次。
