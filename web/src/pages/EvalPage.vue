@@ -11,6 +11,7 @@ import { getEvaluation, USE_MOCK, ApiError } from '../api/index.js'
 import { formatTime } from '../api/formatters.js'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
+import EmptyState from '../components/EmptyState.vue'
 
 const evaluation = ref(null)
 const loading = ref(false)
@@ -22,7 +23,8 @@ async function load() {
   try {
     evaluation.value = await getEvaluation()
   } catch (e) {
-    error.value = e instanceof ApiError ? e.message : '获取评测结果失败'
+    error.value =
+      e instanceof ApiError ? e.message : '获取评测结果失败：前端与后端之间的请求未成功完成'
   } finally {
     loading.value = false
   }
@@ -70,7 +72,17 @@ const errorBreakdown = computed(() => {
       </button>
     </div>
 
-    <NoticeBar v-if="error" tone="bad" title="读取评测结果失败" :detail="error" />
+    <!-- 加载失败：说清什么失败，提供重试 -->
+    <EmptyState
+      v-if="error"
+      tone="bad"
+      icon="⚠️"
+      title="读取评测结果失败"
+      :detail="error"
+      :retrying="loading"
+      retry-text="重试"
+      @retry="load"
+    />
 
     <!-- 首次读取中：按"本次评测信息 + 指标表"的形状占位 -->
     <template v-if="loading && !evaluation">
@@ -87,9 +99,10 @@ const errorBreakdown = computed(() => {
     </template>
 
     <!-- 尚未评测：这是默认状态，不是异常 -->
-    <NoticeBar
-      v-if="isNotRun && !error && !loading"
+    <EmptyState
+      v-else-if="isNotRun && !loading"
       tone="info"
+      icon="📊"
       title="尚未评测"
       detail="尚无真实评测结果。本页在取得数据前不展示任何指标，以免与实际能力不符。"
     />
