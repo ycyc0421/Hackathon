@@ -40,6 +40,20 @@ provide('taskError', taskError)
 provide('isRunning', isRunning)
 
 /**
+ * 跨页导航：报告页的条目可以直接跳到差异页对应位置。
+ * anchor 经 pendingAnchor 传给目标页（页面随切页重挂载，挂载时消费并清空）。
+ */
+const pendingAnchor = ref(null)
+
+function go(page, anchor) {
+  pendingAnchor.value = anchor ?? null
+  active.value = page
+}
+
+provide('pendingAnchor', pendingAnchor)
+provide('navigate', { go })
+
+/**
  * 评测数据缓存提升到 App 层：
  * 切页时 EvalPage 会卸载重挂载，缓存留在 provide 里，
  * 重挂载时直接复用，不再每次切页都重新请求一次。

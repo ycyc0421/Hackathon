@@ -1194,6 +1194,136 @@ select {
   font-size: 12px;
 }
 
+/* 检查概要的开头结论：一段话告诉读者"要不要处理"，先于统计数字 */
+.report-conclusion {
+  margin: var(--space-2) 0 var(--space-4);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+/* 文件清单压缩为 chips：一行能看多份文件，状态靠色点快速分辨 */
+.doc-chips {
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.doc-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  max-width: 100%;
+}
+
+.doc-chip-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* 色点复用徽章的语义色：处理失败/不支持与正常一眼可分 */
+.doc-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.doc-chip-dot.tone-ok {
+  background: var(--success);
+}
+
+.doc-chip-dot.tone-warn {
+  background: var(--warning);
+}
+
+.doc-chip-dot.tone-bad {
+  background: var(--danger);
+}
+
+.doc-chip-dot.tone-running {
+  background: var(--info);
+}
+
+.doc-chip-dot.tone-muted {
+  background: var(--gray-400);
+}
+
+.doc-chip-name {
+  word-break: break-all;
+}
+
+.doc-chip-type {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+/* 处理失败的原因放 chip 第二行，压缩布局也不能丢错误信息 */
+.doc-chip-error {
+  color: var(--danger);
+  font-size: var(--text-xs);
+}
+
+.issue-foot {
+  margin-top: var(--space-2);
+}
+
+/* 报告页跳到差异页后的定位反馈：高亮背景淡去，约 1.6s 后由 JS 移除 class */
+.cmp-item.cmp-highlight {
+  animation: cmp-highlight-fade 1.6s var(--ease-out);
+}
+
+@keyframes cmp-highlight-fade {
+  from {
+    background: var(--info-bg);
+    box-shadow: 0 0 0 2px var(--info);
+  }
+  to {
+    background: transparent;
+    box-shadow: 0 0 0 2px transparent;
+  }
+}
+
+/* ---------- 打印 ---------- */
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  /* 交互元素在纸面上没有意义 */
+  .topbar,
+  .footer,
+  .mock-tools,
+  .link-btn,
+  .actions {
+    display: none;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid var(--border);
+  }
+
+  /* 条目不被分页切成两半 */
+  .issue-item,
+  .risk-item,
+  .cmp-item,
+  .doc-item,
+  .doc-chip {
+    break-inside: avoid;
+  }
+}
+
 /* ---------- 评测页 ---------- */
 
 /* 各状态共用同一张卡片，切换时卡片本身不动，只有内容淡出/淡入 */

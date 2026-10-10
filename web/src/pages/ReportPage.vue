@@ -6,7 +6,7 @@
  * 导出功能未实现：契约第四节第 9 项未定导出由哪个接口提供。
  */
 import { computed, inject } from 'vue'
-import { formatTime, formatDuration, riskType, severity } from '../api/formatters.js'
+import { formatTime, formatDuration, riskType, severity, processStatus } from '../api/formatters.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -14,6 +14,8 @@ import EmptyState from '../components/EmptyState.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
+/** 跨页导航：跳差异页对应条目。App 层提供 */
+const navigate = inject('navigate')
 
 const summary = computed(() => task.value?.summary ?? null)
 
@@ -47,6 +49,39 @@ const showNoRisk = computed(
 const duration = computed(() =>
   task.value ? formatDuration(task.value.created_at, task.value.finished_at) : null
 )
+
+/**
+ * 检查概要的开头结论：把统计数字串成一句话，让读者先知道"要不要处理"。
+ * - summary 为 null（或任务进行中/失败）时整段不显示——不替后端下结论；
+ * - PARTIAL 必须带"不完整"前缀，不能被读成通过；
+ * - 为 0 的类别跳过不念；风险提示为 0 时只有确实零问题才说"未发现风险"。
+ */
+const conclusion = computed(() => {
+  if (!task.value || !summary.value || task.value.status === 'FAILED') return null
+  const s = summary.value
+
+  const prefix =
+    task.value.status === 'PARTIAL'
+      ? `${failedDocs.value.length} 份文件未能处理，本报告基于不完整结果。`
+      : ''
+
+  const problemParts = []
+  if (s.conflict_count > 0) problemParts.push(`${s.conflict_count} 处不一致`)
+  if (s.missing_count > 0) problemParts.push(`${s.missing_count} 处部分缺失`)
+  if (s.unrecognized_count > 0) problemParts.push(`${s.unrecognized_count} 处无法比对`)
+
+  if (!problemParts.length) {
+    // 无问题：只有零风险才能说"未发现风险"，有风险必须念出来（零问题也可能有风险）
+    const tail = s.risk_count > 0 ? `，另有 ${s.risk_count} 条风险提示需要人工查看` : '，未发现风险提示'
+    return `${prefix}${s.document_count} 份文件、${s.field_count} 个字段全部一致${tail}。`
+  }
+
+  const riskPart = s.risk_count > 0 ? `，另有 ${s.risk_count} 条风险提示` : ''
+  return `${prefix}发现 ${problemParts.join('、')}${riskPart}——需要人工复核。`
+})
+
+/** 文件 chip 的色点按处理状态着色，复用状态文案表里的语义色 */
+const docTone = (d) => processStatus(d.process_status).tone
 
 const severityOf = severity
 </script>
@@ -95,6 +130,9 @@ const severityOf = severity
       <section class="card">
         <h2 class="card-title">检查概要</h2>
 
+        <!-- 结论先行：一段话回答"这次检查要不要处理"。summary 缺失时不显示，不替后端下结论 -->
+        <p v-if="conclusion" class="report-conclusion">{{ conclusion }}</p>
+
         <dl class="meta-grid">
           <div><dt>任务编号</dt><dd>{{ task.task_id }}</dd></div>
           <div><dt>目的国</dt><dd>{{ task.input?.destination_country_name || task.input?.destination_country || '—' }}</dd></div>
@@ -120,13 +158,15 @@ const severityOf = severity
 
       <section class="card">
         <h2 class="card-title">文件清单</h2>
-        <ul class="doc-list">
-          <li v-for="d in task.documents" :key="d.file_id" class="doc-item">
-            <div class="doc-main">
-              <span class="doc-name">{{ d.file_name }}</span>
-              <span class="doc-type">{{ d.doc_type || '类型未识别' }}</span>
-              <span v-if="d.error_message" class="doc-error">{{ d.error_message }}</span>
-            </div>
+        <ul class="doc-chips">
+          <li v-for="d in task.documents" :key="d.file_id" class="doc-chip">
+            <span class="doc-chip-main">
+              <span class="doc-chip-dot" :class="`tone-${docTone(d)}`" aria-hidden="true"></span>
+              <span class="doc-chip-name">{{ d.file_name }}</span>
+              <span class="doc-chip-type">{{ d.doc_type || '类型未识别' }}</span>
+            </span>
+            <!-- 失败原因必须能看到，不能随压缩丢失 -->
+            <span v-if="d.error_message" class="doc-chip-error">{{ d.error_message }}</span>
           </li>
         </ul>
       </section>
@@ -149,6 +189,9 @@ const severityOf = severity
             <p v-if="c.note" class="issue-note">{{ c.note }}</p>
             <!-- 后端的处理建议（可选）。建议不代替比对结论，用次要文本呈现 -->
             <p v-if="c.suggested_action" class="issue-note">建议：{{ c.suggested_action }}</p>
+            <div class="issue-foot">
+              <button class="link-btn" @click="navigate.go('diff', c.comparison_id)">在差异页查看 →</button>
+            </div>
           </li>
         </ul>
         <EmptyState

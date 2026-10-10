@@ -7,7 +7,7 @@
  * - MATCH 之外的每种状态都要显示，尤其 NOT_CHECKED（未校验）——
  *   它必须与「没有问题」在视觉上区分开。
  */
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, onMounted, nextTick } from 'vue'
 import {
   comparisonStatus,
   fieldStatus,
@@ -108,6 +108,26 @@ function showsRaw(v, comparison) {
 }
 
 const severityOf = severity
+
+/**
+ * 报告页「在差异页查看」的锚点：页面随切页重挂载，挂载时消费一次。
+ * 目标条目必然在「需关注」集合里（报告页问题条目的过滤条件与 problemStatuses 等价），
+ * 先切筛选再等渲染，滚动到位后短暂高亮。
+ */
+const pendingAnchor = inject('pendingAnchor')
+
+onMounted(async () => {
+  if (!pendingAnchor?.value) return
+  const targetId = `cmp-${pendingAnchor.value}`
+  pendingAnchor.value = null
+  filter.value = 'problems'
+  await nextTick()
+  const el = document.getElementById(targetId)
+  if (!el) return
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  el.classList.add('cmp-highlight')
+  setTimeout(() => el.classList.remove('cmp-highlight'), 1600)
+})
 </script>
 
 <template>
@@ -175,7 +195,7 @@ const severityOf = severity
               {{ g.title }} <span class="cmp-group-num">{{ g.list.length }}</span>
             </h3>
             <ul class="cmp-list">
-              <li v-for="c in g.list" :key="c.comparison_id" class="cmp-item">
+              <li v-for="c in g.list" :id="`cmp-${c.comparison_id}`" :key="c.comparison_id" class="cmp-item">
                 <div class="cmp-head">
                   <div class="cmp-title">
                     <span class="cmp-label">{{ c.label }}</span>
