@@ -5,11 +5,12 @@
  * 但状态枚举是前端自己渲染的，必须有一份统一对照表，否则三个页面各写一套。
  *
  * 取值集合来自 docs/schema/check-task.schema.json，改动要同步。
+ * 注意：后端已确认任务进行中状态为 PROCESSING（issue #4），schema 的旧写法 RUNNING 已随契约修订更正。
  */
 
 export const TASK_STATUS = {
   PENDING: { text: '排队中', tone: 'muted' },
-  RUNNING: { text: '处理中', tone: 'running' },
+  PROCESSING: { text: '处理中', tone: 'running' },
   COMPLETED: { text: '已完成', tone: 'ok' },
   PARTIAL: { text: '部分完成', tone: 'warn', hint: '有文件未能处理成功，结果不完整' },
   FAILED: { text: '处理失败', tone: 'bad' },

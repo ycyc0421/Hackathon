@@ -147,6 +147,8 @@ const severityOf = severity
               </span>
             </div>
             <p v-if="c.note" class="issue-note">{{ c.note }}</p>
+            <!-- 后端的处理建议（可选）。建议不代替比对结论，用次要文本呈现 -->
+            <p v-if="c.suggested_action" class="issue-note">建议：{{ c.suggested_action }}</p>
           </li>
         </ul>
         <EmptyState
@@ -173,6 +175,8 @@ const severityOf = severity
             <div class="risk-title">{{ r.title }}</div>
             <p class="risk-detail">{{ r.detail }}</p>
             <div class="risk-foot">规则 {{ r.rule_id }}<template v-if="r.rule_source"> · {{ r.rule_source }}</template></div>
+            <!-- 后端的处理建议（可选）。建议不代替结论，用次要文本呈现 -->
+            <p v-if="r.suggested_action" class="risk-detail">建议：{{ r.suggested_action }}</p>
           </li>
         </ul>
       </section>
@@ -188,6 +192,8 @@ const severityOf = severity
             </div>
             <div class="risk-title">{{ r.title }}</div>
             <p class="risk-detail">{{ r.detail }}</p>
+            <!-- 后端的处理建议（可选）。建议不代替结论，用次要文本呈现 -->
+            <p v-if="r.suggested_action" class="risk-detail">建议：{{ r.suggested_action }}</p>
           </li>
         </ul>
       </section>

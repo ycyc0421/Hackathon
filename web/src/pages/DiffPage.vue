@@ -218,6 +218,8 @@ const severityOf = severity
 
                 <div v-if="c.rule_id" class="cmp-foot">依据规则 {{ c.rule_id }}</div>
                 <div v-else class="cmp-foot muted">未经规则校验</div>
+                <!-- 后端的处理建议（可选，null 时不显示）。建议只辅助人工，不代替比对结论 -->
+                <p v-if="c.suggested_action" class="cmp-note">建议：{{ c.suggested_action }}</p>
               </li>
             </ul>
           </div>
