@@ -127,6 +127,12 @@ body {
   text-align: center;
 }
 
+.mock-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .mock-flag {
   padding: 3px var(--space-3);
   border: 1px dashed var(--warning);
@@ -134,6 +140,16 @@ body {
   background: var(--warning-bg);
   color: var(--warning);
   font-size: var(--text-xs);
+}
+
+.mock-scenario-select {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-body);
+  font-size: var(--text-xs);
+  cursor: pointer;
 }
 
 .content {
