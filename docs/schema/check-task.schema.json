@@ -10,6 +10,7 @@
     "created_at",
     "finished_at",
     "input",
+    "items",
     "documents",
     "extractions",
     "comparisons",
@@ -34,6 +35,11 @@
       "description": "未完成时为 null"
     },
     "input": { "$ref": "#/$defs/TaskInput" },
+    "items": {
+      "type": "array",
+      "description": "本票货物的商品目录，仅在当前任务内有效。第一版按单品名交付，返回单元素数组",
+      "items": { "$ref": "#/$defs/Item" }
+    },
     "documents": {
       "type": "array",
       "items": { "$ref": "#/$defs/Document" }
@@ -145,6 +151,29 @@
       "enum": ["TEXT_LAYER", "OCR", "EDI_PARSE", null]
     },
 
+    "Item": {
+      "type": "object",
+      "description": "任务内的商品目录条目。item_id 只是任务内的商品关联键：不是类别、不是属性、不是 HS 编码、不是正确答案；跨任务可复用",
+      "required": ["item_id", "display_name"],
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "pattern": "^item_[a-zA-Z0-9_-]+$"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "前端展示用的商品名"
+        },
+        "description": { "type": ["string", "null"] },
+        "line_no": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "该商品在原始文件中的行号，不用于跨文件匹配"
+        }
+      }
+    },
+
     "FieldStatus": {
       "type": "string",
       "description": "该字段在某一份文件里的状态。NOT_IN_DOC 与 MISSING_IN_DOC 必须分开：前者是这份单证按规则本就没有该字段（正常），后者是应该有但没找到（异常）",
@@ -212,6 +241,16 @@
           "description": "给不出来给 null，不要给假的 1.0"
         },
         "status": { "$ref": "#/$defs/FieldStatus" },
+        "item_id": {
+          "type": ["string", "null"],
+          "pattern": "^item_[a-zA-Z0-9_-]+$",
+          "description": "商品级字段归属的商品；整票级字段为 null"
+        },
+        "line_no": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "该字段在原始文件中的行号，不用于跨文件匹配"
+        },
         "page": { "type": ["integer", "null"], "minimum": 1 },
         "bbox": { "$ref": "#/$defs/BBox" },
         "bbox_unit": {
@@ -287,6 +326,11 @@
       "properties": {
         "file_id": { "type": "string" },
         "file_name": { "type": "string" },
+        "item_id": {
+          "type": ["string", "null"],
+          "pattern": "^item_[a-zA-Z0-9_-]+$",
+          "description": "该值归属的商品，用于追溯；整票级字段为 null"
+        },
         "raw_value": { "type": ["string", "null"] },
         "normalized_value": {
           "type": ["string", "number", "boolean", "null"]
@@ -316,6 +360,11 @@
         "field_key": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "item_id": {
+          "type": ["string", "null"],
+          "pattern": "^item_[a-zA-Z0-9_-]+$",
+          "description": "商品级比对归属的商品；整票级比对为 null。比较键为 item_id + field_key"
         },
         "label": { "type": "string" },
         "value_type": { "$ref": "#/$defs/ValueType" },
