@@ -118,16 +118,73 @@ async function request(path, options = {}, { onRetry, signal } = {}) {
   throw lastError
 }
 
+/**
+ * 带上传进度回调的 POST。fetch 拿不到上传进度，这里用 XMLHttpRequest。
+ * 错误分类与 request() 保持一致，页面不用区分两条路径。
+ * @param {string} path
+ * @param {FormData} form
+ * @param {(percent: number) => void} onProgress 0-100，仅在可计算总长时回调
+ */
+function requestWithUploadProgress(path, form, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', `${API_BASE}${path}`)
+    xhr.responseType = 'json'
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable && e.total > 0) {
+        onProgress(Math.round((e.loaded / e.total) * 100))
+      }
+    }
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const body = xhr.response
+        if (body && typeof body === 'object') {
+          resolve(body)
+        } else {
+          reject(new ApiError('后端返回的内容不是合法 JSON', { kind: 'PARSE', status: xhr.status }))
+        }
+        return
+      }
+      let code = null
+      let message = `请求失败（HTTP ${xhr.status}）`
+      const body = xhr.response
+      if (body?.error?.message) message = body.error.message
+      if (body?.error?.code) code = body.error.code
+      reject(new ApiError(message, { kind: 'SERVER', code, status: xhr.status }))
+    }
+
+    xhr.onerror = () => {
+      reject(new ApiError('无法连接后端，请确认服务已启动、代理配置正确', { kind: 'NETWORK' }))
+    }
+
+    xhr.send(form)
+  })
+}
+
 // —— 对外接口 ——
 
 /**
  * 创建检查任务。契约第四节第 1 项按任务式设计。
  * @param {{ files: File[], destinationCountry: string, notes?: string }} input
+ * @param {{ onUploadProgress?: (percent: number) => void, onRetry?: Function, signal?: AbortSignal }} [options]
+ *        onUploadProgress 收到 0-100 的整数百分比，仅在能计算总长时回调（走 XHR，无重试）
  * @returns {Promise<{ task_id: string, status: string }>}
  */
-export async function createCheck({ files, destinationCountry, notes }, { onRetry, signal } = {}) {
+export async function createCheck(
+  { files, destinationCountry, notes },
+  { onUploadProgress, onRetry, signal } = {}
+) {
   if (USE_MOCK) {
-    await sleep(400)
+    // mock 下按文件大小模拟上传进度，让上传页能看到真实的进度条形态
+    const total = files.reduce((s, f) => s + f.size, 0) || 1
+    let loaded = 0
+    for (const f of files) {
+      await sleep(150)
+      loaded += f.size
+      onUploadProgress?.(Math.round((loaded / total) * 100))
+    }
     return {
       task_id: `mock_${Date.now()}`,
       status: 'PENDING',
@@ -140,6 +197,9 @@ export async function createCheck({ files, destinationCountry, notes }, { onRetr
   form.append('destination_country', destinationCountry)
   if (notes) form.append('notes', notes)
 
+  if (onUploadProgress) {
+    return requestWithUploadProgress('/checks', form, onUploadProgress)
+  }
   return request('/checks', { method: 'POST', body: form }, { onRetry, signal })
 }
 

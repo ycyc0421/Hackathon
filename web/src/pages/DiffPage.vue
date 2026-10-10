@@ -17,8 +17,10 @@ import {
 } from '../api/formatters.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
+import SkeletonBlock from '../components/SkeletonBlock.vue'
 
 const task = inject('task')
+const isRunning = inject('isRunning')
 
 const filter = ref('problems') // all | problems | conflicts | unchecked
 
@@ -75,8 +77,23 @@ const severityOf = severity
 
 <template>
   <div class="page">
+    <!-- 任务进行中且没有旧结果：按比对卡片的形状占位 -->
+    <section v-if="!task && isRunning" class="card" aria-hidden="true">
+      <div class="skeleton-chips">
+        <SkeletonBlock v-for="i in 4" :key="i" width="76px" height="26px" radius="lg" />
+      </div>
+      <div class="skeleton-cmp">
+        <SkeletonBlock width="55%" height="16px" />
+        <SkeletonBlock height="96px" />
+      </div>
+      <div class="skeleton-cmp">
+        <SkeletonBlock width="45%" height="16px" />
+        <SkeletonBlock height="96px" />
+      </div>
+    </section>
+
     <NoticeBar
-      v-if="!task"
+      v-else-if="!task"
       tone="info"
       title="尚无检查结果"
       detail="请先在「上传」页创建一次检查。"

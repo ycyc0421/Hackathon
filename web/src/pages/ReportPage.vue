@@ -9,8 +9,10 @@ import { computed, inject } from 'vue'
 import { formatTime, formatDuration, riskType, severity } from '../api/formatters.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
+import SkeletonBlock from '../components/SkeletonBlock.vue'
 
 const task = inject('task')
+const isRunning = inject('isRunning')
 
 const summary = computed(() => task.value?.summary ?? null)
 
@@ -42,8 +44,25 @@ const severityOf = severity
 
 <template>
   <div class="page">
+    <!-- 任务进行中且没有旧结果：按概要卡 + 统计行的形状占位 -->
+    <template v-if="!task && isRunning">
+      <section class="card" aria-hidden="true">
+        <SkeletonBlock width="100px" height="18px" />
+        <div class="skeleton-meta-grid">
+          <SkeletonBlock v-for="i in 4" :key="i" height="36px" />
+        </div>
+        <div class="skeleton-stat-row">
+          <SkeletonBlock v-for="i in 6" :key="i" height="52px" radius="md" />
+        </div>
+      </section>
+      <section class="card" aria-hidden="true">
+        <SkeletonBlock width="100px" height="18px" />
+        <SkeletonBlock v-for="i in 3" :key="i" height="34px" />
+      </section>
+    </template>
+
     <NoticeBar
-      v-if="!task"
+      v-else-if="!task"
       tone="info"
       title="尚无检查结果"
       detail="请先在「上传」页创建一次检查。"
