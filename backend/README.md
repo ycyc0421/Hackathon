@@ -127,6 +127,8 @@ PP-StructureV3 提供行列结构，普通 OCR 提供正文原文。若表格结
 读数作为 `raw_text` / `raw_value`，归一值使用校正后的候选；字段标为
 `LOW_CONFIDENCE`，若跨文件比对一致，仍附 `WARNING` 与人工核对说明。其他品名分歧返回
 `NOT_CHECKED` 和 `OCR_TEXT_DISAGREEMENT` 警告。
+当前本地 OCR 只接受可交叉核验的单张商品表；一页多张表、缺少货号或品名列时，
+文件显式解析失败，不丢弃明细后继续给出比对结论。表头支持抽取层已有的中英文列名。
 
 ```powershell
 $env:PADDLE_OCR_ENABLED = '1'

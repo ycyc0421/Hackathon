@@ -8,6 +8,7 @@ from io import BytesIO
 from threading import Lock
 
 from .reader import ReadResult
+from .rows import HEADER_MAP, _looks_like_header
 from ..config import MIN_TEXT_LAYER_CHARS
 from ..models import ParseMethod
 
@@ -66,18 +67,31 @@ def _table_lines(html: str) -> list[str]:
     return ["   ".join(row[i].strip() for i in keep) for row in table]
 
 
-def _needs_table(lines: list[str]) -> bool:
-    markers = {"DESCRIPTION", "HS CODE", "QTY", "PACKAGES", "AMOUNT"}
+def _header_key(cell: str) -> str | None:
+    keys = {key for pattern, key in HEADER_MAP if pattern.fullmatch(cell.strip().rstrip("."))}
+    return next(iter(keys)) if len(keys) == 1 else None
+
+
+def _table_start(lines: list[str]) -> int | None:
+    # 与抽取层共用列名；OCR 表头可能没有句点、序号列，或使用中文。
     for i, line in enumerate(lines):
-        if line.strip().upper() in {"NO.", "ITEM NO.", "ITEMNO."}:
-            nearby = {x.strip().upper() for x in lines[i : i + 12]}
-            if len(markers & nearby) >= 3:
-                return True
-    return False
+        if _looks_like_header(line):
+            return i
+        keys = set()
+        for cell in lines[i : i + 12]:
+            if cell.strip().upper().rstrip(".") in {"NO", "序号"}:
+                continue
+            key = _header_key(cell)
+            if key is None:
+                break
+            keys.add(key)
+        if len(keys) >= 3:
+            return i
+    return None
 
 
 def _replace_table(lines: list[str], table_lines: list[str]) -> str:
-    start = next((i for i, line in enumerate(lines) if line.strip().upper() in {"NO.", "ITEM NO.", "ITEMNO."}), None)
+    start = _table_start(lines)
     end = next((i for i, line in enumerate(lines) if i > (start or 0) and re.match(r"\s*(?:合计|TOTAL|GRAND TOTAL)\b", line, re.I)), None)
     if start is None or end is None or end <= start:
         raise ValueError("无法确定 OCR 表格在原文中的边界")
@@ -129,10 +143,10 @@ def _correct_zero_confusion(value: str) -> str:
 def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[list[str], list[str], list[dict[str, str]]]:
     """Cross-check two OCR paths; resolve only unambiguous zero/O unit tokens."""
     header = table_lines[0].split("   ")
-    code_at = next((i for i, h in enumerate(header) if re.fullmatch(r"ITEM\s*NO\.?", h, re.I)), None)
-    desc_at = next((i for i, h in enumerate(header) if h.upper() == "DESCRIPTION"), None)
+    code_at = next((i for i, h in enumerate(header) if _header_key(h) == "item_code"), None)
+    desc_at = next((i for i, h in enumerate(header) if _header_key(h) == "description"), None)
     if code_at is None or desc_at is None:
-        return table_lines, [], []
+        raise ValueError("商品明细表缺少可交叉核验的货号或品名列")
     uncertain: list[str] = []
     corrections: list[dict[str, str]] = []
     out = [table_lines[0]]
@@ -195,13 +209,13 @@ def read_image(data: bytes) -> ReadResult:
             lines = [str(x).strip() for x in results[0].json["res"]["rec_texts"] if str(x).strip()]
             uncertain: list[str] = []
             corrections: list[dict[str, str]] = []
-            if _needs_table(lines):
+            if _table_start(lines) is not None:
                 structure = list(_get_structure().predict(input=image))
                 if len(structure) != 1:
                     raise ValueError("表格识别未返回单页结果")
                 markdown = structure[0].markdown["markdown_texts"]
-                html = re.search(r"<table\b.*?</table>", markdown, re.I | re.S)
-                lines_text = _table_lines(html.group()) if html else _sequential_packing_table(lines)
+                # 交给解析器检查整页，不能截出第一张表后静默丢弃其他表格。
+                lines_text = _table_lines(markdown) if re.search(r"<table\b", markdown, re.I) else _sequential_packing_table(lines)
                 lines_text, uncertain, corrections = _check_descriptions(lines_text, lines)
                 text = _replace_table(lines, lines_text)
             else:

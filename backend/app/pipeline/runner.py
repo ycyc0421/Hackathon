@@ -20,6 +20,7 @@ from . import classify, rules
 from .align import align_items
 from .compare import build_comparisons, build_item_comparisons
 from .extract import extract_fields
+from .normalize import normalize_description
 from .reader import guess_file_type, read_document
 from .rows import parse_line_items
 
@@ -29,12 +30,14 @@ log = logging.getLogger("backend.pipeline")
 def _apply_ocr_corrections(line_items: list[dict], corrections: list[dict[str, str]]) -> None:
     """Keep the uncorrected OCR reading as evidence; compare the corrected candidate cautiously."""
     for correction in corrections:
+        corrected = normalize_description(correction["corrected"])
         for line in line_items:
             code = next((field.get("raw_value") for field in line["fields"] if field["field_key"] == "item_code"), None)
             if code != correction["item_code"]:
                 continue
             for field in line["fields"]:
-                if field["field_key"] == "description" and field["raw_value"] == correction["corrected"]:
+                # raw_value 已截断为 80 字符；归一值仍保留完整品名。
+                if field["field_key"] == "description" and field["normalized_value"] == corrected:
                     field["raw_text"] = correction["original"]
                     field["raw_value"] = correction["original"]
                     field["status"] = "LOW_CONFIDENCE"
