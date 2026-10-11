@@ -157,9 +157,9 @@ const errorBreakdown = computed(() => {
             <thead>
               <tr>
                 <th>项目</th>
-                <th>精确率</th>
-                <th>召回率</th>
-                <th>F1</th>
+                <th class="num">精确率</th>
+                <th class="num">召回率</th>
+                <th class="num">F1</th>
               </tr>
             </thead>
             <tbody>
