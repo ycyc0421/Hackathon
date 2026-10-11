@@ -71,6 +71,10 @@
 
 补充原则：
 
+- **时序纪律**：所有 transition/animation 必须显式使用 `var(--ease)`，
+  禁止缺省（linear / 浏览器默认 ease），也不另用 ease-in/ease-out 变体；
+  尺寸类过渡（width / height / grid-template-rows）统一 `var(--duration-base)`，
+  避免尺寸变化与颜色变化节奏不一致。
 - **平级视图的互换**：同一信息的两种排布互为切换（如差异页的表格 ↔ 对照）时，
   用交叉淡入淡出（离场内容脱离文档流）+ 容器高度平滑过渡；切换两端的视觉重量
   应相当，不出现「切过去反而更空」的方向感。

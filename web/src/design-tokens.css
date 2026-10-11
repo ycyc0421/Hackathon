@@ -101,9 +101,8 @@
   --duration-base: 200ms;
   --duration-slow: 300ms;
 
+  /* 全站唯一的缓动曲线：DESIGN.md 动画一节要求所有过渡显式使用它，不设备选 */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
 
   /* ========== 视图模式（默认舒适）========== */
   --row-height: 48px;

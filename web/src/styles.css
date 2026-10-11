@@ -663,7 +663,7 @@ select {
   display: grid;
   grid-template-rows: 1fr;
   opacity: 1;
-  transition: grid-template-rows var(--duration-slow) var(--ease),
+  transition: grid-template-rows var(--duration-base) var(--ease),
               opacity var(--duration-base) var(--ease);
 }
 
@@ -693,7 +693,7 @@ select {
   height: 100%;
   background: var(--color-primary);
   border-radius: var(--radius-sm);
-  transition: width var(--duration-fast) var(--ease);
+  transition: width var(--duration-base) var(--ease);
 }
 
 .progress-num {
@@ -1128,7 +1128,7 @@ select {
 
 .compare-col.divergent .compare-value {
   color: var(--danger);
-  animation: divergent-read-in var(--duration-slow) var(--ease-out);
+  animation: divergent-read-in var(--duration-slow) var(--ease);
 }
 
 @keyframes divergent-read-in {
@@ -1550,7 +1550,7 @@ select {
 
 /* 报告页跳到差异页后的定位反馈：高亮背景淡去，约 1.6s 后由 JS 移除 class */
 .cmp-item.cmp-highlight {
-  animation: cmp-highlight-fade 1.6s var(--ease-out);
+  animation: cmp-highlight-fade 1.6s var(--ease);
 }
 
 @keyframes cmp-highlight-fade {
