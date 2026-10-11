@@ -28,6 +28,7 @@ import completedSample from '../mock/check-completed.json'
 import partialSample from '../mock/check-partial.json'
 import multiItemSample from '../mock/check-multi-item.json'
 import cleanSample from '../mock/check-clean.json'
+import evaluationDoneSample from '../mock/evaluation-done.json'
 
 // 错误类型、上传校验与同名拆分在此处统一出口，页面只从 api/index.js 引入
 export { ApiError, UPLOAD_LIMITS, validateFiles, splitByName }
@@ -181,19 +182,13 @@ export async function pollCheck(taskId, { onTick, onSlow, onRetry, signal } = {}
 /**
  * 评测结果。契约第四节第 10 项未定，拿不到就给 NOT_RUN。
  * 页面据此显示"尚未评测"，不填任何数字。
+ * mock 下返回一份 DONE 示例（web/src/mock/evaluation-done.json），
+ * 用于演示评测看板有数据时的形态，页面带有「示例数据」标识。
  */
 export async function getEvaluation(options = {}) {
   if (isMock()) {
     await sleep(200)
-    return {
-      status: 'NOT_RUN',
-      dataset_version: null,
-      sample_count: 0,
-      model_version: null,
-      metrics: null,
-      error_breakdown: null,
-      run_at: null,
-    }
+    return stripComment(JSON.parse(JSON.stringify(evaluationDoneSample)))
   }
 
   try {

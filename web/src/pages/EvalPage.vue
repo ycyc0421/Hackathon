@@ -192,7 +192,7 @@ const errorBreakdown = computed(() => {
       v-if="mock"
       tone="info"
       title="当前使用示例数据"
-      detail="后端评测接口尚未提供，本页显示的是占位状态。"
+      detail="本页显示的是内置示例评测结果，并非真实跑分，数值不代表实际能力。"
     />
   </div>
 </template>

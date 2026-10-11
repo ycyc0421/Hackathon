@@ -1,0 +1,20 @@
+{
+  "_comment": "mock 评测结果（DONE）。数值刻意不满分、各分项有强有弱，形态对齐真实跑分：冲突检出与风险提示明显难于字段抽取。仅用于演示评测页有数据时的样子，不代表真实能力。结构须与 docs/schema/evaluation.schema.json 一致。",
+  "status": "DONE",
+  "dataset_version": "golden-v1",
+  "sample_count": 132,
+  "model_version": "extract-pipeline-0.4.2",
+  "metrics": {
+    "field_extraction": { "precision": 0.912, "recall": 0.883, "f1": 0.897 },
+    "conflict_detection": { "precision": 0.847, "recall": 0.792, "f1": 0.819 },
+    "risk_hint": { "precision": 0.778, "recall": 0.694, "f1": 0.734 }
+  },
+  "error_breakdown": {
+    "扫描件 OCR 误识": 17,
+    "版式解析错位": 12,
+    "多品名归因错误": 7,
+    "单位换算遗漏": 5,
+    "表格跨页断行": 4
+  },
+  "run_at": "2026-10-09T14:32:07Z"
+}
