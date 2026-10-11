@@ -37,7 +37,7 @@ from . import normalize as N
 ROW_START = re.compile(r"^\s*(\d{1,3})\s*[.)]?\s+(?=\S)")
 
 # 合计行 —— 属于票级，不算品名行，且要保留给票级抽取
-TOTAL_LINE = re.compile(r"^\s*(?:TOTAL|SAY|SUB\s*-?\s*TOTAL|GRAND\s+TOTAL|合计|总计)\b", re.I)
+TOTAL_LINE = re.compile(r"^\s*(?:TOTAL|SAY|SUB\s*-?\s*TOTAL|GRAND\s+TOTAL|合计|总计|总件数)\b", re.I)
 
 # 表格区域的起止：以 TOTAL 行为界，或连续 40 行内没有新行
 MAX_ROWS = 200
@@ -131,7 +131,8 @@ def split_table(text: str) -> tuple[str, list[str], list[str]]:
 
     rows: list[str] = []
     end = len(lines)
-    for j in range(header_at + 1, min(len(lines), header_at + 1 + MAX_ROWS)):
+    # 多看一行，区分刚好达到上限与仍有正文未读；超限时由解析层明确降级。
+    for j in range(header_at + 1, min(len(lines), header_at + 2 + MAX_ROWS)):
         line = lines[j]
         if TOTAL_LINE.match(line):
             end = j
@@ -313,10 +314,11 @@ def parse_line_items(text: str, page: int | None = None) -> TableResult:
         header_keys = {s.key for s in ITEM_LEVEL}
 
     line_items: list[dict] = []
-    suspected = False
+    suspected = len(row_lines) > MAX_ROWS
     saw_content = False
+    seen_item_nos: set[int] = set()
 
-    for line in row_lines:
+    for line in row_lines[:MAX_ROWS]:
         if not line.strip():
             continue
         saw_content = True
@@ -326,6 +328,7 @@ def parse_line_items(text: str, page: int | None = None) -> TableResult:
             # 有 ≥2 个空格的版面才敢当一行处理。
             parts = _cells(line)
             if not parts:
+                suspected = True
                 continue
             item_no = len(line_items) + 1
             assigned = _assign_from_cells(parts, header_order)
@@ -351,6 +354,9 @@ def parse_line_items(text: str, page: int | None = None) -> TableResult:
         # 描述与金额是判断「这行读对了没」的两个关键列
         if not assigned.get("description"):
             suspected = True
+        if item_no in seen_item_nos:
+            suspected = True
+        seen_item_nos.add(item_no)
 
         line_items.append(
             {

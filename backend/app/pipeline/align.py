@@ -30,6 +30,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass, field
 
 # 描述相似度阈值：低于它就不认这对，避免"随便配一对"
@@ -141,6 +142,8 @@ def align_items(extractions: list[dict], documents: list[dict]) -> list[dict]:
         return []
 
     groups: list[Group] = []
+    code_counts = Counter((row.file_id, row.code) for row in rows if row.code)
+    ambiguous_codes = {code for (_, code), count in code_counts.items() if count > 1}
 
     # ---- 第 1 遍：货号完全一致 -------------------------------------------
     for row in rows:
@@ -154,7 +157,10 @@ def align_items(extractions: list[dict], documents: list[dict]) -> list[dict]:
         if target is None:
             target = Group()
             groups.append(target)
-        target.add(row, "ITEM_CODE", 1.0)
+        # 同一文件重复货号时，行序只能占位，不能作为唯一对应关系。
+        ambiguous = row.code in ambiguous_codes
+        target.unresolved = target.unresolved or ambiguous
+        target.add(row, "ITEM_CODE", None if ambiguous else 1.0)
 
     # ---- 第 2 遍：描述相似（只处理没有货号的行） --------------------------
     leftover: list[Row] = []
@@ -257,10 +263,10 @@ def align_items(extractions: list[dict], documents: list[dict]) -> list[dict]:
 
 def _to_item(index: int, g: Group, doc_names: dict[str, str]) -> dict:
     members = sorted(g.members, key=lambda m: m["file_id"])
-    if g.unresolved:
+    if g.unresolved and len(members) >= 2:
         status, basis = "UNALIGNED", "POSITION"
         note = (
-            "多份文件都有品名行，但既没有货号、描述也无法对应，"
+            "单证间的品名行缺少唯一对应关系（如货号重复或描述相近），"
             "无法确定哪一行对应哪一行，不据此给出比对结论。请人工核对。"
         )
     elif len(members) >= 2:

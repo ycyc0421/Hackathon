@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 import threading
@@ -207,7 +208,7 @@ async def create_check(
         current = store.get(task_id) or {}
         if current.get("status") not in ("PENDING", "PROCESSING"):
             break
-        time.sleep(0.05)
+        await asyncio.sleep(0.05)
 
     return to_frontend_task(dump(_load_task(task_id)))
 

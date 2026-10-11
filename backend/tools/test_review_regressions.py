@@ -23,6 +23,43 @@ def value(table, key):
     return next(f for f in table.line_items[0]["fields"] if f["field_key"] == key)
 
 
+def test_ambiguous_item_codes() -> None:
+    header = "NO.  ITEM NO.  DESCRIPTION  QTY  PACKAGES\n"
+    white = "SKU-001  CERAMIC MUG WHITE  100 PCS  10 CARTONS"
+    black = "SKU-001  CERAMIC MUG BLACK  200 PCS  20 CARTONS"
+    a = parse_line_items(header + f"1  {white}\n2  {black}\nTOTAL 300 PCS")
+    b = parse_line_items(header + f"1  {black}\n2  {white}\nTOTAL 300 PCS")
+    assert not a.suspected and not b.suspected
+    docs = [{"file_id": f, "file_name": f, "process_status": "EXTRACTED"} for f in ("f1", "f2")]
+    exts = [{"file_id": f, "line_items": t.line_items, "fields": []} for f, t in (("f1", a), ("f2", b))]
+    items = align_items(exts, docs)
+    assert len(items) == 2 and all(i["alignment_status"] == "UNALIGNED" for i in items), items
+    assert sum(len(i["members"]) for i in items) == 4
+    assert all(m["match_score"] is None for i in items for m in i["members"])
+    comparisons = build_item_comparisons(items, docs, exts, lambda *_: True, "DE", "德国")
+    assert comparisons and all(c["status"] == "NOT_CHECKED" for c in comparisons), comparisons
+    single_source = align_items(exts[:1], docs[:1])
+    assert len(single_source) == 2 and all(i["alignment_status"] == "PARTIAL" for i in single_source)
+
+
+def test_incomplete_table() -> None:
+    header = "NO.  DESCRIPTION  QTY  PACKAGES\n"
+    first = "1  CERAMIC MUG  100 PCS  10 CARTONS\n"
+    mixed = parse_line_items(header + first + "GLASS BOTTLES 500 PCS 20 CARTONS\nTOTAL 600 PCS")
+    assert mixed.suspected, mixed
+    repeated = parse_line_items(header + first + "1  GLASS BOTTLES  500 PCS  20 CARTONS\nTOTAL 600 PCS")
+    assert repeated.suspected, repeated
+    full = "".join(f"{i}  CERAMIC MUG  1 PCS  1 CARTON\n" for i in range(1, 201))
+    assert not parse_line_items(header + full + "TOTAL 200 PCS").suspected
+    over_limit = parse_line_items(header + full + "201  GLASS BOTTLES  500 PCS  20 CARTONS\nTOTAL 700 PCS")
+    assert over_limit.suspected, over_limit
+    valid = parse_line_items(header + first + "2  GLASS BOTTLES  500 PCS  20 CARTONS\nTOTAL 600 PCS")
+    assert not valid.suspected and len(valid.line_items) == 2, valid
+    footer = parse_line_items(header + first + "总件数: 10 箱\n毛重: 100 公斤")
+    assert not footer.suspected and len(footer.line_items) == 1, footer
+    assert "总件数: 10 箱" in footer.doc_text and "毛重: 100 公斤" in footer.doc_text, footer
+
+
 def test_package_units() -> None:
     for text, unit in (
         ("SAY TEN (10) PALLETS ONLY", "PALLETS"),
@@ -176,6 +213,8 @@ def test_pdf_image_placement() -> None:
 
 
 def main() -> None:
+    test_ambiguous_item_codes()
+    test_incomplete_table()
     test_package_units()
     test_measure_units()
     test_mixed_pdf_header()
