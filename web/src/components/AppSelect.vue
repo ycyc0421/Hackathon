@@ -145,10 +145,12 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onOutsidePoint
       <span class="app-select-label">{{ selected?.label ?? '请选择' }}</span>
       <span class="app-select-caret" aria-hidden="true">▾</span>
     </button>
-    <!-- 选项与浮层的 click 都要阻止冒泡：组件若被包在原生 <label> 里
+    <!-- 选项与浮层的 click 要 prevent + stop：组件若被包在原生 <label> 里
          （如上传页目的国），点选 <li> 会触发 label 的激活行为，浏览器对
-         触发按钮再合成一次 click，刚收起的浮层又被重新展开 -->
-    <ul v-if="open" ref="listRef" class="app-select-list" role="listbox" @click.stop>
+         触发按钮再合成一次 click，刚收起的浮层又被重新展开。
+         合成 click 是 label 的默认行为（按祖先链确定，不走冒泡分发），
+         仅 stop 拦不住，必须 preventDefault 取消默认行为 -->
+    <ul v-if="open" ref="listRef" class="app-select-list" role="listbox" @click.prevent.stop>
       <li
         v-for="(o, i) in options"
         :id="optionId(i)"
@@ -158,7 +160,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onOutsidePoint
         role="option"
         :aria-selected="o.value === modelValue"
         @pointerenter="activeIndex = i"
-        @click.stop="choose(o)"
+        @click.prevent.stop="choose(o)"
       >
         {{ o.label }}
       </li>
