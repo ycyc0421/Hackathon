@@ -2,6 +2,7 @@
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { isMock, listMockScenarios, setMockScenario, getEvaluation } from './api/index.js'
 import { setMock } from './api/config.js'
+import { needsReview } from './utils/needsReview.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import AppSelect from './components/AppSelect.vue'
 import UploadPage from './pages/UploadPage.vue'
@@ -161,10 +162,10 @@ onMounted(async () => {
   }
 })
 
-/** 差异页有问题可看时才点亮，给用户一个"该去哪看"的提示 */
+/** 差异页有待复核条目时才点亮，给用户一个"该去哪看"的提示。口径与差异页「需关注」一致 */
 const problemCount = computed(() => {
   if (!task.value) return 0
-  return task.value.comparisons?.filter((c) => c.status !== 'MATCH' && c.status !== 'SINGLE_SOURCE').length ?? 0
+  return task.value.comparisons?.filter(needsReview).length ?? 0
 })
 
 const current = computed(() => PAGES.find((p) => p.key === active.value)?.component)

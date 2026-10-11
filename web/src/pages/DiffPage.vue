@@ -16,6 +16,7 @@ import {
   confidenceText,
 } from '../api/formatters.js'
 import { divergentFileIds } from '../utils/divergence.js'
+import { needsReview } from '../utils/needsReview.js'
 import { buildEvidenceIndex, evidenceRawText } from '../utils/evidence.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
@@ -41,6 +42,7 @@ const counts = computed(() => {
   const list = comparisons.value
   return {
     total: list.length,
+    problems: list.filter(needsReview).length,
     conflict: list.filter((c) => c.status === 'CONFLICT').length,
     missing: list.filter((c) => c.status === 'MISSING_IN_SOME').length,
     unchecked: list.filter((c) => c.status === 'NOT_CHECKED').length,
@@ -50,14 +52,11 @@ const counts = computed(() => {
   }
 })
 
-/** 「有问题」= 需要人看一眼的，包括未校验 */
-const problemStatuses = ['CONFLICT', 'MISSING_IN_SOME', 'NOT_CHECKED', 'UNRECOGNIZED']
-
 const visible = computed(() => {
   const list = comparisons.value
   switch (filter.value) {
     case 'problems':
-      return list.filter((c) => problemStatuses.includes(c.status))
+      return list.filter(needsReview)
     case 'conflicts':
       return list.filter((c) => c.status === 'CONFLICT')
     case 'unchecked':
@@ -191,7 +190,7 @@ function isDivergentValue(c, v) {
 
 /**
  * 报告页「在差异页查看」的锚点：页面随切页重挂载，挂载时消费一次。
- * 目标条目必然在「需关注」集合里（报告页问题条目的过滤条件与 problemStatuses 等价），
+ * 目标条目必然在「需关注」集合里（报告页问题条目与这里的筛选同用 needsReview 判定），
  * 先切筛选再等渲染，滚动到位后短暂高亮。
  */
 const pendingAnchor = inject('pendingAnchor')
@@ -254,7 +253,7 @@ onMounted(async () => {
       <section v-if="comparisons.length" class="card">
         <div class="filter-row">
           <button class="chip" :class="{ active: filter === 'problems' }" @click="filter = 'problems'">
-            需关注 <span class="chip-num">{{ counts.conflict + counts.missing + counts.unchecked + counts.unrecognized }}</span>
+            需关注 <span class="chip-num">{{ counts.problems }}</span>
           </button>
           <button class="chip" :class="{ active: filter === 'conflicts' }" @click="filter = 'conflicts'">
             不一致 <span class="chip-num">{{ counts.conflict }}</span>

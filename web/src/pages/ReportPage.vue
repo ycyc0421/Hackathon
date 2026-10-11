@@ -8,6 +8,7 @@
 import { computed, inject } from 'vue'
 import { formatTime, formatDuration, riskType, severity, processStatus } from '../api/formatters.js'
 import { buildConclusion } from '../utils/reportConclusion.js'
+import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -25,13 +26,19 @@ const summary = computed(() => task.value?.summary ?? null)
 const TERMINAL_STATUSES = ['COMPLETED', 'PARTIAL', 'FAILED']
 const isTerminal = computed(() => task.value && TERMINAL_STATUSES.includes(task.value.status))
 
-/** 需要处理的条目：不一致、部分缺失、未校验、无法比对 */
+/**
+ * 需要处理的条目：与差异页「需关注」同一口径（needsReview）——
+ * 问题状态之外，MATCH 但含 LOW_CONFIDENCE 取值（请核对）的也在列。
+ */
 const issues = computed(() => {
   const list = task.value?.comparisons ?? []
-  return list.filter((c) => !['MATCH', 'SINGLE_SOURCE'].includes(c.status))
+  return list.filter(needsReview)
 })
 
-const matched = computed(() => (task.value?.comparisons ?? []).filter((c) => c.status === 'MATCH'))
+/** 「另有 N 个字段一致」脚注：已列入问题条目的 MATCH（含请核对取值）不再重复计数 */
+const matched = computed(
+  () => (task.value?.comparisons ?? []).filter((c) => c.status === 'MATCH' && !needsReview(c))
+)
 
 const failedDocs = computed(
   () =>
