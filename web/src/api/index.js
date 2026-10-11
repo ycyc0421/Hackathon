@@ -1,14 +1,14 @@
 /**
  * 数据访问层。页面只调这里的函数，不直接 fetch。
  *
- * mock 与真实实现共用同一组函数签名，切换只靠 config.js 的 USE_MOCK。
+ * mock 与真实实现共用同一组函数签名，运行时切换靠 config.js 的 isMock()。
  * 这样后端就绪后，页面代码一行都不用改。
  *
  * 契约见 docs/数据契约.md 与 docs/schema/check-task.schema.json
  */
 
 import {
-  USE_MOCK,
+  isMock,
   API_BASE,
   POLL_INTERVAL_MS,
   POLL_MAX_ATTEMPTS,
@@ -85,15 +85,29 @@ async function requestOnce(path, options = {}) {
   }
 
   if (!res.ok) {
-    // 契约要求失败返回非 2xx。这里读一下是否有结构化错误体
+    // 契约要求失败返回非 2xx。这里读一下是否有结构化错误体。
+    // 5xx 且没有契约错误体的，多半是代理/网关打不通上游（dev proxy 后端没启动、
+    // 网关超时）时自己返回的错误页——根因是连接问题，归入 NETWORK，
+    // 否则用户会拿着"服务端处理失败"去排查一个根本没收到请求的后端。
     let code = null
     let message = `请求失败（HTTP ${res.status}）`
+    let hasContractError = false
     try {
       const body = await res.json()
-      if (body?.error?.message) message = body.error.message
+      if (body?.error?.message) {
+        message = body.error.message
+        hasContractError = true
+      }
       if (body?.error?.code) code = body.error.code
     } catch {
       /* 错误体不是 JSON，用默认文案 */
+    }
+    if (res.status >= 500 && !hasContractError) {
+      throw new ApiError('无法连接后端，请确认服务已启动、代理配置正确', {
+        kind: 'NETWORK',
+        code,
+        status: res.status,
+      })
     }
     throw new ApiError(message, { kind: 'SERVER', code, status: res.status })
   }
@@ -164,11 +178,27 @@ function requestWithUploadProgress(path, form, onProgress) {
         }
         return
       }
+      // 与 requestOnce 同一规则：5xx 且没有契约错误体的按连接问题归 NETWORK
+      //（典型场景：dev proxy 的上游后端没启动，代理自己回了错误页）
       let code = null
       let message = `请求失败（HTTP ${xhr.status}）`
+      let hasContractError = false
       const body = xhr.response
-      if (body?.error?.message) message = body.error.message
+      if (body?.error?.message) {
+        message = body.error.message
+        hasContractError = true
+      }
       if (body?.error?.code) code = body.error.code
+      if (xhr.status >= 500 && !hasContractError) {
+        reject(
+          new ApiError('无法连接后端，请确认服务已启动、代理配置正确', {
+            kind: 'NETWORK',
+            code,
+            status: xhr.status,
+          })
+        )
+        return
+      }
       reject(new ApiError(message, { kind: 'SERVER', code, status: xhr.status }))
     }
 
@@ -193,7 +223,7 @@ export async function createCheck(
   { files, destinationCountry, notes },
   { onUploadProgress, onRetry, signal } = {}
 ) {
-  if (USE_MOCK) {
+  if (isMock()) {
     // mock 下按文件大小模拟上传进度，让上传页能看到真实的进度条形态
     const total = files.reduce((s, f) => s + f.size, 0) || 1
     let loaded = 0
@@ -225,7 +255,7 @@ export async function createCheck(
  * @returns {Promise<object>} CheckTask
  */
 export async function getCheck(taskId, { onRetry, signal } = {}) {
-  if (USE_MOCK) {
+  if (isMock()) {
     await sleep(500)
     const sample = nextMockSample()
     sample.task_id = taskId
@@ -256,7 +286,7 @@ export async function pollCheck(taskId, { onTick, onSlow, onRetry, signal } = {}
 
     // mock 下没有真实后端，直接走 getCheck 的 mock 分支拿样例；
     // 否则请求会打到 dev server 的 SPA 回退上，拿到 HTML 报 PARSE 错误
-    const task = USE_MOCK
+    const task = isMock()
       ? await getCheck(taskId, { signal })
       : await request(`/checks/${encodeURIComponent(taskId)}`, {}, { onRetry, signal })
     onTick?.(task)
@@ -268,7 +298,7 @@ export async function pollCheck(taskId, { onTick, onSlow, onRetry, signal } = {}
       onSlow?.()
     }
 
-    await sleep(USE_MOCK ? 300 : POLL_INTERVAL_MS)
+    await sleep(isMock() ? 300 : POLL_INTERVAL_MS)
   }
 
   throw new ApiError('处理时间过长，请稍后重试', { kind: 'TIMEOUT' })
@@ -279,7 +309,7 @@ export async function pollCheck(taskId, { onTick, onSlow, onRetry, signal } = {}
  * 页面据此显示"尚未评测"，不填任何数字。
  */
 export async function getEvaluation(options = {}) {
-  if (USE_MOCK) {
+  if (isMock()) {
     await sleep(200)
     return {
       status: 'NOT_RUN',
@@ -337,4 +367,4 @@ export function validateFiles(fileList) {
   return errors
 }
 
-export { USE_MOCK }
+export { isMock }

@@ -8,8 +8,9 @@ export default defineConfig({
   base: './',
   server: {
     port: 5173,
-    // 接真实后端时取消注释，并把 src/api/config.js 的 USE_MOCK 关掉。
-    // 前端代码不用改。
+    // 真实后端跑在 8000 端口时取消注释即可；mock/真实后端的切换是运行时的
+    //（URL 参数 ?mock=0 或顶栏数据源切换器），前端代码不用改、不用重新构建。
+    // 后端跨域开发期 allow_origins=["*"]，不走 proxy 直连 http://127.0.0.1:8000 也行。
     // proxy: {
     //   '/api': {
     //     target: 'http://127.0.0.1:8000',

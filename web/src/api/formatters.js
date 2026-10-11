@@ -6,6 +6,7 @@
  */
 
 import { lookup, SEVERITY, TASK_STATUS, PROCESS_STATUS, FIELD_STATUS, COMPARISON_STATUS, RISK_TYPE, ERROR_LEVEL, API_ERROR_KIND } from './labels.js'
+import { backendErrorText } from './errors.js'
 
 /**
  * 按 value_type 渲染归一值。
@@ -64,11 +65,17 @@ export const riskType = (v) => RISK_TYPE[v] ?? '其他提示'
 export const errorLevel = (v) => lookup(ERROR_LEVEL, v)
 
 /**
- * 把 catch 到的异常规整成页面可直接展示的 { kind, tone, title, hint }。
+ * 把 catch 到的异常规整成页面可直接展示的 { kind, tone, title, hint, message }。
  * ApiError 之外的异常（前端 bug 之类）归入 UNKNOWN，不吞掉、也不直接抛原始 message。
+ * SERVER 类错误的 message 会先按后端错误码查用户可读文案（api/errors.js），
+ * 查不到映射时保留后端给的 message 兜底，不把英文 code 甩给用户。
  */
 export function describeApiError(e) {
-  const kind = e?.name === 'ApiError' ? e.kind : 'UNKNOWN'
-  const info = lookup(API_ERROR_KIND, kind, '未知错误')
-  return { kind, tone: info.tone, title: info.title, hint: info.hint }
+  if (e?.name !== 'ApiError') {
+    const info = lookup(API_ERROR_KIND, 'UNKNOWN', '未知错误')
+    return { kind: 'UNKNOWN', tone: info.tone, title: info.title, hint: info.hint, message: null }
+  }
+  const info = lookup(API_ERROR_KIND, e.kind, '未知错误')
+  const message = e.kind === 'SERVER' ? backendErrorText(e) : e.message
+  return { kind: e.kind, tone: info.tone, title: info.title, hint: info.hint, message }
 }

@@ -142,6 +142,16 @@ body {
   font-size: var(--text-xs);
 }
 
+/* 与 .mock-flag 对应的「真实后端」徽标：实线边框、成功色 */
+.backend-flag {
+  padding: 3px var(--space-3);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-sm);
+  background: var(--success-bg);
+  color: var(--success);
+  font-size: var(--text-xs);
+}
+
 .mock-scenario-select {
   padding: 2px var(--space-2);
   border: 1px solid var(--border);
