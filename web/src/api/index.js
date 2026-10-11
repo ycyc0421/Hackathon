@@ -16,6 +16,7 @@ import {
   RETRY_BASE_DELAY_MS,
   SLOW_POLL_MS,
 } from './config.js'
+import { UPLOAD_LIMITS, validateFiles, splitByName } from './uploadLimits.js'
 import completedSample from '../mock/check-completed.json'
 import partialSample from '../mock/check-partial.json'
 import multiItemSample from '../mock/check-multi-item.json'
@@ -32,6 +33,9 @@ export class ApiError extends Error {
     this.status = status
   }
 }
+
+// 上传校验与同名拆分在此处统一出口，页面只从 api/index.js 引入
+export { UPLOAD_LIMITS, validateFiles, splitByName }
 
 // —— mock 实现 ——
 
@@ -339,32 +343,6 @@ export async function getEvaluation(options = {}) {
     }
     throw e
   }
-}
-
-/** 上传前的前端校验。上限来自契约第四节第 11 项的当前处理方式，需后端侧确认 */
-export const UPLOAD_LIMITS = {
-  maxFiles: 10,
-  maxFileSizeMB: 20,
-  accept: '.pdf,.png,.jpg,.jpeg,.webp',
-}
-
-export function validateFiles(fileList) {
-  const errors = []
-  const files = Array.from(fileList)
-
-  if (files.length === 0) errors.push('请至少选择一份文件')
-  if (files.length > UPLOAD_LIMITS.maxFiles) {
-    errors.push(`一次最多 ${UPLOAD_LIMITS.maxFiles} 份文件，当前 ${files.length} 份`)
-  }
-
-  for (const f of files) {
-    const mb = f.size / 1024 / 1024
-    if (mb > UPLOAD_LIMITS.maxFileSizeMB) {
-      errors.push(`${f.name} 超过 ${UPLOAD_LIMITS.maxFileSizeMB}MB（${mb.toFixed(1)}MB）`)
-    }
-  }
-
-  return errors
 }
 
 export { isMock }

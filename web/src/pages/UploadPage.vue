@@ -6,7 +6,7 @@
  * 这里按用户选择实现——可控，演示时不依赖抽取准确率。
  */
 import { ref, computed, inject, onBeforeUnmount } from 'vue'
-import { createCheck, pollCheck, validateFiles, ApiError, UPLOAD_LIMITS } from '../api/index.js'
+import { createCheck, pollCheck, validateFiles, splitByName, ApiError, UPLOAD_LIMITS } from '../api/index.js'
 import { backendErrorText } from '../api/errors.js'
 import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
 import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '../api/labels.js'
@@ -61,7 +61,13 @@ const startedAt = ref(null)
 const now = ref(Date.now())
 let clockTimer = null
 
-const canSubmit = computed(() => files.value.length > 0 && !isRunning.value)
+/**
+ * 提交入口以当前文件集合实时跑 validateFiles 为准：
+ * 不满足阻塞性限制（0 份 / 超份数 / 超大小）时按钮禁用，
+ * 不能只依赖 addFiles 时算过的 localErrors——那之后文件可能已被移除或追加。
+ * 扫描件预检测警告不在此列（非阻塞提示）。
+ */
+const canSubmit = computed(() => !isRunning.value && validateFiles(files.value).length === 0)
 
 const acceptedTypes = computed(() =>
   UPLOAD_LIMITS.accept.split(',').map((s) => s.trim().toUpperCase().replace('.', ''))
@@ -109,9 +115,13 @@ function addFiles(list) {
   }
 
   const accepted = incoming.filter(isAccepted)
-  // 同名文件去重，避免重复上传造成"件数不一致"的假象
-  const seen = new Set(files.value.map(fileKey))
-  const fresh = accepted.filter((f) => !seen.has(fileKey(f)))
+  // 同名即歧义：「查看原文」按文件名关联本地 File 对象，契约没有更可靠的
+  // 文件身份可用，同名文件会让映射互相覆盖、打开错原文——按文件名拒绝，
+  // 让用户重命名后再添加，而不是静默接受或猜测 file_id。
+  const { fresh, duplicateNames } = splitByName(files.value, accepted)
+  if (duplicateNames.length) {
+    localErrors.value.push(UPLOAD_ERROR_TEXT.DUPLICATE_NAME(duplicateNames.join('、')))
+  }
   files.value = [...files.value, ...fresh]
 
   const problems = validateFiles(files.value)
@@ -137,7 +147,8 @@ function onPick(e) {
 function removeFile(index) {
   const removed = files.value[index]
   files.value = files.value.filter((_, i) => i !== index)
-  localErrors.value = []
+  // 复验剩余文件而不是清空错误：移除一个正常文件后，其余超限文件的错误必须还在
+  localErrors.value = files.value.length ? validateFiles(files.value) : []
   // 同步清理预检测记录，避免残留警告指向已移除的文件
   if (removed && scanWarnings.value.has(fileKey(removed))) {
     const next = new Set(scanWarnings.value)
@@ -214,7 +225,13 @@ const stageIndex = computed(() => {
 const skeletonRows = computed(() => Math.max(files.value.length, 2))
 
 async function submit() {
-  if (!canSubmit.value) return
+  // 直接调用 submit 也不能绕过校验：以当前文件集合实时复验为准
+  const problems = validateFiles(files.value)
+  if (isRunning.value) return
+  if (problems.length) {
+    localErrors.value = problems
+    return
+  }
 
   // 提交即把当前文件写入 App 层映射：diff 页「查看原文」按文件名从这里取 File。
   // mock 场景 files 为空（mock 不经真实上传），映射随之清空，按钮自然不渲染。
