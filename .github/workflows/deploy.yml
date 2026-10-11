@@ -1,30 +1,132 @@
-name: Deploy to Cloudflare Worker
+name: Deploy frontend and backend
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
+# 发布过程中不取消任务，避免服务切换到一半被下一次提交中断。
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
-  deploy:
-    name: 部署到 Cloudflare Worker
+  revision:
+    name: 确认通过 CI 的主分支版本
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      sha: ${{ steps.revision.outputs.sha }}
+    steps:
+      - name: 跳过过期提交，手动发布也必须已有成功的 CI
+        id: revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REVISION: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          latest=$(gh api "repos/$GH_REPO/commits/main" --jq .sha)
+          if [ "$REVISION" != "$latest" ]; then
+            echo "::notice::主分支已有更新，跳过本次旧版本发布。"
+            exit 0
+          fi
+          passed=$(gh run list --repo "$GH_REPO" --workflow ci.yml --commit "$REVISION" --event push --status success --json databaseId --jq length)
+          test "$passed" -gt 0
+          echo "sha=$REVISION" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: 发布后端并接通前端
+    needs: revision
+    if: needs.revision.outputs.sha != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: production
     permissions:
       contents: read
       deployments: write
+    env:
+      VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+      FRONTEND_ORIGIN: ${{ vars.FRONTEND_ORIGIN }}
+      BACKEND_SSH_HOST: ${{ secrets.BACKEND_SSH_HOST }}
+      BACKEND_SSH_USER: ${{ secrets.BACKEND_SSH_USER }}
+      RELEASE_ID: ${{ needs.revision.outputs.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.revision.outputs.sha }}
+          persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: 检查联调配置
+        env:
+          BACKEND_SSH_KEY: ${{ secrets.BACKEND_SSH_KEY }}
+          BACKEND_SSH_KNOWN_HOSTS: ${{ secrets.BACKEND_SSH_KNOWN_HOSTS }}
+        run: |
+          python3 - <<'PY'
+          import os, re
+          from urllib.parse import urlsplit
+
+          required = ("VITE_API_BASE", "FRONTEND_ORIGIN", "BACKEND_SSH_HOST", "BACKEND_SSH_USER", "BACKEND_SSH_KEY", "BACKEND_SSH_KNOWN_HOSTS")
+          for name in required:
+              if not os.environ.get(name):
+                  raise SystemExit(f"production 环境缺少配置：{name}")
+          api = urlsplit(os.environ["VITE_API_BASE"])
+          if api.scheme != "https" or not api.hostname or api.path != "/api/v1" or api.query or api.fragment or api.username or api.password:
+              raise SystemExit("VITE_API_BASE 必须是以 /api/v1 结尾的 HTTPS 地址，不带尾斜杠、查询参数或凭据")
+          origin = urlsplit(os.environ["FRONTEND_ORIGIN"])
+          if origin.scheme != "https" or not origin.hostname or origin.path not in ("", "/") or origin.query or origin.fragment or origin.username or origin.password:
+              raise SystemExit("FRONTEND_ORIGIN 必须是前端站点的 HTTPS 源地址")
+          if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9.-]*", os.environ["BACKEND_SSH_HOST"]):
+              raise SystemExit("BACKEND_SSH_HOST 需为域名或 IPv4 地址")
+          user = os.environ["BACKEND_SSH_USER"]
+          if user == "root" or not re.fullmatch(r"[a-z_][a-z0-9_-]*", user):
+              raise SystemExit("BACKEND_SSH_USER 必须是普通维护用户")
+          PY
 
       - name: 安装前端依赖并构建
         working-directory: web
         run: |
           npm ci
           npm run build
+
+      - name: 准备部署密钥和服务器指纹
+        env:
+          BACKEND_SSH_KEY: ${{ secrets.BACKEND_SSH_KEY }}
+          BACKEND_SSH_KNOWN_HOSTS: ${{ secrets.BACKEND_SSH_KNOWN_HOSTS }}
+        run: |
+          umask 077
+          printf '%s\n' "$BACKEND_SSH_KEY" > "$RUNNER_TEMP/backend_key"
+          printf '%s\n' "$BACKEND_SSH_KNOWN_HOSTS" > "$RUNNER_TEMP/backend_known_hosts"
+
+      - name: 发布独立后端版本
+        id: backend
+        run: |
+          ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
+          target="$BACKEND_SSH_USER@$BACKEND_SSH_HOST"
+          git archive --format=tar.gz --output="$RUNNER_TEMP/$RELEASE_ID.tar.gz" HEAD
+          ssh "${ssh_options[@]}" "$target" 'mkdir -p app/incoming'
+          scp "${ssh_options[@]}" "$RUNNER_TEMP/$RELEASE_ID.tar.gz" "$target:app/incoming/$RELEASE_ID.tar.gz"
+          ssh "${ssh_options[@]}" "$target" "python3 - $RELEASE_ID" < deploy/backend.py
+
+      - name: 验证公网接口、上传轮询及返回契约
+        id: smoke
+        env:
+          SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
+        run: |
+          npm ci
+          node deploy/smoke.mjs
+          node backend/tools/validate_outputs.mjs "$SMOKE_OUTPUT_DIR"
 
       - name: 安装 Worker 依赖
         working-directory: worker
@@ -36,3 +138,12 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
+
+      - name: 公网联调失败时回退后端
+        if: failure() && steps.backend.outcome == 'success' && steps.smoke.outcome == 'failure'
+        run: |
+          ssh -i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts" "$BACKEND_SSH_USER@$BACKEND_SSH_HOST" "python3 - $RELEASE_ID --rollback" < deploy/backend.py
+
+      - name: 清理临时密钥
+        if: always()
+        run: rm -f "$RUNNER_TEMP/backend_key" "$RUNNER_TEMP/backend_known_hosts"
