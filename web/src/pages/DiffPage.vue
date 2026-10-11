@@ -17,6 +17,7 @@ import {
 } from '../api/formatters.js'
 import { divergentFileIds } from '../utils/divergence.js'
 import { needsReview } from '../utils/needsReview.js'
+import { animateHeight, animateHeightFrom, captureHeight } from '../utils/animateHeight.js'
 import { buildEvidenceIndex, evidenceRawText } from '../utils/evidence.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
@@ -142,7 +143,7 @@ function viewOf(c) {
 
 /**
  * 切换视图时做高度平滑过渡：旧内容直接移除、新内容快速淡入（--duration-fast，
- * 见 .cmp-swap 样式），容器高度由这里的 JS 从旧高度动画到新高度。
+ * 见 .cmp-swap 样式），容器高度由 animateHeight 从旧高度动画到新高度。
  * 不做离场动画、不用 absolute 定位——crossfade 会让父容器高度在过渡中途
  * 坍缩，与高度动画打架，表现为整列抖动。宁可简单稳定。
  * prefers-reduced-motion 下全局 CSS 已把过渡时长压到 0，这里的 JS 自然退化为瞬时。
@@ -151,33 +152,29 @@ async function setView(c, mode, ev) {
   if (mode === viewOf(c)) return
   const body = ev?.currentTarget?.closest('.cmp-item')?.querySelector('.cmp-view-body')
   views.value = new Map(views.value).set(c.comparison_id, mode)
-  if (!body) return
-  const fromH = body.offsetHeight
-  body.style.height = `${fromH}px`
-  body.style.overflow = 'hidden'
-  await nextTick()
-  // 测新内容高度：固定高度下 scrollHeight 不小于 clientHeight，内容更矮时
-  // 测不准。还原到最终态量真实高度再设回起点；测量与还原在同一帧内
-  // 同步完成，不会上屏。
-  body.style.cssText = ''
-  const toH = body.offsetHeight
-  body.style.height = `${fromH}px`
-  body.style.overflow = 'hidden'
-  if (toH === fromH) {
-    // 高度不变不会有 transitionend，直接还原，避免内联样式残留
-    body.style.cssText = ''
-    return
-  }
-  body.style.transition = `height var(--duration-base) var(--ease)`
-  void body.offsetHeight // 强制 reflow，确立过渡起点
-  body.style.height = `${toH}px`
-  body.addEventListener(
-    'transitionend',
-    () => {
-      body.style.cssText = ''
-    },
-    { once: true }
-  )
+  await animateHeight(body)
+}
+
+/**
+ * 筛选 chips 切换的高度衔接：筛选后的列表包在 out-in Transition 里，
+ * 旧内容离场结束、新内容插入的瞬间容器高度会跳变。这里在点击时记录
+ * 容器旧高度，等新内容插入（Transition 的 enter 钩子）再从旧高度
+ * 平滑过渡到新高度。
+ * 注意测量目标是外层持久存在的 .cmp-filter-clip，不是 .cmp-filtered
+ * 本身——后者带 :key，切换时整个元素会被替换。
+ */
+const filterClipRef = ref(null)
+let filterFromH = null
+
+function setFilter(name) {
+  if (name === filter.value) return
+  filterFromH = captureHeight(filterClipRef.value)
+  filter.value = name
+}
+
+function onFilterEnter() {
+  animateHeightFrom(filterClipRef.value, filterFromH)
+  filterFromH = null
 }
 
 /**
@@ -252,16 +249,16 @@ onMounted(async () => {
 
       <section v-if="comparisons.length" class="card">
         <div class="filter-row">
-          <button class="chip" :class="{ active: filter === 'problems' }" @click="filter = 'problems'">
+          <button class="chip" :class="{ active: filter === 'problems' }" @click="setFilter('problems')">
             需关注 <span class="chip-num">{{ counts.problems }}</span>
           </button>
-          <button class="chip" :class="{ active: filter === 'conflicts' }" @click="filter = 'conflicts'">
+          <button class="chip" :class="{ active: filter === 'conflicts' }" @click="setFilter('conflicts')">
             不一致 <span class="chip-num">{{ counts.conflict }}</span>
           </button>
-          <button class="chip" :class="{ active: filter === 'unchecked' }" @click="filter = 'unchecked'">
+          <button class="chip" :class="{ active: filter === 'unchecked' }" @click="setFilter('unchecked')">
             未校验 <span class="chip-num">{{ counts.unchecked }}</span>
           </button>
-          <button class="chip" :class="{ active: filter === 'all' }" @click="filter = 'all'">
+          <button class="chip" :class="{ active: filter === 'all' }" @click="setFilter('all')">
             全部 <span class="chip-num">{{ counts.total }}</span>
           </button>
         </div>
@@ -270,8 +267,11 @@ onMounted(async () => {
           「未校验」指当前规则集未覆盖该字段，并非表示没有问题。
         </p>
 
-        <!-- 筛选切换时整块内容淡出淡入；:key="filter" 驱动 Transition -->
-        <Transition name="list-swap" mode="out-in">
+        <!-- 筛选切换时整块内容淡出淡入；:key="filter" 驱动 Transition。
+             外层 .cmp-filter-clip 持久存在，切换时由 setFilter/onFilterEnter
+             做高度平滑过渡，新内容插入瞬间高度不跳变 -->
+        <div ref="filterClipRef" class="cmp-filter-clip">
+        <Transition name="list-swap" mode="out-in" @enter="onFilterEnter">
         <div :key="filter" class="cmp-filtered">
         <template v-if="visible.length">
           <div v-for="g in groups" :key="g.key" class="cmp-group">
@@ -356,6 +356,7 @@ onMounted(async () => {
         />
         </div>
         </Transition>
+        </div>
       </section>
 
       <section v-else class="card">
