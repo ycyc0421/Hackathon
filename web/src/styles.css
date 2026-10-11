@@ -14,6 +14,11 @@ body {
   padding: 0;
 }
 
+html {
+  /* 滚动条出没（如筛选切到短列表）不引起横向抖动 */
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--surface);
   color: var(--text-body);
@@ -1104,11 +1109,15 @@ textarea {
   margin-top: var(--space-3);
 }
 .cmp-swap-enter-active {
-  transition: opacity var(--duration-fast) var(--ease);
+  transition: opacity var(--duration-fast) var(--ease),
+              transform var(--duration-fast) var(--ease);
 }
 
+/* 新内容带轻微位移淡入，与筛选切换的 list-swap 一致；大高度差交换
+ * （DiffPage.setView 的距离自适应分支）不补间高度时靠它给出方向感 */
 .cmp-swap-enter-from {
   opacity: 0;
+  transform: translateY(4px);
 }
 
 /*

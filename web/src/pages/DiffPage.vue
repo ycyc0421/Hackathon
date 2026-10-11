@@ -17,7 +17,7 @@ import {
 } from '../api/formatters.js'
 import { divergentFileIds } from '../utils/divergence.js'
 import { needsReview } from '../utils/needsReview.js'
-import { animateHeight, animateHeightFrom, captureHeight } from '../utils/animateHeight.js'
+import { animateHeightAdaptive, captureHeight } from '../utils/animateHeight.js'
 import { buildEvidenceIndex, evidenceRawText } from '../utils/evidence.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
@@ -149,24 +149,29 @@ function viewOf(c) {
 }
 
 /**
- * 切换视图时做高度平滑过渡：旧内容直接移除、新内容快速淡入（--duration-fast，
- * 见 .cmp-swap 样式），容器高度由 animateHeight 从旧高度动画到新高度。
+ * 切换视图的高度衔接（距离自适应）：旧内容直接移除、新内容快速淡入
+ * （--duration-fast，见 .cmp-swap 样式），高度差 ≤ 阈值时容器由
+ * animateHeightAdaptive 从旧高度动画到新高度；差值过大（如长表格 ↔ 短对照）
+ * 不做高度补间、容器直接到位，页面变短悬空时滚动补偿到本卡片可见。
  * 不做离场动画、不用 absolute 定位——crossfade 会让父容器高度在过渡中途
  * 坍缩，与高度动画打架，表现为整列抖动。宁可简单稳定。
- * prefers-reduced-motion 下全局 CSS 已把过渡时长压到 0，这里的 JS 自然退化为瞬时。
  */
 async function setView(c, mode, ev) {
   if (mode === viewOf(c)) return
-  const body = ev?.currentTarget?.closest('.cmp-item')?.querySelector('.cmp-view-body')
+  const item = ev?.currentTarget?.closest('.cmp-item')
+  const body = item?.querySelector('.cmp-view-body')
+  const fromH = captureHeight(body)
   views.value = new Map(views.value).set(c.comparison_id, mode)
-  await animateHeight(body)
+  await nextTick()
+  animateHeightAdaptive(body, fromH, item)
 }
 
 /**
- * 筛选 chips 切换的高度衔接：筛选后的列表包在 out-in Transition 里，
- * 旧内容离场结束、新内容插入的瞬间容器高度会跳变。这里在点击时记录
- * 容器旧高度，等新内容插入（Transition 的 enter 钩子）再从旧高度
- * 平滑过渡到新高度。
+ * 筛选 chips 切换的高度衔接（距离自适应）：筛选后的列表包在 out-in
+ * Transition 里，旧内容离场结束、新内容插入的瞬间容器高度会跳变。
+ * 点击时记录容器旧高度，新内容插入（enter 钩子）后由 animateHeightAdaptive
+ * 分流：高度差 ≤ 阈值做高度补间；差值过大（如「全部」↔「不一致」）
+ * 不补间、直接到位，页面变短悬空时滚动补偿到筛选卡片可见。
  * 注意测量目标是外层持久存在的 .cmp-filter-clip，不是 .cmp-filtered
  * 本身——后者带 :key，切换时整个元素会被替换。
  */
@@ -180,7 +185,8 @@ function setFilter(name) {
 }
 
 function onFilterEnter() {
-  animateHeightFrom(filterClipRef.value, filterFromH)
+  const clip = filterClipRef.value
+  animateHeightAdaptive(clip, filterFromH, clip?.closest('.card'))
   filterFromH = null
 }
 
