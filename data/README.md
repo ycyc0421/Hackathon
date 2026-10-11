@@ -1,6 +1,6 @@
 # SQLite 数据层（第一版）
 
-第一版按单品名设计。`schema.sql` 定义表结构，`init_db.py` 创建数据库，`seed_data.py` 将仓库里的完整任务样例导入 SQLite。
+当前数据层按 `items[]` 结构组织，单品名是其中只有一个元素的特例。`schema.sql` 定义表结构，`init_db.py` 创建数据库，`seed_data.py` 将任务样例导入 SQLite。
 
 ## 运行
 
