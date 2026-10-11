@@ -93,6 +93,33 @@ provide('pendingAnchor', pendingAnchor)
 provide('navigate', { go })
 
 /**
+ * 报告 ↔ 差异 的滚动位置记忆：两页都长、互跳频繁，切回时从头看起
+ * 会丢失阅读上下文。切页前记录离开页的 scrollY，切回时在重挂载后恢复。
+ * 其他页面之间不恢复（内容短，从头看成本低）。
+ * 带锚点跳转（报告条目 → 差异页对应卡片）时不恢复，锚点滚动优先。
+ */
+const SCROLL_MEMO_PAGES = new Set(['diff', 'report'])
+const scrollMemo = new Map()
+/** 切页过渡结束后待恢复的滚动位置（out-in：新页挂载晚于 active 变化一个离场过渡） */
+let pendingScrollRestore = null
+
+watch(active, (to, from) => {
+  scrollMemo.set(from, window.scrollY)
+  pendingScrollRestore = null
+  if (!SCROLL_MEMO_PAGES.has(to) || !SCROLL_MEMO_PAGES.has(from)) return
+  if (pendingAnchor.value) return // 锚点跳转由 DiffPage 挂载时滚动，不恢复
+  const y = scrollMemo.get(to)
+  if (y != null) pendingScrollRestore = y
+})
+
+/** 新页面进场完毕再恢复滚动：此时 DOM 高度已稳定，scrollTo 不会被钳位 */
+function onPageEntered() {
+  if (pendingScrollRestore == null) return
+  window.scrollTo(0, pendingScrollRestore)
+  pendingScrollRestore = null
+}
+
+/**
  * 用户上传的 File 对象映射，key 为 file.name，value 为 File。
  * File 对象只在浏览器内存里；上传页提交时写入，差异页「查看原文」用它拼 objectURL。
  * mock 场景不经过真实上传，映射为空，「查看原文」按钮随之不渲染（降级，不伪造）。
@@ -237,7 +264,7 @@ watch(active, updateIndicator)
     </header>
 
     <main class="content">
-      <Transition name="fade" mode="out-in">
+      <Transition name="fade" mode="out-in" @after-enter="onPageEntered">
         <component :is="current" :key="active" />
       </Transition>
     </main>
