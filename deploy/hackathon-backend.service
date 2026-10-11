@@ -1,0 +1,23 @@
+[Unit]
+Description=Hackathon document checking backend
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/app/current/backend
+EnvironmentFile=%h/app/shared/backend.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=%h/app/current/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 18000 --workers 1 --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=yes
+MemoryHigh=1G
+MemoryMax=1536M
+CPUQuota=200%
+TasksMax=128
+
+[Install]
+WantedBy=default.target
