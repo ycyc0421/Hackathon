@@ -61,10 +61,9 @@ npm run validate     # 校验 docs/fixtures/ 下全部样例
 
 ## 校验后端返回
 
-将后端返回保存为 JSON 文件后执行：
+将后端返回保存为 JSON 文件后，在仓库根目录执行：
 
 ```sh
-cd /home/ycyc/projects/Hackathon
 node --input-type=module -e "
 import Ajv2020 from 'ajv/dist/2020.js'
 import { readFileSync } from 'node:fs'
