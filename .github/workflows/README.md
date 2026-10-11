@@ -10,11 +10,12 @@
 
 ## ci.yml
 
-**触发条件**：所有分支的 push 和针对 main 的 PR
+**触发条件**：`main`、`web/*` 分支的 push，以及针对 `main` 的 PR
 
 **工作流程**：
 1. **validate-contract**: 校验数据契约（`npm run validate`）
 2. **build-frontend**: 构建前端（`web/` 目录）
+3. **backend-regression**: 后端语义回归、接口返回校验与挑战样例验证
 
 **不包含部署**：PR 只做验证，不访问生产 secrets，不部署到任何环境。
 
@@ -29,16 +30,18 @@
 2. 安装 Worker 依赖
 3. 部署到 Cloudflare Worker
 
+当前只部署前端静态资源和 JS Worker，Python 后端需单独部署并接入 API 路由。
+
 **使用 Environment**：`production` environment 提供额外保护层
 
 ## 所需配置
 
 ### GitHub Environment Secrets
 
-在 https://github.com/ycyc0421/Hackathon/settings/environments/production 添加：
+在仓库的 **Settings → Environments → production** 中添加：
 
 - `CLOUDFLARE_API_TOKEN`: Cloudflare API Token
-- `CLOUDFLARE_ACCOUNT_ID`: `1dff901bbea91ab236726f6889839ff1`
+- `CLOUDFLARE_ACCOUNT_ID`: 部署目标的 Cloudflare 账户 ID
 
 ### Token 权限要求
 
@@ -64,4 +67,3 @@
 **效率**：
 - PR 快速验证（无部署等待）
 - 合并后自动部署
-- CI 失败不影响生产环境
