@@ -1022,8 +1022,11 @@ select {
   align-self: center;
 }
 
-/* 分段控件：表格与并排对照是平级的两种视图，切换而非展开 */
+/* 分段控件：表格与并排对照是平级的两种视图，切换而非展开。
+   选中态由按钮背后的 pill 指示器表达（ViewSwitch.vue 按实测位置写入
+   transform/width），切换时 pill 平滑滑动，不做背景色瞬变 */
 .view-switch {
+  position: relative; /* pill 的定位与测量基准 */
   display: inline-flex;
   padding: 2px;
   border: 1px solid var(--border);
@@ -1031,7 +1034,22 @@ select {
   background: var(--gray-50);
 }
 
+.view-switch-pill {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease),
+              width var(--duration-fast) var(--ease),
+              opacity var(--duration-fast) var(--ease);
+  pointer-events: none;
+}
+
 .view-switch button {
+  position: relative; /* 压在 pill 之上 */
   border: none;
   background: transparent;
   padding: 2px var(--space-3);
@@ -1040,9 +1058,7 @@ select {
   font-size: var(--text-xs);
   color: var(--text-muted);
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease),
-              color var(--duration-fast) var(--ease),
-              box-shadow var(--duration-fast) var(--ease);
+  transition: color var(--duration-fast) var(--ease);
 }
 
 .view-switch button:hover:not([aria-pressed="true"]) {
@@ -1050,10 +1066,8 @@ select {
 }
 
 .view-switch button[aria-pressed="true"] {
-  background: var(--surface-raised);
   color: var(--color-primary);
   font-weight: 600;
-  box-shadow: var(--shadow-sm);
 }
 
 .view-switch button:focus-visible {

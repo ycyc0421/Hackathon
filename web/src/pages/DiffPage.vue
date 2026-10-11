@@ -22,6 +22,13 @@ import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ComparePane from '../components/ComparePane.vue'
+import ViewSwitch from '../components/ViewSwitch.vue'
+
+/** 视图切换分段控件的选项，值与 views Map 里存的 key 一致 */
+const VIEW_OPTIONS = [
+  { value: 'table', label: '表格' },
+  { value: 'compare', label: '对照' },
+]
 
 const task = inject('task')
 const isRunning = inject('isRunning')
@@ -278,18 +285,11 @@ onMounted(async () => {
                   <div class="cmp-title">
                     <!-- 表格与并排对照是平级的两种视图，用分段控件切换，而非展开/收起。
                          控件放最左：视线顺序是 切换方式 → 字段 → 徽章 -->
-                    <div class="view-switch" role="group" aria-label="查看方式">
-                      <button
-                        type="button"
-                        :aria-pressed="viewOf(c) === 'table'"
-                        @click="setView(c, 'table', $event)"
-                      >表格</button>
-                      <button
-                        type="button"
-                        :aria-pressed="viewOf(c) === 'compare'"
-                        @click="setView(c, 'compare', $event)"
-                      >对照</button>
-                    </div>
+                    <ViewSwitch
+                      :model-value="viewOf(c)"
+                      :options="VIEW_OPTIONS"
+                      @select="(mode, ev) => setView(c, mode, ev)"
+                    />
                     <span class="cmp-label">{{ c.label }}</span>
                     <span class="cmp-key">{{ c.field_key }}</span>
                   </div>
