@@ -1,4 +1,5 @@
 name: Deploy frontend and backend
+run-name: 前后端部署 · ${{ github.event.workflow_run.head_sha || github.sha }}
 
 on:
   workflow_run:
@@ -42,8 +43,8 @@ jobs:
           test "$passed" -gt 0
           echo "sha=$REVISION" >> "$GITHUB_OUTPUT"
 
-  deploy:
-    name: 发布后端并接通前端
+  deploy-backend:
+    name: 部署后端与公网验证
     needs: revision
     if: needs.revision.outputs.sha != ''
     runs-on: ubuntu-latest
@@ -59,6 +60,18 @@ jobs:
       BACKEND_SSH_USER: ${{ secrets.BACKEND_SSH_USER }}
       RELEASE_ID: ${{ needs.revision.outputs.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
+      - name: 重试时也确认发布版本仍是最新 main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REVISION: ${{ needs.revision.outputs.sha }}
+        run: |
+          latest=$(gh api "repos/$GH_REPO/commits/main" --jq .sha)
+          if [ "$REVISION" != "$latest" ]; then
+            echo "::error::main 已更新，请运行最新版本的完整部署。"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.revision.outputs.sha }}
@@ -94,11 +107,20 @@ jobs:
               raise SystemExit("BACKEND_SSH_USER 必须是普通维护用户")
           PY
 
-      - name: 安装前端依赖并构建
+      - name: 预先构建联调前端（尚未发布）
         working-directory: web
         run: |
           npm ci
           npm run build
+
+      - name: 保存供前端部署使用的构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-production
+          path: web/dist/
+          if-no-files-found: error
+          retention-days: 7
+          overwrite: true
 
       - name: 准备部署密钥和服务器指纹
         env:
@@ -135,17 +157,6 @@ jobs:
           scp "${ssh_options[@]}" "$target:app/releases/$RELEASE_ID/smoke-output/*.json" "$SMOKE_OUTPUT_DIR/"
           node backend/tools/validate_outputs.mjs "$SMOKE_OUTPUT_DIR"
 
-      - name: 安装 Worker 依赖
-        working-directory: worker
-        run: npm ci
-
-      - name: 部署到 Cloudflare Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
-
       - name: 公网联调失败时回退后端
         if: failure() && steps.backend.outcome == 'success' && steps.smoke.outcome == 'failure'
         run: |
@@ -154,3 +165,67 @@ jobs:
       - name: 清理临时密钥
         if: always()
         run: rm -f "$RUNNER_TEMP/backend_key" "$RUNNER_TEMP/backend_known_hosts"
+
+      - name: 记录后端部署结果
+        run: |
+          {
+            echo '## 后端部署与公网验证通过'
+            echo '后端版本已切换，跨域预检、样例上传轮询和返回契约校验均通过。'
+            echo '前端尚待后续「部署前端到 Cloudflare」job 发布，请以该 job 的结果确认前端状态。'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-frontend:
+    name: 部署前端到 Cloudflare
+    needs: [revision, deploy-backend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: 重试时也确认发布版本仍是最新 main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REVISION: ${{ needs.revision.outputs.sha }}
+        run: |
+          latest=$(gh api "repos/$GH_REPO/commits/main" --jq .sha)
+          if [ "$REVISION" != "$latest" ]; then
+            echo "::error::main 已更新，请运行最新版本的完整部署。"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.revision.outputs.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 取回同一次部署的前端构建产物
+        uses: actions/download-artifact@v5
+        with:
+          name: frontend-production
+          path: web/dist/
+
+      - name: 安装 Worker 依赖
+        working-directory: worker
+        run: npm ci
+
+      - name: 发布前端静态资源与 Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: 记录前端部署结果
+        run: |
+          {
+            echo '## 前后端部署完成'
+            echo '后端已通过公网验证，前端静态资源与 Worker 已发布。'
+            echo '前端默认仍使用示例模式；联调时在顶栏切换到「真实后端」，或使用 ?mock=0。'
+          } >> "$GITHUB_STEP_SUMMARY"
