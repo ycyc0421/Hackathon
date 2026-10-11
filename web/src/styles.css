@@ -1880,3 +1880,114 @@ textarea {
   color: var(--color-primary);
   font-weight: 600;
 }
+
+/* ---------- 手机端适配（≤640px）---------- */
+
+@media (max-width: 640px) {
+  /* 顶栏折成两行：品牌 + mock 工具一行，页签独占一行 */
+  .topbar {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 0 var(--space-3);
+    padding: 0 var(--space-3);
+  }
+
+  .brand {
+    padding: var(--space-2) 0;
+  }
+
+  /* 窄屏上副标题只会逐字换行，直接隐藏 */
+  .brand-sub {
+    display: none;
+  }
+
+  .mock-tools {
+    margin-left: auto;
+    padding: var(--space-2) 0;
+  }
+
+  .tabs {
+    order: 3;
+    flex-basis: 100%;
+    height: 44px;
+  }
+
+  .tab {
+    padding: 0 var(--space-2);
+  }
+
+  .content {
+    padding: var(--space-3);
+  }
+
+  .card {
+    padding: var(--space-4);
+  }
+
+  .footer {
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-3);
+    padding: var(--space-3);
+  }
+
+  /* 上传页的表单行纵向堆叠 */
+  .field-row {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* 条目头部：字段名放不下时徽章换行，字段 key 允许断开 */
+  .cmp-head {
+    flex-wrap: wrap;
+  }
+
+  .cmp-title {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .cmp-key {
+    word-break: break-all;
+  }
+
+  /* 差异表格改为堆叠行：每份文件一块，单元格用 data-label 当小标题。
+     四列在 ~350px 下只能逐字换行，堆叠是唯一可读方案 */
+  .cmp-table thead {
+    display: none;
+  }
+
+  .cmp-table,
+  .cmp-table tbody,
+  .cmp-table tr,
+  .cmp-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .cmp-table tr {
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cmp-table tr:last-child {
+    border-bottom: none;
+  }
+
+  .cmp-table td {
+    border-bottom: none;
+    padding: 2px var(--space-1);
+  }
+
+  .cmp-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  /* 文件名作块的标题，不加小标签 */
+  .cmp-table .cell-file {
+    font-weight: 600;
+    color: var(--text-body);
+  }
+}

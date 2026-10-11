@@ -341,19 +341,19 @@ onMounted(async () => {
                     <tbody>
                       <tr v-for="v in c.values" :key="v.file_id" :class="{ 'row-odd': v.field_status !== 'EXTRACTED' }">
                         <td class="cell-file">{{ v.file_name }}</td>
-                        <td class="cell-value" :class="{ divergent: isDivergentValue(c, v) }">
+                        <td class="cell-value" data-label="值" :class="{ divergent: isDivergentValue(c, v) }">
                           <template v-if="v.normalized_value !== null && v.normalized_value !== undefined">
                             {{ valueText(v, c) }}
                           </template>
                           <span v-else class="cell-empty">—</span>
                         </td>
-                        <td class="cell-raw">
+                        <td class="cell-raw" data-label="原文">
                           <template v-if="showsRaw(v, c)">{{ v.raw_value }}</template>
                           <!-- raw_value 读不出值时回退到抽取层保留的原文片段，不显示成空白 -->
                           <template v-else-if="rawEvidence(c, v)">{{ rawEvidence(c, v) }}</template>
                           <span v-else class="cell-empty">—</span>
                         </td>
-                        <td><StatusBadge :status="fileStatusOf(v)" /></td>
+                        <td data-label="状态"><StatusBadge :status="fileStatusOf(v)" /></td>
                       </tr>
                     </tbody>
                   </table>
