@@ -17,7 +17,20 @@
 /** 最多扫描的 stream 段数。文本层通常出现在前几个内容流，扫多了只是浪费 CPU */
 const MAX_STREAMS = 20
 
-/** 字节级 ASCII 转字符串，用于在原始字节里找 marker */
+/**
+ * 最多读入的文件前缀字节数。内容流一般在文件前部，扫前 4MB 足够判定；
+ * 不截断的话，超限大文件（如 60MB+ 扫描件）会被 arrayBuffer() 整份读入
+ * 内存、再做全字节扫描，全在主线程——添加文件的动画必然卡死。
+ * 被截断的文件只允许给出 'text' 结论（找到了就是找到了），扫不到一律
+ * 'unknown'，不能凭部分数据判 'no-text' 误报扫描件。
+ */
+const MAX_SCAN_BYTES = 4 * 1024 * 1024
+
+/**
+ * 字节级 ASCII 转字符串。只用于固定小窗口（文件头 1KB），
+ * 禁止对大段字节调用——循环拼字符串在大输入上是 GC 灾难，
+ * 大段查找一律走 indexOfBytes 字节比较。
+ */
 function ascii(bytes, start, end) {
   let s = ''
   for (let i = start; i < end; i++) s += String.fromCharCode(bytes[i])
@@ -78,6 +91,10 @@ export function findStreams(bytes, maxCount = MAX_STREAMS) {
   return ranges
 }
 
+const BT_MARKER = asciiBytes('BT')
+const TJ_LOWER = asciiBytes('Tj')
+const TJ_UPPER = asciiBytes('TJ')
+
 /**
  * 在（已解压的）内容流字节里搜文本绘制操作符。
  * 纯函数，便于 node 测试。
@@ -85,14 +102,16 @@ export function findStreams(bytes, maxCount = MAX_STREAMS) {
  * 判定：同时出现 `BT`（Begin Text）和 `Tj` 或 `TJ`（两种文本绘制操作符）。
  * 只查 BT 不够——空文本对象 `BT /F1 12 Tf ET` 不画任何字；
  * 只查 Tj 可能撞上别的字节组合（如字体名里的 'Tj'），两个一起查可以压低误报。
+ * 字节级查找，不做字节→字符串转换（大内容流上字符串拼接是主线程负担）。
  *
  * @param {Uint8Array} bytes 解压后的内容流
  * @returns {boolean}
  */
 export function hasTextOperators(bytes) {
-  // 内容流是 ASCII 为主的文本，直接按字节转字符串做 includes 判定
-  const s = ascii(bytes, 0, bytes.length)
-  return s.includes('BT') && (s.includes('Tj') || s.includes('TJ'))
+  return (
+    indexOfBytes(bytes, BT_MARKER) !== -1 &&
+    (indexOfBytes(bytes, TJ_LOWER) !== -1 || indexOfBytes(bytes, TJ_UPPER) !== -1)
+  )
 }
 
 /** 检查文件头与加密标记。纯函数，便于 node 测试 */
@@ -148,9 +167,12 @@ export async function detectPdfTextLayer(file) {
   // 老浏览器没有 DecompressionStream 时直接放弃检测
   if (typeof DecompressionStream === 'undefined') return 'unknown'
 
+  // 只读文件前缀（见 MAX_SCAN_BYTES）：整份读入大文件会在主线程造成
+  // 明显的内存分配与扫描卡顿。slice 是懒视图，浏览器只读实际需要的部分。
+  const truncated = file.size > MAX_SCAN_BYTES
   let bytes
   try {
-    bytes = new Uint8Array(await file.arrayBuffer())
+    bytes = new Uint8Array(await file.slice(0, MAX_SCAN_BYTES).arrayBuffer())
   } catch {
     return 'unknown'
   }
@@ -165,8 +187,11 @@ export async function detectPdfTextLayer(file) {
     const inflated = await tryInflate(bytes.subarray(start, end))
     if (inflated === null) continue // 该段无法解压（可能误切或非 flate），跳过
     sawInflated = true
-    if (hasTextOperators(inflated)) return 'text'
+    if (hasTextOperators(inflated)) return 'text' // 找到即确证，截断也有效
   }
+
+  // 截断文件的「没找到」不算数：内容流可能在 4MB 之后，静默降级而不是误报
+  if (truncated) return 'unknown'
 
   // 所有段都解不开时多半是内容流用了别的过滤器（如 LZWDecode/ASCII85），
   // 启发式覆盖不到，按 unknown 静默处理，避免对正常文件误报
