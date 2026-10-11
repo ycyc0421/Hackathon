@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from pathlib import Path
 from types import SimpleNamespace
+from threading import Barrier, get_ident
 import unittest
 from unittest.mock import patch
 
@@ -47,6 +49,31 @@ def read_with_models(header, ordinary_rows, tables):
 
 
 class ReviewRegressions(unittest.TestCase):
+    def test_model_creation_and_inference_stay_on_one_thread_across_tasks(self):
+        from PIL import Image
+        data = BytesIO()
+        Image.new("RGB", (10, 10), "white").save(data, format="PNG")
+        def create_model(**kwargs):
+            owner = get_ident()
+            def predict(**kwargs):
+                if get_ident() != owner:
+                    raise RuntimeError("推理器不可跨线程使用")
+                return [SimpleNamespace(json={"res": {"rec_texts": [
+                    "COMMERCIAL INVOICE", "DESCRIPTION: CERAMIC MUG", "QUANTITY: 100 PCS",
+                ]}})]
+            return SimpleNamespace(predict=predict)
+        barrier = Barrier(2)
+        def request():
+            barrier.wait(timeout=5)
+            return read_image(data.getvalue())
+        with patch.dict(sys.modules, {
+            "numpy": SimpleNamespace(asarray=lambda image: image),
+            "paddleocr": SimpleNamespace(PaddleOCR=create_model),
+        }), patch("app.pipeline.paddle_reader._ocr", None), ThreadPoolExecutor(max_workers=2) as requests:
+            futures = [requests.submit(request) for _ in range(2)]
+            results = [future.result(timeout=10) for future in futures]
+        self.assertTrue(all(result.ok for result in results), [result.error_message for result in results])
+
     def test_header_aliases_preserve_product_rows(self):
         for header in (
             ["NO", "ITEM NO", "DESCRIPTION", "QTY", "PACKAGES"],

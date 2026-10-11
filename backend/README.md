@@ -136,4 +136,6 @@ python backend/tools/run_ocr_probe.py
 ```
 
 该探针单独运行 09–11 的 PNG，不进入默认 CI；CI 仍只运行无需下载模型的
-文本层 PDF 与纯逻辑回归。
+文本层 PDF 与纯逻辑回归。探针要求所选样例的文件全部经过 OCR 成功处理；11 号
+还须保留 4 个商品行并检出颜色差异。自动部署的 Python 选择、OCR 开关和公网扫描
+PDF 验证见 [工作流说明](../.github/workflows/README.md#后端主机初始化)。

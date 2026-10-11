@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from concurrent.futures import ThreadPoolExecutor
 from html.parser import HTMLParser
 from io import BytesIO
 from threading import Lock
@@ -15,7 +16,7 @@ from ..models import ParseMethod
 _ocr = None
 _structure = None
 _model_lock = Lock()
-_run_lock = Lock()
+_run_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="paddle-ocr")
 
 
 class _TableParser(HTMLParser):
@@ -194,6 +195,11 @@ def _get_structure():
 
 
 def read_image(data: bytes) -> ReadResult:
+    # Paddle 推理器需在同一线程创建和复用；互斥锁无法保证跨任务线程的稳定性。
+    return _run_executor.submit(_recognize_image, data).result()
+
+
+def _recognize_image(data: bytes) -> ReadResult:
     """Recognize one image; reject uncertain table reconstruction."""
     try:
         from PIL import Image
@@ -202,24 +208,23 @@ def read_image(data: bytes) -> ReadResult:
         if getattr(source, "n_frames", 1) != 1:
             raise ValueError("多帧图片尚不支持逐页识别")
         image = np.asarray(source.convert("RGB"))
-        with _run_lock:
-            results = list(_get_ocr().predict(input=image))
-            if len(results) != 1:
-                raise ValueError("OCR 未返回单页结果")
-            lines = [str(x).strip() for x in results[0].json["res"]["rec_texts"] if str(x).strip()]
-            uncertain: list[str] = []
-            corrections: list[dict[str, str]] = []
-            if _table_start(lines) is not None:
-                structure = list(_get_structure().predict(input=image))
-                if len(structure) != 1:
-                    raise ValueError("表格识别未返回单页结果")
-                markdown = structure[0].markdown["markdown_texts"]
-                # 交给解析器检查整页，不能截出第一张表后静默丢弃其他表格。
-                lines_text = _table_lines(markdown) if re.search(r"<table\b", markdown, re.I) else _sequential_packing_table(lines)
-                lines_text, uncertain, corrections = _check_descriptions(lines_text, lines)
-                text = _replace_table(lines, lines_text)
-            else:
-                text = "\n".join(lines)
+        results = list(_get_ocr().predict(input=image))
+        if len(results) != 1:
+            raise ValueError("OCR 未返回单页结果")
+        lines = [str(x).strip() for x in results[0].json["res"]["rec_texts"] if str(x).strip()]
+        uncertain: list[str] = []
+        corrections: list[dict[str, str]] = []
+        if _table_start(lines) is not None:
+            structure = list(_get_structure().predict(input=image))
+            if len(structure) != 1:
+                raise ValueError("表格识别未返回单页结果")
+            markdown = structure[0].markdown["markdown_texts"]
+            # 交给解析器检查整页，不能截出第一张表后静默丢弃其他表格。
+            lines_text = _table_lines(markdown) if re.search(r"<table\b", markdown, re.I) else _sequential_packing_table(lines)
+            lines_text, uncertain, corrections = _check_descriptions(lines_text, lines)
+            text = _replace_table(lines, lines_text)
+        else:
+            text = "\n".join(lines)
         if len(text.strip()) < MIN_TEXT_LAYER_CHARS:
             raise ValueError("OCR 返回文字过少")
         return ReadResult(text=text, page_count=1, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain, ocr_corrections=corrections)

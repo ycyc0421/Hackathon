@@ -23,7 +23,13 @@ def main() -> None:
                 continue
             task = upload(client, case, country, name, [".png"], wait_seconds=300)
             report(task, f"OCR {case}")
-            assert any(d["process_status"] == "EXTRACTED" for d in task["documents"]), case
+            assert task["status"] == "COMPLETED", case
+            assert task["documents"] and all(d["process_status"] == "EXTRACTED" for d in task["documents"]), case
+            assert task["extractions"] and all(e["parse_method"] == "OCR" for e in task["extractions"]), case
+            if case == "11_de_multiitem_mixed":
+                assert len(task["items"]) == 4, case
+                assert any(c["field_key"] == "description" and c["item_id"] is not None
+                           and c["status"] == "CONFLICT" for c in task["comparisons"]), case
 
 
 if __name__ == "__main__":

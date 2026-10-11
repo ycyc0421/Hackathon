@@ -48,7 +48,7 @@ jobs:
     needs: revision
     if: needs.revision.outputs.sha != ''
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     environment: production
     permissions:
       contents: read
@@ -131,7 +131,7 @@ jobs:
           printf '%s\n' "$BACKEND_SSH_KEY" > "$RUNNER_TEMP/backend_key"
           printf '%s\n' "$BACKEND_SSH_KNOWN_HOSTS" > "$RUNNER_TEMP/backend_known_hosts"
 
-      - name: 发布独立后端版本
+      - name: 按共享配置发布 Python 3.12 后端并预检 OCR
         id: backend
         run: |
           ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
@@ -141,7 +141,7 @@ jobs:
           scp "${ssh_options[@]}" "$RUNNER_TEMP/$RELEASE_ID.tar.gz" "$target:app/incoming/$RELEASE_ID.tar.gz"
           ssh "${ssh_options[@]}" "$target" "python3 - $RELEASE_ID" < deploy/backend.py
 
-      - name: 验证公网接口、上传轮询及返回契约
+      - name: 验证公网接口及 OCR 图片和扫描 PDF（启用时）
         id: smoke
         env:
           SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
@@ -171,6 +171,7 @@ jobs:
           {
             echo '## 后端部署与公网验证通过'
             echo '后端版本已切换，跨域预检、样例上传轮询和返回契约校验均通过。'
+            echo '共享配置启用 OCR 时，还须通过真实模型预检、图片与无文本层扫描 PDF 的公网验证；验证模式见步骤日志。'
             echo '前端发布结果请查看「部署前端到 Cloudflare」job。'
           } >> "$GITHUB_STEP_SUMMARY"
 

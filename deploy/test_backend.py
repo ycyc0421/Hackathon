@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import subprocess
+import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -93,6 +94,77 @@ class DeploymentTests(unittest.TestCase):
         run.assert_not_called()
         self.assertEqual((self.root / "current").resolve(), self.old)
         self.assert_shared_unchanged()
+
+    def prepare_archive(self, settings):
+        (self.root / "shared/backend.env").write_text(settings)
+        (self.root / "venv/bin").mkdir(parents=True)
+        (self.root / "venv/bin/python").touch()
+        (self.root / "incoming").mkdir()
+        (self.new / "backend").mkdir()
+        release_id = "a" * 40 + "-1-1"
+        with tarfile.open(self.root / "incoming" / f"{release_id}.tar.gz", "w:gz") as archive:
+            archive.add(self.new, arcname="")
+        return release_id
+
+    @patch("backend.activate")
+    @patch("backend.run")
+    def test_enabled_ocr_uses_selected_python_and_verifies_before_activation(self, run, activate):
+        settings = 'BACKEND_PYTHON="/opt/python312/bin/python"\nPADDLE_OCR_ENABLED=1\n'
+        release_id = self.prepare_archive(settings)
+        backend.deploy(self.root, release_id)
+        calls = [call.args for call in run.call_args_list]
+        venv = next(args for args in calls if "venv" in args)
+        self.assertEqual(venv[0], "/opt/python312/bin/python")
+        self.assertTrue(any("paddlepaddle==3.2.0" in args for args in calls))
+        self.assertTrue(any(str(args[-1]).endswith("requirements-ocr.txt") for args in calls))
+        probes = [call for call in run.call_args_list if "run_ocr_probe.py" in str(call.args)]
+        self.assertEqual(len(probes), 1)
+        self.assertEqual(probes[0].kwargs["env"]["PADDLE_OCR_ENABLED"], "1")
+        for call in run.call_args_list:
+            if any(name in str(call.args) for name in ("selftest.py", "run_challenge.py", "test_paddle_adapter.py")):
+                self.assertEqual(call.kwargs["env"]["PADDLE_OCR_ENABLED"], "0")
+        activate.assert_called_once_with(self.root, self.root / "releases" / release_id)
+        self.assertEqual((self.root / "shared/backend.env").read_text(), settings)
+        self.assertEqual((self.root / "shared/data/task.json").read_text(), "已有任务")
+
+    @patch("backend.activate")
+    @patch("backend.run")
+    def test_disabled_ocr_keeps_text_only_deployment(self, run, activate):
+        release_id = self.prepare_archive("PADDLE_OCR_ENABLED=0\n")
+        backend.deploy(self.root, release_id)
+        calls = [call.args for call in run.call_args_list]
+        self.assertTrue(any(str(args[-1]).endswith("backend/requirements.txt") for args in calls))
+        self.assertFalse(any("paddlepaddle==3.2.0" in args or "run_ocr_probe.py" in str(args) for args in calls))
+        activate.assert_called_once()
+
+    @patch("backend.activate")
+    @patch("backend.run")
+    def test_ocr_probe_failure_never_switches_current_release(self, run, activate):
+        release_id = self.prepare_archive("PADDLE_OCR_ENABLED=1\n")
+        def fail_probe(*args, **kwargs):
+            if "run_ocr_probe.py" in str(args):
+                raise subprocess.CalledProcessError(1, args)
+        run.side_effect = fail_probe
+        with self.assertRaises(subprocess.CalledProcessError):
+            backend.deploy(self.root, release_id)
+        activate.assert_not_called()
+        self.assertEqual((self.root / "current").resolve(), self.old)
+        self.assertEqual((self.old / ".venv/unchanged").read_text(), "旧依赖")
+
+    def test_shared_settings_handle_quotes_and_last_assignment(self):
+        (self.root / "shared/backend.env").write_text(
+            '# PADDLE_OCR_ENABLED=0\nLLM_API_KEY=ignored\n'
+            'PADDLE_OCR_ENABLED=0\nPADDLE_OCR_ENABLED="1"\n'
+        )
+        self.assertEqual(backend.deployment_settings(self.root)["PADDLE_OCR_ENABLED"], "1")
+
+    @patch("backend.activate")
+    @patch("backend.run")
+    def test_invalid_ocr_flag_stops_before_install(self, run, activate):
+        release_id = self.prepare_archive("PADDLE_OCR_ENABLED=true\n")
+        with self.assertRaisesRegex(ValueError, "PADDLE_OCR_ENABLED"):
+            backend.deploy(self.root, release_id)
+        run.assert_not_called()
 
 
 if __name__ == "__main__":

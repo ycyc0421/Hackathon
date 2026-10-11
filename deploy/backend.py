@@ -6,9 +6,9 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import shutil
 import subprocess
-import sys
 import tarfile
 import time
 from urllib.error import URLError
@@ -16,6 +16,23 @@ from urllib.request import urlopen
 
 
 SERVICE = "hackathon-backend.service"
+
+
+def deployment_settings(root):
+    """只读取发布所需的两个配置项，其他服务配置不输出、不改写。"""
+    settings = {"BACKEND_PYTHON": str(root.parent / ".local/bin/python3.12"), "PADDLE_OCR_ENABLED": "0"}
+    for line in (root / "shared/backend.env").read_text().splitlines():
+        name, separator, value = line.partition("=")
+        name = name.strip()
+        if not separator or name not in settings:
+            continue
+        tokens = shlex.split(value)
+        if len(tokens) != 1:
+            raise ValueError(f"{name} 必须配置一个值")
+        settings[name] = tokens[0]
+    if settings["PADDLE_OCR_ENABLED"] not in {"0", "1"}:
+        raise ValueError("PADDLE_OCR_ENABLED 只能为 0 或 1")
+    return settings
 
 
 def run(*args, **kwargs):
@@ -93,6 +110,10 @@ def deploy(root, release_id):
             raise RuntimeError(f"缺少预先初始化的文件：{path}")
     if not (root / "current").is_symlink():
         raise RuntimeError("current 必须指向已有的可回退版本")
+    settings = deployment_settings(root)
+    ocr_enabled = settings["PADDLE_OCR_ENABLED"] == "1"
+    interpreter = str(Path(settings["BACKEND_PYTHON"]).expanduser())
+    run(interpreter, "-c", "import sys; assert sys.version_info[:2] == (3, 12), '发布环境需要 Python 3.12'")
     archive = root / "incoming" / f"{release_id}.tar.gz"
     release = root / "releases" / release_id
     release.mkdir()
@@ -100,19 +121,28 @@ def deploy(root, release_id):
         source.extractall(release, filter="data")
 
     # 每个版本使用独立依赖，失败时不会污染仍在运行的旧环境。
-    run(sys.executable, "-m", "venv", "--without-pip", str(release / ".venv"))
+    run(interpreter, "-m", "venv", "--without-pip", str(release / ".venv"))
     installer = str(root / "venv/bin/python")
     python = str(release / ".venv/bin/python")
-    run(installer, "-m", "pip", "--python", python, "install", "-r", str(release / "backend/requirements.txt"))
+    requirements = "requirements-ocr.txt" if ocr_enabled else "requirements.txt"
+    run(installer, "-m", "pip", "--python", python, "install", "-r", str(release / "backend" / requirements))
+    if ocr_enabled:
+        run(installer, "-m", "pip", "--python", python, "install", "paddlepaddle==3.2.0",
+            "--index-url", "https://www.paddlepaddle.org.cn/packages/stable/cpu/")
     run(installer, "-m", "pip", "--python", python, "check")
     with (release / "requirements.lock").open("w") as lock:
         run(installer, "-m", "pip", "--python", python, "freeze", stdout=lock)
 
     # 候选版本先用自己的临时数据自检，避免测试读写共享的运行中任务。
-    env = {**os.environ, "LLM_BASE_URL": "", "LLM_API_KEY": "", "LLM_MODEL": "", "PYTHONDONTWRITEBYTECODE": "1"}
+    env = {**os.environ, "LLM_BASE_URL": "", "LLM_API_KEY": "", "LLM_MODEL": "",
+           "PADDLE_OCR_ENABLED": "0", "PYTHONDONTWRITEBYTECODE": "1"}
     for script, args in (("test_compare.py", []), ("test_review_regressions.py", []),
-                         ("selftest.py", ["--no-node"]), ("run_challenge.py", [])):
+                         ("test_paddle_adapter.py", []), ("selftest.py", ["--no-node"]), ("run_challenge.py", [])):
         run(python, str(release / "backend/tools" / script), *args, cwd=release, env=env)
+    if ocr_enabled:
+        # 在切换服务前加载真实模型并验证图片；使用候选版本的临时任务数据。
+        run(python, str(release / "backend/tools/run_ocr_probe.py"), "11_de_multiitem_mixed",
+            cwd=release, env={**env, "PADDLE_OCR_ENABLED": "1"}, timeout=900)
     temporary_data = release / "backend/.data"
     if temporary_data.exists():
         shutil.rmtree(temporary_data)

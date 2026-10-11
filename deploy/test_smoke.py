@@ -1,6 +1,7 @@
 """公网挑战、跨域缺失和任务失败都必须阻止发布。"""
 
 from pathlib import Path
+from io import BytesIO
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -19,10 +20,10 @@ class PublicSmokeTests(unittest.TestCase):
         self.addCleanup(directory.cleanup)
         self.output = Path(directory.name)
 
-    def run_probe(self, handler):
+    def run_probe(self, handler, **kwargs):
         client = httpx.Client(transport=httpx.MockTransport(handler), headers={'Origin': self.origin})
         with patch('smoke.httpx.Client', return_value=client):
-            smoke.run(self.base, self.origin, self.output)
+            smoke.run(self.base, self.origin, self.output, **kwargs)
 
     def test_edge_challenge_reports_status_without_response_body(self):
         requests = []
@@ -54,6 +55,65 @@ class PublicSmokeTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, '任务未完成'):
             self.run_probe(handler)
         self.assertEqual(list(self.output.iterdir()), [])
+
+    def test_scan_uploads_have_images_and_no_pdf_text_layer(self):
+        from pypdf import PdfReader
+        from PIL import Image
+        uploads = smoke.ocr_uploads(scan=True)
+        self.assertEqual(len(uploads), 3)
+        sources = sorted(Path('backend/samples/11_de_multiitem_mixed').glob('*.png'))
+        for (_, (name, data, mime)), source in zip(uploads, sources):
+            self.assertTrue(name.endswith('.pdf'))
+            self.assertEqual(mime, 'application/pdf')
+            reader = PdfReader(BytesIO(data))
+            self.assertEqual(len(reader.pages), 1)
+            self.assertFalse(reader.pages[0].extract_text())
+            self.assertTrue(reader.pages[0].images)
+            with Image.open(source) as original:
+                embedded = reader.pages[0].images[0].image.convert('RGB')
+                self.assertTrue(embedded.tobytes() == original.convert('RGB').tobytes(),
+                                '扫描探针不得通过有损压缩改变样例内容')
+
+    def ocr_handler(self, parse_method='OCR'):
+        uploads = []
+        def handler(request):
+            headers = {'access-control-allow-origin': self.origin, 'access-control-allow-methods': 'GET, POST'}
+            if request.method == 'OPTIONS':
+                return httpx.Response(200, headers=headers)
+            if request.method == 'POST':
+                uploads.append(request.read())
+                return httpx.Response(200, headers=headers, json={'task_id': f'probe_{len(uploads)}'})
+            if request.url.path.endswith('tsk_missing_deployment_probe'):
+                return httpx.Response(404, json={'error': {'code': 'TASK_NOT_FOUND'}})
+            if request.url.path.endswith('evaluation/latest'):
+                return httpx.Response(200, headers=headers, json={'status': 'NOT_RUN'})
+            task = {'status': 'COMPLETED', 'summary': {'conflict_count': 0 if len(uploads) == 1 else 1},
+                    'items': [{}, {}, {}, {}],
+                    'documents': [{'process_status': 'EXTRACTED'} for _ in range(3)],
+                    'extractions': [{'parse_method': parse_method} for _ in range(3)],
+                    'comparisons': [{'field_key': 'description', 'item_id': 'item_4', 'status': 'CONFLICT'}]}
+            return httpx.Response(200, headers=headers, json=task)
+        return handler, uploads
+
+    def test_enabled_ocr_uploads_png_and_scans_and_saves_both_results(self):
+        handler, uploads = self.ocr_handler()
+        self.run_probe(handler, ocr_enabled=True)
+        self.assertEqual(len(uploads), 5)
+        self.assertIn(b'image/png', uploads[3])
+        self.assertIn(b'application/pdf', uploads[4])
+        self.assertTrue((self.output / 'ocr_png.json').is_file())
+        self.assertTrue((self.output / 'ocr_scan.json').is_file())
+
+    def test_ocr_probe_rejects_a_result_that_did_not_use_ocr(self):
+        handler, _ = self.ocr_handler(parse_method='TEXT_LAYER')
+        with self.assertRaisesRegex(AssertionError, 'OCR'):
+            self.run_probe(handler, ocr_enabled=True)
+        self.assertFalse((self.output / 'ocr_png.json').exists())
+
+    def test_disabled_ocr_only_uploads_text_fixtures(self):
+        handler, uploads = self.ocr_handler()
+        self.run_probe(handler)
+        self.assertEqual(len(uploads), 3)
 
 
 if __name__ == '__main__':

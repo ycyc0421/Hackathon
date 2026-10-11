@@ -1,3 +1,5 @@
 -r requirements.txt
 paddleocr[doc-parser]==3.7.0
 pymupdf>=1.24
+# PaddlePaddle 3.2 使用 setuptools 的旧扩展接口。
+setuptools<82
