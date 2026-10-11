@@ -106,6 +106,17 @@
   文字被自己的栏位裁掉、栏位与文字一体，兄弟行随高度变化自然移动。
   禁止 absolute 脱流方案——实测栏位不收缩、文字与栏位脱离、下方内容
   突兀上移（上传页文件列表踩过的坑）。
+- **高度测量必须放在 onEnter，不是 onBeforeEnter**：Vue 的 `onBeforeEnter`
+  在元素【插入 DOM 之前】调用，游离节点没有布局，`offsetHeight` 恒为 0。
+  在 beforeEnter 量高会让高度补间起点=终点=0：高度从不过渡，条目只靠
+  padding 长出一半，等别的属性 transitionend 后内联样式被清掉瞬间弹到
+  全高——表现为「出现→卡一下→弹到位」。正确姿势：beforeEnter 只做视觉
+  归零防首帧闪现；onEnter 里先还原量自然高，再收起、强制 reflow、展开，
+  量与还原同帧同步完成不上屏。单元素 v-if 的收合（`collapseHooks`）同理。
+- **主线程重活避让动画**：文件预检测这类读文件+扫描的计算，在添加条目
+  动画同帧跑会卡住补间（transition 走主线程）。预检测限读文件前缀
+  （`pdfTextLayer.js` 的 `MAX_SCAN_BYTES`），并用 `requestIdleCallback`
+  调度到动画之后；大段字节查找一律字节级比较，禁止循环拼字符串。
 
 尊重 `prefers-reduced-motion`：JS 驱动的动画（平滑滚动、容器高度过渡）
 需各自判断该偏好并降级。
@@ -172,7 +183,17 @@ label 在输入框上方。错误：红色边框 + 下方错误文案。
 已选文件清单用 `TransitionGroup` 渲染，`key` 取稳定业务值
 （`fileKey = 文件名:大小`），禁止数组下标。条目进入/离开为
 高度收起 + 淡出（`--duration-fast`），其余条目 move 平滑补位
-（`--duration-base`）；`appear` 让列表从空到有的首次出现也有进入动画。
+（`--duration-base`）。
+
+**容器纪律**（适用于一切 TransitionGroup 列表）：
+
+- 容器常驻挂载，**不用 `v-if` 包容器**：`v-if` 在删到最后一项时会把容器
+  直接移除，条目离场钩子不执行，只剩窗口硬 resize。空态改用类绑定
+  （`.file-list--empty`）把容器自身的边框/margin 一并过渡，首尾项的
+  增删与中间项同样连贯。
+- **持久状态列表禁用 `appear`**：`appear` 的语义是"每次挂载都播进入动画"。
+  文件列表这类状态提升在 App 层、切页后还在的列表，加 `appear` 会导致
+  每次切回页面都重播。条目插入本身就会触发进入钩子，不需要 `appear`。
 
 ### 状态徽章
 
