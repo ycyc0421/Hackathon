@@ -15,10 +15,13 @@
 import { computed, inject, onBeforeUnmount } from 'vue'
 import { formatValue, fieldStatus } from '../api/formatters.js'
 import { divergenceInfo } from '../utils/divergence.js'
+import { evidenceRawText } from '../utils/evidence.js'
 import StatusBadge from './StatusBadge.vue'
 
 const props = defineProps({
   comparison: { type: Object, required: true },
+  /** 抽取层原文证据索引（DiffPage 由 task.extractions 构建）；缺省时不做证据回退 */
+  evidenceIndex: { type: Object, default: null },
 })
 
 const sourceFiles = inject('sourceFiles')
@@ -40,6 +43,14 @@ function showsRaw(v) {
   if (!v.raw_value) return false
   const { main } = formatValue(v.normalized_value, props.comparison.value_type, props.comparison.unit)
   return String(v.raw_value).trim() !== String(main).trim()
+}
+
+/**
+ * raw_value 读不出值时的证据回退：抽取层保留的原文片段 raw_text。
+ * 关联键 file_id + item_id + field_key，多商品不串证据；没有证据时返回 null。
+ */
+function rawEvidence(v) {
+  return evidenceRawText(props.evidenceIndex, props.comparison, v)
 }
 
 function fileStatusOf(v) {
@@ -106,6 +117,8 @@ onBeforeUnmount(() => {
         </div>
 
         <div v-if="showsRaw(v)" class="compare-raw">原文：{{ v.raw_value }}</div>
+        <!-- raw_value 为空时回退展示抽取层原文片段，标注为片段、不冒充归一值 -->
+        <div v-else-if="rawEvidence(v)" class="compare-raw">原文片段：{{ rawEvidence(v) }}</div>
 
         <div class="compare-foot">
           <StatusBadge :status="fileStatusOf(v)" />
