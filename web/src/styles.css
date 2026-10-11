@@ -14,6 +14,11 @@ body {
   padding: 0;
 }
 
+html {
+  /* 滚动条出没（如筛选切到短列表）不引起横向抖动 */
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--surface);
   color: var(--text-body);
@@ -152,16 +157,6 @@ body {
   font-size: var(--text-xs);
 }
 
-.mock-scenario-select {
-  padding: 2px var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface-raised);
-  color: var(--text-body);
-  font-size: var(--text-xs);
-  cursor: pointer;
-}
-
 .content {
   flex: 1;
   width: 100%;
@@ -185,6 +180,26 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+
+/* 页面头：标题 + 一行任务上下文（差异页；报告页以「检查概要」卡片承担同类职责）。
+   字级沿用卡片标题的 text-lg/600 与卡片副文的 text-sm/muted，不另立 scale */
+.page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.page-sub {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
 }
 
 .card {
@@ -230,6 +245,8 @@ body {
   border: 1px solid;
   border-radius: var(--radius-sm);
   font-size: var(--text-sm);
+  /* 出现时渐现，与骨架屏/空状态的出现节奏一致 */
+  animation: fade-in var(--duration-base) var(--ease);
 }
 
 .notice + .notice {
@@ -266,6 +283,12 @@ body {
   background: var(--danger-bg);
   border-color: var(--danger);
   color: var(--danger);
+}
+
+.notice.tone-ok {
+  background: var(--success-bg);
+  border-color: var(--success);
+  color: var(--success);
 }
 
 /* ---------- 状态标签 ---------- */
@@ -326,6 +349,12 @@ body {
   background: #f2f6fc;
 }
 
+/* 键盘可达（role=button）：聚焦描边与 chip 的 focus-visible 同款 */
+.dropzone:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .dropzone-main {
   font-size: 14px;
   color: var(--text-body);
@@ -341,12 +370,30 @@ body {
   display: none;
 }
 
+/*
+ * 文件列表条目增删（UploadPage 的 TransitionGroup）走 JS 精确高度钩子
+ * （utils/animateHeight.js 的 heightListItemHooks，:css="false"），
+ * 此处只保留静态样式。曾用 absolute 脱流 + max-height 近似方案：
+ * 栏位不收缩、文字与栏位脱离、下方内容突兀上移，已废弃。
+ */
 .file-list {
   margin: 12px 0 0;
   padding: 0;
   list-style: none;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  /* 容器常驻挂载（见 UploadPage 注释）：空态收起边框与 margin，且全程过渡——
+     首个文件进入 / 最后一个文件离开时容器与条目动画同步，不突兀 */
+  transition:
+    margin-top var(--duration-base) var(--ease),
+    border-width var(--duration-base) var(--ease),
+    border-color var(--duration-base) var(--ease);
+}
+
+.file-list--empty {
+  margin-top: 0;
+  border-width: 0;
+  border-color: transparent;
 }
 
 .file-item {
@@ -396,7 +443,6 @@ body {
 /* ---------- 表单输入框 ---------- */
 
 .input,
-select,
 textarea {
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
@@ -412,13 +458,11 @@ textarea {
 }
 
 .input:hover,
-select:hover,
 textarea:hover {
   border-color: var(--border-hover);
 }
 
 .input:focus,
-select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--color-primary);
@@ -436,15 +480,6 @@ textarea:focus {
 textarea {
   min-height: 80px;
   resize: vertical;
-}
-
-select {
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right var(--space-3) center;
-  padding-right: var(--space-8);
 }
 
 .actions {
@@ -655,7 +690,7 @@ select {
   display: grid;
   grid-template-rows: 1fr;
   opacity: 1;
-  transition: grid-template-rows var(--duration-slow) var(--ease),
+  transition: grid-template-rows var(--duration-base) var(--ease),
               opacity var(--duration-base) var(--ease);
 }
 
@@ -685,7 +720,7 @@ select {
   height: 100%;
   background: var(--color-primary);
   border-radius: var(--radius-sm);
-  transition: width var(--duration-fast) var(--ease);
+  transition: width var(--duration-base) var(--ease);
 }
 
 .progress-num {
@@ -813,12 +848,42 @@ select {
   font-family: inherit;
   font-size: 13px;
   cursor: pointer;
+  transition: background var(--duration-fast) var(--ease),
+              color var(--duration-fast) var(--ease),
+              border-color var(--duration-fast) var(--ease);
+}
+
+.chip:hover:not(.active) {
+  background: var(--gray-100);
+  border-color: var(--border-hover);
+  color: var(--text-body);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .chip.active {
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: #fff;
+}
+
+/* 筛选切换时列表整体淡出淡入，避免条目瞬间重排的生硬感 */
+.list-swap-enter-active,
+.list-swap-leave-active {
+  transition: opacity var(--duration-fast) var(--ease),
+              transform var(--duration-fast) var(--ease);
+}
+
+.list-swap-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.list-swap-leave-to {
+  opacity: 0;
 }
 
 .chip-num {
@@ -904,7 +969,6 @@ select {
 
 .cmp-table {
   width: 100%;
-  margin-top: var(--space-3);
   border-collapse: collapse;
   font-size: var(--text-sm);
 }
@@ -959,7 +1023,8 @@ select {
 .cell-raw {
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  /* 原文是关键证据，阅读级别不低于正文辅助信息，不用脚注级 12px */
+  font-size: 13px;
   word-break: break-all;
 }
 
@@ -978,70 +1043,104 @@ select {
   font-style: italic;
 }
 
-/* ---------- 并排对照展开面板（ComparePane）---------- */
+/* ---------- 并排对照视图切换（ComparePane）---------- */
 
-/* 卡片头部整行可点：展开/收起并排对照 */
-.cmp-head-toggle {
+/* 分段控件在卡片头部最左：切换方式 → 字段 → 徽章的视线顺序 */
+.cmp-title .view-switch {
+  align-self: center;
+}
+
+/* 分段控件：表格与并排对照是平级的两种视图，切换而非展开。
+   选中态由按钮背后的 pill 指示器表达（ViewSwitch.vue 按实测位置写入
+   transform/width），切换时 pill 平滑滑动，不做背景色瞬变 */
+.view-switch {
+  position: relative; /* pill 的定位与测量基准 */
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--gray-50);
+}
+
+.view-switch-pill {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease),
+              width var(--duration-fast) var(--ease),
+              opacity var(--duration-fast) var(--ease);
+  pointer-events: none;
+}
+
+.view-switch button {
+  position: relative; /* 压在 pill 之上 */
+  border: none;
+  background: transparent;
+  padding: 2px var(--space-3);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
   cursor: pointer;
-  user-select: none;
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
-  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2));
-  transition: background var(--duration-fast) var(--ease);
+  transition: color var(--duration-fast) var(--ease);
 }
 
-/* 整行可点需要能被感知到：悬停给底色 + 提示展开的箭头颜色加深 */
-.cmp-head-toggle:hover {
-  background: var(--gray-100);
-}
-
-.cmp-head-toggle:hover .cmp-chevron {
+.view-switch button:hover:not([aria-pressed="true"]) {
   color: var(--text-body);
 }
 
-.cmp-head-toggle:focus-visible {
+.view-switch button[aria-pressed="true"] {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.view-switch button:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-.cmp-chevron {
-  display: inline-block;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  transition: transform var(--duration-fast) var(--ease);
-}
-
-.cmp-chevron.open {
-  transform: rotate(90deg);
-}
-
-/* 收起态表格里与多数派不同的值：不展开也能定位到「哪份文件不一样」 */
+/* 收起态表格里与多数派不同的值：切到对照视图前也能定位「哪份文件不一样」 */
 .cell-value.divergent {
   color: var(--danger);
   font-weight: 600;
 }
 
-/* 展开/收起时表格与并排面板原位互换：淡出 + 淡入，高度变化不抢戏 */
-.cmp-swap-enter-active,
-.cmp-swap-leave-active {
-  transition: opacity var(--duration-base) var(--ease),
-              transform var(--duration-base) var(--ease);
+/*
+ * 视图互换的容器：旧内容直接消失（无离场动画、不用 absolute），新内容快速淡入；
+ * 容器高度由 DiffPage.setView 的 JS 平滑过渡。
+ * crossfade + absolute 曾导致父容器高度中途坍缩、整列抖动，故不做。
+ * 上边距放在容器上而不是两种视图的根元素上：切换时容器会被临时设为
+ * overflow:hidden（成为 BFC），子元素 margin 的折叠行为若随切换改变，
+ * 会在切换瞬间产生一个 margin 高度的跳动。
+ */
+.cmp-view-body {
+  margin-top: var(--space-3);
+}
+.cmp-swap-enter-active {
+  transition: opacity var(--duration-fast) var(--ease),
+              transform var(--duration-fast) var(--ease);
 }
 
+/* 新内容带轻微位移淡入，与筛选切换的 list-swap 一致；大高度差交换
+ * （DiffPage.setView 的距离自适应分支）不补间高度时靠它给出方向感 */
 .cmp-swap-enter-from {
   opacity: 0;
   transform: translateY(4px);
 }
 
-.cmp-swap-leave-to {
-  opacity: 0;
+/*
+ * 离场内容立即隐藏：不做离场动画，且 Vue 在移除旧节点前它不能继续占位，
+ * 否则 setView 测到的新高度会把旧内容算进去，高度动画先胀后缩。
+ */
+.cmp-swap-leave-active {
+  display: none;
 }
 
 /* 多于两份文件时列自动换行平铺，保持可读 */
-.compare-pane {
-  margin-top: var(--space-3);
-}
-
 .compare-cols {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1074,14 +1173,9 @@ select {
 }
 
 .compare-col.divergent .compare-value {
+  /* 直接落位红色：曾用 keyframes 从正文色渐变到 danger 做「读入」强调，
+     但在表格↔对照切换里表现为先黑后红的跳变，像渲染故障，已去除 */
   color: var(--danger);
-  animation: divergent-read-in var(--duration-slow) var(--ease-out);
-}
-
-@keyframes divergent-read-in {
-  from {
-    color: var(--text-body);
-  }
 }
 
 .compare-file {
@@ -1121,7 +1215,8 @@ select {
 .compare-raw {
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  /* 同 .cell-raw：原文承担证据职责，不用脚注级 12px */
+  font-size: 13px;
   word-break: break-all;
 }
 
@@ -1155,30 +1250,11 @@ select {
   align-items: center;
   text-align: center;
   padding: var(--space-10) var(--space-6);
+  animation: fade-in var(--duration-base) var(--ease);
 }
 
-/* 图标用圆形浅底托住，按语气着色，比裸 emoji 更精致 */
-.empty-state-icon {
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--info-bg);
-  font-size: 24px;
-  line-height: 1;
-}
-
-.empty-state.tone-ok .empty-state-icon {
-  background: var(--success-bg);
-}
-
-.empty-state.tone-bad .empty-state-icon {
-  background: var(--danger-bg);
-}
-
+/* 纯文字排版：不用 emoji 插图，靠标题字重与语气色区分 */
 .empty-state-title {
-  margin-top: var(--space-4);
   font-size: var(--text-lg);
   font-weight: 600;
 }
@@ -1231,19 +1307,27 @@ select {
 }
 
 .stat-row {
-  display: flex;
-  gap: 24px;
-  margin-top: 18px;
-  flex-wrap: wrap;
+  /* 等分拉满整行：flex + 固定 min-width 会在右侧留下不均匀的空白，
+     卡片越宽越明显；grid auto-fit 让方块数随宽度增减且始终铺满 */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
 }
 
+/* 每个统计数字一张小卡：需要处理的数字在零值时收敛、非零时突出 */
 .stat {
   display: flex;
   flex-direction: column;
+  gap: 1px;
+  min-width: 96px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 }
 
 .stat-num {
-  font-size: 20px;
+  font-size: var(--text-xl);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -1253,8 +1337,27 @@ select {
   font-size: 12px;
 }
 
+/* 零值的问题计数收敛为弱化灰，不抢「没问题」的语义 */
+.stat.zero {
+  background: transparent;
+}
+
+.stat.zero .stat-num {
+  color: var(--text-muted);
+}
+
+.stat.alert {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}
+
 .stat.alert .stat-num {
   color: var(--danger);
+}
+
+.stat.warn {
+  background: var(--warning-bg);
+  border-color: var(--warning);
 }
 
 .stat.warn .stat-num {
@@ -1264,83 +1367,95 @@ select {
 .issue-list,
 .risk-list,
 .err-list {
-  margin: 12px 0 0;
+  margin: var(--space-3) 0 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .issue-item {
-  padding: 12px 14px;
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border);
   border-left: 3px solid var(--danger);
   border-radius: var(--radius-sm);
 }
 
+/* 头部：字段名 + 商品归属 + 徽章，归属 pill 弱化、字段名最重 */
 .issue-head {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
 .issue-label {
   font-weight: 600;
 }
 
+/* 各文件取值收进一块浅底区域，与头部/脚注分出层次 */
 .issue-values {
-  margin-top: 6px;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--gray-50);
   display: flex;
   flex-direction: column;
   gap: 2px;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-sm);
+}
+
+.issue-values strong {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-body);
 }
 
 .issue-note {
-  margin: 6px 0 0;
+  margin: var(--space-2) 0 0;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .risk-item {
-  padding: 12px 14px;
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
 }
 
 .risk-item.suggested {
   border-style: dashed;
-  background: #fcfcfd;
+  background: var(--gray-50);
 }
 
 .risk-head {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .risk-type {
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
 }
 
 .risk-title {
-  margin-top: 4px;
+  margin-top: var(--space-1);
   font-weight: 600;
 }
 
 .risk-detail {
-  margin: 6px 0 0;
+  margin: var(--space-2) 0 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .risk-foot {
-  margin-top: 8px;
+  margin-top: var(--space-2);
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .err-item {
@@ -1366,11 +1481,39 @@ select {
   font-size: 12px;
 }
 
-/* 检查概要的开头结论：一段话告诉读者"要不要处理"，先于统计数字 */
+/*
+ * 检查概要的开头结论：全页最重要的一句话，先于统计数字出现。
+ * 左边带 + 底色卡片承载，一眼可见；颜色跟随结论语气（tone），
+ * 与文案同源推导，不出现"坏消息配蓝色"的错位。
+ */
 .report-conclusion {
   margin: var(--space-2) 0 var(--space-4);
-  font-size: var(--text-sm);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gray-400);
+  border-radius: var(--radius-sm);
+  background: var(--gray-50);
+  font-size: var(--text-base);
+  font-weight: 500;
   line-height: var(--leading-relaxed);
+}
+
+.report-conclusion.tone-bad {
+  border-color: var(--danger);
+  border-left-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.report-conclusion.tone-warn {
+  border-color: var(--warning);
+  border-left-color: var(--warning);
+  background: var(--warning-bg);
+}
+
+.report-conclusion.tone-ok {
+  border-color: var(--success);
+  border-left-color: var(--success);
+  background: var(--success-bg);
 }
 
 /* 文件清单压缩为 chips：一行能看多份文件，状态靠色点快速分辨 */
@@ -1451,7 +1594,7 @@ select {
 
 /* 报告页跳到差异页后的定位反馈：高亮背景淡去，约 1.6s 后由 JS 移除 class */
 .cmp-item.cmp-highlight {
-  animation: cmp-highlight-fade 1.6s var(--ease-out);
+  animation: cmp-highlight-fade 1.6s var(--ease);
 }
 
 @keyframes cmp-highlight-fade {
@@ -1523,6 +1666,8 @@ select {
 /* ---------- 评测页表格 ---------- */
 
 .metric-table {
+  /* 与全站表格一致拉满卡片：曾用 width:auto + min-width:50% 收敛，
+     结果在宽卡片里指标表只占半宽、与全宽的错误分类列表尺寸不一致 */
   width: 100%;
   margin-top: var(--space-3);
   border-collapse: collapse;
@@ -1556,6 +1701,8 @@ select {
   background: var(--gray-100);
 }
 
+/* 数字列：表头与数据用同一个 .num 类，对齐方式同源，不会出现头左数右的错位
+   （.metric-table .num 的优先级高于 .metric-table th，表头加 .num 即右对齐） */
 .metric-table .num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
@@ -1621,4 +1768,105 @@ select {
   font-size: 12px;
   line-height: 1.5;
   white-space: nowrap;
+}
+
+/* ============================================================
+ * AppSelect 自定义下拉（web/src/components/AppSelect.vue）
+ * 替代原生 <select>：浮层样式跟随 token，键盘与 aria 语义在组件内
+ * ============================================================ */
+.app-select {
+  position: relative;
+  display: inline-block;
+}
+
+.app-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-body);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease),
+              box-shadow var(--duration-fast) var(--ease);
+}
+
+.app-select-trigger:hover {
+  border-color: var(--border-hover);
+}
+
+.app-select-trigger:focus-visible,
+.app-select.open .app-select-trigger {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--color-primary) l c h / 0.1);
+}
+
+.app-select-caret {
+  color: var(--text-muted);
+  font-size: 10px;
+  transition: transform var(--duration-fast) var(--ease);
+}
+
+.app-select.open .app-select-caret {
+  transform: rotate(180deg);
+}
+
+/* 块级模式（表单场景）：宽度撑满，外观对齐 .input */
+.app-select.block {
+  display: block;
+}
+
+.app-select.block .app-select-trigger {
+  width: 100%;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background: white;
+  font-size: var(--text-sm);
+}
+
+.app-select-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  min-width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+  animation: fade-in var(--duration-fast) var(--ease);
+}
+
+.app-select-option {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--text-body);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.app-select.block .app-select-option {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.app-select-option.active {
+  background: var(--gray-100);
+}
+
+.app-select-option.selected {
+  color: var(--color-primary);
+  font-weight: 600;
 }

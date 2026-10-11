@@ -111,7 +111,6 @@ const errorBreakdown = computed(() => {
           v-else-if="error"
           key="error"
           tone="bad"
-          icon="⚠️"
           title="读取评测结果失败"
           :detail="error"
           :retrying="loading"
@@ -124,7 +123,6 @@ const errorBreakdown = computed(() => {
           v-else-if="isNotRun"
           key="not-run"
           tone="info"
-          icon="📊"
           title="尚未评测"
           detail="尚无真实评测结果。本页在取得数据前不展示任何指标，以免与实际能力不符。"
         />
@@ -133,7 +131,6 @@ const errorBreakdown = computed(() => {
           v-else-if="evaluation?.status === 'RUNNING'"
           key="running"
           tone="info"
-          icon="⏳"
           title="评测进行中"
           detail="跑分完成后可刷新查看。"
         />
@@ -142,7 +139,6 @@ const errorBreakdown = computed(() => {
           v-else-if="evaluation?.status === 'FAILED'"
           key="failed"
           tone="bad"
-          icon="⚠️"
           title="评测失败"
           detail="本次跑分未产生结果。"
         />
@@ -161,9 +157,9 @@ const errorBreakdown = computed(() => {
             <thead>
               <tr>
                 <th>项目</th>
-                <th>精确率</th>
-                <th>召回率</th>
-                <th>F1</th>
+                <th class="num">精确率</th>
+                <th class="num">召回率</th>
+                <th class="num">F1</th>
               </tr>
             </thead>
             <tbody>
@@ -196,7 +192,7 @@ const errorBreakdown = computed(() => {
       v-if="mock"
       tone="info"
       title="当前使用示例数据"
-      detail="后端评测接口尚未提供，本页显示的是占位状态。"
+      detail="本页显示的是内置示例评测结果，并非真实跑分，数值不代表实际能力。"
     />
   </div>
 </template>

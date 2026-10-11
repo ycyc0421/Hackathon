@@ -8,10 +8,10 @@
 import { computed, inject } from 'vue'
 import { formatTime, formatDuration, riskType, severity, processStatus } from '../api/formatters.js'
 import { buildConclusion } from '../utils/reportConclusion.js'
+import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
-import EmptyState from '../components/EmptyState.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
@@ -26,13 +26,19 @@ const summary = computed(() => task.value?.summary ?? null)
 const TERMINAL_STATUSES = ['COMPLETED', 'PARTIAL', 'FAILED']
 const isTerminal = computed(() => task.value && TERMINAL_STATUSES.includes(task.value.status))
 
-/** 需要处理的条目：不一致、部分缺失、未校验、无法比对 */
+/**
+ * 需要处理的条目：与差异页「需关注」同一口径（needsReview）——
+ * 问题状态之外，MATCH 但含 LOW_CONFIDENCE 取值（请核对）的也在列。
+ */
 const issues = computed(() => {
   const list = task.value?.comparisons ?? []
-  return list.filter((c) => !['MATCH', 'SINGLE_SOURCE'].includes(c.status))
+  return list.filter(needsReview)
 })
 
-const matched = computed(() => (task.value?.comparisons ?? []).filter((c) => c.status === 'MATCH'))
+/** 「另有 N 个字段一致」脚注：已列入问题条目的 MATCH（含请核对取值）不再重复计数 */
+const matched = computed(
+  () => (task.value?.comparisons ?? []).filter((c) => c.status === 'MATCH' && !needsReview(c))
+)
 
 const failedDocs = computed(
   () =>
@@ -185,8 +191,9 @@ const severityOf = severity
       <section class="card">
         <h2 class="card-title">检查概要</h2>
 
-        <!-- 结论先行：一段话回答"这次检查要不要处理"。summary 缺失时不显示，不替后端下结论 -->
-        <p v-if="conclusion" class="report-conclusion">{{ conclusion }}</p>
+        <!-- 结论先行：一段话回答"这次检查要不要处理"。summary 缺失时不显示，不替后端下结论。
+             tone 与文案同源推导（utils/reportConclusion.js），结论条按 tone 上色 -->
+        <p v-if="conclusion" class="report-conclusion" :class="`tone-${conclusion.tone}`">{{ conclusion.text }}</p>
 
         <dl class="meta-grid">
           <div><dt>任务编号</dt><dd>{{ task.task_id }}</dd></div>
@@ -198,13 +205,13 @@ const severityOf = severity
         <div v-if="summary" class="stat-row">
           <div class="stat"><span class="stat-num">{{ summary.document_count }}</span><span class="stat-label">文件</span></div>
           <div class="stat"><span class="stat-num">{{ summary.field_count }}</span><span class="stat-label">抽取字段</span></div>
-          <div class="stat" :class="{ alert: summary.conflict_count > 0 }">
+          <div class="stat" :class="summary.conflict_count > 0 ? 'alert' : 'zero'">
             <span class="stat-num">{{ summary.conflict_count }}</span><span class="stat-label">不一致</span>
           </div>
-          <div class="stat" :class="{ warn: summary.missing_count > 0 }">
+          <div class="stat" :class="summary.missing_count > 0 ? 'warn' : 'zero'">
             <span class="stat-num">{{ summary.missing_count }}</span><span class="stat-label">部分缺失</span>
           </div>
-          <div class="stat" :class="{ warn: summary.unrecognized_count > 0 }">
+          <div class="stat" :class="summary.unrecognized_count > 0 ? 'warn' : 'zero'">
             <span class="stat-num">{{ summary.unrecognized_count }}</span><span class="stat-label">无法比对</span>
           </div>
           <div class="stat"><span class="stat-num">{{ summary.risk_count }}</span><span class="stat-label">风险提示</span></div>
@@ -251,13 +258,12 @@ const severityOf = severity
             </div>
           </li>
         </ul>
-        <!-- 成功式空状态只在终态成功时出现；处理中/失败/轮询中断都不能显示"没有问题" -->
-        <EmptyState
+        <!-- 成功式确认只在终态成功时出现；处理中/失败/轮询中断都不能显示"没有问题"。
+             正向确认收敛为一条细窄提示条，不用居中大空状态（DESIGN.md 通过态收敛原则） -->
+        <NoticeBar
           v-else-if="showNoIssues"
           tone="ok"
-          icon="✅"
-          title="没有需要人工处理的条目"
-          detail="所有字段在各文件间一致。"
+          :title="showNoRisk ? '没有需要人工处理的条目，也未发现风险提示' : '没有需要人工处理的条目'"
         />
 
         <p v-if="matched.length" class="foot-note">
@@ -298,15 +304,6 @@ const severityOf = severity
           </li>
         </ul>
       </section>
-
-      <!-- 有成功结果且确实零风险时给出正向反馈，避免显示成空白表格 -->
-      <EmptyState
-        v-if="showNoRisk"
-        tone="ok"
-        icon="✅"
-        title="没有风险提示"
-        detail="本次检查未发现需要提示的风险项。"
-      />
 
       <section v-if="task.errors?.length" class="card">
         <h2 class="card-title">错误记录</h2>

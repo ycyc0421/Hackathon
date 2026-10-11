@@ -11,29 +11,38 @@ import { backendErrorText } from '../api/errors.js'
 import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
 import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '../api/labels.js'
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
+import { needsReview } from '../utils/needsReview.js'
+import { heightListItemHooks, collapseHooks } from '../utils/animateHeight.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import EmptyState from '../components/EmptyState.vue'
+import AppSelect from '../components/AppSelect.vue'
 
 const task = inject('task')
 const taskError = inject('taskError')
 const isRunning = inject('isRunning')
 const sourceFiles = inject('sourceFiles')
+/** 跨页导航：完成态 CTA 直跳差异页 */
+const navigate = inject('navigate')
 
 // 目的国列表为演示用。后端（issue #4）确认当前规则覆盖美/德/荷/法/英，
 // 均为未经核实的演示规则，正式合规结论不能据此得出。
-const COUNTRIES = [
-  { code: 'US', name: '美国' },
-  { code: 'DE', name: '德国' },
-  { code: 'NL', name: '荷兰' },
-  { code: 'FR', name: '法国' },
-  { code: 'GB', name: '英国' },
+const COUNTRY_OPTIONS = [
+  { value: 'US', label: '美国' },
+  { value: 'DE', label: '德国' },
+  { value: 'NL', label: '荷兰' },
+  { value: 'FR', label: '法国' },
+  { value: 'GB', label: '英国' },
 ]
 
-const files = ref([])
-const country = ref('DE')
-const notes = ref('')
+/**
+ * 表单状态由 App 层持有（provide/inject），切页返回时文件列表/目的国/备注保留，
+ * 与 task 生命周期一致；scanWarnings 同样来自 App 层，见 App.vue 的说明。
+ */
+const files = inject('uploadFiles')
+const country = inject('uploadCountry')
+const notes = inject('uploadNotes')
 const localErrors = ref([])
 const dragActive = ref(false)
 const fileInput = ref(null)
@@ -41,9 +50,9 @@ const fileInput = ref(null)
 /**
  * PDF 文本层预检测命中的文件集合，key 与去重键一致（`${name}:${size}`）。
  * 只存判定为 'no-text' 的；'unknown'（查不了）一律静默，不进入集合。
- * 检测针对用户选的真实文件，与 USE_MOCK 开关无关。
+ * 检测针对用户选的真实文件，与 USE_MOCK 开关无关。状态由 App 层持有。
  */
-const scanWarnings = ref(new Set())
+const scanWarnings = inject('uploadScanWarnings')
 
 /** 命中预检测的文件数，供汇总提示条使用 */
 const scanWarnCount = computed(() => scanWarnings.value.size)
@@ -94,10 +103,26 @@ function fileKey(f) {
 async function scanOne(file) {
   const result = await detectPdfTextLayer(file)
   const key = fileKey(file)
+  // 检测是异步的，出结果时文件可能已被用户移除——不回写已移除文件的警告
+  if (!files.value.some((f) => fileKey(f) === key)) return
   const next = new Set(scanWarnings.value)
   if (result === 'no-text') next.add(key)
   else next.delete(key)
   scanWarnings.value = next
+}
+
+/**
+ * 调度预检测：等条目进入动画结束、浏览器空闲时再跑。
+ * 检测要读文件并解压内容流（已在 pdfTextLayer 里限制只扫前 4MB），
+ * 若与动画同帧抢主线程，添加文件的补间会掉帧。
+ */
+function scheduleScan(file) {
+  const run = () => scanOne(file)
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(run, { timeout: 900 })
+  } else {
+    setTimeout(run, 350)
+  }
 }
 
 function addFiles(list) {
@@ -130,7 +155,7 @@ function addFiles(list) {
   // 只对 PDF 做文本层预检测，图片（本来就没有文本层）不检测。
   // 异步后台跑，不阻塞文件进入列表；检测失败在 detectPdfTextLayer 内部降级为 unknown。
   for (const f of fresh) {
-    if (isPdf(f)) scanOne(f)
+    if (isPdf(f)) scheduleScan(f)
   }
 }
 
@@ -328,6 +353,9 @@ const failedDocs = computed(
 function docStatus(d) {
   return processStatus(d.process_status)
 }
+
+/** 待复核条目数：与差异页「需关注」、顶栏角标同一口径 */
+const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).length ?? 0)
 </script>
 
 <template>
@@ -336,14 +364,19 @@ function docStatus(d) {
       <h2 class="card-title">创建检查</h2>
       <p class="card-sub">选择属于同一票货物的多份单证。系统将逐份抽取字段，再交叉比对它们之间是否一致。</p>
 
-      <!-- 文件选择 -->
+      <!-- 文件选择。role=button + tabindex 保证键盘可达：Enter/Space 打开文件选择 -->
       <div
         class="dropzone"
         :class="{ active: dragActive }"
+        role="button"
+        tabindex="0"
+        aria-label="选择或拖入单证文件"
         @dragover.prevent="dragActive = true"
         @dragleave.prevent="dragActive = false"
         @drop.prevent="onDrop"
         @click="fileInput?.click()"
+        @keydown.enter.prevent="fileInput?.click()"
+        @keydown.space.prevent="fileInput?.click()"
       >
         <div class="dropzone-main">把文件拖到这里，或点击选择</div>
         <div class="dropzone-hint">
@@ -360,8 +393,26 @@ function docStatus(d) {
         />
       </div>
 
-      <ul v-if="files.length" class="file-list">
-        <li v-for="(f, i) in files" :key="`${f.name}-${i}`" class="file-item">
+      <!--
+        文件列表增删动画：TransitionGroup + 稳定 key（fileKey，不带下标——
+        删中间项时按下标做 key 会让后续条目全部重键、补位动画失效）。
+        进入/离开走 JS 精确高度钩子（utils/animateHeight.js 的 heightListItemHooks，
+        :css="false"）：条目留在文档流内，高度/padding/边框与透明度同步收放，
+        栏位与文字一体，兄弟行随高度变化自然移动。
+        容器常驻挂载（不用 v-if）：v-if 会在删到最后一项时把 ul 直接移除，
+        条目离场钩子不执行、只剩窗口 resize；空态用 .file-list--empty 把
+        边框与 margin 一并过渡，首尾项的增删与中间项同样连贯。
+        不加 appear：切页重挂载时已有文件不应重播进入动画（appear 的语义
+        就是每次挂载都播），条目插入本身就会触发进入钩子。
+      -->
+      <TransitionGroup
+        tag="ul"
+        class="file-list"
+        :class="{ 'file-list--empty': !files.length }"
+        :css="false"
+        v-bind="heightListItemHooks"
+      >
+        <li v-for="(f, i) in files" :key="fileKey(f)" class="file-item">
           <span class="file-name">{{ f.name }}</span>
           <span
             v-if="scanWarnings.has(`${f.name}:${f.size}`)"
@@ -372,14 +423,16 @@ function docStatus(d) {
           <span class="file-size">{{ sizeText(f.size) }}</span>
           <button class="link-btn" @click="removeFile(i)">移除</button>
         </li>
-      </ul>
+      </TransitionGroup>
 
       <div class="field-row">
         <label class="field">
           <span class="field-label">目的国</span>
-          <select v-model="country" class="input">
-            <option v-for="c in COUNTRIES" :key="c.code" :value="c.code">{{ c.name }}</option>
-          </select>
+          <AppSelect
+            v-model="country"
+            block
+            :options="COUNTRY_OPTIONS"
+          />
           <span class="field-label">规则覆盖范围为演示配置，未经核实，不作为正式合规结论。</span>
         </label>
 
@@ -389,23 +442,29 @@ function docStatus(d) {
         </label>
       </div>
 
-      <NoticeBar
-        v-if="localErrors.length"
-        tone="warn"
-        title="请先处理以下问题"
-      >
-        <ul class="notice-list">
-          <li v-for="(e, i) in localErrors" :key="i">{{ e }}</li>
-        </ul>
-      </NoticeBar>
+      <!-- 校验错误与扫描警告：整块出现/消失走 collapse 收合动画，
+           不硬插硬撤（与文件列表同一套收放语义，见 utils/animateHeight.js） -->
+      <Transition :css="false" v-bind="collapseHooks">
+        <NoticeBar
+          v-if="localErrors.length"
+          tone="warn"
+          title="请先处理以下问题"
+        >
+          <ul class="notice-list">
+            <li v-for="(e, i) in localErrors" :key="i">{{ e }}</li>
+          </ul>
+        </NoticeBar>
+      </Transition>
 
       <!-- 扫描件预检测警告：只提示，不影响 canSubmit，用户仍可提交 -->
-      <NoticeBar
-        v-if="scanWarnCount"
-        tone="warn"
-        :title="SCAN_WARNING.title"
-        :detail="SCAN_WARNING.detail(scanWarnCount)"
-      />
+      <Transition :css="false" v-bind="collapseHooks">
+        <NoticeBar
+          v-if="scanWarnCount"
+          tone="warn"
+          :title="SCAN_WARNING.title"
+          :detail="SCAN_WARNING.detail(scanWarnCount)"
+        />
+      </Transition>
 
       <div class="actions">
         <button class="btn primary" :disabled="!canSubmit" @click="submit">
@@ -421,7 +480,6 @@ function docStatus(d) {
     <EmptyState
       v-if="!isRunning && !task && !taskError"
       tone="info"
-      icon="📄"
       title="尚未上传单证"
       :detail="`把同一票货物的发票、箱单、提单等单证拖到上方虚线框，选好目的国后点「开始检查」。支持 ${UPLOAD_LIMITS.accept.split(',').join(' / ')}，单个不超过 ${UPLOAD_LIMITS.maxFileSizeMB}MB，最多 ${UPLOAD_LIMITS.maxFiles} 份。`"
     />
@@ -482,9 +540,13 @@ function docStatus(d) {
             </li>
           </ul>
 
-          <p v-if="task.status === 'COMPLETED' || task.status === 'PARTIAL'" class="next-hint">
-            已生成比对结果，切到「差异」页查看。
-          </p>
+          <!-- 完成态主路径：直接给去差异页的按钮，不让用户自己找下一屏 -->
+          <div v-if="task.status === 'COMPLETED' || task.status === 'PARTIAL'" class="next-actions">
+            <button class="btn primary" @click="navigate.go('diff')">
+              {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
+            </button>
+            <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
+          </div>
         </div>
 
         <!-- 处理中：分阶段进度 + 上传百分比 + 已等待时长 + 骨架屏 -->
