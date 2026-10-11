@@ -15,6 +15,7 @@ import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import EmptyState from '../components/EmptyState.vue'
+import AppSelect from '../components/AppSelect.vue'
 
 const task = inject('task')
 const taskError = inject('taskError')
@@ -23,12 +24,12 @@ const sourceFiles = inject('sourceFiles')
 
 // 目的国列表为演示用。后端（issue #4）确认当前规则覆盖美/德/荷/法/英，
 // 均为未经核实的演示规则，正式合规结论不能据此得出。
-const COUNTRIES = [
-  { code: 'US', name: '美国' },
-  { code: 'DE', name: '德国' },
-  { code: 'NL', name: '荷兰' },
-  { code: 'FR', name: '法国' },
-  { code: 'GB', name: '英国' },
+const COUNTRY_OPTIONS = [
+  { value: 'US', label: '美国' },
+  { value: 'DE', label: '德国' },
+  { value: 'NL', label: '荷兰' },
+  { value: 'FR', label: '法国' },
+  { value: 'GB', label: '英国' },
 ]
 
 /**
@@ -381,9 +382,11 @@ function docStatus(d) {
       <div class="field-row">
         <label class="field">
           <span class="field-label">目的国</span>
-          <select v-model="country" class="input">
-            <option v-for="c in COUNTRIES" :key="c.code" :value="c.code">{{ c.name }}</option>
-          </select>
+          <AppSelect
+            v-model="country"
+            block
+            :options="COUNTRY_OPTIONS"
+          />
           <span class="field-label">规则覆盖范围为演示配置，未经核实，不作为正式合规结论。</span>
         </label>
 

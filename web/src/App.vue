@@ -3,6 +3,7 @@ import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } f
 import { isMock, listMockScenarios, setMockScenario, getEvaluation } from './api/index.js'
 import { setMock } from './api/config.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
+import AppSelect from './components/AppSelect.vue'
 import UploadPage from './pages/UploadPage.vue'
 import DiffPage from './pages/DiffPage.vue'
 import ReportPage from './pages/ReportPage.vue'
@@ -24,8 +25,13 @@ const active = ref('upload')
  */
 const mock = ref(isMock())
 
-function onSourceChange(event) {
-  const next = event.target.value === 'mock'
+const SOURCE_OPTIONS = [
+  { value: 'mock', label: '示例数据' },
+  { value: 'backend', label: '真实后端' },
+]
+
+function onSourceChange(value) {
+  const next = value === 'mock'
   if (next === mock.value) return
   setMock(next)
   window.location.reload()
@@ -38,8 +44,11 @@ const SCENARIO_NAMES = {
   'multi-item': '双品名 · 分组',
   clean: '全部一致',
 }
-const mockScenarios = listMockScenarios()
 const mockScenario = ref('single-item')
+const scenarioOptions = listMockScenarios().map((key) => ({
+  value: key,
+  label: SCENARIO_NAMES[key] ?? key,
+}))
 
 function onScenarioChange() {
   setMockScenario(mockScenario.value)
@@ -211,26 +220,19 @@ watch(active, updateIndicator)
           class="backend-flag"
           title="前端直连后端接口，所见均为真实处理结果"
         >真实后端</span>
-        <select
+        <AppSelect
           v-if="mock"
           v-model="mockScenario"
-          class="mock-scenario-select"
+          :options="scenarioOptions"
           title="选择示例场景，下次提交检查时生效"
           @change="onScenarioChange"
-        >
-          <option v-for="key in mockScenarios" :key="key" :value="key">
-            {{ SCENARIO_NAMES[key] ?? key }}
-          </option>
-        </select>
-        <select
-          :value="mock ? 'mock' : 'backend'"
-          class="mock-scenario-select"
+        />
+        <AppSelect
+          :model-value="mock ? 'mock' : 'backend'"
+          :options="SOURCE_OPTIONS"
           title="切换数据来源，切换后页面自动刷新"
           @change="onSourceChange"
-        >
-          <option value="mock">示例数据</option>
-          <option value="backend">真实后端</option>
-        </select>
+        />
       </div>
     </header>
 
