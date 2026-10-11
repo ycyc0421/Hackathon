@@ -84,9 +84,12 @@ provide('uploadScanWarnings', uploadScanWarnings)
  * anchor 经 pendingAnchor 传给目标页（页面随切页重挂载，挂载时消费并清空）。
  */
 const pendingAnchor = ref(null)
+/** 本次切页是否锚点跳转：是则滚动交给目标页挂载时的锚点定位，进场钩子不碰滚动 */
+let anchorJump = false
 
 function go(page, anchor) {
   pendingAnchor.value = anchor ?? null
+  anchorJump = !!anchor
   active.value = page
 }
 
@@ -113,11 +116,26 @@ watch(active, (to, from) => {
   if (y != null) pendingScrollRestore = y
 })
 
-/** 新页面进场完毕再恢复滚动：此时 DOM 高度已稳定，scrollTo 不会被钳位 */
-function onPageEntered() {
-  if (pendingScrollRestore == null) return
-  window.scrollTo(0, pendingScrollRestore)
-  pendingScrollRestore = null
+/**
+ * 滚动恢复必须在新页淡入第一帧之前完成，用 enter 钩子（元素插入后、
+ * 过渡开始前同步触发）；after-enter 才 scrollTo 会让新页先从头淡入
+ * 约 200ms 再硬跳，肉眼可见。
+ * out-in 下旧页已离场，新页内容在插入时即完成渲染，文档高度就是新页
+ * 高度，此时 scrollTo 不会被钳位。
+ * 报告 ↔ 差异之外没有记忆位置的切页，同一时刻归零，不残留上一页的滚动。
+ * 锚点跳转（报告条目 → 差异页卡片）不在这里滚动，由 DiffPage 挂载时定位。
+ */
+function onPageEnter() {
+  if (anchorJump) {
+    anchorJump = false
+    return
+  }
+  if (pendingScrollRestore != null) {
+    window.scrollTo(0, pendingScrollRestore)
+    pendingScrollRestore = null
+    return
+  }
+  window.scrollTo(0, 0)
 }
 
 /**
@@ -265,7 +283,7 @@ watch(active, updateIndicator)
     </header>
 
     <main class="content">
-      <Transition name="fade" mode="out-in" @after-enter="onPageEntered">
+      <Transition name="fade" mode="out-in" @enter="onPageEnter">
         <component :is="current" :key="active" />
       </Transition>
     </main>
