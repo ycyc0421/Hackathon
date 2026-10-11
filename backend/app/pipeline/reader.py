@@ -90,14 +90,31 @@ def _read_pdf(data: bytes) -> ReadResult:
 
         page_count = len(reader.pages)
         chunks: list[str] = []
-        for page in reader.pages:
+        unreadable_pages: list[int] = []
+        for index, page in enumerate(reader.pages, start=1):
             try:
-                chunks.append(page.extract_text() or "")
+                page_text = page.extract_text() or ""
+                chunks.append(page_text)
+                # 一页图片的内容不能用另一页的文本长度掩盖。
+                if len(page_text.strip()) < MIN_TEXT_LAYER_CHARS and page.images:
+                    unreadable_pages.append(index)
             except Exception:  # noqa: BLE001
+                unreadable_pages.append(index)
                 chunks.append("")
         text = "\n".join(chunks).strip()
     except Exception as exc:  # noqa: BLE001
         return ReadResult(error_message=f"PDF 解析失败：{exc}", failed=True)
+
+    if unreadable_pages:
+        if llm_enabled():
+            images = _pdf_pages_to_images(data)
+            if images is not None:
+                return _transcribe_with_llm(images, page_count=page_count)
+        return ReadResult(
+            page_count=page_count,
+            error_message=f"PDF 第 {', '.join(map(str, unreadable_pages))} 页含未读取的图片或解析失败；整份文件未完成识别",
+            failed=True,
+        )
 
     if len(text) >= MIN_TEXT_LAYER_CHARS:
         return ReadResult(text=text, page_count=page_count, parse_method=ParseMethod.TEXT_LAYER)

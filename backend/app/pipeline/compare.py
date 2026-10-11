@@ -123,10 +123,8 @@ def _agree(field_key: str, values: list) -> tuple[bool, bool, str | None]:
         # 互为前缀即视为一致，否则会把「写法详略不同」误报成冲突。
         strs = [str(v) for v in canon if v is not None]
         if len(strs) >= 2:
-            shortest = min(strs, key=len)
-            if len(shortest) >= 6 and all(
-                s.startswith(shortest) or shortest.startswith(s) for s in strs
-            ):
+            longest = max(strs, key=len)
+            if len(min(strs, key=len)) >= 6 and all(longest.startswith(s) for s in strs):
                 return True, len(set(strs)) > 1, None
     return len(set(canon)) == 1, False, None
 

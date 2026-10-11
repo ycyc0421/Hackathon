@@ -14,6 +14,36 @@ from datetime import datetime
 # --------------------------------------------------------------------------
 _NUMBER_TOKEN = re.compile(r"[-+]?\d[\d,.]*")
 
+_MEASURE_UNITS = {
+    "quantity": ("PCS", r"PCS|PIECES?|UNITS?|个|只", 1),
+    "packages": ("CARTON", r"CARTONS?|CTNS?|箱", 1),
+    "gross_weight": ("KGS", r"KGS?|KILOGRAMS?|KILOS?|千克|公斤", 1),
+    "net_weight": ("KGS", r"KGS?|KILOGRAMS?|KILOS?|千克|公斤", 1),
+    "volume": ("CBM", r"CBM|M3|M³|立方米", 1),
+}
+
+
+def to_measure(raw: str | None, field_key: str) -> tuple[int | float | None, str | None]:
+    """数值与原单位一起归一；未知单位不按默认单位冒充成功。"""
+    default, aliases, factor = _MEASURE_UNITS[field_key]
+    if raw is None:
+        return None, None
+    text = str(raw).strip()
+    match = _NUMBER_TOKEN.search(text)
+    if not match:
+        return None, None
+    number = to_number(match.group(0))
+    if number is None:
+        return None, None
+    suffix = text[match.end():].strip(" .:：,，")
+    if not suffix:
+        return number, default  # 没写单位时沿用该字段约定的默认单位
+    if re.fullmatch(rf"(?:{aliases})(?:\s*[（(]\s*(?:{aliases})\s*[）)])?", suffix, re.I):
+        return number * factor, default
+    if field_key in {"gross_weight", "net_weight"} and re.fullmatch(r"LBS?|POUNDS?|磅", suffix, re.I):
+        return round(number * 0.45359237, 6), default
+    return None, None
+
 
 def to_number(raw: str | None) -> int | float | None:
     """'2,400.00 KGS' / '12.500' / '120 CARTONS' -> 2400.0 / 12.5 / 120"""

@@ -139,6 +139,9 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
 
         if table.suspected:
             row_unparsed = True
+            # 列归属不可靠时整份文件的品名行不得参与比对；LOW_CONFIDENCE
+            # 仍属于可比值，保留它会产生貌似正常的 MATCH。
+            line_items = []
             errors.append(
                 {
                     "code": "MULTI_LINE_ITEMS_SUSPECTED",

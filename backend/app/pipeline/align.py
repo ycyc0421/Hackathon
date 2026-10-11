@@ -61,9 +61,9 @@ def _mutually_unique(a: Row, b: Row, all_rows: list[Row]) -> bool:
     """
     best = _similarity(a.desc, b.desc)
     for r in all_rows:
-        if r is not a and r.file_id == a.file_id and abs(_similarity(r.desc, b.desc) - best) < 1e-9:
+        if r is not a and r.file_id == a.file_id and _similarity(r.desc, b.desc) >= best - 1e-9:
             return False
-        if r is not b and r.file_id == b.file_id and abs(_similarity(r.desc, a.desc) - best) < 1e-9:
+        if r is not b and r.file_id == b.file_id and _similarity(r.desc, a.desc) >= best - 1e-9:
             return False
     return True
 
@@ -176,6 +176,14 @@ def align_items(extractions: list[dict], documents: list[dict]) -> list[dict]:
         if len(scored) > 1 and abs(scored[0][0] - scored[1][0]) < 1e-9:
             leftover.append(row)
             continue
+        best_score, best_group = scored[0]
+        if any(
+            other is not row and not other.code and other.file_id == row.file_id
+            and other.desc and max(_similarity(other.desc, d) for d in best_group.descs) >= best_score - 1e-9
+            for other in rows
+        ):
+            leftover.append(row)
+            continue
         scored[0][1].add(row, "DESCRIPTION", round(scored[0][0], 3))
 
     # 两张都没有货号的表互相配对（上面只能挂到已存在的组，组之间需要新建）
@@ -212,7 +220,7 @@ def align_items(extractions: list[dict], documents: list[dict]) -> list[dict]:
             if j in used or c.file_id in g.file_ids:
                 continue
             s = _similarity(a.desc, c.desc)
-            if s >= DESC_MIN_SIMILARITY:
+            if s >= DESC_MIN_SIMILARITY and _mutually_unique(a, c, unpaired):
                 g.add(c, "DESCRIPTION", round(s, 3))
                 used.add(j)
 

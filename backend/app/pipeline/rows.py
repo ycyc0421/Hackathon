@@ -92,14 +92,28 @@ def _looks_like_header(line: str) -> set[str]:
     return hits if len(hits) >= 3 else set()
 
 
-def split_table(text: str) -> tuple[str, list[str], set[str]]:
+def _header_columns(line: str) -> list[str]:
+    """只接受能按列切开的表头，保留单证原有列序。"""
+    columns: list[str] = []
+    for cell in CELL_SPLIT.split(line.strip()):
+        matches = [key for pattern, key in HEADER_MAP if pattern.fullmatch(cell.strip().rstrip("."))]
+        if len(matches) == 1:
+            if matches[0] in columns:
+                return []
+            columns.append(matches[0])
+        elif cell.strip().upper() not in {"NO.", "NO", "序号"}:
+            return []
+    return columns if len(columns) >= 3 else []
+
+
+def split_table(text: str) -> tuple[str, list[str], list[str]]:
     """返回 (剥掉表格后的票级文本, 表格行原文, 表头列集合)。
 
     合计行故意保留在票级文本里 —— 整票合计是票级字段，不是品名行。
     """
     lines = text.split("\n")
     header_at: int | None = None
-    header_keys: set[str] = set()
+    header_order: list[str] = []
 
     if len(lines) > 400:
         # 保住性能，同时保证 lines 的下标与原件一致（用短行占位）
@@ -109,11 +123,11 @@ def split_table(text: str) -> tuple[str, list[str], set[str]]:
         keys = _looks_like_header(line)
         if keys:
             header_at = i
-            header_keys = keys
+            header_order = _header_columns(line)
             break
 
     if header_at is None:
-        return text, [], set()
+        return text, [], []
 
     rows: list[str] = []
     end = len(lines)
@@ -125,7 +139,7 @@ def split_table(text: str) -> tuple[str, list[str], set[str]]:
         rows.append(line)
 
     kept = lines[:header_at] + lines[end:]
-    return "\n".join(kept), rows, header_keys
+    return "\n".join(kept), rows, header_order
 
 
 # --------------------------------------------------------------------------
@@ -141,27 +155,25 @@ def _cells(line: str) -> list[str]:
 def _number_of(cell: str | None) -> str | None:
     if not cell:
         return None
-    m = re.search(r"[-+]?\d[\d,]*(?:\.\d+)?", cell)
+    m = re.search(r"[-+]?\d[\d,.]*", cell)
     return m.group(0) if m else None
 
 
-def _assign_from_cells(parts: list[str], header_keys: set[str]) -> dict[str, str]:
+def _assign_from_cells(parts: list[str], header_order: list[str]) -> dict[str, str]:
     """按表头顺序把单元格分给各列。
 
     表头数量与单元格数量对不上时（多空格/缺列），退化为「按值的样子猜列」，
     这种行会被记成低分，不当作可靠抽取。
     """
     out: dict[str, str] = {}
-    ordered = [key for key in ITEM_LEVEL_ORDER if key in header_keys]
-
-    if len(parts) == len(ordered):
-        for key, value in zip(ordered, parts):
+    if header_order and len(parts) == len(header_order):
+        for key, value in zip(header_order, parts):
             out[key] = value
         return out
 
     # 单元格里第一个像货号的优先给 item_code
     rest = list(parts)
-    if "item_code" in header_keys and rest and _ITEM_CODE_RE.match(rest[0].split()[0]):
+    if "item_code" in header_order and rest and _ITEM_CODE_RE.match(rest[0].split()[0]):
         out["item_code"] = rest.pop(0)
     for cell in rest:
         low = cell.lower()
@@ -205,18 +217,18 @@ def _assign_from_text(rest: str) -> dict[str, str]:
             marks.append(m.start())
 
     take("hs_code", _HS_RE)
-    take("quantity", _QTY_RE, 1)
-    take("packages", _PKG_RE, 1)
+    take("quantity", _QTY_RE)
+    take("packages", _PKG_RE)
 
     kgs = list(_KG_RE.finditer(rest))
     if kgs:
-        out["net_weight"] = kgs[0].group(1)
+        out["net_weight"] = kgs[0].group(0)
         marks.append(kgs[0].start())
         if len(kgs) >= 2:
-            out["gross_weight"] = kgs[1].group(1)
+            out["gross_weight"] = kgs[1].group(0)
             marks.append(kgs[1].start())
 
-    take("volume", _CBM_RE, 1)
+    take("volume", _CBM_RE)
 
     money = list(_MONEY_RE.finditer(rest))
     if money:
@@ -250,13 +262,8 @@ _NORMALIZERS = {
     "item_code": lambda v: (v.strip().upper() if v else None),
     "description": lambda v: N.normalize_description(v),
     "hs_code": lambda v: N.to_hs_code(v),
-    "quantity": lambda v: N.to_number(_number_of(v)),
-    "packages": lambda v: N.to_number(_number_of(v)),
-    "net_weight": lambda v: N.to_number(_number_of(v)),
-    "gross_weight": lambda v: N.to_number(_number_of(v)),
-    "volume": lambda v: N.to_number(_number_of(v)),
-    "unit_price": lambda v: N.to_number(_number_of(v)),
-    "amount": lambda v: N.to_number(_number_of(v)),
+    "unit_price": lambda v: N.to_number(v),
+    "amount": lambda v: N.to_number(v),
 }
 
 
@@ -274,12 +281,16 @@ def _row_fields(assigned: dict[str, str], header_keys: set[str], confidence_ok: 
             fields.append(_field(spec, status=status))
             continue
 
-        normalized = _NORMALIZERS[spec.key](raw)
+        if spec.key in {"quantity", "packages", "net_weight", "gross_weight", "volume"}:
+            normalized, detected_unit = N.to_measure(raw, spec.key)
+        else:
+            normalized = _NORMALIZERS[spec.key](raw)
+            detected_unit = spec.unit
         if normalized is None:
             fields.append(_field(spec, status="NORMALIZE_FAILED", raw_value=raw[:80]))
             continue
 
-        unit = spec.unit
+        unit = detected_unit
         if spec.key == "amount":
             unit = None  # 行金额的币种来自票级 currency，不在行内重复
         status = "EXTRACTED" if confidence_ok else "LOW_CONFIDENCE"
@@ -292,7 +303,8 @@ def _row_fields(assigned: dict[str, str], header_keys: set[str], confidence_ok: 
 # --------------------------------------------------------------------------
 def parse_line_items(text: str, page: int | None = None) -> TableResult:
     """把文本拆成 (票级文本, 品名行)。纯函数，不改入参。"""
-    doc_text, row_lines, header_keys = split_table(text)
+    doc_text, row_lines, header_order = split_table(text)
+    header_keys = set(header_order)
     if not row_lines:
         return TableResult(doc_text=doc_text)
 
@@ -316,19 +328,22 @@ def parse_line_items(text: str, page: int | None = None) -> TableResult:
             if not parts:
                 continue
             item_no = len(line_items) + 1
-            assigned = _assign_from_cells(parts, header_keys)
+            assigned = _assign_from_cells(parts, header_order)
             reliable = False
+            if not header_order or len(parts) != len(header_order):
+                suspected = True
             saw_content = True
         else:
             item_no = int(m.group(1))
             parts = _cells(line)
             rest = ROW_START.sub("", line.strip(), count=1)
-            if len(parts) >= len(header_keys) - 1 and len(parts) >= 3:
-                assigned = _assign_from_cells(parts, header_keys)
+            if header_order and len(parts) == len(header_order):
+                assigned = _assign_from_cells(parts, header_order)
                 reliable = True
             else:
                 assigned = _assign_from_text(rest)
                 reliable = False
+                suspected = True
 
         if not assigned:
             suspected = True

@@ -29,6 +29,19 @@ backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --hos
 已创建任务的处理失败通过 `GET` 的 `status: FAILED` 与 `errors[]` 表示；参数错误、超限、
 未知任务和内部错误返回非 2xx 与统一的 `error.code` / `error.message`。
 
+前端可按错误码映射文案：
+
+| 位置 | `code` | 含义 |
+|---|---|---|
+| 非 2xx `error.code` | `INVALID_REQUEST`、`INVALID_DESTINATION_COUNTRY`、`INVALID_CURRENCY`、`NO_FILE` | 请求参数错误（400） |
+| 非 2xx `error.code` | `FILE_TOO_LARGE`、`TOO_MANY_FILES` | 上传超限（413） |
+| 非 2xx `error.code` | `TASK_NOT_FOUND`、`NOT_FOUND` | 任务或路径不存在（404） |
+| 非 2xx `error.code` | `METHOD_NOT_ALLOWED`、`HTTP_ERROR`、`INTERNAL_ERROR`、`CONTRACT_VIOLATION` | 方法不允许、其他 HTTP 错误或服务端错误 |
+| 任务 `errors[].code` | `DOC_PARSE_FAILED`、`UNSUPPORTED_FILE_TYPE`、`MULTI_LINE_ITEMS_SUSPECTED` | 单文件解析失败、格式不支持、品名表格未可靠切行 |
+| 任务 `errors[].code` | `RULES_UNVERIFIED`、`ALL_DOCUMENTS_FAILED`、`INTERNAL_ERROR`、`CONTRACT_VIOLATION` | 演示规则警告、全部文件失败或处理异常 |
+
+已创建任务的处理错误需先看任务 `status` 和 `errors[]`；不能仅凭 GET 返回 200 显示“检查完成”。
+
 `items[]` 是任务内的商品目录；商品级字段和比对使用 `item_id` 关联。
 行序不一致时优先按货号、其次按描述对齐；无法可靠对齐时给 `NOT_CHECKED`，不猜测一致或冲突。
 `suggested_action` 只提供可执行的核对建议，不指定哪份文件正确；无可靠建议时为 `null`。
@@ -40,7 +53,7 @@ backend/.venv/Scripts/python.exe -m uvicorn app.main:app --app-dir backend --hos
 - `MATCH` 只表示**参与比对的已识别值一致**，不是整票合规通过。`NOT_CHECKED`、`UNRECOGNIZED`、`SINGLE_SOURCE` 和解析失败都不能当作一致；前端应展示状态、来源文件、原值及 `note`。`suggested_action` 是核对建议，不代替结论。
 - 有文件解析失败时，该文件进入 `errors[]`，任务可能为 `PARTIAL` 或 `FAILED`；前端需按任务状态显示失败。表格疑似多品名却无法可靠切行时，后端给 `MULTI_LINE_ITEMS_SUSPECTED` 警告并降级，不把猜出的行当成确定结果。
 
-- ## 项目结构
+## 项目结构
 
 ```text
 backend/
@@ -48,7 +61,7 @@ backend/
 │   ├── main.py             FastAPI 路由与统一错误响应
 │   ├── models.py           内部数据模型与状态校验
 │   ├── frontend_view.py    将内部结果映射到对外 Schema
-│   ├── doc_profile.py      单证类型与适用字段的临时规则表
+│   ├── doc_profile.py      单证类型与必需字段表（前三类按已确认规则）
 │   ├── store.py            任务存储与已完成结果落盘
 │   ├── rules/              目的国演示规则配置
 │   └── pipeline/           文件读取、抽取、归一、行对齐、比对与规则检查
@@ -66,6 +79,7 @@ backend/
 ```powershell
 backend/.venv/Scripts/python.exe backend/tools/selftest.py       # 01–08、评测返回及 Schema
 backend/.venv/Scripts/python.exe backend/tools/test_compare.py   # 数值、币种、行对齐断言
+backend/.venv/Scripts/python.exe backend/tools/test_review_regressions.py  # 审查边界：列序、单位、HS、混合 PDF 等
 backend/.venv/Scripts/python.exe backend/tools/run_challenge.py  # 09–11 挑战样例与金标断言
 ```
 
@@ -90,4 +104,4 @@ backend/.venv/Scripts/python.exe backend/tools/run_challenge.py  # 09–11 挑�
 - 目的国规则是未核实的演示规则，结果保留“演示规则·未经核实”标记，不能作为正式合规结论。
 - `confidence` 与 `bbox` 暂为 `null`；人工修正、报告导出和 EDI 解析尚未实现。
 - 任务结果落盘并可在重启后读取；处理中的任务重启恢复尚未实现。正式部署需接入持久任务队列或数据库。
-- `app/doc_profile.py` 的单证适用字段表为临时版，待数据侧正式表替换。
+- `app/doc_profile.py` 的商业发票、装箱单、提单按已确认最小规则区分必需/可选；其他单证类型及更完整的适用字段表待数据侧确认。

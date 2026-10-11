@@ -102,6 +102,7 @@ def _next_nonempty_line(text: str, pos: int) -> str:
 
 PKG_WORD = r"(?:CARTONS?|CTNS?|CASES?|PACKAGES?|PKGS?|PALLETS?|PLTS?|BOXES?|BAGS?|DRUMS?|BUNDLES?|箱|件|托)"
 KG_WORD = r"(?:KGS?|KILOGRAMS?|KILOS?|千克|公斤)"
+LB_WORD = r"(?:LBS?|POUNDS?|磅)"
 CBM_WORD = r"(?:CBM|M3|M³|立方米)"
 PCS_WORD = r"(?:PCS|PIECES?|SETS?|UNITS?|个|件|只)"
 
@@ -125,7 +126,9 @@ def _m_packages(text: str) -> Found | None:
         # 比阿拉伯数字更容易看错，分数下调，落到 LOW_CONFIDENCE
         if re.search(r"\bSAY\b|\bONLY\b", line, re.I):
             score = round(score - 0.2, 2)
-        return Found(raw_text=line, raw_value=_clip(f"{m.group(1)} " + "CARTONS"), score=score)
+        unit = re.match(r"\s*(" + PKG_WORD + r")\b", text[m.end(1):], re.I)
+        raw = m.group(1) + (" " + unit.group(1) if unit else "")
+        return Found(raw_text=line, raw_value=_clip(raw), score=score)
     return None
 
 
@@ -156,7 +159,7 @@ def _m_gross_weight(text: str) -> Found | None:
     if f:
         return f
     # 提单上常写成裸的 '2400.00 KGS'，没有 G.W. 标签，降到低把握
-    m = re.search(r"(?<![\d.])(\d[\d,.]*)\s*" + KG_WORD, text, re.I)
+    m = re.search(r"(?<![\d.])(\d[\d,.]*)\s*(?:" + KG_WORD + "|" + LB_WORD + ")", text, re.I)
     if m:
         return Found(raw_text=_line_of(text, m.start()), raw_value=_clip(m.group(0)), score=0.62)
     return None
@@ -182,7 +185,7 @@ def _m_quantity(text: str) -> Found | None:
     # 多品名表格的合计行可以只写 TOTAL: 9600 PCS。
     m = re.search(r"^\s*(?:TOTAL|合计(?:\s*/\s*TOTAL)?|总计)\s*[:：]?\s*(\d[\d,.]*)\s*" + PCS_WORD, text, re.I | re.M)
     if m:
-        return Found(raw_text=_line_of(text, m.start()), raw_value=m.group(1), score=0.82)
+        return Found(raw_text=_line_of(text, m.start()), raw_value=_clip(text[m.start(1):m.end()]), score=0.82)
     return None
 
 
@@ -537,8 +540,12 @@ def extract_fields(
             )
             continue
 
-        normalizer = NORMALIZERS.get(key, _norm_text)
-        normalized, _ = normalizer(f.raw_value)
+        if key in {"packages", "quantity", "gross_weight", "net_weight", "volume"}:
+            normalized, detected_unit = N.to_measure(f.raw_value, key)
+            unit = detected_unit
+        else:
+            normalizer = NORMALIZERS.get(key, _norm_text)
+            normalized, _ = normalizer(f.raw_value)
 
         if normalized is None:
             fields.append(
