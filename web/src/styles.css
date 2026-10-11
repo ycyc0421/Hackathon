@@ -177,6 +177,26 @@ body {
   gap: var(--space-4);
 }
 
+/* 页面头：标题 + 一行任务上下文（差异页；报告页以「检查概要」卡片承担同类职责）。
+   字级沿用卡片标题的 text-lg/600 与卡片副文的 text-sm/muted，不另立 scale */
+.page-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.page-sub {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
 .card {
   background: var(--surface-raised);
   border: 1px solid var(--border);
@@ -322,6 +342,12 @@ body {
 .dropzone.active {
   border-color: var(--color-primary);
   background: #f2f6fc;
+}
+
+/* 键盘可达（role=button）：聚焦描边与 chip 的 focus-visible 同款 */
+.dropzone:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .dropzone-main {
@@ -1013,7 +1039,8 @@ textarea {
 .cell-raw {
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  /* 原文是关键证据，阅读级别不低于正文辅助信息，不用脚注级 12px */
+  font-size: 13px;
   word-break: break-all;
 }
 
@@ -1205,7 +1232,8 @@ textarea {
 .compare-raw {
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  /* 同 .cell-raw：原文承担证据职责，不用脚注级 12px */
+  font-size: 13px;
   word-break: break-all;
 }
 

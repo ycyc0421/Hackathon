@@ -130,6 +130,13 @@ function rawEvidence(c, v) {
 
 const severityOf = severity
 
+/** 页面头的任务短号：完整编号放 title，行内只显示末 6 位够定位即可 */
+const taskShortId = computed(() => {
+  const id = task.value?.task_id
+  return id ? id.slice(-6) : ''
+})
+const docCount = computed(() => task.value?.documents?.length ?? 0)
+
 /**
  * 每张比对卡片的当前视图：'table'（四行表格，默认）| 'compare'（并排对照）。
  * 两者是同一信息的两种排布、互为切换，不是概要/详情的展开关系，
@@ -233,6 +240,14 @@ onMounted(async () => {
     />
 
     <template v-else>
+      <!-- 页面头：标题 + 任务上下文。字级与报告页的卡片标题同一 scale，不喧宾夺主 -->
+      <header class="page-head">
+        <h2 class="page-title">差异比对</h2>
+        <p class="page-sub" :title="`任务 ${task.task_id}`">
+          任务 {{ taskShortId }} · {{ docCount }} 份文件
+        </p>
+      </header>
+
       <!-- PARTIAL 必须在差异页也提醒一次，用户可能直接跳到这里 -->
       <NoticeBar
         v-if="task.status === 'PARTIAL'"

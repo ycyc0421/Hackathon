@@ -11,6 +11,7 @@ import { backendErrorText } from '../api/errors.js'
 import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
 import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '../api/labels.js'
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
+import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -21,6 +22,8 @@ const task = inject('task')
 const taskError = inject('taskError')
 const isRunning = inject('isRunning')
 const sourceFiles = inject('sourceFiles')
+/** 跨页导航：完成态 CTA 直跳差异页 */
+const navigate = inject('navigate')
 
 // 目的国列表为演示用。后端（issue #4）确认当前规则覆盖美/德/荷/法/英，
 // 均为未经核实的演示规则，正式合规结论不能据此得出。
@@ -333,6 +336,9 @@ const failedDocs = computed(
 function docStatus(d) {
   return processStatus(d.process_status)
 }
+
+/** 待复核条目数：与差异页「需关注」、顶栏角标同一口径 */
+const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).length ?? 0)
 </script>
 
 <template>
@@ -341,14 +347,19 @@ function docStatus(d) {
       <h2 class="card-title">创建检查</h2>
       <p class="card-sub">选择属于同一票货物的多份单证。系统将逐份抽取字段，再交叉比对它们之间是否一致。</p>
 
-      <!-- 文件选择 -->
+      <!-- 文件选择。role=button + tabindex 保证键盘可达：Enter/Space 打开文件选择 -->
       <div
         class="dropzone"
         :class="{ active: dragActive }"
+        role="button"
+        tabindex="0"
+        aria-label="选择或拖入单证文件"
         @dragover.prevent="dragActive = true"
         @dragleave.prevent="dragActive = false"
         @drop.prevent="onDrop"
         @click="fileInput?.click()"
+        @keydown.enter.prevent="fileInput?.click()"
+        @keydown.space.prevent="fileInput?.click()"
       >
         <div class="dropzone-main">把文件拖到这里，或点击选择</div>
         <div class="dropzone-hint">
@@ -494,9 +505,13 @@ function docStatus(d) {
             </li>
           </ul>
 
-          <p v-if="task.status === 'COMPLETED' || task.status === 'PARTIAL'" class="next-hint">
-            已生成比对结果，切到「差异」页查看。
-          </p>
+          <!-- 完成态主路径：直接给去差异页的按钮，不让用户自己找下一屏 -->
+          <div v-if="task.status === 'COMPLETED' || task.status === 'PARTIAL'" class="next-actions">
+            <button class="btn primary" @click="navigate.go('diff')">
+              {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
+            </button>
+            <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
+          </div>
         </div>
 
         <!-- 处理中：分阶段进度 + 上传百分比 + 已等待时长 + 骨架屏 -->
