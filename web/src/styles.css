@@ -985,6 +985,18 @@ select {
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2));
+  transition: background var(--duration-fast) var(--ease);
+}
+
+/* 整行可点需要能被感知到：悬停给底色 + 提示展开的箭头颜色加深 */
+.cmp-head-toggle:hover {
+  background: var(--gray-100);
+}
+
+.cmp-head-toggle:hover .cmp-chevron {
+  color: var(--text-body);
 }
 
 .cmp-head-toggle:focus-visible {
@@ -1003,12 +1015,44 @@ select {
   transform: rotate(90deg);
 }
 
+/* 收起态表格里与多数派不同的值：不展开也能定位到「哪份文件不一样」 */
+.cell-value.divergent {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* 展开/收起时表格与并排面板原位互换：淡出 + 淡入，高度变化不抢戏 */
+.cmp-swap-enter-active,
+.cmp-swap-leave-active {
+  transition: opacity var(--duration-base) var(--ease),
+              transform var(--duration-base) var(--ease);
+}
+
+.cmp-swap-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.cmp-swap-leave-to {
+  opacity: 0;
+}
+
 /* 多于两份文件时列自动换行平铺，保持可读 */
 .compare-pane {
   margin-top: var(--space-3);
+}
+
+.compare-cols {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--space-3);
+}
+
+/* 无多数基准时的一句说明，先于逐列细节出现 */
+.compare-basis-note {
+  margin: 0 0 var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
 }
 
 .compare-col {
@@ -1023,10 +1067,21 @@ select {
   min-width: 0;
 }
 
-/* 值与其他列不同的那一列才强调：中性列保持默认边框，不渲染成"有问题" */
+/* 差异列先出颜色，聚焦文本随后加重（read-in 动画从默认色过渡） */
 .compare-col.divergent {
   border-left-color: var(--danger);
   background: var(--danger-bg);
+}
+
+.compare-col.divergent .compare-value {
+  color: var(--danger);
+  animation: divergent-read-in var(--duration-slow) var(--ease-out);
+}
+
+@keyframes divergent-read-in {
+  from {
+    color: var(--text-body);
+  }
 }
 
 .compare-file {
