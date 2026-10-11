@@ -171,7 +171,7 @@ jobs:
           {
             echo '## 后端部署与公网验证通过'
             echo '后端版本已切换，跨域预检、样例上传轮询和返回契约校验均通过。'
-            echo '前端尚待后续「部署前端到 Cloudflare」job 发布，请以该 job 的结果确认前端状态。'
+            echo '前端发布结果请查看「部署前端到 Cloudflare」job。'
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-frontend:
