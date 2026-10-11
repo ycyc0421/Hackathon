@@ -198,13 +198,13 @@ const severityOf = severity
         <div v-if="summary" class="stat-row">
           <div class="stat"><span class="stat-num">{{ summary.document_count }}</span><span class="stat-label">文件</span></div>
           <div class="stat"><span class="stat-num">{{ summary.field_count }}</span><span class="stat-label">抽取字段</span></div>
-          <div class="stat" :class="{ alert: summary.conflict_count > 0 }">
+          <div class="stat" :class="summary.conflict_count > 0 ? 'alert' : 'zero'">
             <span class="stat-num">{{ summary.conflict_count }}</span><span class="stat-label">不一致</span>
           </div>
-          <div class="stat" :class="{ warn: summary.missing_count > 0 }">
+          <div class="stat" :class="summary.missing_count > 0 ? 'warn' : 'zero'">
             <span class="stat-num">{{ summary.missing_count }}</span><span class="stat-label">部分缺失</span>
           </div>
-          <div class="stat" :class="{ warn: summary.unrecognized_count > 0 }">
+          <div class="stat" :class="summary.unrecognized_count > 0 ? 'warn' : 'zero'">
             <span class="stat-num">{{ summary.unrecognized_count }}</span><span class="stat-label">无法比对</span>
           </div>
           <div class="stat"><span class="stat-num">{{ summary.risk_count }}</span><span class="stat-label">风险提示</span></div>
