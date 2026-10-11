@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { USE_MOCK, listMockScenarios, setMockScenario } from './api/index.js'
+import { isMock, listMockScenarios, setMockScenario } from './api/index.js'
+import { setMock } from './api/config.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import UploadPage from './pages/UploadPage.vue'
 import DiffPage from './pages/DiffPage.vue'
@@ -15,6 +16,20 @@ const PAGES = [
 ]
 
 const active = ref('upload')
+
+/**
+ * 数据源：mock 示例数据 / 真实后端。初始值在 config.js 里按
+ * URL 参数 ?mock= → localStorage → 默认 mock 的顺序解析。
+ * 顶栏切换后整页刷新：任务、缓存、错误提示都属于旧数据源，不值得就地迁移。
+ */
+const mock = ref(isMock())
+
+function onSourceChange(event) {
+  const next = event.target.value === 'mock'
+  if (next === mock.value) return
+  setMock(next)
+  window.location.reload()
+}
 
 /** mock 场景选择。key → 中文名只用于展示，场景数据以 api 层注册表为准 */
 const SCENARIO_NAMES = {
@@ -156,9 +171,19 @@ watch(active, updateIndicator)
         <span class="tab-indicator" :style="indicatorStyle" aria-hidden="true" />
       </nav>
 
-      <div v-if="USE_MOCK" class="mock-tools">
-        <span class="mock-flag" title="前端正在使用本地示例数据，未连接后端">示例数据</span>
+      <div class="mock-tools">
+        <span
+          v-if="mock"
+          class="mock-flag"
+          title="前端正在使用本地示例数据，未连接后端"
+        >示例数据</span>
+        <span
+          v-else
+          class="backend-flag"
+          title="前端直连后端接口，所见均为真实处理结果"
+        >真实后端</span>
         <select
+          v-if="mock"
           v-model="mockScenario"
           class="mock-scenario-select"
           title="选择示例场景，下次提交检查时生效"
@@ -167,6 +192,15 @@ watch(active, updateIndicator)
           <option v-for="key in mockScenarios" :key="key" :value="key">
             {{ SCENARIO_NAMES[key] ?? key }}
           </option>
+        </select>
+        <select
+          :value="mock ? 'mock' : 'backend'"
+          class="mock-scenario-select"
+          title="切换数据来源，切换后页面自动刷新"
+          @change="onSourceChange"
+        >
+          <option value="mock">示例数据</option>
+          <option value="backend">真实后端</option>
         </select>
       </div>
     </header>

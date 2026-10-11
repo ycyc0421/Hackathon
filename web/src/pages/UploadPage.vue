@@ -6,8 +6,9 @@
  * 这里按用户选择实现——可控，演示时不依赖抽取准确率。
  */
 import { ref, computed, inject, onBeforeUnmount } from 'vue'
-import { createCheck, pollCheck, validateFiles, ApiError, UPLOAD_LIMITS, USE_MOCK } from '../api/index.js'
-import { taskStatus, processStatus, formatTime, formatDuration, describeApiError } from '../api/formatters.js'
+import { createCheck, pollCheck, validateFiles, ApiError, UPLOAD_LIMITS } from '../api/index.js'
+import { backendErrorText } from '../api/errors.js'
+import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
 import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '../api/labels.js'
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
 import StatusBadge from '../components/StatusBadge.vue'
@@ -260,10 +261,16 @@ async function submit() {
 
     task.value = result
   } catch (e) {
-    // 失败必须显式呈现。绝不能落到"结果为空 → 页面显示没有问题"
+    // 失败必须显式呈现。绝不能落到"结果为空 → 页面显示没有问题"。
+    // 服务端错误按后端错误码换成面向用户的中文文案（api/errors.js），
+    // 查不到映射时用后端给的 message 兜底，不把英文 code 甩给用户。
     taskError.value =
       e instanceof ApiError
-        ? { message: e.message, kind: e.kind, code: e.code }
+        ? {
+            message: e.kind === 'SERVER' ? backendErrorText(e) : e.message,
+            kind: e.kind,
+            code: e.code,
+          }
         : { message: e?.message ?? '未知错误', kind: 'UNKNOWN' }
   } finally {
     isRunning.value = false

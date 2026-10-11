@@ -7,7 +7,8 @@
  * 契约里 Evaluation.status 的 NOT_RUN 就是为这一点设计的。
  */
 import { ref, computed, inject, onMounted } from 'vue'
-import { getEvaluation, USE_MOCK, ApiError } from '../api/index.js'
+import { getEvaluation, isMock, ApiError } from '../api/index.js'
+import { backendErrorText } from '../api/errors.js'
 import { formatTime } from '../api/formatters.js'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -16,6 +17,9 @@ import EmptyState from '../components/EmptyState.vue'
 // 评测数据缓存由 App 层持有：切页重挂载时直接复用，不重复请求
 const evaluation = inject('evaluation')
 const evaluationLoaded = inject('evaluationLoaded')
+
+/** 示例数据横幅只在 mock 数据源下出现（App 顶栏的「示例数据」徽标同款） */
+const mock = ref(isMock())
 
 const loading = ref(false)
 const error = ref(null)
@@ -29,7 +33,11 @@ async function load() {
     evaluationLoaded.value = true
   } catch (e) {
     error.value =
-      e instanceof ApiError ? e.message : '获取评测结果失败：前端与后端之间的请求未成功完成'
+      e instanceof ApiError
+        ? e.kind === 'SERVER'
+          ? backendErrorText(e)
+          : e.message
+        : '获取评测结果失败：前端与后端之间的请求未成功完成'
   } finally {
     loading.value = false
   }
@@ -185,7 +193,7 @@ const errorBreakdown = computed(() => {
     </section>
 
     <NoticeBar
-      v-if="USE_MOCK"
+      v-if="mock"
       tone="info"
       title="当前使用示例数据"
       detail="后端评测接口尚未提供，本页显示的是占位状态。"
