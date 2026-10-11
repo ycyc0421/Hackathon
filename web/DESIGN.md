@@ -128,6 +128,31 @@ label 在输入框上方。错误：红色边框 + 下方错误文案。
 - **空状态**：必须有说明文字（"尚未评测""没有风险提示"）
 - **错误**：说明什么失败 + 重试按钮
 
+### 文件 chips（报告页）
+
+文件名清单压缩为 chips，一行多份，状态靠色点快分。
+
+- 结构：状态色点（8px 圆，`processStatus` 的 tone → 语义色）+ 文件名 + 类型
+- 失败文件：`error_message` 放 chip 第二行（`--danger` 小号字），压缩布局也不丢错误信息
+- 布局：`flex-wrap` + `gap: var(--space-2)`，边框 `var(--border)`，圆角 `var(--radius-md)`
+
+### 并排对照面板（差异页 ComparePane）
+
+比对卡片就地展开的左右对照视图，回答「几份文件摆在一起，差异在哪」。
+
+- 触发：卡片头部整行可点（`role="button"` + 键盘 Enter/Space + `aria-expanded`），chevron ▶ 旋转 90° 指示
+- 布局：`grid` + `repeat(auto-fit, minmax(220px, 1fr))`，多文件自动换行平铺
+- 每列：文件名（muted 小字）→ 值（等宽 600）+ 页码 → 原文 → 字段状态徽章 + 「查看原文」链接
+- 差异强调：仅「CONFLICT 且本列归一值与其他列不同」的那一列，左边框 3px `--danger` + `--danger-bg`；一致列保持中性
+- 降级：无 File 对象（mock）不渲染「查看原文」；`page` 为 null 不显示页码；值为 null 显示「—」
+
+### 扫描件警告（上传页）
+
+PDF 文本层预检测命中的行内标记（`.scan-warn`）。
+
+- 位置：文件名右侧行内，warning 边框 + 底色 + 文字
+- `cursor: help` + `title` 放完整说明；措辞一律「可能」（启发式会误判），不阻止提交
+
 ## 约束
 
 - 桌面端 ≥1024px，移动端暂不适配
