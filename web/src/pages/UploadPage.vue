@@ -425,7 +425,6 @@ function docStatus(d) {
     <EmptyState
       v-if="!isRunning && !task && !taskError"
       tone="info"
-      icon="📄"
       title="尚未上传单证"
       :detail="`把同一票货物的发票、箱单、提单等单证拖到上方虚线框，选好目的国后点「开始检查」。支持 ${UPLOAD_LIMITS.accept.split(',').join(' / ')}，单个不超过 ${UPLOAD_LIMITS.maxFileSizeMB}MB，最多 ${UPLOAD_LIMITS.maxFiles} 份。`"
     />

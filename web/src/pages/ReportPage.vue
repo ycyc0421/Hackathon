@@ -11,7 +11,6 @@ import { buildConclusion } from '../utils/reportConclusion.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
-import EmptyState from '../components/EmptyState.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
@@ -252,13 +251,12 @@ const severityOf = severity
             </div>
           </li>
         </ul>
-        <!-- 成功式空状态只在终态成功时出现；处理中/失败/轮询中断都不能显示"没有问题" -->
-        <EmptyState
+        <!-- 成功式确认只在终态成功时出现；处理中/失败/轮询中断都不能显示"没有问题"。
+             正向确认收敛为一条细窄提示条，不用居中大空状态（DESIGN.md 通过态收敛原则） -->
+        <NoticeBar
           v-else-if="showNoIssues"
           tone="ok"
-          icon="✅"
-          title="没有需要人工处理的条目"
-          detail="所有字段在各文件间一致。"
+          :title="showNoRisk ? '没有需要人工处理的条目，也未发现风险提示' : '没有需要人工处理的条目'"
         />
 
         <p v-if="matched.length" class="foot-note">
@@ -299,15 +297,6 @@ const severityOf = severity
           </li>
         </ul>
       </section>
-
-      <!-- 有成功结果且确实零风险时给出正向反馈，避免显示成空白表格 -->
-      <EmptyState
-        v-if="showNoRisk"
-        tone="ok"
-        icon="✅"
-        title="没有风险提示"
-        detail="本次检查未发现需要提示的风险项。"
-      />
 
       <section v-if="task.errors?.length" class="card">
         <h2 class="card-title">错误记录</h2>

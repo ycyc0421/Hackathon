@@ -352,7 +352,6 @@ onMounted(async () => {
         <EmptyState
           v-else
           tone="info"
-          icon="🔎"
           title="当前筛选下没有条目"
           detail="切到「全部」可查看一致字段。"
         />
@@ -363,7 +362,6 @@ onMounted(async () => {
       <section v-else class="card">
         <EmptyState
           tone="info"
-          icon="📭"
           title="后端未返回任何比对结果"
           detail="本次任务没有产出可比对的字段。如需人工确认，请查看「报告」页。"
         />

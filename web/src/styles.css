@@ -270,6 +270,12 @@ body {
   color: var(--danger);
 }
 
+.notice.tone-ok {
+  background: var(--success-bg);
+  border-color: var(--success);
+  color: var(--success);
+}
+
 /* ---------- 状态标签 ---------- */
 
 .badge {
@@ -1204,28 +1210,8 @@ select {
   animation: fade-in var(--duration-base) var(--ease);
 }
 
-/* 图标用圆形浅底托住，按语气着色，比裸 emoji 更精致 */
-.empty-state-icon {
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--info-bg);
-  font-size: 24px;
-  line-height: 1;
-}
-
-.empty-state.tone-ok .empty-state-icon {
-  background: var(--success-bg);
-}
-
-.empty-state.tone-bad .empty-state-icon {
-  background: var(--danger-bg);
-}
-
+/* 纯文字排版：不用 emoji 插图，靠标题字重与语气色区分 */
 .empty-state-title {
-  margin-top: var(--space-4);
   font-size: var(--text-lg);
   font-weight: 600;
 }

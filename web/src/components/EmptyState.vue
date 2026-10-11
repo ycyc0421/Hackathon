@@ -4,14 +4,14 @@
  *
  * 统一三类场景的占位展示：
  * - info：尚未评测、尚无结果等中性占位
- * - ok：  没有风险提示等正向占位
+ * - ok：  没有风险提示等正向占位（注意：全通过的正向确认优先用细窄
+ *   NoticeBar，不用大空状态，见 DESIGN.md 通过态收敛原则）
  * - bad： 加载失败，必须配 onRetry 提供重试
  *
  * 原则：缺数据就占位说明，绝不伪造数值（AGENTS.md 降级原则）。
- * 插图只用 emoji + CSS，不引入图片资源。
+ * 纯文字排版，不用 emoji 插图——企业工具，保持克制。
  */
 defineProps({
-  icon: { type: String, default: '📭' },
   title: { type: String, required: true },
   detail: { type: String, default: '' },
   /** info | ok | bad */
@@ -29,7 +29,6 @@ const emit = defineEmits(['retry'])
 
 <template>
   <div class="empty-state" :class="`tone-${tone}`" role="status">
-    <div class="empty-state-icon" aria-hidden="true">{{ icon }}</div>
     <div class="empty-state-title">{{ title }}</div>
     <p v-if="detail" class="empty-state-detail">{{ detail }}</p>
     <div v-if="$slots.default" class="empty-state-extra">
