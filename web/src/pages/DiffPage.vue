@@ -15,6 +15,7 @@ import {
   formatValue,
   confidenceText,
 } from '../api/formatters.js'
+import { divergentFileIds } from '../utils/divergence.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -128,6 +129,14 @@ function isExpanded(c) {
 }
 
 /**
+ * 收起态表格的差异强调：与多数派不同的值标红，
+ * 不展开也能定位到「哪份文件不一样」。判定规则与展开的并排面板共用。
+ */
+function isDivergentValue(c, v) {
+  return divergentFileIds(c).has(v.file_id)
+}
+
+/**
  * 报告页「在差异页查看」的锚点：页面随切页重挂载，挂载时消费一次。
  * 目标条目必然在「需关注」集合里（报告页问题条目的过滤条件与 problemStatuses 等价），
  * 先切筛选再等渲染，滚动到位后短暂高亮。
@@ -237,35 +246,41 @@ onMounted(async () => {
 
                 <p v-if="c.note" class="cmp-note">{{ c.note }}</p>
 
-                <table class="cmp-table">
-                  <thead>
-                    <tr>
-                      <th>来源文件</th>
-                      <th>值</th>
-                      <th>原文</th>
-                      <th>状态</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="v in c.values" :key="v.file_id" :class="{ 'row-odd': v.field_status !== 'EXTRACTED' }">
-                      <td class="cell-file">{{ v.file_name }}</td>
-                      <td class="cell-value">
-                        <template v-if="v.normalized_value !== null && v.normalized_value !== undefined">
-                          {{ valueText(v, c) }}
-                        </template>
-                        <span v-else class="cell-empty">—</span>
-                      </td>
-                      <td class="cell-raw">
-                        <template v-if="showsRaw(v, c)">{{ v.raw_value }}</template>
-                        <span v-else class="cell-empty">—</span>
-                      </td>
-                      <td><StatusBadge :status="fileStatusOf(v)" /></td>
-                    </tr>
-                  </tbody>
-                </table>
+                <!--
+                  展开后表格原位换成并排对照面板：面板回答「几份文件摆在一起差异在哪」，
+                  是表格内容的另一种排布而非新增信息，两者不同时出现。
+                  out-in 过渡让两者淡入淡出，不造成高度抖动。
+                -->
+                <Transition name="cmp-swap" mode="out-in">
+                  <table v-if="!isExpanded(c)" key="table" class="cmp-table">
+                    <thead>
+                      <tr>
+                        <th>来源文件</th>
+                        <th>值</th>
+                        <th>原文</th>
+                        <th>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="v in c.values" :key="v.file_id" :class="{ 'row-odd': v.field_status !== 'EXTRACTED' }">
+                        <td class="cell-file">{{ v.file_name }}</td>
+                        <td class="cell-value" :class="{ divergent: isDivergentValue(c, v) }">
+                          <template v-if="v.normalized_value !== null && v.normalized_value !== undefined">
+                            {{ valueText(v, c) }}
+                          </template>
+                          <span v-else class="cell-empty">—</span>
+                        </td>
+                        <td class="cell-raw">
+                          <template v-if="showsRaw(v, c)">{{ v.raw_value }}</template>
+                          <span v-else class="cell-empty">—</span>
+                        </td>
+                        <td><StatusBadge :status="fileStatusOf(v)" /></td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-                <!-- 就地展开的并排对照：几份文件的值摆在一起看差异，不遮挡列表 -->
-                <ComparePane v-if="isExpanded(c)" :comparison="c" />
+                  <ComparePane v-else key="pane" :comparison="c" />
+                </Transition>
 
                 <div v-if="c.rule_id" class="cmp-foot">依据规则 {{ c.rule_id }}</div>
                 <div v-else class="cmp-foot muted">未经规则校验</div>
