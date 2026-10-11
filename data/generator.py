@@ -201,6 +201,7 @@ def build_cases(seed=20261010):
         for f in doc['fields']:
             if f['field_key'] == 'gross_weight':
                 f['raw_value'] = '2,400.00 KG' if doc['file_id'] == 'f2' else '2400KGS'
+    dirty['expected']['comparisons'] = expected_comparison(dirty['documents'])
     return cases
 
 

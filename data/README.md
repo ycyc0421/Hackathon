@@ -7,6 +7,8 @@
 ```powershell
 python data/init_db.py
 python data/seed_data.py
+# 导入某一组生成样例
+python data/seed_data.py --input data/generated/normal_multi.json
 ```
 
 生成的 `data/app.db` 是本地运行文件，不提交到 Git。表结构和导入脚本才需要提交。
@@ -15,6 +17,12 @@ python data/seed_data.py
 
 ```powershell
 python -c "import sqlite3; c=sqlite3.connect('data/app.db'); print(c.execute('SELECT task_id,status FROM tasks').fetchall()); print(c.execute(\"SELECT field_key,COUNT(*) FROM extracted_fields GROUP BY field_key\").fetchall())"
+```
+
+运行数据层回归测试：
+
+```powershell
+python -m unittest discover -s data -p "test_*.py" -v
 ```
 
 `normalized_value_json` 和 `bbox_json` 是 JSON 文本，读取后用 Python `json.loads()` 还原。

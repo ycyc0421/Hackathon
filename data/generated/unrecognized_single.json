@@ -45,8 +45,8 @@
           "field_key": "quantity",
           "item_id": "item_001",
           "line_no": 1,
-          "raw_value": "2880 PCS",
-          "normalized_value": 2880,
+          "raw_value": "2448 PCS",
+          "normalized_value": 2448,
           "unit": "PCS",
           "status": "EXTRACTED",
           "confidence": 0.98
@@ -55,8 +55,8 @@
           "field_key": "packages",
           "item_id": "item_001",
           "line_no": 1,
-          "raw_value": "120 CARTON",
-          "normalized_value": 120,
+          "raw_value": "102 CARTON",
+          "normalized_value": 102,
           "unit": "CARTON",
           "status": "EXTRACTED",
           "confidence": 0.98
@@ -65,8 +65,8 @@
           "field_key": "invoice_no",
           "item_id": null,
           "line_no": null,
-          "raw_value": "INV-42-unrecognized_single",
-          "normalized_value": "INV-42-unrecognized_single",
+          "raw_value": "INV-20261010-unrecognized_single",
+          "normalized_value": "INV-20261010-unrecognized_single",
           "unit": null,
           "status": "EXTRACTED",
           "confidence": 0.98
@@ -75,8 +75,8 @@
           "field_key": "total_amount",
           "item_id": null,
           "line_no": null,
-          "raw_value": "14400.0 USD",
-          "normalized_value": 14400.0,
+          "raw_value": "12240.0 USD",
+          "normalized_value": 12240.0,
           "unit": "USD",
           "status": "EXTRACTED",
           "confidence": 0.98
@@ -133,8 +133,8 @@
           "field_key": "quantity",
           "item_id": "item_001",
           "line_no": 1,
-          "raw_value": "2880 PCS",
-          "normalized_value": 2880,
+          "raw_value": "2448 PCS",
+          "normalized_value": 2448,
           "unit": "PCS",
           "status": "EXTRACTED",
           "confidence": 0.98
@@ -143,8 +143,8 @@
           "field_key": "packages",
           "item_id": "item_001",
           "line_no": 1,
-          "raw_value": "120 CARTON",
-          "normalized_value": 120,
+          "raw_value": "102 CARTON",
+          "normalized_value": 102,
           "unit": "CARTON",
           "status": "EXTRACTED",
           "confidence": 0.98
@@ -184,8 +184,8 @@
             "file_id": "f1",
             "line_no": null,
             "unit": null,
-            "raw_value": "INV-42-unrecognized_single",
-            "normalized_value": "INV-42-unrecognized_single",
+            "raw_value": "INV-20261010-unrecognized_single",
+            "normalized_value": "INV-20261010-unrecognized_single",
             "field_status": "EXTRACTED"
           }
         ]
@@ -220,8 +220,8 @@
             "file_id": "f1",
             "line_no": null,
             "unit": "USD",
-            "raw_value": "14400.0 USD",
-            "normalized_value": 14400.0,
+            "raw_value": "12240.0 USD",
+            "normalized_value": 12240.0,
             "field_status": "EXTRACTED"
           }
         ]
@@ -290,16 +290,16 @@
             "file_id": "f1",
             "line_no": 1,
             "unit": "CARTON",
-            "raw_value": "120 CARTON",
-            "normalized_value": 120,
+            "raw_value": "102 CARTON",
+            "normalized_value": 102,
             "field_status": "EXTRACTED"
           },
           {
             "file_id": "f2",
             "line_no": 1,
             "unit": "CARTON",
-            "raw_value": "120 CARTON",
-            "normalized_value": 120,
+            "raw_value": "102 CARTON",
+            "normalized_value": 102,
             "field_status": "EXTRACTED"
           }
         ]
@@ -316,16 +316,16 @@
             "file_id": "f1",
             "line_no": 1,
             "unit": "PCS",
-            "raw_value": "2880 PCS",
-            "normalized_value": 2880,
+            "raw_value": "2448 PCS",
+            "normalized_value": 2448,
             "field_status": "EXTRACTED"
           },
           {
             "file_id": "f2",
             "line_no": 1,
             "unit": "PCS",
-            "raw_value": "2880 PCS",
-            "normalized_value": 2880,
+            "raw_value": "2448 PCS",
+            "normalized_value": 2448,
             "field_status": "EXTRACTED"
           }
         ]

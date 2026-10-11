@@ -37,6 +37,9 @@ jobs:
           python backend/tools/selftest.py
           python backend/tools/run_challenge.py
 
+      - name: 数据层回归
+        run: python -m unittest discover -s data -p 'test_*.py' -v
+
   validate-contract:
     name: 验证数据契约
     runs-on: ubuntu-latest

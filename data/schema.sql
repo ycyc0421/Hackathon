@@ -2,7 +2,7 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS tasks (
     task_id TEXT PRIMARY KEY,
-    status TEXT NOT NULL CHECK (status IN ('PENDING','RUNNING','COMPLETED','PARTIAL','FAILED')),
+    status TEXT NOT NULL CHECK (status IN ('PENDING','PROCESSING','COMPLETED','PARTIAL','FAILED')),
     destination_country TEXT NOT NULL,
     destination_country_name TEXT,
     trade_mode TEXT,
@@ -96,6 +96,8 @@ CREATE TABLE IF NOT EXISTS comparison_values (
 CREATE TABLE IF NOT EXISTS risks (
     risk_id TEXT PRIMARY KEY,
     task_id TEXT NOT NULL,
+    item_id TEXT,
+    comparison_id TEXT,
     risk_type TEXT NOT NULL,
     severity TEXT NOT NULL,
     title TEXT NOT NULL,
@@ -103,7 +105,9 @@ CREATE TABLE IF NOT EXISTS risks (
     destination_country TEXT,
     rule_id TEXT,
     rule_source TEXT,
-    FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE
+    FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE,
+    FOREIGN KEY (task_id, item_id) REFERENCES items(task_id, item_id),
+    FOREIGN KEY (comparison_id) REFERENCES comparisons(comparison_id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS risk_fields (
@@ -111,6 +115,15 @@ CREATE TABLE IF NOT EXISTS risk_fields (
     field_key TEXT NOT NULL,
     PRIMARY KEY (risk_id, field_key),
     FOREIGN KEY (risk_id) REFERENCES risks(risk_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS risk_files (
+    risk_id TEXT NOT NULL,
+    file_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    PRIMARY KEY (risk_id, file_id),
+    FOREIGN KEY (risk_id) REFERENCES risks(risk_id) ON DELETE CASCADE,
+    FOREIGN KEY (file_id) REFERENCES documents(file_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS hs_dictionary (
