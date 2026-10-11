@@ -365,8 +365,14 @@ function docStatus(d) {
         />
       </div>
 
-      <ul v-if="files.length" class="file-list">
-        <li v-for="(f, i) in files" :key="`${f.name}-${i}`" class="file-item">
+      <!--
+        文件列表增删动画：TransitionGroup + 稳定 key（fileKey，不带下标——
+        删中间项时按下标做 key 会让后续条目全部重键、补位动画失效）。
+        条目进入/离开用 高度+透明度 过渡，其余条目 move 平滑补位；
+        appear 让列表从空到有的首次出现也有进入动画。
+      -->
+      <TransitionGroup v-if="files.length" tag="ul" name="file-item" class="file-list" appear>
+        <li v-for="(f, i) in files" :key="fileKey(f)" class="file-item">
           <span class="file-name">{{ f.name }}</span>
           <span
             v-if="scanWarnings.has(`${f.name}:${f.size}`)"
@@ -377,7 +383,7 @@ function docStatus(d) {
           <span class="file-size">{{ sizeText(f.size) }}</span>
           <button class="link-btn" @click="removeFile(i)">移除</button>
         </li>
-      </ul>
+      </TransitionGroup>
 
       <div class="field-row">
         <label class="field">

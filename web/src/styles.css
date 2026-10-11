@@ -345,6 +345,8 @@ body {
   list-style: none;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  /* 离场条目 absolute 定位的包含块 */
+  position: relative;
 }
 
 .file-item {
@@ -358,6 +360,43 @@ body {
 
 .file-item:last-child {
   border-bottom: none;
+}
+
+/*
+ * 文件列表条目增删过渡（UploadPage 的 TransitionGroup）：
+ * 进入/离开 = 高度收起 + 淡出，其余条目 transform 平滑补位。
+ * 条目高度随文件名换行变化，height:auto 不可过渡，用 max-height
+ * 近似（上限取约两行文件名的高度）；padding 与边框一并收起，
+ * 否则高度到 0 后还残留一段边距。
+ */
+.file-item-enter-active,
+.file-item-leave-active {
+  transition: opacity var(--duration-fast) var(--ease),
+              max-height var(--duration-fast) var(--ease),
+              padding var(--duration-fast) var(--ease),
+              border-width var(--duration-fast) var(--ease);
+  max-height: 64px;
+  overflow: hidden;
+}
+
+.file-item-enter-from,
+.file-item-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom-width: 0;
+}
+
+.file-item-move {
+  transition: transform var(--duration-base) var(--ease);
+}
+
+/* 离场条目脱离文档流，其余条目不等离场结束、立即开始补位 */
+.file-item-leave-active {
+  position: absolute;
+  left: 0;
+  right: 0;
 }
 
 .file-name {
