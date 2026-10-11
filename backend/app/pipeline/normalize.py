@@ -29,19 +29,21 @@ def to_measure(raw: str | None, field_key: str) -> tuple[int | float | None, str
     if raw is None:
         return None, None
     text = str(raw).strip()
-    match = _NUMBER_TOKEN.search(text)
-    if not match:
-        return None, None
-    number = to_number(match.group(0))
-    if number is None:
-        return None, None
-    suffix = text[match.end():].strip(" .:：,，")
-    if not suffix:
-        return number, default  # 没写单位时沿用该字段约定的默认单位
-    if re.fullmatch(rf"(?:{aliases})(?:\s*[（(]\s*(?:{aliases})\s*[）)])?", suffix, re.I):
-        return number * factor, default
-    if field_key in {"gross_weight", "net_weight"} and re.fullmatch(r"LBS?|POUNDS?|磅", suffix, re.I):
-        return round(number * 0.45359237, 6), default
+    # 检查数字两侧的完整片段；M3 本身含数字，不能直接把首个数字当成数值。
+    for match in _NUMBER_TOKEN.finditer(text):
+        number = to_number(match.group(0))
+        if number is None:
+            continue
+        units = text[:match.start()] + " " + text[match.end():]
+        units = re.sub(r"[()（）.:：,，]", " ", units).strip()
+        if not units:
+            return number, default  # 确实没写单位时才沿用字段约定
+        if re.fullmatch(rf"(?:{aliases})(?:\s+(?:{aliases}))*", units, re.I):
+            return number * factor, default
+        if field_key in {"gross_weight", "net_weight"} and re.fullmatch(
+            r"(?:LBS?|POUNDS?|磅)(?:\s+(?:LBS?|POUNDS?|磅))*", units, re.I
+        ):
+            return round(number * 0.45359237, 6), default
     return None, None
 
 

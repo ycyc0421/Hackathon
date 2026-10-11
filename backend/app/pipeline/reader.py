@@ -77,6 +77,53 @@ def read_document(filename: str, data: bytes) -> ReadResult:
 # --------------------------------------------------------------------------
 # PDF
 # --------------------------------------------------------------------------
+def _pdf_image_coverage(page) -> float:
+    """按页面上实际绘制的范围识别扫描正文，不用图片像素数判断 logo。"""
+    from pypdf import Transformation
+    from pypdf.generic import ContentStream
+
+    crop = tuple(float(v) for v in page.cropbox)
+    page_area = (crop[2] - crop[0]) * (crop[3] - crop[1])
+    image_boxes: set[tuple[float, float, float, float]] = set()
+
+    def bounds(matrix, box):
+        points = [matrix.apply_on((x, y)) for x in (box[0], box[2]) for y in (box[1], box[3])]
+        return (min(p[0] for p in points), min(p[1] for p in points),
+                max(p[0] for p in points), max(p[1] for p in points))
+
+    def intersect(a, b):
+        return max(a[0], b[0]), max(a[1], b[1]), min(a[2], b[2]), min(a[3], b[3])
+
+    def walk(stream, resources, matrix, clip, ancestors):
+        stack = []
+        for operands, operator in ContentStream(stream, page.pdf).operations:
+            if operator == b"q":
+                stack.append(matrix)
+            elif operator == b"Q":
+                matrix = stack.pop()
+            elif operator == b"cm":
+                matrix = Transformation(tuple(float(v) for v in operands)).transform(matrix)
+            elif operator == b"INLINE IMAGE":
+                image_boxes.add(intersect(bounds(matrix, (0, 0, 1, 1)), clip))
+            elif operator == b"Do":
+                obj = resources["/XObject"][operands[0]].get_object()
+                if obj.get("/Subtype") == "/Image":
+                    image_boxes.add(intersect(bounds(matrix, (0, 0, 1, 1)), clip))
+                elif obj.get("/Subtype") == "/Form":
+                    if id(obj) in ancestors:
+                        raise ValueError("PDF 图像资源存在循环引用")
+                    form_matrix = Transformation(obj.get("/Matrix", (1, 0, 0, 1, 0, 0))).transform(matrix)
+                    form_clip = intersect(bounds(form_matrix, obj["/BBox"]), clip)
+                    form_resources = obj["/Resources"] if "/Resources" in obj else resources
+                    walk(obj, form_resources, form_matrix, form_clip, ancestors | {id(obj)})
+
+    walk(page.get_contents(), page["/Resources"] if "/Resources" in page else {}, Transformation(), crop, set())
+    # 按外接矩形保守估算，复杂裁剪或重叠可能多算；疑似正文交给 OCR。
+    # 同一范围的重复绘制不重复计数；正文分成多个图块时累加其占比。
+    area = sum(max(0, right - left) * max(0, top - bottom) for left, bottom, right, top in image_boxes)
+    return area / page_area
+
+
 def _read_pdf(data: bytes) -> ReadResult:
     try:
         from pypdf import PdfReader
@@ -94,10 +141,12 @@ def _read_pdf(data: bytes) -> ReadResult:
         for index, page in enumerate(reader.pages, start=1):
             try:
                 page_text = page.extract_text() or ""
-                chunks.append(page_text)
-                # 一页图片的内容不能用另一页的文本长度掩盖。
-                if len(page_text.strip()) < MIN_TEXT_LAYER_CHARS and page.images:
+                image_coverage = _pdf_image_coverage(page)
+                # 图片占据至少五分之一页面时保守走 OCR，页眉再长也不能代表正文已读。
+                # 小 logo 仅在本页文本不足时沿用扫描页检查。
+                if image_coverage >= 0.2 or (image_coverage > 0 and len(page_text.strip()) < MIN_TEXT_LAYER_CHARS):
                     unreadable_pages.append(index)
+                chunks.append(page_text)
             except Exception:  # noqa: BLE001
                 unreadable_pages.append(index)
                 chunks.append("")

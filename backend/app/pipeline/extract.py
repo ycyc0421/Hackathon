@@ -116,6 +116,17 @@ _PKG_LABELED = re.compile(r"(?:TOTAL\s+)?(?:PACKAGES?|CARTONS?|PKGS?|件数)\s*[
 _PKG_BARE = re.compile(r"(?<![\d.])(\d{1,7})\s*" + PKG_WORD, re.I)
 
 
+def _measure_tail(text: str, pos: int) -> str:
+    # 多空格可能只是数值与单位的间距；只有遇到下一字段标签才截断。
+    return re.split(
+        r"[ \t]{2,}(?=(?:[GN]\.?\s*W\.?|(?:GROSS|NET)\s*(?:WEIGHT|WT)|"
+        r"PACKAGES?|CARTONS?|PKGS?|QTY|QUANTITY|MEAS(?:UREMENT)?\.?|VOLUME|"
+        r"AMOUNT|TOTAL|毛重|净重|数量|件数|体积|金额|合计)"
+        r"[ \t]*(?:[:：]|[+-]?\d|(?:" + KNOWN_CURRENCIES + r"|US\$)\b))",
+        _tail(text, pos), maxsplit=1, flags=re.I,
+    )[0]
+
+
 def _m_packages(text: str) -> Found | None:
     for pattern, score in ((_PKG_PAREN, 0.93), (_PKG_LABELED, 0.90), (_PKG_BARE, 0.85)):
         m = pattern.search(text)
@@ -126,8 +137,10 @@ def _m_packages(text: str) -> Found | None:
         # 比阿拉伯数字更容易看错，分数下调，落到 LOW_CONFIDENCE
         if re.search(r"\bSAY\b|\bONLY\b", line, re.I):
             score = round(score - 0.2, 2)
-        unit = re.match(r"\s*(" + PKG_WORD + r")\b", text[m.end(1):], re.I)
-        raw = m.group(1) + (" " + unit.group(1) if unit else "")
+        start = m.start() if pattern is _PKG_PAREN else m.start(1)
+        raw = _measure_tail(text, start)
+        # ONLY 是件数大写表述的结束词；未知单位仍保留，交给归一化明确失败。
+        raw = re.sub(r"\s+ONLY[ .。]*$", "", raw, flags=re.I)
         return Found(raw_text=line, raw_value=_clip(raw), score=score)
     return None
 
@@ -150,7 +163,7 @@ def _labeled_number(
         # 标签在、值读不出来
         return Found(raw_text=line, raw_value=_clip(tail) or None, score=None, unreadable=True)
     score = score_with_unit if _has_unit(tail, unit_re) else score_without_unit
-    value = _clip(tail.split("  ")[0])
+    value = _clip(_measure_tail(text, m.end()))
     return Found(raw_text=line, raw_value=value or f"{number} {unit_name}", score=score)
 
 
