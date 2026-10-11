@@ -125,7 +125,14 @@ jobs:
           SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
         run: |
           npm ci
-          node deploy/smoke.mjs
+          ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
+          target="$BACKEND_SSH_USER@$BACKEND_SSH_HOST"
+          python3 - <<'PY' | ssh "${ssh_options[@]}" "$target" "cd app/releases/$RELEASE_ID && .venv/bin/python deploy/smoke.py smoke-output"
+          import json, os
+          print(json.dumps({name: os.environ[name] for name in ("VITE_API_BASE", "FRONTEND_ORIGIN")}))
+          PY
+          mkdir -p "$SMOKE_OUTPUT_DIR"
+          scp "${ssh_options[@]}" "$target:app/releases/$RELEASE_ID/smoke-output/*.json" "$SMOKE_OUTPUT_DIR/"
           node backend/tools/validate_outputs.mjs "$SMOKE_OUTPUT_DIR"
 
       - name: 安装 Worker 依赖

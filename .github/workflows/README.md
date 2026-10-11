@@ -33,10 +33,12 @@
 2. 把 `VITE_API_BASE` 注入前端构建
 3. 通过专用普通用户上传版本归档，在独立虚拟环境中安装依赖、运行后端自检
 4. 保留共享配置和数据，切换代码目录并重启用户服务；启动失败自动回退
-5. 通过 HTTPS 验证跨域、样例上传、任务查询和返回契约；失败则回退后端
+5. 从部署服务器通过公开 HTTPS 域名验证跨域、样例上传和任务查询，将结果传回 CI 校验契约；任一步失败则回退后端
 6. 发布前端和 Worker 到 Cloudflare
 
-当前采用浏览器直连 HTTPS 后端，Worker 继续托管静态资源。后端部署脚本见 [`deploy/backend.py`](../../deploy/backend.py)，公网验证脚本见 [`deploy/smoke.mjs`](../../deploy/smoke.mjs)。
+当前采用浏览器直连 HTTPS 后端，Worker 继续托管静态资源。后端部署脚本见 [`deploy/backend.py`](../../deploy/backend.py)，公网验证脚本见 [`deploy/smoke.py`](../../deploy/smoke.py)。
+
+公网验证复用后端版本中的 Python 与 HTTPX，无需在服务器安装 Node。这样可避免 GitHub 托管执行器被边缘人机挑战拦截；请求仍经过公开域名、TLS 和边缘代理。该检查验证部署服务器的出网路径，不能替代浏览器和其他网络的联调检查。
 
 前端地址在构建时固定。修改 GitHub 变量后需重新运行工作流；在 Cloudflare 后台设置同名运行时变量不会改写已构建的页面。部署后通过 `?mock=0` 或顶栏切换到“真实后端”，填入 API 地址不会自动关闭示例模式。
 

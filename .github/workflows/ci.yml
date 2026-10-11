@@ -43,7 +43,7 @@ jobs:
       - name: 部署与回退验证
         run: |
           python -m unittest discover -s deploy -p 'test_*.py' -v
-          node --check deploy/smoke.mjs
+          python -m py_compile deploy/smoke.py
 
   validate-contract:
     name: 验证数据契约
