@@ -55,6 +55,21 @@ provide('taskError', taskError)
 provide('isRunning', isRunning)
 
 /**
+ * 上传页表单状态提升到 App 层：文件列表/目的国/备注在切页返回时保留，
+ * 与任务状态（task）的生命周期一致——任务还在、输入却丢了，层级不一致。
+ * scanWarnings 由文件内容异步检测得出，一并在 App 层持有，
+ * 否则返回上传页时文件还在、扫描件警告却丢了。
+ */
+const uploadFiles = ref([])
+const uploadCountry = ref('DE')
+const uploadNotes = ref('')
+const uploadScanWarnings = ref(new Set())
+provide('uploadFiles', uploadFiles)
+provide('uploadCountry', uploadCountry)
+provide('uploadNotes', uploadNotes)
+provide('uploadScanWarnings', uploadScanWarnings)
+
+/**
  * 跨页导航：报告页的条目可以直接跳到差异页对应位置。
  * anchor 经 pendingAnchor 传给目标页（页面随切页重挂载，挂载时消费并清空）。
  */

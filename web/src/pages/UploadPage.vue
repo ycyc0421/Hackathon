@@ -31,9 +31,13 @@ const COUNTRIES = [
   { code: 'GB', name: '英国' },
 ]
 
-const files = ref([])
-const country = ref('DE')
-const notes = ref('')
+/**
+ * 表单状态由 App 层持有（provide/inject），切页返回时文件列表/目的国/备注保留，
+ * 与 task 生命周期一致；scanWarnings 同样来自 App 层，见 App.vue 的说明。
+ */
+const files = inject('uploadFiles')
+const country = inject('uploadCountry')
+const notes = inject('uploadNotes')
 const localErrors = ref([])
 const dragActive = ref(false)
 const fileInput = ref(null)
@@ -41,9 +45,9 @@ const fileInput = ref(null)
 /**
  * PDF 文本层预检测命中的文件集合，key 与去重键一致（`${name}:${size}`）。
  * 只存判定为 'no-text' 的；'unknown'（查不了）一律静默，不进入集合。
- * 检测针对用户选的真实文件，与 USE_MOCK 开关无关。
+ * 检测针对用户选的真实文件，与 USE_MOCK 开关无关。状态由 App 层持有。
  */
-const scanWarnings = ref(new Set())
+const scanWarnings = inject('uploadScanWarnings')
 
 /** 命中预检测的文件数，供汇总提示条使用 */
 const scanWarnCount = computed(() => scanWarnings.value.size)
