@@ -16,6 +16,7 @@ import {
   confidenceText,
 } from '../api/formatters.js'
 import { divergentFileIds } from '../utils/divergence.js'
+import { buildEvidenceIndex, evidenceRawText } from '../utils/evidence.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -107,6 +108,17 @@ function showsRaw(v, comparison) {
   if (!v.raw_value) return false
   const { main } = formatValue(v.normalized_value, comparison.value_type, comparison.unit)
   return String(v.raw_value).trim() !== String(main).trim()
+}
+
+/**
+ * 抽取层原文证据索引：raw_value 读不出值时，回退展示抽取层保留的 raw_text。
+ * 关联键为 file_id + item_id + field_key，多商品不串证据（见 utils/evidence.js）。
+ */
+const evidenceIndex = computed(() => buildEvidenceIndex(task.value?.extractions))
+
+/** 该值对应的抽取层原文片段；没有证据时为 null（如实显示无证据） */
+function rawEvidence(c, v) {
+  return evidenceRawText(evidenceIndex.value, c, v)
 }
 
 const severityOf = severity
@@ -272,6 +284,8 @@ onMounted(async () => {
                         </td>
                         <td class="cell-raw">
                           <template v-if="showsRaw(v, c)">{{ v.raw_value }}</template>
+                          <!-- raw_value 读不出值时回退到抽取层保留的原文片段，不显示成空白 -->
+                          <template v-else-if="rawEvidence(c, v)">{{ rawEvidence(c, v) }}</template>
                           <span v-else class="cell-empty">—</span>
                         </td>
                         <td><StatusBadge :status="fileStatusOf(v)" /></td>
@@ -279,7 +293,7 @@ onMounted(async () => {
                     </tbody>
                   </table>
 
-                  <ComparePane v-else key="pane" :comparison="c" />
+                  <ComparePane v-else key="pane" :comparison="c" :evidence-index="evidenceIndex" />
                 </Transition>
 
                 <div v-if="c.rule_id" class="cmp-foot">依据规则 {{ c.rule_id }}</div>

@@ -124,6 +124,9 @@ export const UPLOAD_ERROR_TEXT = {
     `文件过大：${name}（${actualText}）超过单文件上限 ${limitMB}MB。请压缩或拆分后重试。`,
   UNSUPPORTED_FORMAT: (names, accept) =>
     `格式不支持：${names}。当前仅支持 ${accept} 格式的单证。`,
+  /** 同名文件会让「查看原文」的本地映射互相覆盖，必须阻断而不是静默接受 */
+  DUPLICATE_NAME: (names) =>
+    `同名文件无法区分原文，请重命名后再添加：${names}。`,
   NETWORK: '上传失败：网络连接异常，请检查网络后重试。',
 }
 
