@@ -825,6 +825,16 @@ textarea {
   font-size: 12px;
 }
 
+/* 完成态主按钮：与上方文件列表拉开间距；横向留白加大一档，
+   「查看待复核项（N）」这类长文案不至于顶到按钮边缘 */
+.next-actions {
+  margin-top: var(--space-4);
+}
+
+.next-actions .btn {
+  padding: var(--space-2) var(--space-5);
+}
+
 .next-hint {
   margin: 12px 0 0;
   color: var(--text-muted);
