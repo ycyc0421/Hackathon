@@ -120,17 +120,41 @@ export function animateHeightAdaptive(el, fromH, anchorEl = el) {
 }
 
 /**
+ * 收放类过渡的公共件：transition 串、内联样式清理、done() 兜底。
+ *
+ * 【关键时序】Vue 的 onBeforeEnter 在元素【插入 DOM 之前】调用，
+ * 此时元素是游离节点、没有布局，offsetHeight 恒为 0——在 beforeEnter
+ * 里量高度必然量到 0，导致 enter 动画的高度补间起点=终点=0px：
+ * 高度从不过渡，条目只靠 padding 长出一半，等别的属性 transitionend
+ * 后内联样式被清掉才瞬间弹到全高（「出现→卡一下→弹到位」的病灶）。
+ * 正确做法：beforeEnter 只做视觉归零（防首帧闪现），高度的测量放到
+ * onEnter——此时元素已在文档中，先还原出自然尺寸量高，再收起、强制
+ * reflow、展开。量与还原在同一帧内同步完成，不会上屏。
+ */
+
+/** 过渡结束后清理内联样式并调 done()；带超时兜底，transitionend 丢失也不会卡死 */
+function finishOnTransitionEnd(el, done, cleanup) {
+  let called = false
+  const finish = () => {
+    if (called) return
+    called = true
+    cleanup(el)
+    done()
+  }
+  el.addEventListener('transitionend', finish, { once: true })
+  // --duration-base 之外的余量；事件正常时此计时器无害
+  setTimeout(finish, 500)
+}
+
+/**
  * 列表条目增删的 TransitionGroup JS 钩子（上传页文件列表在用，:css="false"）。
  * 条目始终在文档流内：离场先量真实高度，再在同一时长内同步收
  * height / padding / border + 淡出——文字被自己的栏位裁掉，栏位与文字一体；
  * 兄弟行随高度收缩自然上移，不需要 move transform 补位。进入为反向。
  * 禁止 absolute 脱流方案：栏位不收缩、文字与栏位脱离、下方内容突兀上移。
  */
-const listItemHeight = new WeakMap()
-
 function clearItemInline(el) {
   el.style.cssText = ''
-  listItemHeight.delete(el)
 }
 
 const ITEM_TRANSITION = `height var(--duration-base) var(--ease),
@@ -138,19 +162,26 @@ const ITEM_TRANSITION = `height var(--duration-base) var(--ease),
     border-width var(--duration-base) var(--ease),
     opacity var(--duration-base) var(--ease)`
 
+function collapseItemToZero(el) {
+  el.style.height = '0px'
+  el.style.paddingTop = '0'
+  el.style.paddingBottom = '0'
+  el.style.borderBottomWidth = '0'
+  el.style.opacity = '0'
+  el.style.overflow = 'hidden'
+}
+
 export const heightListItemHooks = {
   onBeforeEnter(el) {
-    // 元素已插入、处于自然尺寸，先记录真实高度再收起到 0
-    listItemHeight.set(el, el.offsetHeight)
-    el.style.height = '0px'
-    el.style.paddingTop = '0'
-    el.style.paddingBottom = '0'
-    el.style.borderBottomWidth = '0'
-    el.style.opacity = '0'
-    el.style.overflow = 'hidden'
+    // 元素尚未插入（量不到高度），只做视觉归零防止首帧以全高闪现
+    collapseItemToZero(el)
   },
   onEnter(el, done) {
-    const h = listItemHeight.get(el) ?? el.offsetHeight
+    // 元素已在文档中。先还原量出自然高度，再收起→reflow→展开；
+    // 还原与收起在同一帧内同步完成，浏览器不会把中间态画出来
+    el.style.cssText = ''
+    const h = el.offsetHeight
+    collapseItemToZero(el)
     void el.offsetHeight // 强制 reflow，确立过渡起点
     el.style.transition = ITEM_TRANSITION
     el.style.height = `${h}px`
@@ -158,14 +189,7 @@ export const heightListItemHooks = {
     el.style.paddingBottom = ''
     el.style.borderBottomWidth = ''
     el.style.opacity = '1'
-    el.addEventListener(
-      'transitionend',
-      () => {
-        clearItemInline(el)
-        done()
-      },
-      { once: true }
-    )
+    finishOnTransitionEnd(el, done, clearItemInline)
   },
   onEnterCancelled(el) {
     clearItemInline(el)
@@ -175,14 +199,75 @@ export const heightListItemHooks = {
     el.style.overflow = 'hidden'
     void el.offsetHeight // 强制 reflow，确立过渡起点
     el.style.transition = ITEM_TRANSITION
-    el.style.height = '0px'
-    el.style.paddingTop = '0'
-    el.style.paddingBottom = '0'
-    el.style.borderBottomWidth = '0'
-    el.style.opacity = '0'
-    el.addEventListener('transitionend', () => done(), { once: true })
+    collapseItemToZero(el)
+    finishOnTransitionEnd(el, done, clearItemInline)
   },
   onLeaveCancelled(el) {
     clearItemInline(el)
+  },
+}
+
+/**
+ * 单元素 v-if 的收合过渡钩子（配合 <Transition :css="false"> 使用）。
+ * 用于提示条、错误框这类整块出现/消失的内容：高度/padding/margin/边框
+ * 与透明度同步收放，块留文档流内，上下内容随高度平滑移动——不硬插、不硬撤。
+ * 与 heightListItemHooks 的差别：列表条目只收 border-bottom，这里上下左右
+ * 的 border 与 margin 全收（提示条通常四周都有边框与外边距）。
+ */
+function clearBoxInline(el) {
+  el.style.cssText = ''
+}
+
+const BOX_TRANSITION = `height var(--duration-base) var(--ease),
+    padding var(--duration-base) var(--ease),
+    margin var(--duration-base) var(--ease),
+    border-width var(--duration-base) var(--ease),
+    opacity var(--duration-base) var(--ease)`
+
+function collapseBoxToZero(el) {
+  el.style.height = '0px'
+  el.style.paddingTop = '0'
+  el.style.paddingBottom = '0'
+  el.style.marginTop = '0'
+  el.style.marginBottom = '0'
+  el.style.borderTopWidth = '0'
+  el.style.borderBottomWidth = '0'
+  el.style.opacity = '0'
+  el.style.overflow = 'hidden'
+}
+
+export const collapseHooks = {
+  onBeforeEnter(el) {
+    collapseBoxToZero(el)
+  },
+  onEnter(el, done) {
+    el.style.cssText = ''
+    const h = el.offsetHeight
+    collapseBoxToZero(el)
+    void el.offsetHeight // 强制 reflow，确立过渡起点
+    el.style.transition = BOX_TRANSITION
+    el.style.height = `${h}px`
+    el.style.paddingTop = ''
+    el.style.paddingBottom = ''
+    el.style.marginTop = ''
+    el.style.marginBottom = ''
+    el.style.borderTopWidth = ''
+    el.style.borderBottomWidth = ''
+    el.style.opacity = '1'
+    finishOnTransitionEnd(el, done, clearBoxInline)
+  },
+  onEnterCancelled(el) {
+    clearBoxInline(el)
+  },
+  onLeave(el, done) {
+    el.style.height = `${el.offsetHeight}px`
+    el.style.overflow = 'hidden'
+    void el.offsetHeight // 强制 reflow，确立过渡起点
+    el.style.transition = BOX_TRANSITION
+    collapseBoxToZero(el)
+    finishOnTransitionEnd(el, done, clearBoxInline)
+  },
+  onLeaveCancelled(el) {
+    clearBoxInline(el)
   },
 }

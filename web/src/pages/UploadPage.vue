@@ -12,7 +12,7 @@ import { taskStatus, processStatus, formatTime, formatDuration } from '../api/fo
 import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '../api/labels.js'
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
 import { needsReview } from '../utils/needsReview.js'
-import { heightListItemHooks } from '../utils/animateHeight.js'
+import { heightListItemHooks, collapseHooks } from '../utils/animateHeight.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -103,10 +103,26 @@ function fileKey(f) {
 async function scanOne(file) {
   const result = await detectPdfTextLayer(file)
   const key = fileKey(file)
+  // 检测是异步的，出结果时文件可能已被用户移除——不回写已移除文件的警告
+  if (!files.value.some((f) => fileKey(f) === key)) return
   const next = new Set(scanWarnings.value)
   if (result === 'no-text') next.add(key)
   else next.delete(key)
   scanWarnings.value = next
+}
+
+/**
+ * 调度预检测：等条目进入动画结束、浏览器空闲时再跑。
+ * 检测要读文件并解压内容流（已在 pdfTextLayer 里限制只扫前 4MB），
+ * 若与动画同帧抢主线程，添加文件的补间会掉帧。
+ */
+function scheduleScan(file) {
+  const run = () => scanOne(file)
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(run, { timeout: 900 })
+  } else {
+    setTimeout(run, 350)
+  }
 }
 
 function addFiles(list) {
@@ -139,7 +155,7 @@ function addFiles(list) {
   // 只对 PDF 做文本层预检测，图片（本来就没有文本层）不检测。
   // 异步后台跑，不阻塞文件进入列表；检测失败在 detectPdfTextLayer 内部降级为 unknown。
   for (const f of fresh) {
-    if (isPdf(f)) scanOne(f)
+    if (isPdf(f)) scheduleScan(f)
   }
 }
 
@@ -382,14 +398,17 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
         删中间项时按下标做 key 会让后续条目全部重键、补位动画失效）。
         进入/离开走 JS 精确高度钩子（utils/animateHeight.js 的 heightListItemHooks，
         :css="false"）：条目留在文档流内，高度/padding/边框与透明度同步收放，
-        栏位与文字一体，兄弟行随高度变化自然移动；
-        appear 让列表从空到有的首次出现也有进入动画。
+        栏位与文字一体，兄弟行随高度变化自然移动。
+        容器常驻挂载（不用 v-if）：v-if 会在删到最后一项时把 ul 直接移除，
+        条目离场钩子不执行、只剩窗口 resize；空态用 .file-list--empty 把
+        边框与 margin 一并过渡，首尾项的增删与中间项同样连贯。
+        不加 appear：切页重挂载时已有文件不应重播进入动画（appear 的语义
+        就是每次挂载都播），条目插入本身就会触发进入钩子。
       -->
       <TransitionGroup
-        v-if="files.length"
         tag="ul"
         class="file-list"
-        appear
+        :class="{ 'file-list--empty': !files.length }"
         :css="false"
         v-bind="heightListItemHooks"
       >
@@ -423,23 +442,29 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
         </label>
       </div>
 
-      <NoticeBar
-        v-if="localErrors.length"
-        tone="warn"
-        title="请先处理以下问题"
-      >
-        <ul class="notice-list">
-          <li v-for="(e, i) in localErrors" :key="i">{{ e }}</li>
-        </ul>
-      </NoticeBar>
+      <!-- 校验错误与扫描警告：整块出现/消失走 collapse 收合动画，
+           不硬插硬撤（与文件列表同一套收放语义，见 utils/animateHeight.js） -->
+      <Transition :css="false" v-bind="collapseHooks">
+        <NoticeBar
+          v-if="localErrors.length"
+          tone="warn"
+          title="请先处理以下问题"
+        >
+          <ul class="notice-list">
+            <li v-for="(e, i) in localErrors" :key="i">{{ e }}</li>
+          </ul>
+        </NoticeBar>
+      </Transition>
 
       <!-- 扫描件预检测警告：只提示，不影响 canSubmit，用户仍可提交 -->
-      <NoticeBar
-        v-if="scanWarnCount"
-        tone="warn"
-        :title="SCAN_WARNING.title"
-        :detail="SCAN_WARNING.detail(scanWarnCount)"
-      />
+      <Transition :css="false" v-bind="collapseHooks">
+        <NoticeBar
+          v-if="scanWarnCount"
+          tone="warn"
+          :title="SCAN_WARNING.title"
+          :detail="SCAN_WARNING.detail(scanWarnCount)"
+        />
+      </Transition>
 
       <div class="actions">
         <button class="btn primary" :disabled="!canSubmit" @click="submit">

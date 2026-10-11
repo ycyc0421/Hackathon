@@ -382,6 +382,18 @@ body {
   list-style: none;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  /* 容器常驻挂载（见 UploadPage 注释）：空态收起边框与 margin，且全程过渡——
+     首个文件进入 / 最后一个文件离开时容器与条目动画同步，不突兀 */
+  transition:
+    margin-top var(--duration-base) var(--ease),
+    border-width var(--duration-base) var(--ease),
+    border-color var(--duration-base) var(--ease);
+}
+
+.file-list--empty {
+  margin-top: 0;
+  border-width: 0;
+  border-color: transparent;
 }
 
 .file-item {
@@ -1161,14 +1173,9 @@ textarea {
 }
 
 .compare-col.divergent .compare-value {
+  /* 直接落位红色：曾用 keyframes 从正文色渐变到 danger 做「读入」强调，
+     但在表格↔对照切换里表现为先黑后红的跳变，像渲染故障，已去除 */
   color: var(--danger);
-  animation: divergent-read-in var(--duration-slow) var(--ease);
-}
-
-@keyframes divergent-read-in {
-  from {
-    color: var(--text-body);
-  }
 }
 
 .compare-file {
@@ -1300,10 +1307,12 @@ textarea {
 }
 
 .stat-row {
-  display: flex;
+  /* 等分拉满整行：flex + 固定 min-width 会在右侧留下不均匀的空白，
+     卡片越宽越明显；grid auto-fit 让方块数随宽度增减且始终铺满 */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: var(--space-3);
   margin-top: var(--space-4);
-  flex-wrap: wrap;
 }
 
 /* 每个统计数字一张小卡：需要处理的数字在零值时收敛、非零时突出 */
@@ -1657,11 +1666,9 @@ textarea {
 /* ---------- 评测页表格 ---------- */
 
 .metric-table {
-  /* 只有 4 列短内容，100% 拉满在宽卡片里太散；按内容收敛并设上限，
-     宽度不够时（窄卡片）再回落到可用宽度 */
-  width: auto;
-  min-width: 50%;
-  max-width: 100%;
+  /* 与全站表格一致拉满卡片：曾用 width:auto + min-width:50% 收敛，
+     结果在宽卡片里指标表只占半宽、与全宽的错误分类列表尺寸不一致 */
+  width: 100%;
   margin-top: var(--space-3);
   border-collapse: collapse;
   font-size: var(--text-sm);
