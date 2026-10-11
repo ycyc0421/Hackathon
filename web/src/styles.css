@@ -230,6 +230,8 @@ body {
   border: 1px solid;
   border-radius: var(--radius-sm);
   font-size: var(--text-sm);
+  /* 出现时渐现，与骨架屏/空状态的出现节奏一致 */
+  animation: fade-in var(--duration-base) var(--ease);
 }
 
 .notice + .notice {
@@ -813,12 +815,42 @@ select {
   font-family: inherit;
   font-size: 13px;
   cursor: pointer;
+  transition: background var(--duration-fast) var(--ease),
+              color var(--duration-fast) var(--ease),
+              border-color var(--duration-fast) var(--ease);
+}
+
+.chip:hover:not(.active) {
+  background: var(--gray-100);
+  border-color: var(--border-hover);
+  color: var(--text-body);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .chip.active {
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: #fff;
+}
+
+/* 筛选切换时列表整体淡出淡入，避免条目瞬间重排的生硬感 */
+.list-swap-enter-active,
+.list-swap-leave-active {
+  transition: opacity var(--duration-fast) var(--ease),
+              transform var(--duration-fast) var(--ease);
+}
+
+.list-swap-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.list-swap-leave-to {
+  opacity: 0;
 }
 
 .chip-num {
@@ -1180,6 +1212,7 @@ select {
   align-items: center;
   text-align: center;
   padding: var(--space-10) var(--space-6);
+  animation: fade-in var(--duration-base) var(--ease);
 }
 
 /* 图标用圆形浅底托住，按语气着色，比裸 emoji 更精致 */

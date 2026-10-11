@@ -185,7 +185,9 @@ onMounted(async () => {
   await nextTick()
   const el = document.getElementById(targetId)
   if (!el) return
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  // 平滑滚动同样尊重 prefers-reduced-motion（CSS 媒体查询管不到 JS 滚动）
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' })
   el.classList.add('cmp-highlight')
   setTimeout(() => el.classList.remove('cmp-highlight'), 1600)
 })
@@ -250,6 +252,9 @@ onMounted(async () => {
           「未校验」指当前规则集未覆盖该字段，并非表示没有问题。
         </p>
 
+        <!-- 筛选切换时整块内容淡出淡入；:key="filter" 驱动 Transition -->
+        <Transition name="list-swap" mode="out-in">
+        <div :key="filter" class="cmp-filtered">
         <template v-if="visible.length">
           <div v-for="g in groups" :key="g.key" class="cmp-group">
             <h3 v-if="showGroupTitle" class="cmp-group-title">
@@ -341,6 +346,8 @@ onMounted(async () => {
           title="当前筛选下没有条目"
           detail="切到「全部」可查看一致字段。"
         />
+        </div>
+        </Transition>
       </section>
 
       <section v-else class="card">
