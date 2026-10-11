@@ -135,8 +135,10 @@ function viewOf(c) {
 }
 
 /**
- * 切换视图时做高度平滑过渡：记录切换前容器高度，切换后从旧高度
- * 动画到内容的新高度，配合交叉淡入淡出，避免高度突变。
+ * 切换视图时做高度平滑过渡：旧内容直接移除、新内容快速淡入（--duration-fast，
+ * 见 .cmp-swap 样式），容器高度由这里的 JS 从旧高度动画到新高度。
+ * 不做离场动画、不用 absolute 定位——crossfade 会让父容器高度在过渡中途
+ * 坍缩，与高度动画打架，表现为整列抖动。宁可简单稳定。
  * prefers-reduced-motion 下全局 CSS 已把过渡时长压到 0，这里的 JS 自然退化为瞬时。
  */
 async function setView(c, mode, ev) {
@@ -148,11 +150,21 @@ async function setView(c, mode, ev) {
   body.style.height = `${fromH}px`
   body.style.overflow = 'hidden'
   await nextTick()
-  const toH = body.scrollHeight
+  // 测新内容高度：overflow:hidden 让容器成为 BFC，子元素的 margin-top 不再
+  // 折叠，测出的高度会比最终态多出一个 margin。直接还原到最终态量真实高度，
+  // 再设回起点；测量与还原在同一帧内同步完成，不会上屏。
+  body.style.cssText = ''
+  const toH = body.offsetHeight
+  body.style.height = `${fromH}px`
+  body.style.overflow = 'hidden'
+  if (toH === fromH) {
+    // 高度不变不会有 transitionend，直接还原，避免内联样式残留
+    body.style.cssText = ''
+    return
+  }
   body.style.transition = `height var(--duration-base) var(--ease)`
-  requestAnimationFrame(() => {
-    body.style.height = `${toH}px`
-  })
+  void body.offsetHeight // 强制 reflow，确立过渡起点
+  body.style.height = `${toH}px`
   body.addEventListener(
     'transitionend',
     () => {
@@ -264,11 +276,8 @@ onMounted(async () => {
               <li v-for="c in g.list" :id="`cmp-${c.comparison_id}`" :key="c.comparison_id" class="cmp-item">
                 <div class="cmp-head">
                   <div class="cmp-title">
-                    <span class="cmp-label">{{ c.label }}</span>
-                    <span class="cmp-key">{{ c.field_key }}</span>
-                  </div>
-                  <div class="cmp-head-side">
-                    <!-- 表格与并排对照是平级的两种视图，用分段控件切换，而非展开/收起 -->
+                    <!-- 表格与并排对照是平级的两种视图，用分段控件切换，而非展开/收起。
+                         控件放最左：视线顺序是 切换方式 → 字段 → 徽章 -->
                     <div class="view-switch" role="group" aria-label="查看方式">
                       <button
                         type="button"
@@ -281,10 +290,12 @@ onMounted(async () => {
                         @click="setView(c, 'compare', $event)"
                       >对照</button>
                     </div>
-                    <div class="cmp-badges">
-                      <StatusBadge :status="severityOf(c.severity)" />
-                      <StatusBadge :status="comparisonStatus(c.status)" />
-                    </div>
+                    <span class="cmp-label">{{ c.label }}</span>
+                    <span class="cmp-key">{{ c.field_key }}</span>
+                  </div>
+                  <div class="cmp-badges">
+                    <StatusBadge :status="severityOf(c.severity)" />
+                    <StatusBadge :status="comparisonStatus(c.status)" />
                   </div>
                 </div>
 
@@ -292,8 +303,7 @@ onMounted(async () => {
 
                 <!--
                   表格与并排对照面板互为切换：同一信息的两种排布，不同时出现。
-                  交叉淡入淡出（离场内容脱离文档流，由入场内容撑开高度），
-                  容器高度由 setView 里的 JS 平滑过渡，避免突变。
+                  旧内容直接消失，新内容快速淡入；容器高度由 setView 的 JS 平滑过渡。
                 -->
                 <div class="cmp-view-body">
                   <Transition name="cmp-swap">
