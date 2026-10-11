@@ -97,12 +97,20 @@ provide('pendingAnchor', pendingAnchor)
 provide('navigate', { go })
 
 /**
- * 报告 ↔ 差异 的滚动位置记忆：两页都长、互跳频繁，切回时从头看起
- * 会丢失阅读上下文。切页前记录离开页的 scrollY，切回时在重挂载后恢复。
- * 其他页面之间不恢复（内容短，从头看成本低）。
- * 带锚点跳转（报告条目 → 差异页对应卡片）时不恢复，锚点滚动优先。
+ * 差异页跨页状态提升到 App 层：筛选与每张卡片的 表格/对照 选择
+ * 在切页返回时保留——页面内容（task）还在，查看进度却丢了，层级不一致。
+ * 与 uploadFiles 同一模式；views 保持 new Map 整体赋值的响应式写法。
  */
-const SCROLL_MEMO_PAGES = new Set(['diff', 'report'])
+const diffFilter = ref('problems')
+const diffViews = ref(new Map())
+provide('diffFilter', diffFilter)
+provide('diffViews', diffViews)
+
+/**
+ * 每页滚动位置记忆（通用）：任何页面离开时记录 scrollY，返回时该页有记录
+ * 就恢复，不限来源页；无记录的页归零。带锚点跳转（报告条目 → 差异页
+ * 对应卡片）时不恢复，锚点滚动优先。
+ */
 const scrollMemo = new Map()
 /** 切页过渡结束后待恢复的滚动位置（out-in：新页挂载晚于 active 变化一个离场过渡） */
 let pendingScrollRestore = null
@@ -110,7 +118,6 @@ let pendingScrollRestore = null
 watch(active, (to, from) => {
   scrollMemo.set(from, window.scrollY)
   pendingScrollRestore = null
-  if (!SCROLL_MEMO_PAGES.has(to) || !SCROLL_MEMO_PAGES.has(from)) return
   if (pendingAnchor.value) return // 锚点跳转由 DiffPage 挂载时滚动，不恢复
   const y = scrollMemo.get(to)
   if (y != null) pendingScrollRestore = y
@@ -122,7 +129,7 @@ watch(active, (to, from) => {
  * 约 200ms 再硬跳，肉眼可见。
  * out-in 下旧页已离场，新页内容在插入时即完成渲染，文档高度就是新页
  * 高度，此时 scrollTo 不会被钳位。
- * 报告 ↔ 差异之外没有记忆位置的切页，同一时刻归零，不残留上一页的滚动。
+ * 没有记忆位置的页面，同一时刻归零，不残留上一页的滚动。
  * 锚点跳转（报告条目 → 差异页卡片）不在这里滚动，由 DiffPage 挂载时定位。
  */
 function onPageEnter() {

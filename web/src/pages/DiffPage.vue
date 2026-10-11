@@ -35,7 +35,8 @@ const VIEW_OPTIONS = [
 const task = inject('task')
 const isRunning = inject('isRunning')
 
-const filter = ref('problems') // all | problems | conflicts | unchecked
+/** all | problems | conflicts | unchecked。状态由 App 层持有，切页返回时保留 */
+const filter = inject('diffFilter')
 
 const comparisons = computed(() => task.value?.comparisons ?? [])
 
@@ -140,9 +141,10 @@ const docCount = computed(() => task.value?.documents?.length ?? 0)
 /**
  * 每张比对卡片的当前视图：'table'（四行表格，默认）| 'compare'（并排对照）。
  * 两者是同一信息的两种排布、互为切换，不是概要/详情的展开关系，
- * 因此用分段控件切换而不是展开箭头。状态不持久化，切页重挂载后回到表格视图。
+ * 因此用分段控件切换而不是展开箭头。状态由 App 层持有（new Map 整体
+ * 赋值保持响应式），切页返回时各卡片的选择保留。
  */
-const views = ref(new Map())
+const views = inject('diffViews')
 
 function viewOf(c) {
   return views.value.get(c.comparison_id) ?? 'table'
