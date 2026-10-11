@@ -468,6 +468,12 @@ def build_item_comparisons(
                     rule_id = "CROSS_CHECK_001"
                     if fuzzy:
                         note = "归一后一致，但原始写法不同。"
+                    if key == "description" and any(
+                        f["status"] == "LOW_CONFIDENCE" and f.get("raw_text")
+                        for _, f in usable
+                    ):
+                        severity = "WARNING"
+                        note = "OCR 品名经自动校正后与其他单证一致，原识别读数见来源值；请核对原件。"
             elif len(usable) == 1:
                 if len(rows) <= 1:
                     # 这一项只有一份文件按行提供（如装箱单本来就没有 HS 列）——

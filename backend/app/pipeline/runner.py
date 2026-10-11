@@ -26,6 +26,20 @@ from .rows import parse_line_items
 log = logging.getLogger("backend.pipeline")
 
 
+def _apply_ocr_corrections(line_items: list[dict], corrections: list[dict[str, str]]) -> None:
+    """Keep the uncorrected OCR reading as evidence; compare the corrected candidate cautiously."""
+    for correction in corrections:
+        for line in line_items:
+            code = next((field.get("raw_value") for field in line["fields"] if field["field_key"] == "item_code"), None)
+            if code != correction["item_code"]:
+                continue
+            for field in line["fields"]:
+                if field["field_key"] == "description" and field["raw_value"] == correction["corrected"]:
+                    field["raw_text"] = correction["original"]
+                    field["raw_value"] = correction["original"]
+                    field["status"] = "LOW_CONFIDENCE"
+
+
 def run_check(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
     """在后台线程里跑完一票货的全部处理。"""
     try:
@@ -138,9 +152,11 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
         line_items = table.line_items
 
         if result.ocr_corrections:
+            _apply_ocr_corrections(line_items, result.ocr_corrections)
+            changes = [f"{c['item_code']}: {c['original']} → {c['corrected']}" for c in result.ocr_corrections]
             errors.append({
                 "code": "OCR_AUTO_CORRECTED",
-                "message": f"{filename} 的 OCR 数字/字母混淆已按单位格式和另一识别结果校正：{'；'.join(result.ocr_corrections)}。请核对原件。",
+                "message": f"{filename} 的 OCR 数字/字母混淆已按单位格式和另一识别结果校正：{'；'.join(changes)}。原识别值保留在字段证据中，请核对原件。",
                 "level": "WARNING",
                 "file_ids": [file_id],
             })

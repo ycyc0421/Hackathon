@@ -48,7 +48,7 @@ class ReadResult:
     error_message: str | None = None
     failed: bool = False
     uncertain_item_codes: list[str] = field(default_factory=list)
-    ocr_corrections: list[str] = field(default_factory=list)
+    ocr_corrections: list[dict[str, str]] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -164,7 +164,7 @@ def _read_pdf(data: bytes) -> ReadResult:
                 return ReadResult(page_count=page_count, error_message="PaddleOCR 处理扫描页需要 pymupdf", failed=True)
             from .paddle_reader import read_image as paddle_read_image
             uncertain_codes: list[str] = []
-            corrections: list[str] = []
+            corrections: list[dict[str, str]] = []
             for index in unreadable_pages:
                 recognized = paddle_read_image(images[index - 1][1])
                 if not recognized.ok:
@@ -194,7 +194,7 @@ def _read_pdf(data: bytes) -> ReadResult:
         from .paddle_reader import read_image as paddle_read_image
         chunks = []
         uncertain_codes: list[str] = []
-        corrections: list[str] = []
+        corrections: list[dict[str, str]] = []
         for index, (_, image) in enumerate(images, start=1):
             recognized = paddle_read_image(image)
             if not recognized.ok:

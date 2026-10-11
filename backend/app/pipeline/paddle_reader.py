@@ -126,7 +126,7 @@ def _correct_zero_confusion(value: str) -> str:
     )
 
 
-def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[list[str], list[str], list[str]]:
+def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[list[str], list[str], list[dict[str, str]]]:
     """Cross-check two OCR paths; resolve only unambiguous zero/O unit tokens."""
     header = table_lines[0].split("   ")
     code_at = next((i for i, h in enumerate(header) if re.fullmatch(r"ITEM\s*NO\.?", h, re.I)), None)
@@ -134,7 +134,7 @@ def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[l
     if code_at is None or desc_at is None:
         return table_lines, [], []
     uncertain: list[str] = []
-    corrections: list[str] = []
+    corrections: list[dict[str, str]] = []
     out = [table_lines[0]]
     for row in table_lines[1:]:
         cells = row.split("   ")
@@ -150,9 +150,9 @@ def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[l
                 valid_measure = r"(?<![A-Z0-9])\d+(?:\.\d+)?(?:ML|KG|CM|MM|G|L)(?![A-Z0-9])"
                 if re.search(valid_measure, ordinary.upper()) and compact(_correct_zero_confusion(structured)) == compact(ordinary):
                     cells[desc_at] = ordinary
-                    corrections.append(f"{code}: {structured} → {ordinary}")
+                    corrections.append({"item_code": code, "original": structured, "corrected": ordinary})
                 elif re.search(valid_measure, structured.upper()) and compact(_correct_zero_confusion(ordinary)) == compact(structured):
-                    corrections.append(f"{code}: {ordinary} → {structured}")
+                    corrections.append({"item_code": code, "original": ordinary, "corrected": structured})
                 else:
                     uncertain.append(code)
             else:
@@ -194,7 +194,7 @@ def read_image(data: bytes) -> ReadResult:
                 raise ValueError("OCR 未返回单页结果")
             lines = [str(x).strip() for x in results[0].json["res"]["rec_texts"] if str(x).strip()]
             uncertain: list[str] = []
-            corrections: list[str] = []
+            corrections: list[dict[str, str]] = []
             if _needs_table(lines):
                 structure = list(_get_structure().predict(input=image))
                 if len(structure) != 1:
