@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { isMock, listMockScenarios, setMockScenario } from './api/index.js'
+import { isMock, listMockScenarios, setMockScenario, getEvaluation } from './api/index.js'
 import { setMock } from './api/config.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import UploadPage from './pages/UploadPage.vue'
@@ -95,6 +95,20 @@ const evaluation = ref(null)
 const evaluationLoaded = ref(false)
 provide('evaluation', evaluation)
 provide('evaluationLoaded', evaluationLoaded)
+
+/**
+ * 评测数据静默预取：App 挂载时就发起请求，用户切到评测页时缓存已就绪，
+ * 不再出现骨架屏 → 内容的二次替换闪烁。不阻塞渲染；失败静默——
+ * evaluationLoaded 保持 false，EvalPage 进入时会自行请求并展示错误态。
+ */
+onMounted(async () => {
+  try {
+    evaluation.value = await getEvaluation()
+    evaluationLoaded.value = true
+  } catch {
+    /* 静默：错误态由 EvalPage 自己处理 */
+  }
+})
 
 /** 差异页有问题可看时才点亮，给用户一个"该去哪看"的提示 */
 const problemCount = computed(() => {
