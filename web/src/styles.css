@@ -978,54 +978,79 @@ select {
   font-style: italic;
 }
 
-/* ---------- 并排对照展开面板（ComparePane）---------- */
+/* ---------- 并排对照视图切换（ComparePane）---------- */
 
-/* 卡片头部整行可点：展开/收起并排对照 */
-.cmp-head-toggle {
+/* 卡片头部右侧：视图切换 + 状态徽章 */
+.cmp-head-side {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* 分段控件：表格与并排对照是平级的两种视图，切换而非展开 */
+.view-switch {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--gray-50);
+}
+
+.view-switch button {
+  border: none;
+  background: transparent;
+  padding: 2px var(--space-3);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
   cursor: pointer;
-  user-select: none;
-  border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-2);
-  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2));
-  transition: background var(--duration-fast) var(--ease);
+  transition: background var(--duration-fast) var(--ease),
+              color var(--duration-fast) var(--ease),
+              box-shadow var(--duration-fast) var(--ease);
 }
 
-/* 整行可点需要能被感知到：悬停给底色 + 提示展开的箭头颜色加深 */
-.cmp-head-toggle:hover {
-  background: var(--gray-100);
-}
-
-.cmp-head-toggle:hover .cmp-chevron {
+.view-switch button:hover:not([aria-pressed="true"]) {
   color: var(--text-body);
 }
 
-.cmp-head-toggle:focus-visible {
+.view-switch button[aria-pressed="true"] {
+  background: var(--surface-raised);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.view-switch button:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-.cmp-chevron {
-  display: inline-block;
-  font-size: var(--text-xs);
-  color: var(--text-muted);
-  transition: transform var(--duration-fast) var(--ease);
-}
-
-.cmp-chevron.open {
-  transform: rotate(90deg);
-}
-
-/* 收起态表格里与多数派不同的值：不展开也能定位到「哪份文件不一样」 */
+/* 收起态表格里与多数派不同的值：切到对照视图前也能定位「哪份文件不一样」 */
 .cell-value.divergent {
   color: var(--danger);
   font-weight: 600;
 }
 
-/* 展开/收起时表格与并排面板原位互换：淡出 + 淡入，高度变化不抢戏 */
+/* 视图互换的容器：高度由 DiffPage.setView 的 JS 平滑过渡 */
+.cmp-view-body {
+  position: relative;
+}
+
+/* 表格与并排面板交叉淡入淡出：离场内容脱离文档流，由入场内容撑开高度 */
 .cmp-swap-enter-active,
 .cmp-swap-leave-active {
   transition: opacity var(--duration-base) var(--ease),
               transform var(--duration-base) var(--ease);
+}
+
+.cmp-swap-leave-active {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
 }
 
 .cmp-swap-enter-from {

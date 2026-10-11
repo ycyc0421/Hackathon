@@ -124,20 +124,42 @@ function rawEvidence(c, v) {
 const severityOf = severity
 
 /**
- * 并排对照面板的展开状态，key 为 comparison_id，可同时展开多张卡片。
- * 用 Set 的替换赋值触发更新；展开状态不持久化，切页重挂载后收起，与锚点跳转互不干扰。
+ * 每张比对卡片的当前视图：'table'（四行表格，默认）| 'compare'（并排对照）。
+ * 两者是同一信息的两种排布、互为切换，不是概要/详情的展开关系，
+ * 因此用分段控件切换而不是展开箭头。状态不持久化，切页重挂载后回到表格视图。
  */
-const expanded = ref(new Set())
+const views = ref(new Map())
 
-function toggleExpand(c) {
-  const next = new Set(expanded.value)
-  if (next.has(c.comparison_id)) next.delete(c.comparison_id)
-  else next.add(c.comparison_id)
-  expanded.value = next
+function viewOf(c) {
+  return views.value.get(c.comparison_id) ?? 'table'
 }
 
-function isExpanded(c) {
-  return expanded.value.has(c.comparison_id)
+/**
+ * 切换视图时做高度平滑过渡：记录切换前容器高度，切换后从旧高度
+ * 动画到内容的新高度，配合交叉淡入淡出，避免高度突变。
+ * prefers-reduced-motion 下全局 CSS 已把过渡时长压到 0，这里的 JS 自然退化为瞬时。
+ */
+async function setView(c, mode, ev) {
+  if (mode === viewOf(c)) return
+  const body = ev?.currentTarget?.closest('.cmp-item')?.querySelector('.cmp-view-body')
+  views.value = new Map(views.value).set(c.comparison_id, mode)
+  if (!body) return
+  const fromH = body.offsetHeight
+  body.style.height = `${fromH}px`
+  body.style.overflow = 'hidden'
+  await nextTick()
+  const toH = body.scrollHeight
+  body.style.transition = `height var(--duration-base) var(--ease)`
+  requestAnimationFrame(() => {
+    body.style.height = `${toH}px`
+  })
+  body.addEventListener(
+    'transitionend',
+    () => {
+      body.style.cssText = ''
+    },
+    { once: true }
+  )
 }
 
 /**
@@ -235,36 +257,42 @@ onMounted(async () => {
             </h3>
             <ul class="cmp-list">
               <li v-for="c in g.list" :id="`cmp-${c.comparison_id}`" :key="c.comparison_id" class="cmp-item">
-                <div
-                  class="cmp-head cmp-head-toggle"
-                  role="button"
-                  tabindex="0"
-                  :aria-expanded="isExpanded(c)"
-                  :title="isExpanded(c) ? '收起并排对照' : '展开并排对照'"
-                  @click="toggleExpand(c)"
-                  @keydown.enter.prevent="toggleExpand(c)"
-                  @keydown.space.prevent="toggleExpand(c)"
-                >
+                <div class="cmp-head">
                   <div class="cmp-title">
-                    <span class="cmp-chevron" :class="{ open: isExpanded(c) }" aria-hidden="true">▶</span>
                     <span class="cmp-label">{{ c.label }}</span>
                     <span class="cmp-key">{{ c.field_key }}</span>
                   </div>
-                  <div class="cmp-badges">
-                    <StatusBadge :status="severityOf(c.severity)" />
-                    <StatusBadge :status="comparisonStatus(c.status)" />
+                  <div class="cmp-head-side">
+                    <!-- 表格与并排对照是平级的两种视图，用分段控件切换，而非展开/收起 -->
+                    <div class="view-switch" role="group" aria-label="查看方式">
+                      <button
+                        type="button"
+                        :aria-pressed="viewOf(c) === 'table'"
+                        @click="setView(c, 'table', $event)"
+                      >表格</button>
+                      <button
+                        type="button"
+                        :aria-pressed="viewOf(c) === 'compare'"
+                        @click="setView(c, 'compare', $event)"
+                      >对照</button>
+                    </div>
+                    <div class="cmp-badges">
+                      <StatusBadge :status="severityOf(c.severity)" />
+                      <StatusBadge :status="comparisonStatus(c.status)" />
+                    </div>
                   </div>
                 </div>
 
                 <p v-if="c.note" class="cmp-note">{{ c.note }}</p>
 
                 <!--
-                  展开后表格原位换成并排对照面板：面板回答「几份文件摆在一起差异在哪」，
-                  是表格内容的另一种排布而非新增信息，两者不同时出现。
-                  out-in 过渡让两者淡入淡出，不造成高度抖动。
+                  表格与并排对照面板互为切换：同一信息的两种排布，不同时出现。
+                  交叉淡入淡出（离场内容脱离文档流，由入场内容撑开高度），
+                  容器高度由 setView 里的 JS 平滑过渡，避免突变。
                 -->
-                <Transition name="cmp-swap" mode="out-in">
-                  <table v-if="!isExpanded(c)" key="table" class="cmp-table">
+                <div class="cmp-view-body">
+                  <Transition name="cmp-swap">
+                  <table v-if="viewOf(c) === 'table'" key="table" class="cmp-table">
                     <thead>
                       <tr>
                         <th>来源文件</th>
@@ -294,7 +322,8 @@ onMounted(async () => {
                   </table>
 
                   <ComparePane v-else key="pane" :comparison="c" :evidence-index="evidenceIndex" />
-                </Transition>
+                  </Transition>
+                </div>
 
                 <div v-if="c.rule_id" class="cmp-foot">依据规则 {{ c.rule_id }}</div>
                 <div v-else class="cmp-foot muted">未经规则校验</div>
