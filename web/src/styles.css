@@ -942,7 +942,6 @@ select {
 
 .cmp-table {
   width: 100%;
-  margin-top: var(--space-3);
   border-collapse: collapse;
   font-size: var(--text-sm);
 }
@@ -1069,10 +1068,16 @@ select {
 }
 
 /*
- * 视图互换：旧内容直接消失（无离场动画、不用 absolute），新内容快速淡入；
+ * 视图互换的容器：旧内容直接消失（无离场动画、不用 absolute），新内容快速淡入；
  * 容器高度由 DiffPage.setView 的 JS 平滑过渡。
  * crossfade + absolute 曾导致父容器高度中途坍缩、整列抖动，故不做。
+ * 上边距放在容器上而不是两种视图的根元素上：切换时容器会被临时设为
+ * overflow:hidden（成为 BFC），子元素 margin 的折叠行为若随切换改变，
+ * 会在切换瞬间产生一个 margin 高度的跳动。
  */
+.cmp-view-body {
+  margin-top: var(--space-3);
+}
 .cmp-swap-enter-active {
   transition: opacity var(--duration-fast) var(--ease);
 }
@@ -1090,10 +1095,6 @@ select {
 }
 
 /* 多于两份文件时列自动换行平铺，保持可读 */
-.compare-pane {
-  margin-top: var(--space-3);
-}
-
 .compare-cols {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

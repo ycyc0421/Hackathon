@@ -150,9 +150,9 @@ async function setView(c, mode, ev) {
   body.style.height = `${fromH}px`
   body.style.overflow = 'hidden'
   await nextTick()
-  // 测新内容高度：overflow:hidden 让容器成为 BFC，子元素的 margin-top 不再
-  // 折叠，测出的高度会比最终态多出一个 margin。直接还原到最终态量真实高度，
-  // 再设回起点；测量与还原在同一帧内同步完成，不会上屏。
+  // 测新内容高度：固定高度下 scrollHeight 不小于 clientHeight，内容更矮时
+  // 测不准。还原到最终态量真实高度再设回起点；测量与还原在同一帧内
+  // 同步完成，不会上屏。
   body.style.cssText = ''
   const toH = body.offsetHeight
   body.style.height = `${fromH}px`
