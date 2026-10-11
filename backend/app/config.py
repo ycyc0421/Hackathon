@@ -28,6 +28,9 @@ MAX_FILE_COUNT = int(os.getenv("MAX_FILE_COUNT", "10"))
 # PDF 文本层少于这么多字符时，视为「没有文本层」（很可能是扫描件），转走兜底通道
 MIN_TEXT_LAYER_CHARS = int(os.getenv("MIN_TEXT_LAYER_CHARS", "40"))
 
+# 本地 PaddleOCR 默认关闭；单独安装模型依赖并设置 1 后启用。
+PADDLE_OCR_ENABLED = os.getenv("PADDLE_OCR_ENABLED", "0") == "1"
+
 # ---- 任务形态 ------------------------------------------------------------
 # POST /api/v1/checks 之后，最多等待流水线完成 POST_WAIT_MS 毫秒：
 #   在时限内跑完 -> 直接返回 COMPLETED / PARTIAL，前端无需轮询也能拿到结果

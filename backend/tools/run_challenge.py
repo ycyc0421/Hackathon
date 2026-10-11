@@ -37,7 +37,7 @@ TERMINAL = {"COMPLETED", "PARTIAL", "FAILED"}
 WATCH_FIELD_STATUS = {"NORMALIZE_FAILED", "UNRECOGNIZED", "MISSING_IN_DOC", "LOW_CONFIDENCE"}
 
 
-def upload(client: TestClient, dir_name: str, cc: str, cname: str, suffixes: list[str]) -> dict:
+def upload(client: TestClient, dir_name: str, cc: str, cname: str, suffixes: list[str], wait_seconds: int = 90) -> dict:
     d = SAMPLES_DIR / dir_name
     files = []
     for p in sorted(d.iterdir()):
@@ -53,12 +53,12 @@ def upload(client: TestClient, dir_name: str, cc: str, cname: str, suffixes: lis
         raise SystemExit(f"POST 失败 {resp.status_code}: {resp.text[:300]}")
     task_id = resp.json()["task_id"]
 
-    for _ in range(120):
+    for _ in range(int(wait_seconds / 0.3)):
         task = client.get(f"/api/v1/checks/{task_id}").json()
         if task["status"] in TERMINAL:
             return task
         time.sleep(0.3)
-    raise SystemExit(f"{dir_name}: 90 秒内未出结果")
+    raise SystemExit(f"{dir_name}: {wait_seconds} 秒内未出结果")
 
 
 def report(task: dict, title: str) -> None:

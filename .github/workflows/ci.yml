@@ -31,6 +31,7 @@ jobs:
         run: |
           python backend/tools/test_compare.py
           python backend/tools/test_review_regressions.py
+          python backend/tools/test_paddle_adapter.py
 
       - name: 接口与金标
         run: |

@@ -137,6 +137,22 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
         )
         line_items = table.line_items
 
+        if result.uncertain_item_codes:
+            uncertain_codes = set(result.uncertain_item_codes)
+            for li in line_items:
+                code = next((f.get("raw_value") for f in li["fields"] if f["field_key"] == "item_code"), None)
+                if code in uncertain_codes:
+                    for f in li["fields"]:
+                        if f["field_key"] == "description":
+                            f["status"] = "NORMALIZE_FAILED"
+                            f["normalized_value"] = None
+            errors.append({
+                "code": "OCR_TEXT_DISAGREEMENT",
+                "message": f"{filename} 的商品品名在普通 OCR 与表格识别中不一致（货号：{', '.join(result.uncertain_item_codes)}），品名级比对待人工复核。",
+                "level": "WARNING",
+                "file_ids": [file_id],
+            })
+
         if table.suspected:
             row_unparsed = True
             # 列归属不可靠时整份文件的品名行不得参与比对；LOW_CONFIDENCE

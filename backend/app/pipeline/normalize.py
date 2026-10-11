@@ -220,6 +220,13 @@ DESCRIPTION_GLOSSARY = {
     "GREEN": "绿", "GLAZE": "釉",
 }
 
+_CHINESE_DESCRIPTION_TERMS = sorted(
+    {value for value in DESCRIPTION_GLOSSARY.values() if re.fullmatch(r"[\u4e00-\u9fff]+", value)},
+    key=len,
+    reverse=True,
+)
+_CHINESE_DESCRIPTION_RE = re.compile("|".join(map(re.escape, _CHINESE_DESCRIPTION_TERMS)))
+
 
 def normalize_description(raw: str | None) -> str | None:
     """把描述切成词，查词表翻译，去掉重复，保持原顺序拼回。
@@ -233,6 +240,10 @@ def normalize_description(raw: str | None) -> str | None:
     text = str(raw).strip()
     if not text:
         return None
+
+    # OCR 常会吞掉中文词之间的空格，例如「陶瓷餐具16PC蓝」。只切最小词表
+    # 中的已知词，其余未知中文仍保留原文，不凭空翻译。
+    text = _CHINESE_DESCRIPTION_RE.sub(lambda match: f" {match.group()} ", text)
 
     tokens: list[str] = []
     for tok in re.split(r"[^0-9A-Za-z\u4e00-\u9fff]+", text.upper()):

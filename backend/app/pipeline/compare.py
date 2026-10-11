@@ -431,6 +431,10 @@ def build_item_comparisons(
                 note = "本组各文件的行无法确定一一对应关系，未做比对。" + (
                     item.get("alignment_note") or ""
                 )
+            elif len(usable) < 2 and any(f["status"] == "NORMALIZE_FAILED" for _, f in rows):
+                status = "NOT_CHECKED"
+                severity = "WARNING"
+                note = "至少一份单证的该项无法可靠识别或归一，未做比对；请核对原件。"
             elif len(usable) >= 2:
                 money_verdict: str | None = None
                 if key in ("amount", "unit_price", "total_amount"):

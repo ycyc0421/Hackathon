@@ -100,8 +100,35 @@ backend/.venv/Scripts/python.exe backend/tools/run_challenge.py  # 09–11 挑�
 ## 能力边界
 
 - 文本层 PDF 已用上述合成样例验证；真实复杂版式的抽取准确率尚未评测。
-- 图片和无文本层 PDF 需要配置 OCR／多模态识别服务；未配置时显式返回解析失败。
+- 图片和无文本层 PDF 可选用本地 PaddleOCR。默认关闭，未配置识别通道时显式返回解析失败。
 - 目的国规则是未核实的演示规则，结果保留“演示规则·未经核实”标记，不能作为正式合规结论。
 - `confidence` 与 `bbox` 暂为 `null`；人工修正、报告导出和 EDI 解析尚未实现。
 - 任务结果落盘并可在重启后读取；处理中的任务重启恢复尚未实现。正式部署需接入持久任务队列或数据库。
 - `app/doc_profile.py` 的商业发票、装箱单、提单按已确认最小规则区分必需/可选；其他单证类型及更完整的适用字段表待数据侧确认。
+
+## 本地 PaddleOCR（可选）
+
+在独立 Python 3.12 环境，先按 PaddlePaddle 官方 CPU 渠道安装推理引擎，
+再安装 `requirements-ocr.txt`（PaddleOCR 3.7.0 文档解析组件与扫描 PDF 渲染依赖）：
+
+```powershell
+python -m pip install paddlepaddle==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
+python -m pip install -r backend/requirements-ocr.txt
+```
+
+启动后端前设置
+`PADDLE_OCR_ENABLED=1`。模型首次推理时下载到本机缓存，模型文件不提交仓库。
+文本层 PDF 仍直接读取；图片和扫描页使用 OCR。检测到商品明细表时，
+PP-StructureV3 提供行列结构，普通 OCR 提供正文原文。若表格结构、列数或
+页面识别不可靠，文件会显式解析失败。OCR 文字可能误识别，例如
+`350ML` → `35OML`，结果必须保留原文供人工核对。
+两套识别输出的品名不一致时，该项返回 `NOT_CHECKED` 并给
+`OCR_TEXT_DISAGREEMENT` 警告。
+
+```powershell
+$env:PADDLE_OCR_ENABLED = '1'
+python backend/tools/run_ocr_probe.py
+```
+
+该探针单独运行 09–11 的 PNG，不进入默认 CI；CI 仍只运行无需下载模型的
+文本层 PDF 与纯逻辑回归。
