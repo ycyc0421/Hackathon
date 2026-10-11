@@ -122,8 +122,9 @@ python -m pip install -r backend/requirements-ocr.txt
 PP-StructureV3 提供行列结构，普通 OCR 提供正文原文。若表格结构、列数或
 页面识别不可靠，文件会显式解析失败。OCR 文字可能误识别，例如
 `350ML` → `35OML`，结果必须保留原文供人工核对。
-两套识别输出的品名不一致时，该项返回 `NOT_CHECKED` 并给
-`OCR_TEXT_DISAGREEMENT` 警告。
+两套识别输出仅在数字 `0` 与字母 `O` 混淆、且一方符合明确的数字加单位
+格式时，才校正并给 `OCR_AUTO_CORRECTED` 警告；其他品名分歧仍返回
+`NOT_CHECKED` 和 `OCR_TEXT_DISAGREEMENT` 警告。
 
 ```powershell
 $env:PADDLE_OCR_ENABLED = '1'

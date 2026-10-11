@@ -48,6 +48,7 @@ class ReadResult:
     error_message: str | None = None
     failed: bool = False
     uncertain_item_codes: list[str] = field(default_factory=list)
+    ocr_corrections: list[str] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -163,13 +164,15 @@ def _read_pdf(data: bytes) -> ReadResult:
                 return ReadResult(page_count=page_count, error_message="PaddleOCR 处理扫描页需要 pymupdf", failed=True)
             from .paddle_reader import read_image as paddle_read_image
             uncertain_codes: list[str] = []
+            corrections: list[str] = []
             for index in unreadable_pages:
                 recognized = paddle_read_image(images[index - 1][1])
                 if not recognized.ok:
                     return ReadResult(page_count=page_count, error_message=f"PDF 第 {index} 页：{recognized.error_message}", failed=True)
                 chunks[index - 1] = recognized.text
                 uncertain_codes.extend(recognized.uncertain_item_codes)
-            return ReadResult(text="\n".join(chunks).strip(), page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes)
+                corrections.extend(recognized.ocr_corrections)
+            return ReadResult(text="\n".join(chunks).strip(), page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes, ocr_corrections=corrections)
         if llm_enabled():
             images = _pdf_pages_to_images(data)
             if images is not None:
@@ -191,13 +194,15 @@ def _read_pdf(data: bytes) -> ReadResult:
         from .paddle_reader import read_image as paddle_read_image
         chunks = []
         uncertain_codes: list[str] = []
+        corrections: list[str] = []
         for index, (_, image) in enumerate(images, start=1):
             recognized = paddle_read_image(image)
             if not recognized.ok:
                 return ReadResult(page_count=page_count, error_message=f"PDF 第 {index} 页：{recognized.error_message}", failed=True)
             chunks.append(recognized.text)
             uncertain_codes.extend(recognized.uncertain_item_codes)
-        return ReadResult(text="\n".join(chunks), page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes)
+            corrections.extend(recognized.ocr_corrections)
+        return ReadResult(text="\n".join(chunks), page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes, ocr_corrections=corrections)
 
     if not llm_enabled():
         return ReadResult(

@@ -137,6 +137,14 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
         )
         line_items = table.line_items
 
+        if result.ocr_corrections:
+            errors.append({
+                "code": "OCR_AUTO_CORRECTED",
+                "message": f"{filename} 的 OCR 数字/字母混淆已按单位格式和另一识别结果校正：{'；'.join(result.ocr_corrections)}。请核对原件。",
+                "level": "WARNING",
+                "file_ids": [file_id],
+            })
+
         if result.uncertain_item_codes:
             uncertain_codes = set(result.uncertain_item_codes)
             for li in line_items:

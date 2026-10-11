@@ -24,12 +24,19 @@ def main() -> None:
         pass
     else:
         raise AssertionError("Merged table cell was accepted")
-    merged, uncertain = _check_descriptions(rows, ["YT-M001", "陶瓷餐具 16PC 蓝"])
+    merged, uncertain, corrections = _check_descriptions(rows, ["YT-M001", "陶瓷餐具 16PC 蓝"])
     assert merged[1] == "1   YT-M001   陶瓷餐具 16PC 蓝   1800 PCS"
     assert uncertain == []
+    assert corrections == []
 
-    _, uncertain = _check_descriptions(rows, ["YT-M001", "CERAMIC TABLEWARE 16PC BLUE"])
+    _, uncertain, _ = _check_descriptions(rows, ["YT-M001", "CERAMIC TABLEWARE 16PC BLUE"])
     assert uncertain == ["YT-M001"]
+
+    typo = ["NO.   ITEM NO.   DESCRIPTION   QTY", "1   YT-M001   CERAMIC MUG 35OML WHITE   2400 PCS"]
+    corrected, uncertain, corrections = _check_descriptions(typo, ["YT-M001", "CERAMIC MUG 350ML WHITE"])
+    assert "350ML" in corrected[1] and uncertain == [] and len(corrections) == 1
+    _, uncertain, corrections = _check_descriptions(typo, ["YT-M001", "CERAMIC MUG 350ML BLUE"])
+    assert uncertain == ["YT-M001"] and corrections == []
 
     plain = ["NO.", "ITEM NO.", "DESCRIPTION", "QTY", "PACKAGES", "G.W.", "1", "YT-M001", "CERAMIC MUG 350ML WHITE", "2400 PCS", "30", "CTNS", "600.00", "TOTAL PACKAGES: 30 CTNS"]
     fallback = _sequential_packing_table(plain)

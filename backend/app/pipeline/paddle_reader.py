@@ -117,14 +117,24 @@ def _sequential_packing_table(lines: list[str]) -> list[str]:
     return rows
 
 
-def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[list[str], list[str]]:
-    """Keep OCR spacing; flag model disagreement instead of comparing guessed text."""
+def _correct_zero_confusion(value: str) -> str:
+    """Only replace O inside a digit-plus-unit token, e.g. 35OML -> 350ML."""
+    return re.sub(
+        r"(?<![A-Z0-9])(\d[0-9O]*)(ML|KG|CM|MM|G|L)(?![A-Z0-9])",
+        lambda match: match.group(1).replace("O", "0") + match.group(2),
+        value.upper(),
+    )
+
+
+def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[list[str], list[str], list[str]]:
+    """Cross-check two OCR paths; resolve only unambiguous zero/O unit tokens."""
     header = table_lines[0].split("   ")
     code_at = next((i for i, h in enumerate(header) if re.fullmatch(r"ITEM\s*NO\.?", h, re.I)), None)
     desc_at = next((i for i, h in enumerate(header) if h.upper() == "DESCRIPTION"), None)
     if code_at is None or desc_at is None:
-        return table_lines, []
+        return table_lines, [], []
     uncertain: list[str] = []
+    corrections: list[str] = []
     out = [table_lines[0]]
     for row in table_lines[1:]:
         cells = row.split("   ")
@@ -137,11 +147,18 @@ def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[l
             structured = cells[desc_at]
             compact = lambda value: re.sub(r"\s+", "", value).casefold()
             if compact(ordinary) != compact(structured):
-                uncertain.append(code)
+                valid_measure = r"(?<![A-Z0-9])\d+(?:\.\d+)?(?:ML|KG|CM|MM|G|L)(?![A-Z0-9])"
+                if re.search(valid_measure, ordinary.upper()) and compact(_correct_zero_confusion(structured)) == compact(ordinary):
+                    cells[desc_at] = ordinary
+                    corrections.append(f"{code}: {structured} → {ordinary}")
+                elif re.search(valid_measure, structured.upper()) and compact(_correct_zero_confusion(ordinary)) == compact(structured):
+                    corrections.append(f"{code}: {ordinary} → {structured}")
+                else:
+                    uncertain.append(code)
             else:
                 cells[desc_at] = ordinary
         out.append("   ".join(cells))
-    return out, uncertain
+    return out, uncertain, corrections
 
 
 def _get_ocr():
@@ -177,6 +194,7 @@ def read_image(data: bytes) -> ReadResult:
                 raise ValueError("OCR 未返回单页结果")
             lines = [str(x).strip() for x in results[0].json["res"]["rec_texts"] if str(x).strip()]
             uncertain: list[str] = []
+            corrections: list[str] = []
             if _needs_table(lines):
                 structure = list(_get_structure().predict(input=image))
                 if len(structure) != 1:
@@ -184,12 +202,12 @@ def read_image(data: bytes) -> ReadResult:
                 markdown = structure[0].markdown["markdown_texts"]
                 html = re.search(r"<table\b.*?</table>", markdown, re.I | re.S)
                 lines_text = _table_lines(html.group()) if html else _sequential_packing_table(lines)
-                lines_text, uncertain = _check_descriptions(lines_text, lines)
+                lines_text, uncertain, corrections = _check_descriptions(lines_text, lines)
                 text = _replace_table(lines, lines_text)
             else:
                 text = "\n".join(lines)
         if len(text.strip()) < MIN_TEXT_LAYER_CHARS:
             raise ValueError("OCR 返回文字过少")
-        return ReadResult(text=text, page_count=1, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain)
+        return ReadResult(text=text, page_count=1, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain, ocr_corrections=corrections)
     except Exception as exc:  # noqa: BLE001
         return ReadResult(error_message=f"PaddleOCR 识别失败：{exc}", page_count=1, failed=True)
