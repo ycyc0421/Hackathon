@@ -1607,3 +1607,18 @@ select {
   white-space: nowrap;
   cursor: help; /* title 属性里有完整说明，提示用户可以悬浮查看 */
 }
+
+/* ============================================================
+ * 报告页问题条目的商品归属标记（ReportPage issueScope）
+ * 多品名任务里，问题条目必须能区分属于哪个商品 / 整票字段
+ * ============================================================ */
+.issue-scope {
+  display: inline-block;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+}

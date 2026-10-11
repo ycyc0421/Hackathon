@@ -7,6 +7,7 @@
  */
 import { computed, inject } from 'vue'
 import { formatTime, formatDuration, riskType, severity, processStatus } from '../api/formatters.js'
+import { buildConclusion } from '../utils/reportConclusion.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -14,10 +15,16 @@ import EmptyState from '../components/EmptyState.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
+/** 轮询/请求失败信息。缓存 task 还在时不把它当完成报告，必须叠加提示 */
+const taskError = inject('taskError', null)
 /** 跨页导航：跳差异页对应条目。App 层提供 */
 const navigate = inject('navigate')
 
 const summary = computed(() => task.value?.summary ?? null)
+
+/** 终态：只有到达终态的任务才允许出现正向结论与成功式空状态 */
+const TERMINAL_STATUSES = ['COMPLETED', 'PARTIAL', 'FAILED']
+const isTerminal = computed(() => task.value && TERMINAL_STATUSES.includes(task.value.status))
 
 /** 需要处理的条目：不一致、部分缺失、未校验、无法比对 */
 const issues = computed(() => {
@@ -39,46 +46,72 @@ const ruledRisks = computed(() => (task.value?.risks ?? []).filter((r) => r.rule
 const suggestedRisks = computed(() => (task.value?.risks ?? []).filter((r) => !r.rule_id))
 
 /**
- * 「没有风险提示」正向空状态仅在有成功结果且确实零风险时显示。
- * FAILED 时不显示——任务失败与"没有风险"是两回事（AGENTS.md 降级原则）。
+ * 「没有风险提示」正向空状态仅在到达终态、无请求错误且确实零风险时显示。
+ * FAILED / 处理中 / 轮询失败都不算——任务失败与"没有风险"是两回事（AGENTS.md 降级原则）。
  */
 const showNoRisk = computed(
-  () => task.value && task.value.status !== 'FAILED' && (task.value.risks ?? []).length === 0
+  () =>
+    isTerminal.value &&
+    !taskError?.value &&
+    task.value.status !== 'FAILED' &&
+    (task.value.risks ?? []).length === 0
+)
+
+/** 「没有需要人工处理的条目」成功式空状态：仅终态成功且无请求错误时出现 */
+const showNoIssues = computed(
+  () =>
+    isTerminal.value &&
+    !taskError?.value &&
+    task.value.status !== 'FAILED' &&
+    issues.value.length === 0
 )
 
 const duration = computed(() =>
   task.value ? formatDuration(task.value.created_at, task.value.finished_at) : null
 )
 
+/** comparisons 各状态条数，结论与概要都以它为准（不信 summary 的问题计数反推一致） */
+const counts = computed(() => {
+  const list = task.value?.comparisons ?? []
+  const c = { total: list.length, match: 0, single: 0, unchecked: 0, conflict: 0, missing: 0, unrecognized: 0 }
+  for (const item of list) {
+    if (item.status === 'MATCH') c.match += 1
+    else if (item.status === 'SINGLE_SOURCE') c.single += 1
+    else if (item.status === 'NOT_CHECKED') c.unchecked += 1
+    else if (item.status === 'CONFLICT') c.conflict += 1
+    else if (item.status === 'MISSING_IN_SOME') c.missing += 1
+    else if (item.status === 'UNRECOGNIZED') c.unrecognized += 1
+  }
+  return c
+})
+
 /**
  * 检查概要的开头结论：把统计数字串成一句话，让读者先知道"要不要处理"。
- * - summary 为 null（或任务进行中/失败）时整段不显示——不替后端下结论；
- * - PARTIAL 必须带"不完整"前缀，不能被读成通过；
- * - 为 0 的类别跳过不念；风险提示为 0 时只有确实零问题才说"未发现风险"。
+ * 推导规则集中在 utils/reportConclusion.js：
+ * 只有到达终态、且比对状态确实支持时才有正向结论；否则整段不显示——不替后端下结论。
  */
 const conclusion = computed(() => {
-  if (!task.value || !summary.value || task.value.status === 'FAILED') return null
-  const s = summary.value
-
-  const prefix =
-    task.value.status === 'PARTIAL'
-      ? `${failedDocs.value.length} 份文件未能处理，本报告基于不完整结果。`
-      : ''
-
-  const problemParts = []
-  if (s.conflict_count > 0) problemParts.push(`${s.conflict_count} 处不一致`)
-  if (s.missing_count > 0) problemParts.push(`${s.missing_count} 处部分缺失`)
-  if (s.unrecognized_count > 0) problemParts.push(`${s.unrecognized_count} 处无法比对`)
-
-  if (!problemParts.length) {
-    // 无问题：只有零风险才能说"未发现风险"，有风险必须念出来（零问题也可能有风险）
-    const tail = s.risk_count > 0 ? `，另有 ${s.risk_count} 条风险提示需要人工查看` : '，未发现风险提示'
-    return `${prefix}${s.document_count} 份文件、${s.field_count} 个字段全部一致${tail}。`
-  }
-
-  const riskPart = s.risk_count > 0 ? `，另有 ${s.risk_count} 条风险提示` : ''
-  return `${prefix}发现 ${problemParts.join('、')}${riskPart}——需要人工复核。`
+  if (!task.value || !summary.value || taskError?.value) return null
+  return buildConclusion({
+    status: task.value.status,
+    documentCount: summary.value.document_count,
+    fieldCount: summary.value.field_count,
+    riskCount: summary.value.risk_count,
+    failedDocCount: failedDocs.value.length,
+    counts: counts.value,
+  })
 })
+
+/** 商品目录：item_id → 展示名。目录缺失或查不到时返回 null，降级不猜商品名 */
+const itemNames = computed(
+  () => new Map((task.value?.items ?? []).map((it) => [it.item_id, it.display_name]))
+)
+
+/** 问题条目的归属：整票字段 / 商品名 / null（无法确定时不显示，不猜） */
+function issueScope(c) {
+  if (c.item_id == null) return '整票字段'
+  return itemNames.value.get(c.item_id) ?? null
+}
 
 /** 文件 chip 的色点按处理状态着色，复用状态文案表里的语义色 */
 const docTone = (d) => processStatus(d.process_status).tone
@@ -105,6 +138,14 @@ const severityOf = severity
       </section>
     </template>
 
+    <!-- 轮询失败且没有任何任务数据：失败本身就是要呈现的状态 -->
+    <NoticeBar
+      v-else-if="!task && taskError"
+      tone="bad"
+      title="尚未取得检查结果"
+      :detail="taskError.message"
+    />
+
     <NoticeBar
       v-else-if="!task"
       tone="info"
@@ -119,6 +160,20 @@ const severityOf = severity
         tone="bad"
         title="检查失败，无报告可出"
         detail="未产生任何比对结果。"
+      />
+      <!-- 轮询中断但缓存还是中间状态：明确尚未取得最终结果，不把缓存当完成报告 -->
+      <NoticeBar
+        v-else-if="taskError && !isTerminal"
+        tone="bad"
+        title="尚未取得最终结果"
+        :detail="`${taskError.message}。以下为最近一次查询到的中间状态，不是最终报告。`"
+      />
+      <!-- 处理中：即使有 task 对象也不给正向结论 -->
+      <NoticeBar
+        v-else-if="!isTerminal"
+        tone="info"
+        title="任务仍在处理中"
+        detail="以下为中间状态，尚未产生最终结论；处理完成前不能视为通过。"
       />
       <NoticeBar
         v-else-if="task.status === 'PARTIAL'"
@@ -178,6 +233,8 @@ const severityOf = severity
           <li v-for="c in issues" :key="c.comparison_id" class="issue-item">
             <div class="issue-head">
               <span class="issue-label">{{ c.label }}</span>
+              <!-- 商品归属：多品名时问题条目必须能区分属于哪个商品；查不到目录时不猜 -->
+              <span v-if="issueScope(c)" class="issue-scope">{{ issueScope(c) }}</span>
               <StatusBadge :status="severityOf(c.severity)" />
             </div>
             <div class="issue-values">
@@ -194,8 +251,9 @@ const severityOf = severity
             </div>
           </li>
         </ul>
+        <!-- 成功式空状态只在终态成功时出现；处理中/失败/轮询中断都不能显示"没有问题" -->
         <EmptyState
-          v-else
+          v-else-if="showNoIssues"
           tone="ok"
           icon="✅"
           title="没有需要人工处理的条目"
