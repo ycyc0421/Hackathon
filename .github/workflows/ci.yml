@@ -1,4 +1,5 @@
 name: CI
+run-name: CI 验证（不部署）· ${{ github.head_ref || github.ref_name }}
 
 on:
   push:
@@ -41,6 +42,11 @@ jobs:
       - name: 数据层回归
         run: python -m unittest discover -s data -p 'test_*.py' -v
 
+      - name: 部署脚本与回退单元测试（不发布服务）
+        run: |
+          python -m unittest discover -s deploy -p 'test_*.py' -v
+          python -m py_compile deploy/smoke.py
+
   validate-contract:
     name: 验证数据契约
     runs-on: ubuntu-latest
@@ -74,6 +80,9 @@ jobs:
         working-directory: web
         run: npm ci
 
+      - name: 前端逻辑回归
+        run: node --test tests/*.test.mjs
+
       - name: 构建
         working-directory: web
         run: npm run build
@@ -84,3 +93,14 @@ jobs:
           name: web-dist
           path: web/dist/
           retention-days: 7
+
+      - name: 说明验证与部署的区别
+        if: always()
+        run: |
+          {
+            echo '## CI 仅验证，不部署'
+            echo '本次运行执行测试、契约校验和前端构建；构建产物上传不代表线上服务已更新。'
+            echo '只有 main 的 push CI 成功后，才会触发独立的 Deploy frontend and backend 工作流；PR 验证不部署。'
+            echo '请在部署运行中分别查看「部署后端与公网验证」和「部署前端到 Cloudflare」的结果；过期提交会跳过部署。'
+            echo "[打开部署工作流]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/workflows/deploy.yml)"
+          } >> "$GITHUB_STEP_SUMMARY"

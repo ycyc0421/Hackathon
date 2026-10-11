@@ -13,6 +13,7 @@ import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '..
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
 import { needsReview } from '../utils/needsReview.js'
 import { heightListItemHooks, collapseHooks } from '../utils/animateHeight.js'
+import { isMobile } from '../utils/isMobile.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -378,7 +379,8 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
         @keydown.enter.prevent="fileInput?.click()"
         @keydown.space.prevent="fileInput?.click()"
       >
-        <div class="dropzone-main">把文件拖到这里，或点击选择</div>
+        <!-- 手机没有拖放，窄屏只提示点击选择 -->
+        <div class="dropzone-main">{{ isMobile ? '点击选择文件' : '把文件拖到这里，或点击选择' }}</div>
         <div class="dropzone-hint">
           支持 {{ UPLOAD_LIMITS.accept.split(',').join(' / ') }}，单个不超过
           {{ UPLOAD_LIMITS.maxFileSizeMB }}MB，最多 {{ UPLOAD_LIMITS.maxFiles }} 份

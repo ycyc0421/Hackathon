@@ -18,6 +18,7 @@ import {
 import { divergentFileIds } from '../utils/divergence.js'
 import { needsReview } from '../utils/needsReview.js'
 import { animateHeightAdaptive, captureHeight } from '../utils/animateHeight.js'
+import { isMobile } from '../utils/isMobile.js'
 import { buildEvidenceIndex, evidenceRawText } from '../utils/evidence.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
@@ -147,6 +148,9 @@ const docCount = computed(() => task.value?.documents?.length ?? 0)
 const views = inject('diffViews')
 
 function viewOf(c) {
+  // 窄屏（移动端）只有对照单视图：切换器被 CSS 隐藏，行为层同样锁定，
+  // 避免视口跨断点来回时遗留的 'table' 状态把表格渲染出来
+  if (isMobile.value) return 'compare'
   return views.value.get(c.comparison_id) ?? 'table'
 }
 
@@ -159,6 +163,8 @@ function viewOf(c) {
  * 坍缩，与高度动画打架，表现为整列抖动。宁可简单稳定。
  */
 async function setView(c, mode, ev) {
+  // 窄屏恒为对照视图（见 viewOf），切换器虽被 CSS 隐藏，这里再做一层保险
+  if (isMobile.value) return
   if (mode === viewOf(c)) return
   const item = ev?.currentTarget?.closest('.cmp-item')
   const body = item?.querySelector('.cmp-view-body')
@@ -182,12 +188,19 @@ let filterFromH = null
 
 function setFilter(name) {
   if (name === filter.value) return
-  filterFromH = captureHeight(filterClipRef.value)
+  // 窄屏下不记录旧高度——onFilterEnter 会跳过高度补间，容器直接到位，
+  // 避免手机上大高度差补间的抖动
+  filterFromH = isMobile.value ? null : captureHeight(filterClipRef.value)
   filter.value = name
 }
 
 function onFilterEnter() {
   const clip = filterClipRef.value
+  // 窄屏：容器直接到位（fromH 为 null 时 animateHeightAdaptive 静默跳过）
+  if (isMobile.value) {
+    filterFromH = null
+    return
+  }
   animateHeightAdaptive(clip, filterFromH, clip?.closest('.card'))
   filterFromH = null
 }
@@ -341,19 +354,19 @@ onMounted(async () => {
                     <tbody>
                       <tr v-for="v in c.values" :key="v.file_id" :class="{ 'row-odd': v.field_status !== 'EXTRACTED' }">
                         <td class="cell-file">{{ v.file_name }}</td>
-                        <td class="cell-value" :class="{ divergent: isDivergentValue(c, v) }">
+                        <td class="cell-value" data-label="值" :class="{ divergent: isDivergentValue(c, v) }">
                           <template v-if="v.normalized_value !== null && v.normalized_value !== undefined">
                             {{ valueText(v, c) }}
                           </template>
                           <span v-else class="cell-empty">—</span>
                         </td>
-                        <td class="cell-raw">
+                        <td class="cell-raw" data-label="原文">
                           <template v-if="showsRaw(v, c)">{{ v.raw_value }}</template>
                           <!-- raw_value 读不出值时回退到抽取层保留的原文片段，不显示成空白 -->
                           <template v-else-if="rawEvidence(c, v)">{{ rawEvidence(c, v) }}</template>
                           <span v-else class="cell-empty">—</span>
                         </td>
-                        <td><StatusBadge :status="fileStatusOf(v)" /></td>
+                        <td data-label="状态"><StatusBadge :status="fileStatusOf(v)" /></td>
                       </tr>
                     </tbody>
                   </table>

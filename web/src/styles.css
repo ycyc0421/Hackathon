@@ -157,6 +157,33 @@ body {
   font-size: var(--text-xs);
 }
 
+/* 徽标按钮化：视觉沿用 mock-flag/backend-flag，只补按钮基础属性。
+   桌面端点击无行为（App.vue 里按断点拦截），保持默认光标 */
+.flag-btn {
+  font-family: inherit;
+  cursor: default;
+}
+
+/* mock 下拉容器：桌面端摊平进顶栏（contents 不产生自身盒子，
+   两个下拉的排布与间距和原先直接放在 .mock-tools 下完全一致） */
+.mock-selects {
+  display: contents;
+}
+
+.mock-field {
+  display: contents;
+}
+
+/* 弹层内的说明文字只在移动端弹层中出现 */
+.mock-note {
+  display: none;
+}
+
+/* 移动端底部标签栏：桌面端不渲染 */
+.bottom-tabs {
+  display: none;
+}
+
 .content {
   flex: 1;
   width: 100%;
@@ -1629,6 +1656,7 @@ textarea {
   .topbar,
   .footer,
   .mock-tools,
+  .bottom-tabs,
   .link-btn,
   .actions {
     display: none;
@@ -1879,4 +1907,211 @@ textarea {
 .app-select-option.selected {
   color: var(--color-primary);
   font-weight: 600;
+}
+
+/* ---------- 手机端适配（≤640px）---------- */
+
+@media (max-width: 640px) {
+  /* 顶栏回到单行：品牌 + 数据源徽标。页签导航移交底部标签栏 */
+  .topbar {
+    height: 56px;
+    gap: var(--space-3);
+    padding: 0 var(--space-3);
+  }
+
+  /* 窄屏上副标题只会逐字换行，直接隐藏 */
+  .brand-sub {
+    display: none;
+  }
+
+  /* 顶栏页签隐藏，App.vue 里的指示条测量会因 offsetWidth 为 0 自动跳过 */
+  .tabs {
+    display: none;
+  }
+
+  /* 徽标成为弹层的开合按钮 */
+  .flag-btn {
+    cursor: pointer;
+  }
+
+  /* mock 工具收进徽标弹层：容器从 contents 变成定位面板，
+     默认透明 + 不可见，open 时淡入并轻微下移 */
+  .mock-tools {
+    margin-left: auto;
+    position: relative;
+  }
+
+  .mock-selects {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 220px;
+    padding: var(--space-3);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity var(--duration-fast) var(--ease),
+                transform var(--duration-fast) var(--ease),
+                visibility 0s var(--duration-fast);
+  }
+
+  .mock-selects.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity var(--duration-fast) var(--ease),
+                transform var(--duration-fast) var(--ease);
+  }
+
+  /* 弹层内每个下拉占一行，附一句说明 */
+  .mock-field {
+    display: block;
+  }
+
+  .mock-field .app-select {
+    display: block;
+  }
+
+  .mock-field .app-select-trigger {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mock-note {
+    display: block;
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  /* 底部标签栏：固定于屏幕底部，四页签等宽，含安全区内边距。
+     选中态 = 主色 + 加重（不做滑动指示条，触屏切换无需方向感） */
+  .bottom-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10; /* 与顶栏同级，压住页面滚动内容 */
+    display: flex;
+    align-items: stretch;
+    height: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--surface-raised);
+    border-top: 1px solid var(--border);
+  }
+
+  .bottom-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    font-family: inherit;
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease);
+  }
+
+  .bottom-tab.active {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .bottom-tab.locked {
+    color: var(--text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* 内容底部让出标签栏高度，防止被固定栏遮挡 */
+  .content {
+    padding: var(--space-3);
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px) + var(--space-4));
+  }
+
+  .card {
+    padding: var(--space-4);
+  }
+
+  /* 页脚信息（契约版本号等）在移动端让位给底部标签栏，隐藏不影响打印（打印本就隐藏） */
+  .footer {
+    display: none;
+  }
+
+  /* 上传页的表单行纵向堆叠 */
+  .field-row {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* 主操作区纵向堆叠：主按钮（开始检查）在上、次按钮（清空）在下，均全宽 */
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions .btn {
+    width: 100%;
+  }
+
+  /* 「移除」等文字按钮放大触控面积到 44×44（视觉仍是文字链接） */
+  .link-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  /* 条目头部：字段名放不下时徽章换行 */
+  .cmp-head {
+    flex-wrap: wrap;
+  }
+
+  .cmp-title {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  /* 视图切换器在移动端隐藏（差异表格不渲染，只有对照卡片流） */
+  .cmp-title .view-switch {
+    display: none;
+  }
+
+  /* 字段 key（packages 等工程术语）不占移动端空间 */
+  .cmp-key {
+    display: none;
+  }
+
+  /* 对照卡片列：auto-fit minmax(220px,1fr) 在 ~390px 下自然塌成单列，
+     这里显式锁定，避免内容横向溢出 */
+  .compare-cols {
+    grid-template-columns: 1fr;
+  }
+
+  /* 统计数字固定两列：auto-fit 在 ~320px 会塌成一列，浪费纵向空间 */
+  .stat-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- 动效降级 ---------- */
+
+/* 用户系统开启"减少动态效果"时，把所有过渡/动画时长压到近 0。
+   JS 过渡钩子（如滚动恢复）不受 CSS 管辖，行为不变 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

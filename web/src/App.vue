@@ -55,6 +55,25 @@ function onScenarioChange() {
   setMockScenario(mockScenario.value)
 }
 
+/**
+ * 移动端（≤640px）mock 工具收进徽标弹层：顶栏只留数据源徽标，
+ * 点徽标在其下方弹出小面板，面板内放场景/来源两个下拉。
+ * 桌面端徽标只是标识，点击不响应；弹层开/关走 CSS 透明度过渡。
+ */
+const mockPanelOpen = ref(false)
+
+function toggleMockPanel() {
+  if (!window.matchMedia('(max-width: 640px)').matches) return
+  mockPanelOpen.value = !mockPanelOpen.value
+}
+
+/** 点面板外任意处收起 */
+function onDocumentClick(e) {
+  if (!mockPanelOpen.value) return
+  if (e.target.closest?.('.mock-tools')) return
+  mockPanelOpen.value = false
+}
+
 /** 当前检查任务。由上传页写入，差异页和报告页读取 */
 const task = ref(null)
 const taskError = ref(null)
@@ -212,6 +231,9 @@ async function updateIndicator() {
     indicatorStyle.value = { opacity: '0' }
     return
   }
+  /* 窄屏下顶栏页签隐藏（底部标签栏接管导航）：offsetWidth 为 0 时跳过写入，
+     保留桌面端的测量结果，避免指示条被清零后回到桌面端闪跳 */
+  if (el.offsetWidth === 0) return
   indicatorStyle.value = {
     width: `${el.offsetWidth}px`,
     transform: `translateX(${el.offsetLeft}px)`,
@@ -227,11 +249,13 @@ onMounted(() => {
     resizeObserver.observe(tabsRef.value)
   }
   window.addEventListener('resize', updateIndicator)
+  document.addEventListener('click', onDocumentClick)
 })
 
 onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   window.removeEventListener('resize', updateIndicator)
+  document.removeEventListener('click', onDocumentClick)
 })
 
 watch(active, updateIndicator)
@@ -263,31 +287,53 @@ watch(active, updateIndicator)
       </nav>
 
       <div class="mock-tools">
-        <span
-          v-if="mock"
-          class="mock-flag"
-          title="前端正在使用本地示例数据，未连接后端"
-        >示例数据</span>
-        <span
-          v-else
-          class="backend-flag"
-          title="前端直连后端接口，所见均为真实处理结果"
-        >真实后端</span>
-        <AppSelect
-          v-if="mock"
-          v-model="mockScenario"
-          :options="scenarioOptions"
-          title="选择示例场景，下次提交检查时生效"
-          @change="onScenarioChange"
-        />
-        <AppSelect
-          :model-value="mock ? 'mock' : 'backend'"
-          :options="SOURCE_OPTIONS"
-          title="切换数据来源，切换后页面自动刷新"
-          @change="onSourceChange"
-        />
+        <!-- 徽标在桌面端只是标识；≤640px 时是可点按钮，开合下方的 mock-selects 弹层 -->
+        <button
+          type="button"
+          class="flag-btn"
+          :class="mock ? 'mock-flag' : 'backend-flag'"
+          :title="mock ? '前端正在使用本地示例数据，未连接后端' : '前端直连后端接口，所见均为真实处理结果'"
+          @click="toggleMockPanel"
+        >{{ mock ? '示例数据' : '真实后端' }}</button>
+        <!-- 桌面端 display:contents 平铺在顶栏；≤640px 变成徽标下方的弹层 -->
+        <div class="mock-selects" :class="{ open: mockPanelOpen }">
+          <div v-if="mock" class="mock-field">
+            <AppSelect
+              v-model="mockScenario"
+              :options="scenarioOptions"
+              title="选择示例场景，下次提交检查时生效"
+              @change="onScenarioChange"
+            />
+            <p class="mock-note">选择示例场景，下次提交检查时生效</p>
+          </div>
+          <div class="mock-field">
+            <AppSelect
+              :model-value="mock ? 'mock' : 'backend'"
+              :options="SOURCE_OPTIONS"
+              title="切换数据来源，切换后页面自动刷新"
+              @change="onSourceChange"
+            />
+            <p class="mock-note">切换数据来源，切换后页面自动刷新</p>
+          </div>
+        </div>
       </div>
     </header>
+
+    <!-- 移动端主导航：≤640px 显示（顶栏页签隐藏），选中态用颜色/字重表达，不用滑动指示条 -->
+    <nav class="bottom-tabs" aria-label="页面导航">
+      <button
+        v-for="p in PAGES"
+        :key="p.key"
+        class="bottom-tab"
+        :class="{ active: active === p.key, locked: isLocked(p.key) }"
+        :disabled="isLocked(p.key)"
+        :title="isLocked(p.key) ? '先在上传页创建一次检查' : ''"
+        @click="active = p.key"
+      >
+        {{ p.label }}
+        <span v-if="p.key === 'diff' && problemCount" class="tab-badge">{{ problemCount }}</span>
+      </button>
+    </nav>
 
     <main class="content">
       <Transition name="fade" mode="out-in" @enter="onPageEnter">

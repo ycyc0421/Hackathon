@@ -111,6 +111,12 @@ export function compensateScrollAfterShrink(anchorEl) {
  */
 export function animateHeightAdaptive(el, fromH, anchorEl = el) {
   if (!el || fromH == null) return
+  // 窄屏（手机断点 640px）不做高度补间：大高度差在手机上补间抖动明显，
+  // 直接到位（页面变短悬空时仍做滚动补偿）。与 isMobile.js 断点保持一致。
+  if (window.matchMedia?.('(max-width: 640px)').matches) {
+    compensateScrollAfterShrink(anchorEl)
+    return
+  }
   const toH = el.offsetHeight
   if (Math.abs(toH - fromH) <= HEIGHT_TWEEN_MAX_DELTA) {
     animateHeightFrom(el, fromH)

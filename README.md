@@ -58,20 +58,22 @@ VITE_API_BASE=http://127.0.0.1:8000/api/v1 npm --prefix web run dev
 
 在前端顶栏切换数据源，或通过 URL 参数 `?mock=0` 使用真实后端、`?mock=1` 使用示例数据。切换数据源无需修改代码；`VITE_API_BASE` 在前端启动或构建时读取，未设置时请求同源 `/api/v1`。
 
-当前 [部署工作流](.github/workflows/deploy.yml) 只发布前端与 JS Worker，不部署 `backend/`。线上接入真实后端还需配置 [`worker/index.js`](worker/index.js) 中的 API 代理。
+当前 [部署工作流](.github/workflows/deploy.yml) 会在 main 的 CI 成功后，先部署独立 FastAPI 后端并验证公网接口，再发布前端与 JS Worker。线上前端通过构建时的 `VITE_API_BASE` 直连 HTTPS 后端。API 地址填写位置、部署密钥和服务器初始化方式见 [CI/CD 配置说明](.github/workflows/README.md)。
+
+在 GitHub Actions 中，`CI` 仅负责测试和构建；发布结果请查看 `Deploy frontend and backend` 工作流里的「部署后端与公网验证」和「部署前端到 Cloudflare」两个 job。
 
 ## 技术栈
 
 - **前端**：Vue 3（`<script setup>`）+ Vite 6，自研设计系统（OKLCH 色彩、CSS 变量 token），无 UI 组件库 / 路由 / 状态管理依赖
 - **后端**：Python 3.12+、FastAPI、Pydantic、pypdf；可配置多模态识别服务
-- **边缘部署**：Cloudflare Workers + Assets 绑定，托管静态前端并预留 `/api/` 反向代理
+- **部署**：Cloudflare Workers + Assets 托管静态前端，独立服务器运行 FastAPI 后端并提供 HTTPS API
 - **契约校验**：JSON Schema + AJV，含结构与跨字段自洽两层校验
 
 ## 架构
 
 ```
 浏览器 ──► Cloudflare Worker ──► web/dist 静态资源
-                    └── /api/ 代理（待配置）──► FastAPI 后端
+   └────► HTTPS API ──► 反向代理 ──► FastAPI 后端
 
 本地开发：Vite 前端 ──► FastAPI 后端
 
@@ -98,6 +100,7 @@ VITE_API_BASE=http://127.0.0.1:8000/api/v1 npm --prefix web run dev
 │   ├── app/                读取、抽取、归一、行对齐、比对与规则提示
 │   ├── samples/            合成单证样例
 │   └── tools/              接口自检与回归脚本
+├── deploy/                 后端发布、回退与公网验证脚本
 ├── docs/                   数据契约与项目文档
 │   ├── 数据契约.md          契约的可读版本
 │   ├── schema/             契约的 JSON Schema 与校验脚本
@@ -107,7 +110,7 @@ VITE_API_BASE=http://127.0.0.1:8000/api/v1 npm --prefix web run dev
 │       ├── api/            请求封装与状态文案
 │       ├── components/     通用组件（状态徽章、空状态、骨架屏、错误边界…）
 │       └── pages/          上传 / 差异 / 报告 / 评测
-├── worker/                 Cloudflare Worker（静态托管，预留 API 代理）
+├── worker/                 Cloudflare Worker（静态前端托管）
 └── wrangler.toml           Workers 部署配置
 ```
 
@@ -118,7 +121,7 @@ VITE_API_BASE=http://127.0.0.1:8000/api/v1 npm --prefix web run dev
 | 数据契约 | 已定义任务、错误、评测和多品名结构，提供结构及跨字段校验 |
 | 前端 | 四个页面已实现，支持运行时切换示例与真实数据源 |
 | 后端接口 | 已提供创建任务、轮询结果与评测状态接口，验证覆盖合成单证和审查边界 |
-| 线上部署 | 已部署前端；真实后端运行环境与 API 代理待接入 |
+| 线上部署 | 前后端自动发布已接通，包含公网样例与契约验证；联调需切换到真实后端模式 |
 | 金标集与评测 | 正式金标集和真实评测结果尚待提供 |
 
 真实复杂版式和 OCR 质量尚未完成评测；人工修正、后端报告导出和 EDI 解析尚未实现。能力边界详见 [`backend/README.md`](backend/README.md#能力边界)。
