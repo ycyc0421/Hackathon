@@ -185,8 +185,9 @@ const severityOf = severity
       <section class="card">
         <h2 class="card-title">检查概要</h2>
 
-        <!-- 结论先行：一段话回答"这次检查要不要处理"。summary 缺失时不显示，不替后端下结论 -->
-        <p v-if="conclusion" class="report-conclusion">{{ conclusion }}</p>
+        <!-- 结论先行：一段话回答"这次检查要不要处理"。summary 缺失时不显示，不替后端下结论。
+             tone 与文案同源推导（utils/reportConclusion.js），结论条按 tone 上色 -->
+        <p v-if="conclusion" class="report-conclusion" :class="`tone-${conclusion.tone}`">{{ conclusion.text }}</p>
 
         <dl class="meta-grid">
           <div><dt>任务编号</dt><dd>{{ task.task_id }}</dd></div>

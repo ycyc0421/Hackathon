@@ -1452,19 +1452,37 @@ select {
 
 /*
  * 检查概要的开头结论：全页最重要的一句话，先于统计数字出现。
- * 左侧主色色带 + 浅蓝底色卡片承载，一眼可见；
- * 文案语气有好有坏，容器保持中性（主色而非语义色）。
+ * 左边带 + 底色卡片承载，一眼可见；颜色跟随结论语气（tone），
+ * 与文案同源推导，不出现"坏消息配蓝色"的错位。
  */
 .report-conclusion {
   margin: var(--space-2) 0 var(--space-4);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--blue-200);
-  border-left: 3px solid var(--color-primary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gray-400);
   border-radius: var(--radius-sm);
-  background: var(--blue-50);
+  background: var(--gray-50);
   font-size: var(--text-base);
   font-weight: 500;
   line-height: var(--leading-relaxed);
+}
+
+.report-conclusion.tone-bad {
+  border-color: var(--danger);
+  border-left-color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.report-conclusion.tone-warn {
+  border-color: var(--warning);
+  border-left-color: var(--warning);
+  background: var(--warning-bg);
+}
+
+.report-conclusion.tone-ok {
+  border-color: var(--success);
+  border-left-color: var(--success);
+  background: var(--success-bg);
 }
 
 /* 文件清单压缩为 chips：一行能看多份文件，状态靠色点快速分辨 */

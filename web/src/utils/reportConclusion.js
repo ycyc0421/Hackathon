@@ -8,6 +8,9 @@
  * - comparisons 为空时不下任何正向结论；
  * - 抽取字段数（summary.field_count）是抽取总量，不是比对覆盖范围，
  *   两者分开陈述，不用前者冒充后者。
+ *
+ * tone 与文案同源推导，供结论条上色（bad 红 / warn 橙 / ok 绿 / neutral 中性），
+ * 避免"无论什么情况都是同一种颜色"。
  */
 
 /**
@@ -19,7 +22,8 @@
  * @param {number} [input.failedDocCount] PARTIAL 时未能处理的文件数
  * @param {object} input.counts comparisons 各状态条数：
  *   { total, match, single, unchecked, conflict, missing, unrecognized }
- * @returns {string|null} 结论文案；不足以得出结论时为 null（页面不渲染该段）
+ * @returns {{ text: string, tone: 'bad'|'warn'|'ok'|'neutral' }|null}
+ *   不足以得出结论时为 null（页面不渲染该段）
  */
 export function buildConclusion({ status, documentCount, fieldCount, riskCount, failedDocCount = 0, counts }) {
   if (status !== 'COMPLETED' && status !== 'PARTIAL') return null
@@ -38,28 +42,47 @@ export function buildConclusion({ status, documentCount, fieldCount, riskCount, 
     // 有问题时未校验项也要念出来——它同样需要人工处理
     if (counts.unchecked > 0) problems.push(`${counts.unchecked} 项尚未校验`)
     const riskPart = riskCount > 0 ? `，另有 ${riskCount} 条风险提示` : ''
-    return `${prefix}发现 ${problems.join('、')}${riskPart}——需要人工复核。`
+    return { text: `${prefix}发现 ${problems.join('、')}${riskPart}——需要人工复核。`, tone: 'bad' }
   }
+
+  // 无问题条目：未校验或结果不完整都不能算"通过"，橙色提醒
+  const fallbackTone = counts.unchecked > 0 || status === 'PARTIAL' ? 'warn' : 'neutral'
 
   // 以下为"没有问题条目"的分支，逐一区分能不能说"一致"
   if (counts.total === 0) {
-    return `${prefix}未产生任何比对条目（共 ${documentCount} 份文件、抽取 ${fieldCount} 个字段），无法给出一致性结论${riskTail}。`
+    return {
+      text: `${prefix}未产生任何比对条目（共 ${documentCount} 份文件、抽取 ${fieldCount} 个字段），无法给出一致性结论${riskTail}。`,
+      tone: fallbackTone,
+    }
   }
 
   if (counts.unchecked > 0) {
     const matchPart = counts.match > 0 ? `已比对的 ${counts.match} 个字段一致，` : ''
     const singlePart = counts.single > 0 ? `，另 ${counts.single} 个字段仅一份文件提供` : ''
-    return `${prefix}${matchPart}尚有 ${counts.unchecked} 项未校验${singlePart}，不能判定为全部一致${riskTail}。`
+    return {
+      text: `${prefix}${matchPart}尚有 ${counts.unchecked} 项未校验${singlePart}，不能判定为全部一致${riskTail}。`,
+      tone: 'warn',
+    }
   }
 
   if (counts.match > 0 && counts.single > 0) {
-    return `${prefix}${documentCount} 份文件（共抽取 ${fieldCount} 个字段）中，${counts.match} 个比对条目全部一致，另 ${counts.single} 个字段仅一份文件提供、无法交叉比对${riskTail}。`
+    return {
+      text: `${prefix}${documentCount} 份文件（共抽取 ${fieldCount} 个字段）中，${counts.match} 个比对条目全部一致，另 ${counts.single} 个字段仅一份文件提供、无法交叉比对${riskTail}。`,
+      tone: fallbackTone,
+    }
   }
 
   if (counts.match > 0) {
-    return `${prefix}${documentCount} 份文件、${counts.match} 个比对条目全部一致${riskTail}。`
+    // 全部比对条目一致且任务完整完成，是唯一可以给出绿色正向结论的形态
+    return {
+      text: `${prefix}${documentCount} 份文件、${counts.match} 个比对条目全部一致${riskTail}。`,
+      tone: status === 'COMPLETED' ? 'ok' : 'warn',
+    }
   }
 
   // 只剩 SINGLE_SOURCE：没有交叉比对的对象，无从谈一致
-  return `${prefix}共 ${counts.single} 个字段，均仅有一份文件提供，无法交叉比对${riskTail}。`
+  return {
+    text: `${prefix}共 ${counts.single} 个字段，均仅有一份文件提供，无法交叉比对${riskTail}。`,
+    tone: fallbackTone,
+  }
 }
