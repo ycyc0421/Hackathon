@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS tasks (
     declared_currency TEXT,
     notes TEXT,
     created_at TEXT NOT NULL,
-    finished_at TEXT
+    finished_at TEXT,
+    errors_json TEXT NOT NULL DEFAULT '[]'
 );
 
 CREATE TABLE IF NOT EXISTS items (
@@ -31,6 +32,7 @@ CREATE TABLE IF NOT EXISTS documents (
     process_status TEXT NOT NULL CHECK (process_status IN ('UPLOADED','PARSING','EXTRACTED','FAILED','UNSUPPORTED')),
     page_count INTEGER,
     error_message TEXT,
+    parse_method TEXT CHECK (parse_method IS NULL OR parse_method IN ('TEXT_LAYER','OCR','EDI_PARSE')),
     FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE
 );
 
@@ -71,6 +73,7 @@ CREATE TABLE IF NOT EXISTS comparisons (
     severity TEXT NOT NULL,
     rule_id TEXT,
     note TEXT,
+    suggested_action TEXT,
     FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE,
     FOREIGN KEY (task_id, item_id) REFERENCES items(task_id, item_id)
 );
@@ -105,6 +108,7 @@ CREATE TABLE IF NOT EXISTS risks (
     destination_country TEXT,
     rule_id TEXT,
     rule_source TEXT,
+    suggested_action TEXT,
     FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE,
     FOREIGN KEY (task_id, item_id) REFERENCES items(task_id, item_id),
     FOREIGN KEY (comparison_id) REFERENCES comparisons(comparison_id) ON DELETE SET NULL
@@ -145,3 +149,5 @@ CREATE TABLE IF NOT EXISTS golden_cases (
     review_status TEXT NOT NULL CHECK (review_status IN ('PENDING','VERIFIED','REJECTED')),
     reviewed_at TEXT
 );
+
+PRAGMA user_version = 1;

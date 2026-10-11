@@ -13,6 +13,8 @@ python data/seed_data.py --input data/generated/normal_multi.json
 
 生成的 `data/app.db` 是本地运行文件，不提交到 Git。表结构和导入脚本才需要提交。
 
+当前数据库结构版本为 1，以 SQLite 的 `user_version` 标记。同版本可重复初始化，已有记录会保留。旧开发库或其他版本会被明确拒绝；请先停止使用旧库，将其备份并移出 `data/app.db`，再执行以上命令重建并重新导入原始 JSON。初始化脚本不会删除或自动迁移旧数据。
+
 ## 查看数据
 
 ```powershell
@@ -26,6 +28,10 @@ python -m unittest discover -s data -p "test_*.py" -v
 ```
 
 `normalized_value_json` 和 `bbox_json` 是 JSON 文本，读取后用 Python `json.loads()` 还原。
+
+任务错误和告警完整保存到 `tasks.errors_json`，用 `json.loads()` 还原后保留原有顺序、错误码、消息、级别和任务内 `file_ids`。没有错误时保存 `[]`。文件抽取方式保存在 `documents.parse_method`，比对和风险的处理建议分别保存在对应表的 `suggested_action`；未提供的可选值为 SQL `NULL`。
+
+`documents.file_id`、`comparisons.comparison_id`、`risks.risk_id` 在库中使用 `[task_id, 原始ID]` 的 JSON 文本隔离任务，读取时可用 `json.loads()` 取得原始 ID。`items.item_id` 和 `errors_json` 内的文件 ID 保持任务内原值。
 
 ## 生成测试数据
 

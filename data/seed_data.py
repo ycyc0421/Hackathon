@@ -111,6 +111,9 @@ def validate_references(data):
             raise ValueError(f"unknown comparison_id: {risk['comparison_id']}")
         for file_id in risk.get("related_file_ids", []):
             file_ref(file_id)
+    for error in data.get("errors", []):
+        for file_id in error.get("file_ids", []):
+            file_ref(file_id)
 
 
 def import_task(conn, source):
@@ -118,6 +121,7 @@ def import_task(conn, source):
     validate_references(data)
     task_id = data["task_id"]
     storage_id = lambda value: scoped_id(task_id, value)
+    parse_methods = {e["file_id"]: e.get("parse_method") for e in data["extractions"]}
     conn.execute("PRAGMA foreign_keys = ON")
     with conn:
         # Deleting one task cascades only its rows; the transaction preserves old data on error.
@@ -125,11 +129,11 @@ def import_task(conn, source):
         info = data["input"]
         conn.execute(
             """INSERT INTO tasks (task_id,status,destination_country,destination_country_name,
-            trade_mode,declared_currency,notes,created_at,finished_at)
-            VALUES (?,?,?,?,?,?,?,?,?)""",
+            trade_mode,declared_currency,notes,created_at,finished_at,errors_json)
+            VALUES (?,?,?,?,?,?,?,?,?,?)""",
             (task_id, data["status"], info["destination_country"], info.get("destination_country_name"),
              info.get("trade_mode"), info.get("declared_currency"), info.get("notes"),
-             data["created_at"], data.get("finished_at")),
+             data["created_at"], data.get("finished_at"), dump_json(data.get("errors", []))),
         )
         for item in data["items"]:
             conn.execute(
@@ -141,10 +145,11 @@ def import_task(conn, source):
         for doc in data["documents"]:
             conn.execute(
                 """INSERT INTO documents
-                (file_id,task_id,file_name,file_type,doc_type,process_status,page_count,error_message)
-                VALUES (?,?,?,?,?,?,?,?)""",
+                (file_id,task_id,file_name,file_type,doc_type,process_status,page_count,error_message,parse_method)
+                VALUES (?,?,?,?,?,?,?,?,?)""",
                 (storage_id(doc["file_id"]), task_id, doc["file_name"], doc["file_type"],
-                 doc.get("doc_type"), doc["process_status"], doc.get("page_count"), doc.get("error_message")),
+                 doc.get("doc_type"), doc["process_status"], doc.get("page_count"), doc.get("error_message"),
+                 parse_methods.get(doc["file_id"])),
             )
         for extraction in data["extractions"]:
             for field in extraction["fields"]:
@@ -164,11 +169,11 @@ def import_task(conn, source):
             conn.execute(
                 """INSERT INTO comparisons
                 (comparison_id,task_id,item_id,field_key,label,value_type,unit,status,canonical_value_json,
-                 severity,rule_id,note) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                 severity,rule_id,note,suggested_action) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (comparison_id, task_id, comparison.get("item_id"), comparison["field_key"],
                  comparison["label"], comparison["value_type"], comparison.get("unit"), comparison["status"],
                  dump_json(comparison.get("canonical_value")), comparison["severity"],
-                 comparison.get("rule_id"), comparison.get("note")),
+                 comparison.get("rule_id"), comparison.get("note"), comparison.get("suggested_action")),
             )
             for value in comparison["values"]:
                 conn.execute(
@@ -187,13 +192,13 @@ def import_task(conn, source):
             conn.execute(
                 """INSERT INTO risks
                 (risk_id,task_id,item_id,comparison_id,risk_type,severity,title,detail,
-                 destination_country,rule_id,rule_source)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+                 destination_country,rule_id,rule_source,suggested_action)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (risk_id, task_id, risk.get("item_id"), comparison_id, risk.get("type", "OTHER"),
                  risk.get("severity", "WARNING"), risk.get("title", "Synthetic review"),
                  risk.get("detail", risk.get("title", "Synthetic review")),
                  risk.get("destination_country", info["destination_country"]), risk.get("rule_id"),
-                 risk.get("rule_source")),
+                 risk.get("rule_source"), risk.get("suggested_action")),
             )
             for field_key in risk["related_field_keys"]:
                 conn.execute("INSERT INTO risk_fields (risk_id,field_key) VALUES (?,?)", (risk_id, field_key))
