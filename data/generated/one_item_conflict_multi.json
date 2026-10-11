@@ -1,0 +1,544 @@
+{
+  "case_id": "one_item_conflict_multi",
+  "description": "one item conflict multi",
+  "task": {
+    "task_id": "generated_one_item_conflict_multi",
+    "destination_country": "DE",
+    "created_at": "2026-10-10T00:00:00+00:00"
+  },
+  "items": [
+    {
+      "item_id": "item_001",
+      "display_name": "陶瓷马克杯",
+      "description": "CERAMIC MUG 350ML WHITE",
+      "item_order": 1
+    },
+    {
+      "item_id": "item_002",
+      "display_name": "玻璃水杯",
+      "description": "GLASS CUP 500ML",
+      "item_order": 2
+    }
+  ],
+  "documents": [
+    {
+      "file_id": "f1",
+      "file_name": "commercial_invoice-f1.json",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "parse_method": "TEXT_LAYER",
+      "fields": [
+        {
+          "field_key": "description",
+          "item_id": "item_001",
+          "line_no": 1,
+          "raw_value": "CERAMIC MUG 350ML WHITE",
+          "normalized_value": "CERAMIC MUG 350ML WHITE",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "hs_code",
+          "item_id": "item_001",
+          "line_no": 1,
+          "raw_value": "691110",
+          "normalized_value": "691110",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "quantity",
+          "item_id": "item_001",
+          "line_no": 1,
+          "raw_value": "2880 PCS",
+          "normalized_value": 2880,
+          "unit": "PCS",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "packages",
+          "item_id": "item_001",
+          "line_no": 1,
+          "raw_value": "120 CARTON",
+          "normalized_value": 120,
+          "unit": "CARTON",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "description",
+          "item_id": "item_002",
+          "line_no": 2,
+          "raw_value": "GLASS CUP 500ML",
+          "normalized_value": "GLASS CUP 500ML",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "hs_code",
+          "item_id": "item_002",
+          "line_no": 2,
+          "raw_value": "701349",
+          "normalized_value": "701349",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "quantity",
+          "item_id": "item_002",
+          "line_no": 2,
+          "raw_value": "800 PCS",
+          "normalized_value": 800,
+          "unit": "PCS",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "packages",
+          "item_id": "item_002",
+          "line_no": 2,
+          "raw_value": "40 CARTON",
+          "normalized_value": 40,
+          "unit": "CARTON",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "invoice_no",
+          "item_id": null,
+          "line_no": null,
+          "raw_value": "INV-42-one_item_conflict_multi",
+          "normalized_value": "INV-42-one_item_conflict_multi",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "total_amount",
+          "item_id": null,
+          "line_no": null,
+          "raw_value": "18400.0 USD",
+          "normalized_value": 18400.0,
+          "unit": "USD",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "currency",
+          "item_id": null,
+          "line_no": null,
+          "raw_value": "USD",
+          "normalized_value": "USD",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "shipment_date",
+          "item_id": null,
+          "line_no": null,
+          "raw_value": "2026-10-08",
+          "normalized_value": "2026-10-08",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        }
+      ]
+    },
+    {
+      "file_id": "f2",
+      "file_name": "packing_list-f2.json",
+      "doc_type": "PACKING_LIST",
+      "parse_method": "TEXT_LAYER",
+      "fields": [
+        {
+          "field_key": "description",
+          "item_id": "item_001",
+          "line_no": 1,
+          "raw_value": "CERAMIC MUG 350ML WHITE",
+          "normalized_value": "CERAMIC MUG 350ML WHITE",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "hs_code",
+          "item_id": "item_001",
+          "line_no": 1,
+          "raw_value": "691110",
+          "normalized_value": "691110",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "quantity",
+          "item_id": "item_001",
+          "line_no": 1,
+          "raw_value": "2904 PCS",
+          "normalized_value": 2904,
+          "unit": "PCS",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "packages",
+          "item_id": "item_001",
+          "line_no": 1,
+          "raw_value": "120 CARTON",
+          "normalized_value": 120,
+          "unit": "CARTON",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "description",
+          "item_id": "item_002",
+          "line_no": 2,
+          "raw_value": "GLASS CUP 500ML",
+          "normalized_value": "GLASS CUP 500ML",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "hs_code",
+          "item_id": "item_002",
+          "line_no": 2,
+          "raw_value": "701349",
+          "normalized_value": "701349",
+          "unit": null,
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "quantity",
+          "item_id": "item_002",
+          "line_no": 2,
+          "raw_value": "800 PCS",
+          "normalized_value": 800,
+          "unit": "PCS",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        },
+        {
+          "field_key": "packages",
+          "item_id": "item_002",
+          "line_no": 2,
+          "raw_value": "40 CARTON",
+          "normalized_value": 40,
+          "unit": "CARTON",
+          "status": "EXTRACTED",
+          "confidence": 0.98
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "comparisons": [
+      {
+        "comparison_id": "cmp_001",
+        "item_id": null,
+        "field_key": "currency",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "note": "Only one applicable usable source.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": null,
+            "unit": null,
+            "raw_value": "USD",
+            "normalized_value": "USD",
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_002",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "note": "Only one applicable usable source.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": null,
+            "unit": null,
+            "raw_value": "INV-42-one_item_conflict_multi",
+            "normalized_value": "INV-42-one_item_conflict_multi",
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_003",
+        "item_id": null,
+        "field_key": "shipment_date",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "note": "Only one applicable usable source.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": null,
+            "unit": null,
+            "raw_value": "2026-10-08",
+            "normalized_value": "2026-10-08",
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_004",
+        "item_id": null,
+        "field_key": "total_amount",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "note": "Only one applicable usable source.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": null,
+            "unit": "USD",
+            "raw_value": "18400.0 USD",
+            "normalized_value": 18400.0,
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_005",
+        "item_id": "item_001",
+        "field_key": "description",
+        "status": "MATCH",
+        "canonical_value": null,
+        "note": "Applicable usable sources agree.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": 1,
+            "unit": null,
+            "raw_value": "CERAMIC MUG 350ML WHITE",
+            "normalized_value": "CERAMIC MUG 350ML WHITE",
+            "field_status": "EXTRACTED"
+          },
+          {
+            "file_id": "f2",
+            "line_no": 1,
+            "unit": null,
+            "raw_value": "CERAMIC MUG 350ML WHITE",
+            "normalized_value": "CERAMIC MUG 350ML WHITE",
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_006",
+        "item_id": "item_001",
+        "field_key": "hs_code",
+        "status": "MATCH",
+        "canonical_value": null,
+        "note": "Applicable usable sources agree.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": 1,
+            "unit": null,
+            "raw_value": "691110",
+            "normalized_value": "691110",
+            "field_status": "EXTRACTED"
+          },
+          {
+            "file_id": "f2",
+            "line_no": 1,
+            "unit": null,
+            "raw_value": "691110",
+            "normalized_value": "691110",
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_007",
+        "item_id": "item_001",
+        "field_key": "packages",
+        "status": "MATCH",
+        "canonical_value": null,
+        "note": "Applicable usable sources agree.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": 1,
+            "unit": "CARTON",
+            "raw_value": "120 CARTON",
+            "normalized_value": 120,
+            "field_status": "EXTRACTED"
+          },
+          {
+            "file_id": "f2",
+            "line_no": 1,
+            "unit": "CARTON",
+            "raw_value": "120 CARTON",
+            "normalized_value": 120,
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_008",
+        "item_id": "item_001",
+        "field_key": "quantity",
+        "status": "CONFLICT",
+        "canonical_value": null,
+        "note": "Usable evidence disagrees; review all sources.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": 1,
+            "unit": "PCS",
+            "raw_value": "2880 PCS",
+            "normalized_value": 2880,
+            "field_status": "EXTRACTED"
+          },
+          {
+            "file_id": "f2",
+            "line_no": 1,
+            "unit": "PCS",
+            "raw_value": "2904 PCS",
+            "normalized_value": 2904,
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_009",
+        "item_id": "item_002",
+        "field_key": "description",
+        "status": "MATCH",
+        "canonical_value": null,
+        "note": "Applicable usable sources agree.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": 2,
+            "unit": null,
+            "raw_value": "GLASS CUP 500ML",
+            "normalized_value": "GLASS CUP 500ML",
+            "field_status": "EXTRACTED"
+          },
+          {
+            "file_id": "f2",
+            "line_no": 2,
+            "unit": null,
+            "raw_value": "GLASS CUP 500ML",
+            "normalized_value": "GLASS CUP 500ML",
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_010",
+        "item_id": "item_002",
+        "field_key": "hs_code",
+        "status": "MATCH",
+        "canonical_value": null,
+        "note": "Applicable usable sources agree.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": 2,
+            "unit": null,
+            "raw_value": "701349",
+            "normalized_value": "701349",
+            "field_status": "EXTRACTED"
+          },
+          {
+            "file_id": "f2",
+            "line_no": 2,
+            "unit": null,
+            "raw_value": "701349",
+            "normalized_value": "701349",
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_011",
+        "item_id": "item_002",
+        "field_key": "packages",
+        "status": "MATCH",
+        "canonical_value": null,
+        "note": "Applicable usable sources agree.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": 2,
+            "unit": "CARTON",
+            "raw_value": "40 CARTON",
+            "normalized_value": 40,
+            "field_status": "EXTRACTED"
+          },
+          {
+            "file_id": "f2",
+            "line_no": 2,
+            "unit": "CARTON",
+            "raw_value": "40 CARTON",
+            "normalized_value": 40,
+            "field_status": "EXTRACTED"
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_012",
+        "item_id": "item_002",
+        "field_key": "quantity",
+        "status": "MATCH",
+        "canonical_value": null,
+        "note": "Applicable usable sources agree.",
+        "values": [
+          {
+            "file_id": "f1",
+            "line_no": 2,
+            "unit": "PCS",
+            "raw_value": "800 PCS",
+            "normalized_value": 800,
+            "field_status": "EXTRACTED"
+          },
+          {
+            "file_id": "f2",
+            "line_no": 2,
+            "unit": "PCS",
+            "raw_value": "800 PCS",
+            "normalized_value": 800,
+            "field_status": "EXTRACTED"
+          }
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "risk_id": "risk_001",
+        "type": "OTHER",
+        "severity": "WARNING",
+        "item_id": "item_001",
+        "related_field_keys": [
+          "quantity"
+        ],
+        "related_file_ids": [
+          "f1",
+          "f2"
+        ],
+        "comparison_id": "cmp_008",
+        "rule_id": "SYNTHETIC_REVIEW_CONFLICT",
+        "rule_source": "Synthetic test profile v1; not legal guidance",
+        "title": "Review quantity: CONFLICT"
+      }
+    ]
+  }
+}

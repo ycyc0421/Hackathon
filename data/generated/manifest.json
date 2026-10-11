@@ -1,0 +1,71 @@
+{
+  "format_version": "synthetic-v3",
+  "generator_seed": 42,
+  "case_count": 16,
+  "cases": [
+    {
+      "case_id": "normal_single",
+      "file": "normal_single.json"
+    },
+    {
+      "case_id": "quantity_conflict_single",
+      "file": "quantity_conflict_single.json"
+    },
+    {
+      "case_id": "weight_conflict_single",
+      "file": "weight_conflict_single.json"
+    },
+    {
+      "case_id": "missing_hs_single",
+      "file": "missing_hs_single.json"
+    },
+    {
+      "case_id": "normal_multi",
+      "file": "normal_multi.json"
+    },
+    {
+      "case_id": "one_item_conflict_multi",
+      "file": "one_item_conflict_multi.json"
+    },
+    {
+      "case_id": "different_order_multi",
+      "file": "different_order_multi.json"
+    },
+    {
+      "case_id": "whole_shipment_weight_multi",
+      "file": "whole_shipment_weight_multi.json"
+    },
+    {
+      "case_id": "unrecognized_single",
+      "file": "unrecognized_single.json"
+    },
+    {
+      "case_id": "low_confidence_single",
+      "file": "low_confidence_single.json"
+    },
+    {
+      "case_id": "partial_unrecognized_single",
+      "file": "partial_unrecognized_single.json"
+    },
+    {
+      "case_id": "all_missing_single",
+      "file": "all_missing_single.json"
+    },
+    {
+      "case_id": "one_item_missing_multi",
+      "file": "one_item_missing_multi.json"
+    },
+    {
+      "case_id": "scope_mismatch_multi",
+      "file": "scope_mismatch_multi.json"
+    },
+    {
+      "case_id": "bill_weight_conflict",
+      "file": "bill_weight_conflict.json"
+    },
+    {
+      "case_id": "multiple_errors_multi",
+      "file": "multiple_errors_multi.json"
+    }
+  ]
+}

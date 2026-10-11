@@ -1,4 +1,8 @@
 node_modules/
+data/app.db
+data/.test_generator_output/
+data/paddleocr_test/
+data/paddleocr_test_bundle.zip
 dist/
 __pycache__/
 *.pyc
