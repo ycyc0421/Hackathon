@@ -12,6 +12,7 @@ import { taskStatus, processStatus, formatTime, formatDuration } from '../api/fo
 import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '../api/labels.js'
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
 import { needsReview } from '../utils/needsReview.js'
+import { heightListItemHooks } from '../utils/animateHeight.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -379,10 +380,19 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
       <!--
         文件列表增删动画：TransitionGroup + 稳定 key（fileKey，不带下标——
         删中间项时按下标做 key 会让后续条目全部重键、补位动画失效）。
-        条目进入/离开用 高度+透明度 过渡，其余条目 move 平滑补位；
+        进入/离开走 JS 精确高度钩子（utils/animateHeight.js 的 heightListItemHooks，
+        :css="false"）：条目留在文档流内，高度/padding/边框与透明度同步收放，
+        栏位与文字一体，兄弟行随高度变化自然移动；
         appear 让列表从空到有的首次出现也有进入动画。
       -->
-      <TransitionGroup v-if="files.length" tag="ul" name="file-item" class="file-list" appear>
+      <TransitionGroup
+        v-if="files.length"
+        tag="ul"
+        class="file-list"
+        appear
+        :css="false"
+        v-bind="heightListItemHooks"
+      >
         <li v-for="(f, i) in files" :key="fileKey(f)" class="file-item">
           <span class="file-name">{{ f.name }}</span>
           <span
