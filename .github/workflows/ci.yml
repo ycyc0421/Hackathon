@@ -7,6 +7,36 @@ on:
     branches: [main]
 
 jobs:
+  backend-regression:
+    name: 后端语义与契约回归
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 安装依赖
+        run: |
+          python -m pip install -r backend/requirements.txt
+          npm ci
+
+      - name: 比对及审查边界
+        run: |
+          python backend/tools/test_compare.py
+          python backend/tools/test_review_regressions.py
+
+      - name: 接口与金标
+        run: |
+          python backend/tools/selftest.py
+          python backend/tools/run_challenge.py
+
   validate-contract:
     name: 验证数据契约
     runs-on: ubuntu-latest
