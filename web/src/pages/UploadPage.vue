@@ -48,7 +48,7 @@ const scanWarnings = ref(new Set())
 /** 命中预检测的文件数，供汇总提示条使用 */
 const scanWarnCount = computed(() => scanWarnings.value.size)
 
-/** 轮询超过 90s 未结束时显示"处理时间较长"，但不停止等待 */
+/** 轮询超过软提示线（SLOW_POLL_MS，30s）未结束时显示"处理时间较长"，但不停止等待 */
 const slowHint = ref(false)
 /** 请求层自动重试进行中（网络错误 / 5xx），显示"正在重连" */
 const retryHint = ref(false)
@@ -298,6 +298,13 @@ async function submit() {
 
 const statusInfo = computed(() => (task.value ? taskStatus(task.value.status) : null))
 
+/**
+ * 任务是否未达终态。慢提示/重连提示的显示条件以此为准，
+ * 而不是"task 对象是否存在"——首次 onTick 写入 task 后提示不能消失。
+ */
+const TERMINAL_STATUSES = ['COMPLETED', 'PARTIAL', 'FAILED']
+const taskPending = computed(() => !task.value || !TERMINAL_STATUSES.includes(task.value.status))
+
 /** taskError 的分类展示：标题、语气、建议动作统一由 labels.js 的 API_ERROR_KIND 决定 */
 const taskErrorInfo = computed(() => {
   if (!taskError.value) return null
@@ -458,6 +465,12 @@ function docStatus(d) {
             title="检查失败"
             detail="未产生任何比对结果。请检查文件格式后重试。"
           />
+
+          <!-- 慢提示/重连提示：任务未达终态即可见，task 写入后也不能消失 -->
+          <p v-if="isRunning && taskPending && retryHint" class="processing-hint">网络异常，正在自动重连…</p>
+          <p v-else-if="isRunning && taskPending && slowHint" class="processing-hint">
+            处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
+          </p>
 
           <ul class="doc-list">
             <li v-for="d in task.documents" :key="d.file_id" class="doc-item">

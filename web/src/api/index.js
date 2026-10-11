@@ -15,27 +15,22 @@ import {
   RETRY_MAX_ATTEMPTS,
   RETRY_BASE_DELAY_MS,
   SLOW_POLL_MS,
+  REQUEST_TIMEOUT_MS,
 } from './config.js'
+import {
+  ApiError,
+  request,
+  requestWithUploadProgress,
+  pollTask,
+} from './request.js'
 import { UPLOAD_LIMITS, validateFiles, splitByName } from './uploadLimits.js'
 import completedSample from '../mock/check-completed.json'
 import partialSample from '../mock/check-partial.json'
 import multiItemSample from '../mock/check-multi-item.json'
 import cleanSample from '../mock/check-clean.json'
 
-// —— 统一的错误类型：页面按 kind 区分展示方式 ——
-
-export class ApiError extends Error {
-  constructor(message, { kind = 'SERVER', code = null, status = null } = {}) {
-    super(message)
-    this.name = 'ApiError'
-    this.kind = kind // NETWORK | PARSE | SERVER | TIMEOUT | CANCELED
-    this.code = code
-    this.status = status
-  }
-}
-
-// 上传校验与同名拆分在此处统一出口，页面只从 api/index.js 引入
-export { UPLOAD_LIMITS, validateFiles, splitByName }
+// 错误类型、上传校验与同名拆分在此处统一出口，页面只从 api/index.js 引入
+export { ApiError, UPLOAD_LIMITS, validateFiles, splitByName }
 
 // —— mock 实现 ——
 
@@ -77,142 +72,10 @@ function nextMockSample() {
 
 // —— 真实实现 ——
 
-/** 单次请求。失败时抛 ApiError，kind 标出失败在哪一环 */
-async function requestOnce(path, options = {}) {
-  let res
-  try {
-    res = await fetch(`${API_BASE}${path}`, options)
-  } catch (e) {
-    // 直连不通、DNS 失败、CORS 被拦都落这里。
-    // 明确区分于"后端返回了错误"，因为排查方向完全不同。
-    throw new ApiError('无法连接后端，请确认服务已启动、代理配置正确', { kind: 'NETWORK' })
-  }
-
-  if (!res.ok) {
-    // 契约要求失败返回非 2xx。这里读一下是否有结构化错误体。
-    // 5xx 且没有契约错误体的，多半是代理/网关打不通上游（dev proxy 后端没启动、
-    // 网关超时）时自己返回的错误页——根因是连接问题，归入 NETWORK，
-    // 否则用户会拿着"服务端处理失败"去排查一个根本没收到请求的后端。
-    let code = null
-    let message = `请求失败（HTTP ${res.status}）`
-    let hasContractError = false
-    try {
-      const body = await res.json()
-      if (body?.error?.message) {
-        message = body.error.message
-        hasContractError = true
-      }
-      if (body?.error?.code) code = body.error.code
-    } catch {
-      /* 错误体不是 JSON，用默认文案 */
-    }
-    if (res.status >= 500 && !hasContractError) {
-      throw new ApiError('无法连接后端，请确认服务已启动、代理配置正确', {
-        kind: 'NETWORK',
-        code,
-        status: res.status,
-      })
-    }
-    throw new ApiError(message, { kind: 'SERVER', code, status: res.status })
-  }
-
-  try {
-    return await res.json()
-  } catch {
-    throw new ApiError('后端返回的内容不是合法 JSON', { kind: 'PARSE', status: res.status })
-  }
-}
-
 /**
- * 值得重试的失败：连接层错误（NETWORK）和服务端 5xx。
- * 这两类通常是瞬时的（冷启动、网关抖动）；4xx 是请求本身的问题，重试无意义。
+ * 请求层（单次截止、取消传播、重试、上传进度、轮询循环）在 api/request.js，
+ * 这里只负责把 config 的参数接上，保持对外函数签名不变。
  */
-function isRetryable(e) {
-  return e instanceof ApiError && (e.kind === 'NETWORK' || (e.kind === 'SERVER' && e.status >= 500))
-}
-
-/**
- * 带重试的请求。最多 RETRY_MAX_ATTEMPTS 次尝试，间隔按 1s / 2s / 4s 指数退避。
- * onRetry 供页面显示"正在重试"之类的提示；signal 供取消。
- * 重试用尽后抛出最后一次的错误，页面按它的 kind 分类提示。
- */
-async function request(path, options = {}, { onRetry, signal } = {}) {
-  let lastError
-  for (let attempt = 1; attempt <= RETRY_MAX_ATTEMPTS; attempt += 1) {
-    if (signal?.aborted) throw new ApiError('已取消', { kind: 'CANCELED' })
-    try {
-      return await requestOnce(path, options)
-    } catch (e) {
-      lastError = e
-      const canRetry = isRetryable(e) && attempt < RETRY_MAX_ATTEMPTS
-      if (!canRetry) throw e
-      onRetry?.(attempt, RETRY_MAX_ATTEMPTS, e)
-      await sleep(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1))
-    }
-  }
-  throw lastError
-}
-
-/**
- * 带上传进度回调的 POST。fetch 拿不到上传进度，这里用 XMLHttpRequest。
- * 错误分类与 request() 保持一致，页面不用区分两条路径。
- * @param {string} path
- * @param {FormData} form
- * @param {(percent: number) => void} onProgress 0-100，仅在可计算总长时回调
- */
-function requestWithUploadProgress(path, form, onProgress) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest()
-    xhr.open('POST', `${API_BASE}${path}`)
-    xhr.responseType = 'json'
-
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable && e.total > 0) {
-        onProgress(Math.round((e.loaded / e.total) * 100))
-      }
-    }
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const body = xhr.response
-        if (body && typeof body === 'object') {
-          resolve(body)
-        } else {
-          reject(new ApiError('后端返回的内容不是合法 JSON', { kind: 'PARSE', status: xhr.status }))
-        }
-        return
-      }
-      // 与 requestOnce 同一规则：5xx 且没有契约错误体的按连接问题归 NETWORK
-      //（典型场景：dev proxy 的上游后端没启动，代理自己回了错误页）
-      let code = null
-      let message = `请求失败（HTTP ${xhr.status}）`
-      let hasContractError = false
-      const body = xhr.response
-      if (body?.error?.message) {
-        message = body.error.message
-        hasContractError = true
-      }
-      if (body?.error?.code) code = body.error.code
-      if (xhr.status >= 500 && !hasContractError) {
-        reject(
-          new ApiError('无法连接后端，请确认服务已启动、代理配置正确', {
-            kind: 'NETWORK',
-            code,
-            status: xhr.status,
-          })
-        )
-        return
-      }
-      reject(new ApiError(message, { kind: 'SERVER', code, status: xhr.status }))
-    }
-
-    xhr.onerror = () => {
-      reject(new ApiError('无法连接后端，请确认服务已启动、代理配置正确', { kind: 'NETWORK' }))
-    }
-
-    xhr.send(form)
-  })
-}
 
 // —— 对外接口 ——
 
@@ -249,9 +112,17 @@ export async function createCheck(
   if (notes) form.append('notes', notes)
 
   if (onUploadProgress) {
-    return requestWithUploadProgress('/checks', form, onUploadProgress)
+    return requestWithUploadProgress('/checks', form, onUploadProgress, {
+      base: API_BASE,
+      timeoutMs: REQUEST_TIMEOUT_MS,
+      signal,
+    })
   }
-  return request('/checks', { method: 'POST', body: form }, { onRetry, signal })
+  return request(
+    '/checks',
+    { method: 'POST', body: form },
+    { base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS, retries: RETRY_MAX_ATTEMPTS, baseDelayMs: RETRY_BASE_DELAY_MS, onRetry, signal }
+  )
 }
 
 /**
@@ -265,15 +136,19 @@ export async function getCheck(taskId, { onRetry, signal } = {}) {
     sample.task_id = taskId
     return sample
   }
-  return request(`/checks/${encodeURIComponent(taskId)}`, {}, { onRetry, signal })
+  return request(
+    `/checks/${encodeURIComponent(taskId)}`,
+    {},
+    { base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS, retries: RETRY_MAX_ATTEMPTS, baseDelayMs: RETRY_BASE_DELAY_MS, onRetry, signal }
+  )
 }
 
 /**
  * 轮询直到任务结束。
  *
- * 终止条件：拿到终态、达到轮询上限、调用方通过 signal 取消。
- * 超过 SLOW_POLL_MS（90 秒）未结束时通过 onSlow 提示"处理时间较长"，
- * 但继续等待——不把它当失败，让后端有机会跑完大文件。
+ * 终止条件：拿到终态、达到轮询上限（硬截止 90 秒）、调用方通过 signal 取消。
+ * 超过 SLOW_POLL_MS（软提示线，30 秒，先于硬截止触发）未结束时通过 onSlow
+ * 提示"处理时间较长"，但继续等待——不把它当失败，让后端有机会跑完大文件。
  * 超时和失败都抛 ApiError，由页面决定怎么显示——绝不返回一个空结果，
  * 否则页面会把它渲染成"检查完成，没有问题"。
  *
@@ -281,31 +156,26 @@ export async function getCheck(taskId, { onRetry, signal } = {}) {
  * @param {{ onTick?: (task: object) => void, onSlow?: () => void, onRetry?: Function, signal?: AbortSignal }} options
  */
 export async function pollCheck(taskId, { onTick, onSlow, onRetry, signal } = {}) {
-  const TERMINAL = ['COMPLETED', 'PARTIAL', 'FAILED']
-  const startedAt = Date.now()
-  let slowNotified = false
+  // mock 下没有真实后端，直接走 getCheck 的 mock 分支拿样例；
+  // 否则请求会打到 dev server 的 SPA 回退上，拿到 HTML 报 PARSE 错误
+  const mock = isMock()
+  const fetchTask = () =>
+    mock
+      ? getCheck(taskId, { signal })
+      : request(
+          `/checks/${encodeURIComponent(taskId)}`,
+          {},
+          { base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS, retries: RETRY_MAX_ATTEMPTS, baseDelayMs: RETRY_BASE_DELAY_MS, onRetry, signal }
+        )
 
-  for (let i = 0; i < POLL_MAX_ATTEMPTS; i += 1) {
-    if (signal?.aborted) throw new ApiError('已取消', { kind: 'CANCELED' })
-
-    // mock 下没有真实后端，直接走 getCheck 的 mock 分支拿样例；
-    // 否则请求会打到 dev server 的 SPA 回退上，拿到 HTML 报 PARSE 错误
-    const task = isMock()
-      ? await getCheck(taskId, { signal })
-      : await request(`/checks/${encodeURIComponent(taskId)}`, {}, { onRetry, signal })
-    onTick?.(task)
-
-    if (TERMINAL.includes(task.status)) return task
-
-    if (!slowNotified && Date.now() - startedAt > SLOW_POLL_MS) {
-      slowNotified = true
-      onSlow?.()
-    }
-
-    await sleep(isMock() ? 300 : POLL_INTERVAL_MS)
-  }
-
-  throw new ApiError('处理时间过长，请稍后重试', { kind: 'TIMEOUT' })
+  return pollTask(fetchTask, {
+    onTick,
+    onSlow,
+    signal,
+    intervalMs: mock ? 300 : POLL_INTERVAL_MS,
+    maxAttempts: POLL_MAX_ATTEMPTS,
+    slowMs: SLOW_POLL_MS,
+  })
 }
 
 /**
@@ -327,7 +197,13 @@ export async function getEvaluation(options = {}) {
   }
 
   try {
-    return await request('/evaluation/latest', {}, options)
+    return await request('/evaluation/latest', {}, {
+      base: API_BASE,
+      timeoutMs: REQUEST_TIMEOUT_MS,
+      retries: RETRY_MAX_ATTEMPTS,
+      baseDelayMs: RETRY_BASE_DELAY_MS,
+      ...options,
+    })
   } catch (e) {
     // 接口还没做属于预期内。降级为"尚未评测"，但把原因留着便于排查
     if (e.status === 404) {
