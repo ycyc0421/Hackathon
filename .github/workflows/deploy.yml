@@ -55,8 +55,8 @@ jobs:
     env:
       VITE_API_BASE: ${{ vars.VITE_API_BASE }}
       FRONTEND_ORIGIN: ${{ vars.FRONTEND_ORIGIN }}
-      BACKEND_SSH_HOST: ${{ vars.BACKEND_SSH_HOST }}
-      BACKEND_SSH_USER: ${{ vars.BACKEND_SSH_USER }}
+      BACKEND_SSH_HOST: ${{ secrets.BACKEND_SSH_HOST }}
+      BACKEND_SSH_USER: ${{ secrets.BACKEND_SSH_USER }}
       RELEASE_ID: ${{ needs.revision.outputs.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4

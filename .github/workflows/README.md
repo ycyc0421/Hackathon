@@ -52,10 +52,8 @@
 |---|---|
 | `VITE_API_BASE` | 后端完整 HTTPS API 前缀，以 `/api/v1` 结尾，不带尾斜杠，如 `https://backend.example.com/api/v1` |
 | `FRONTEND_ORIGIN` | 实际前端站点的 HTTPS 源地址，用于验证该站点的跨域请求，如 `https://app.example.com` |
-| `BACKEND_SSH_HOST` | 部署主机域名或 IPv4 地址，SSH 使用 22 端口 |
-| `BACKEND_SSH_USER` | 已初始化的普通维护用户，不允许 `root` |
 
-实际服务地址与账户值只填在 GitHub 配置中，不写进仓库。`VITE_API_BASE` 会进入浏览器代码，只能放公开地址。
+Variables 只保存浏览器需要使用的公开地址。`VITE_API_BASE` 会进入前端构建产物；部署主机地址、维护账号和 SSH 凭据统一保存在下方的 Secrets，不写进仓库，也不放在 Variables 中。
 
 ### GitHub Environment Secrets
 
@@ -63,6 +61,8 @@
 
 - `CLOUDFLARE_API_TOKEN`: Cloudflare API Token
 - `CLOUDFLARE_ACCOUNT_ID`: 部署目标的 Cloudflare 账户 ID
+- `BACKEND_SSH_HOST`: 敏感的部署主机域名或 IPv4 地址，SSH 使用 22 端口
+- `BACKEND_SSH_USER`: 已初始化的普通维护用户，不允许 `root`
 - `BACKEND_SSH_KEY`: 仅用于部署的 SSH 私钥，对应公钥安装到普通维护用户；不使用共享登录密码
 - `BACKEND_SSH_KNOWN_HOSTS`: 经可信连接核验的服务器 SSH 公钥记录；工作流严格校验，不临时接受未知主机
 
