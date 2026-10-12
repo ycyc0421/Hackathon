@@ -1,0 +1,79 @@
+{
+  "repository_sha": "fca14f56910333c4bac8c72cfd6428ffe2fb6f2a",
+  "source": "saved initial diagnostic OCR text and PPStructure markdown",
+  "scope": "model-free adapter replay on original PDF rendering; not new inference or HTTP acceptance",
+  "results": [
+    {
+      "file": "exportdoc-proforma-invoice-sample.pdf",
+      "model_inference_performed": false,
+      "external_llm_calls": 0,
+      "read_ok": true,
+      "error": null,
+      "uncertain_item_codes": [],
+      "structured_grid": {
+        "accepted": true,
+        "rows": [
+          "NO.   ITEM NO.   DESCRIPTION OF GOODS   HS CODE   QUANTITY   UNIT PRICE   AMOUNT (USD)",
+          "1   CT-2408   100% Cotton T-shirt, unisex, assorted colors   6109.10   500 PCS   $2.80   $1,400.00"
+        ]
+      },
+      "adapted_text": "SELLER: Ningbo Qihang Export Co., Ltd.\nBUYER: Global Fashion Inc.\nDEMO — NOT FOR TRADE\nPROFORMA INVOICE\nDocument No.: PI-20260830-08300186\nDate: 2026-08-30\nSELLER/ EXPORTER\nBUYER /IMPORTER\nNingbo Qihang Export Co., Ltd.\nGlobal Fashion Inc.\nNo. 168, Haitian North Road, Jiangbei District, Ningbo,\n1234 Broadway, Suite 500, New York, NY 10001, United\nZhejiang, China\nStates\nEmail: sales@qihangexport.example\nEmail: purchasing@globalfashion.example\nTel: +86 574 8700 1234\nTel: +1 212 555 7890\nINCOTERM\nFOB Ningbo\nPAYMENT TERMS\nT/T 30% Deposit, 70% Before Shipment\nPORT OF LOADING\nNingbo, China\nPORT OF DESTINATION\nNew York, USA\nSHIPPING MARK\nGLOBAL FASHION / NEW YORK / C.NO.\nCOUNTRY OF ORIGIN\nChina\n1-20\nVESSEL / FLIGHT\nTo be advised\nCURRENCY\nUSD\nNO.   ITEM NO.   DESCRIPTION OF GOODS   HS CODE   QUANTITY   UNIT PRICE   AMOUNT (USD)\n1   CT-2408   100% Cotton T-shirt, unisex, assorted colors   6109.10   500 PCS   $2.80   $1,400.00\nTOTAL AMOUNT (USD)\n$1,400.00\nTOTAL AMOUNT IN WORDS:\nONE THOUSAND FOUR HUNDRED AND 00/100 USD ONLY\nBANK DETAILS:\nBank of China Ningbo Branch· A/C 6222 0000 0000 0000 · SWIFT BKCHCNBJ92A\nNOTES:\nGoods are packed for export and free from wood packaging materials.\nAuthorized Signature\n1 / 1",
+      "backend_values_verified": true,
+      "expected_values": {
+        "item_code": "CT-2408",
+        "quantity": 500,
+        "unit_price": 2.8,
+        "amount": 1400
+      },
+      "description_raw_value": "100% Cotton T-shirt, unisex, assorted colors"
+    },
+    {
+      "file": "exportdoc-commercial-invoice-sample.pdf",
+      "model_inference_performed": false,
+      "external_llm_calls": 0,
+      "read_ok": true,
+      "error": null,
+      "uncertain_item_codes": [
+        "CT-2408"
+      ],
+      "structured_grid": {
+        "accepted": false,
+        "error": "未识别出唯一的商品明细表"
+      },
+      "adapted_text": "SELLER: Ningbo Qihang Export Co., Ltd.\nBUYER: Global Fashion Inc.\nDEMO — NOT FOR TRADE\nCOMMERCIAL INVOICE\nDocument No.: CI-20260830-08300186 [OCR raw: Cl-20260830-08300186]\nDate: 2026-08-30\nSELLER/ EXPORTER\nBUYER / IMPORTER\nNingbo Qihang Export Co., Ltd.\nGlobal Fashion Inc.\nNo. 168, Haitian North Road, Jiangbei District, Ningbo,\n1234 Broadway, Suite 500, New York, NY 10001, United\nZhejiang, China\nStates\nEmail: sales@qihangexport.example\nEmail: purchasing@globalfashion.example\nTel: +86 574 8700 1234\nTel: +1 212 555 7890\nINCOTERM\nFOB Ningbo\nPAYMENT TERMS\nT/T 30% Deposit, 70% Before Shipment\nPORT OF LOADING\nNingbo, China\nPORT OF DESTINATION\nNew York, USA\nSHIPPING MARK\nGLOBAL FASHION / NEW YORK / C.NO.\nCOUNTRY OF ORIGIN\nChina\n1-20\nVESSEL / FLIGHT\nTo be advised\nCURRENCY\nUSD\nNO.   ITEM NO.   DESCRIPTION OF GOODS   HS CODE   QUANTITY   UNIT PRICE   AMOUNT (USD)\n1   CT-2408   100% Cotton T-shirt, unisex, assorted colors   6109.10   500 PCS   $2.80   $1,400.00\nTOTAL AMOUNT (USD)\n$1,400.00\nTOTAL AMOUNT IN WORDS:\nONE THOUSAND FOUR HUNDRED AND 00/100 USD ONLY\nNOTES:\nGoods are packed for export and free from wood packaging materials.\nAuthorized Signature\n1 / 1",
+      "backend_values_verified": true,
+      "expected_values": {
+        "item_code": "CT-2408",
+        "quantity": 500,
+        "unit_price": 2.8,
+        "amount": 1400
+      },
+      "description_raw_value": "100% Cotton T-shirt, unisex, assorted colors"
+    },
+    {
+      "file": "exportdoc-packing-list-sample.pdf",
+      "model_inference_performed": false,
+      "external_llm_calls": 0,
+      "read_ok": true,
+      "error": null,
+      "uncertain_item_codes": [
+        "CT-2408"
+      ],
+      "structured_grid": {
+        "accepted": false,
+        "error": "商品数据合并单元格的归属不明确，不能重复分配数值"
+      },
+      "adapted_text": "SELLER: Ningbo Qihang Export Co., Ltd.\nBUYER: Global Fashion Inc.\nDEMO — NOT FOR TRADE\nPACKING LIST\nDocument No.: PL-20260830-08300186\nDate: 2026-08-30\nSELLER/ EXPORTER\nBUYER / IMPORTER\nNingbo Qihang Export Co., Ltd.\nGlobal Fashion Inc.\nNo. 168, Haitian North Road, Jiangbei District, Ningbo,\n1234 Broadway, Suite 500, New York, NY 10001, United\nZhejiang, China\nStates\nEmail: sales@qihangexport.example\nEmail: purchasing@globalfashion.example\nTel: +86 574 8700 1234\nTel: +1 212 555 7890\nINCOTERM\nFOB Ningbo\nPAYMENT TERMS\nT/T 30% Deposit, 70% Before Shipment\nPORT OF LOADING\nNingbo, China\nPORT OF DESTINATION\nNew York, USA\nSHIPPING MARK\nGLOBAL FASHION / NEW YORK / C.NO.\nCOUNTRY OF ORIGIN\nChina\n1-20\nVESSEL / FLIGHT\nTo be advised\nCURRENCY\nUSD\nNO.   DESCRIPTION OF GOODS   SKU   QTY   PKGS   NET KG   GROSS KG   CBM\n1   100% Cotton T-shirt, unisex, assorted colors   CT-2408   500 PCS   20   150.00 KG   170.00 KG   1.680 CBM\nTOTAL\n500\n20\n150.00\n170.00\n1.680\nPACKING DECLARATION: The above goods are packed for export. Measurements and weights are declared by the exporter.\nNOTES:\nGoods are packed for export and free from wood packaging materials.\nAuthorized Signature\n1 / 1",
+      "backend_values_verified": true,
+      "expected_values": {
+        "item_code": "CT-2408",
+        "quantity": 500,
+        "packages": 20,
+        "net_weight": 150,
+        "gross_weight": 170,
+        "volume": 1.68
+      },
+      "description_raw_value": "100% Cotton T-shirt, unisex, assorted colors"
+    }
+  ]
+}

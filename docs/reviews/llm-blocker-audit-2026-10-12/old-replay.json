@@ -1,0 +1,46 @@
+{
+  "repository_sha": "6a526985162b90a6757fa5f447ac2e976623f64e",
+  "source": "saved initial diagnostic OCR text and PPStructure markdown",
+  "scope": "model-free adapter replay on original PDF rendering; not new inference or HTTP acceptance",
+  "results": [
+    {
+      "file": "exportdoc-proforma-invoice-sample.pdf",
+      "model_inference_performed": false,
+      "external_llm_calls": 0,
+      "read_ok": false,
+      "error": "PDF 第 1 页：PaddleOCR 识别失败：未识别出唯一的商品明细表",
+      "uncertain_item_codes": [],
+      "structured_grid": {
+        "accepted": false,
+        "error": "未识别出唯一的商品明细表"
+      },
+      "adapted_text": ""
+    },
+    {
+      "file": "exportdoc-commercial-invoice-sample.pdf",
+      "model_inference_performed": false,
+      "external_llm_calls": 0,
+      "read_ok": false,
+      "error": "PDF 第 1 页：PaddleOCR 识别失败：未识别出唯一的商品明细表",
+      "uncertain_item_codes": [],
+      "structured_grid": {
+        "accepted": false,
+        "error": "未识别出唯一的商品明细表"
+      },
+      "adapted_text": ""
+    },
+    {
+      "file": "exportdoc-packing-list-sample.pdf",
+      "model_inference_performed": false,
+      "external_llm_calls": 0,
+      "read_ok": false,
+      "error": "PDF 第 1 页：PaddleOCR 识别失败：商品数据合并单元格的归属不明确，不能重复分配数值",
+      "uncertain_item_codes": [],
+      "structured_grid": {
+        "accepted": false,
+        "error": "商品数据合并单元格的归属不明确，不能重复分配数值"
+      },
+      "adapted_text": ""
+    }
+  ]
+}
