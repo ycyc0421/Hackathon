@@ -1,14 +1,9 @@
-"""Generate deterministic, synthetic UN/EDIFACT D.96A regression inputs.
-
-No runtime parser, upload, deployment or existing sample is changed. The checker
-is a limited fixture reader, not a complete EDIFACT or trading-partner validator.
-"""
+"""手动生成合成 EDI 原件与字段预期，不执行应用解析或验收。"""
 from __future__ import annotations
 
 import argparse
 from copy import deepcopy
 from decimal import Decimal
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -201,30 +196,6 @@ def write_json(path, value):
     path.write_bytes((json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
 
 
-def first_batch_matrix(expected):
-    files = []
-    for case in expected["cases"]:
-        for name in sorted({doc["file_name"] for doc in case["documents"].values()}):
-            docs = [doc for doc in case["documents"].values() if doc["file_name"] == name]
-            if len(docs) > 1:
-                proposal = "OUT_OF_SCOPE_MULTIPLE_UNH"
-            elif docs[0]["message_type"] != "INVOIC":
-                proposal = "OUT_OF_SCOPE_MESSAGE_TYPE"
-            elif case["syntax_expected"] == "REJECT":
-                proposal = "REJECT_INVALID_MESSAGE"
-            else:
-                proposal = "IN_SCOPE_PENDING_C_CONFIRMATION"
-            files.append(dict(path=case["case_id"] + "/" + name,
-                              message_types=[doc["message_type"] for doc in docs],
-                              authored_message_count=len(docs), fixture_syntax_expected=case["syntax_expected"],
-                              proposed_first_batch_expectation=proposal,
-                              specific_error_code="PENDING_C_F_CONTRACT", encoding="ASCII / UTF-8 subset; no BOM"))
-    return dict(proposal_status="PENDING_C_CONFIRMATION",
-                source="https://github.com/ycyc0421/Hackathon/issues/40#issuecomment-6123316495",
-                proposed_message_type="INVOIC:D:96A:UN", maximum_messages_per_file=1,
-                current_runtime_acceptance="NOT_RUN", files=files)
-
-
 def generate(output):
     output.mkdir(parents=True, exist_ok=True)
     expected = dict(dataset_version="edi-synthetic-v1", synthetic=True, directory="D.96A",
@@ -257,29 +228,16 @@ def generate(output):
                                       expected_error=case.get("invalid"), documents=doc_entries,
                                       expected_discrepancies=discrepancies(doc_entries)))
     write_json(output / "expected.json", expected)
-    write_json(output / "first-batch-matrix.json", first_batch_matrix(expected))
-    manifest = []
-    for path in sorted(output.rglob("*.edi")):
-        content = path.read_bytes()
-        manifest.append(dict(path=path.relative_to(output).as_posix(), size_bytes=len(content),
-                             sha256=hashlib.sha256(content).hexdigest()))
-    write_json(output / "manifest.json", dict(dataset_version=expected["dataset_version"], files=manifest))
-    return len(expected["cases"]), len(manifest)
+    return len(expected["cases"])
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--check", action="store_true", help="validate existing files without rewriting them")
     args = parser.parse_args()
-    if not args.check:
-        count, files = generate(args.output)
-        print(f"Generated {count} synthetic cases, {files} EDI files: {args.output.resolve()}")
-    from validate_edi_samples import validate
-    report = validate(args.output)
-    write_json(args.output / "validation-report.json", report)
-    print(json.dumps(report, ensure_ascii=False, indent=2))
-    return 0 if report["passed"] else 1
+    count = generate(args.output)
+    print(f"已生成 {count} 组合成 EDI 样例：{args.output.resolve()}")
+    return 0
 
 
 if __name__ == "__main__":

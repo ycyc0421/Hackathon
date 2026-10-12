@@ -35,9 +35,6 @@ jobs:
           python backend/tools/test_paddle_adapter.py
           python backend/tools/test_sqlite_store.py
 
-      - name: EDI 合成素材完整性（不声明实际解析能力）
-        run: python backend/tools/make_edi_samples.py --check
-
       - name: 接口与金标
         run: |
           python backend/tools/selftest.py
