@@ -21,7 +21,7 @@ const task = inject('task')
 const taskError = inject('taskError', null)
 
 /** 可修正的整票字段白名单（文档级，line_no 为空） */
-const documentKeys = new Set(['packages','gross_weight','net_weight','volume','quantity','hs_code','total_amount','currency','description','invoice_no','shipment_date','bill_of_lading_no','contract_no','container_no','shipper','consignee','port_of_loading','port_of_discharge'])
+const documentKeys = new Set(['packages','gross_weight','net_weight','volume','quantity','hs_code','total_amount','currency','description','document_no','invoice_no','shipment_date','bill_of_lading_no','contract_no','container_no','shipper','consignee','port_of_loading','port_of_discharge'])
 /** 可修正的商品级字段白名单（line_no 有值） */
 const itemKeys = new Set(['item_code','description','hs_code','quantity','packages','net_weight','gross_weight','volume','unit_price','amount'])
 
