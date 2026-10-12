@@ -5,11 +5,26 @@
  * 当前文件集合实时跑 validateFiles 为准，这段逻辑必须能在 node 里单测。
  */
 
-/** 上传前的前端校验。上限来自契约第四节第 11 项的当前处理方式，需后端侧确认 */
+/**
+ * 上传前的前端校验。上限来自契约第四节第 11 项的当前处理方式，需后端侧确认。
+ *
+ * accept 是唯一白名单：选择器 accept 属性、拖放入口校验、界面支持说明都从它派生，
+ * 不接受 .txt——直到后端明确 EDI 的识别约定（issue #40）。扩展名不区分大小写，
+ * .edi 与 .EDI 均可，但不靠 MIME 判断（浏览器常给空或不可靠的 MIME）。
+ */
 export const UPLOAD_LIMITS = {
   maxFiles: 10,
   maxFileSizeMB: 20,
-  accept: '.pdf,.png,.jpg,.jpeg,.webp',
+  accept: '.pdf,.png,.jpg,.jpeg,.webp,.edi',
+}
+
+/**
+ * 按扩展名识别 EDI 文件（大小写一致）。用于原文查看/下载的分支判定，
+ * 与后端把它标为 EDI / OTHER / UNSUPPORTED 无关——前端只认本地扩展名。
+ * 不要用文件内容猜测（invoice.txt 内容像 EDI 也不接受）。
+ */
+export function isEdiName(name) {
+  return typeof name === 'string' && name.split('.').pop()?.toUpperCase() === 'EDI'
 }
 
 /**

@@ -6,10 +6,10 @@
  * 这里按用户选择实现——可控，演示时不依赖抽取准确率。
  */
 import { ref, computed, inject, onBeforeUnmount } from 'vue'
-import { createCheck, pollCheck, validateFiles, splitByName, ApiError, UPLOAD_LIMITS } from '../api/index.js'
+import { createCheck, pollCheck, validateFiles, splitByName, ApiError, UPLOAD_LIMITS, isMock, isEdiName } from '../api/index.js'
 import { backendErrorText } from '../api/errors.js'
 import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
-import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING } from '../api/labels.js'
+import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING, EDI_CAPABILITY } from '../api/labels.js'
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
 import { needsReview } from '../utils/needsReview.js'
 import { heightListItemHooks, collapseHooks } from '../utils/animateHeight.js'
@@ -19,6 +19,7 @@ import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import EmptyState from '../components/EmptyState.vue'
 import AppSelect from '../components/AppSelect.vue'
+import EdiSourceView from '../components/EdiSourceView.vue'
 
 const task = inject('task')
 const taskError = inject('taskError')
@@ -92,6 +93,15 @@ function isPdf(file) {
   return file.name.split('.').pop()?.toUpperCase() === 'PDF'
 }
 
+/**
+ * 该文件名是否对应浏览器内存里可操作的 EDI 原件。
+ * 已选列表直接是 File；任务文件列表则按文件名回查 App 层提交时保存的映射
+ * （失败/不支持没有比较结果，原件入口仍要可达——见 #40 与下方 displayDocs）。
+ */
+function ediSourceFile(name) {
+  return isEdiName(name) ? sourceFiles.get(name) : null
+}
+
 function fileKey(f) {
   return `${f.name}:${f.size}`
 }
@@ -153,7 +163,8 @@ function addFiles(list) {
   const problems = validateFiles(files.value)
   if (problems.length) localErrors.value.push(...problems)
 
-  // 只对 PDF 做文本层预检测，图片（本来就没有文本层）不检测。
+  // 只对 PDF 做文本层预检测，图片（本来就没有文本层）不检测；
+  // EDI 是纯文本报文、没有「文本层」概念，同样不进入 PDF 预检（见 #40）。
   // 异步后台跑，不阻塞文件进入列表；检测失败在 detectPdfTextLayer 内部降级为 unknown。
   for (const f of fresh) {
     if (isPdf(f)) scheduleScan(f)
@@ -370,7 +381,20 @@ const displayDocs = computed(() => {
     name: d.file_name,
     error: d.error_message,
     status: processStatus(d.process_status),
+    // 失败/不支持的 EDI 没有比较结果，原件入口仍要可达：按文件名回查提交时保存的
+    // File 映射。刷新或跨任务后映射丢失则为 null，如实不渲染（不拿 raw_text 拼原件）。
+    sourceFile: ediSourceFile(d.file_name),
   }))
+  if (!live.length) {
+    return files.value.map((f) => ({
+      key: fileKey(f),
+      name: f.name,
+      error: null,
+      status: phase.value === 'uploading'
+        ? { text: '上传中', tone: 'running' }
+        : { text: '排队中', tone: 'muted' },
+    }))
+  }
   if (!live.length) {
     return files.value.map((f) => ({
       key: fileKey(f),
@@ -409,6 +433,13 @@ const extractProgress = computed(() => {
 
 /** 待复核条目数：与差异页「需关注」、顶栏角标同一口径 */
 const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).length ?? 0)
+
+/**
+ * 是否提示 EDI 能力说明：真实模式且已选含 EDI 文件时显示。
+ * 接受 .edi 只表示允许提交原件，不代表后端已解析（#40）；示例数据模式不提示
+ * （示例返回的是合成解析结果，不需要能力声明）。
+ */
+const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiName(f.name)))
 </script>
 
 <template>
@@ -476,6 +507,8 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
           >
           <span class="file-size">{{ sizeText(f.size) }}</span>
           <button class="link-btn" @click="removeFile(i)">移除</button>
+          <!-- EDI 原件：提交前即可查看/下载，纯文本、不解释 HTML 形似内容（#40） -->
+          <EdiSourceView v-if="isEdiName(f.name)" :file="f" class="file-item-source" />
         </li>
       </TransitionGroup>
 
@@ -518,6 +551,11 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
           :title="SCAN_WARNING.title"
           :detail="SCAN_WARNING.detail(scanWarnCount)"
         />
+      </Transition>
+
+      <!-- EDI 能力说明（真实模式）：接受原件不代表已解析，如实说明依赖后端（#40） -->
+      <Transition :css="false" v-bind="collapseHooks">
+        <NoticeBar v-if="showEdiNote" tone="info" title="已选择 EDI 报文" :detail="EDI_CAPABILITY.realNote" />
       </Transition>
 
       <div class="actions">
@@ -669,6 +707,8 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
               <div class="doc-main">
                 <span class="doc-name">{{ d.name }}</span>
                 <span v-if="d.error" class="doc-error">{{ d.error }}</span>
+                <!-- 失败/不支持文件的原件查看/下载：全部失败时没有比较结果，也要能取回原件（#40） -->
+                <EdiSourceView v-if="d.sourceFile" :file="d.sourceFile" class="doc-item-source" />
               </div>
               <span class="doc-status">
                 <!-- 未达终态且该文件也未达终态（解析中/排队中/上传中）都带 spinner，

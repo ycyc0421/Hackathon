@@ -44,6 +44,12 @@ const SCENARIO_NAMES = {
   'partial-fail': '单品名 · 部分失败',
   'multi-item': '双品名 · 分组',
   clean: '全部一致',
+  'edi-only': 'EDI · 单份报文',
+  'edi-mixed': 'EDI · 与 PDF/图片混合',
+  'edi-multi-item': 'EDI · 双商品',
+  'edi-partial': 'EDI · 部分解析失败',
+  'edi-unsupported': 'EDI · 后端不支持',
+  'edi-failed': 'EDI · 解析失败',
 }
 const mockScenario = ref('single-item')
 const scenarioOptions = listMockScenarios().map((key) => ({

@@ -2203,3 +2203,66 @@ textarea {
 .inline-spinner--muted {
   border-top-color: var(--gray-500, #6b7280);
 }
+
+/* ==========================================================================
+   EDI 原文区块（issue #40）
+   单独成区、追加在文件末尾，不重排既有全站样式。覆盖上传列表、文件状态
+   列表与对照面板三处的 EDI 原件查看/下载入口与纯文本预览。
+   ========================================================================== */
+
+/* 原件区域随宿主宽度收缩，按钮与文本纵向排列，避免窄屏被长报文撑开 */
+.file-item-source,
+.doc-item-source,
+.compare-foot-source {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.edi-source-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* 已选文件项是单行 flex，原件预览需另起整行 */
+.file-item {
+  flex-wrap: wrap;
+}
+
+/* 列表内的 EDI 预览：占满整行，等宽纯文本，保留换行与连续空格。
+   文本插值已转义 HTML 形似内容，这里只呈现原始字节对应的字符。 */
+.edi-source-body {
+  min-width: 0;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.edi-source-text {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--surface-2, #f6f7f9);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-mono, 'JetBrains Mono', 'WenQuanYi Micro Hei Mono', monospace);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 320px;
+  overflow: auto;
+  color: var(--text);
+}
+
+.edi-source-loading,
+.edi-source-error {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.edi-source-error {
+  color: var(--warn, #b45309);
+}
