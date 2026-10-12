@@ -8,14 +8,19 @@ export default defineConfig({
   base: './',
   server: {
     port: 5173,
-    // 真实后端跑在 8000 端口时取消注释即可；mock/真实后端的切换是运行时的
-    //（URL 参数 ?mock=0 或顶栏数据源切换器），前端代码不用改、不用重新构建。
-    // 后端跨域开发期 allow_origins=["*"]，不走 proxy 直连 http://127.0.0.1:8000 也行。
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://127.0.0.1:8000',
-    //     changeOrigin: true,
-    //   },
-    // },
+    // mock/真实后端的切换是运行时的（URL 参数 ?mock=0 或顶栏数据源切换器），
+    // 前端代码不用改、不用重新构建。真实后端默认走同源 /api/v1：
+    // - 本地后端（8000 端口）：VITE_PROXY_API=http://127.0.0.1:8000 npm run dev
+    // - 远端已部署后端：VITE_PROXY_API=https://hackathon.ychome.net npm run dev
+    // 不设 VITE_PROXY_API 时也可直连（后端开发期 allow_origins=["*"]，
+    // 配合 VITE_API_BASE 指向后端地址）。
+    proxy: process.env.VITE_PROXY_API
+      ? {
+          '/api': {
+            target: process.env.VITE_PROXY_API,
+            changeOrigin: true,
+          },
+        }
+      : undefined,
   },
 })
