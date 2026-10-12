@@ -9,6 +9,7 @@
 | 了解项目并打开线上应用 | [根 README](../README.md) |
 | 确认哪些能力已交付 | [项目现状与计划](项目现状与计划.md) |
 | 走一遍演示、复现回归 | [演示与验证](演示与验证.md) |
+| 验收 EDI 前端兼容 | [EDI 合成输入、返回夹具与验收矩阵](fixtures/edi/README.md) |
 | 启动后端或配置 OCR | [后端 README](../backend/README.md) |
 | 开发页面或切换数据源 | [前端 README](../web/README.md)、[设计系统](../web/DESIGN.md) |
 | 对接接口、排查字段语义 | [数据契约](数据契约.md)、[Schema 使用说明](schema/README.md) |
@@ -27,11 +28,12 @@
 
 新增或变更契约时，先改 Schema、校验 fixtures，再同步可读文档、前后端与数据层；破坏性变更须先在 Issue 协调。仅纠正文档与已存在 Schema 的差异，不需要改写 Schema。
 
-## 三类验证材料
+## 验证材料
 
 | 目录 | 用途 | 不代表什么 |
 |---|---|---|
-| [fixtures](fixtures/) | API 返回和单文件抽取结构示例 | 不是原始上传文件 |
+| [fixtures/result](fixtures/result/)、[fixtures/raw](fixtures/raw/) | API 返回和单文件抽取结构示例 | 不是原始上传文件 |
+| [fixtures/edi](fixtures/edi/) | EDI 兼容测试的合成上传文件与验收说明 | 不是后端已支持 EDI 的证据或实际业务金标 |
 | [backend/samples](../backend/samples/) | 合成单证、挑战样例及预期结果 | 不是实际业务准确率评测 |
 | [data/generated](../data/generated/) | 字段级结构化测试输入 | 不是原始 OCR 图片，也不一定可直接提交 API |
 

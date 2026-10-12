@@ -1,0 +1,165 @@
+{
+  "task_id": "fixture_edi_multi_item",
+  "status": "COMPLETED",
+  "created_at": "2026-10-12T12:00:00+08:00",
+  "finished_at": "2026-10-12T12:00:01+08:00",
+  "input": {
+    "destination_country": "US",
+    "destination_country_name": "美国",
+    "notes": "合成前端验收夹具；非真实接口输出；未进行合规评估，不用于报关或付款。"
+  },
+  "items": [
+    {"item_id": "item_mug", "display_name": "CERAMIC MUG+SET:350ML?WHITE'S <b>TEST</b>", "description": "CERAMIC MUG+SET:350ML?WHITE'S <b>TEST</b>", "line_no": 1},
+    {"item_id": "item_glass", "display_name": "GLASS CUP 300ML CLEAR", "description": "GLASS CUP 300ML CLEAR", "line_no": 2}
+  ],
+  "documents": [
+    {"file_id": "f_multi", "file_name": "multi-item.edi", "file_type": "EDI", "doc_type": "COMMERCIAL_INVOICE", "process_status": "EXTRACTED", "page_count": null, "error_message": null},
+    {"file_id": "f_missing", "file_name": "multi-item-missing.edi", "file_type": "EDI", "doc_type": "COMMERCIAL_INVOICE", "process_status": "EXTRACTED", "page_count": null, "error_message": null}
+  ],
+  "extractions": [
+    {
+      "file_id": "f_multi",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "parse_method": "EDI_PARSE",
+      "fields": [
+        {"field_key": "packages", "label": "包装件数", "raw_text": "PAC+120++CT'", "raw_value": "120", "normalized_value": 120, "unit": "CARTON", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "total_amount", "label": "总金额", "raw_text": "MOA+77:7200.00'", "raw_value": "7200.00", "normalized_value": 7200, "unit": "USD", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "description", "label": "货物描述", "raw_text": "IMD+F++:::CERAMIC MUG?+SET?:350ML??WHITE?'S <b>TEST</b>'", "raw_value": "CERAMIC MUG?+SET?:350ML??WHITE?'S <b>TEST</b>", "normalized_value": "CERAMIC MUG+SET:350ML?WHITE'S <b>TEST</b>", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "quantity", "label": "数量", "raw_text": "QTY+47:2400:PCE'", "raw_value": "2400", "normalized_value": 2400, "unit": "PCS", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "packages", "label": "包装件数", "raw_text": "PAC+100++CT'", "raw_value": "100", "normalized_value": 100, "unit": "CARTON", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "description", "label": "货物描述", "raw_text": "IMD+F++:::GLASS CUP 300ML CLEAR'", "raw_value": "GLASS CUP 300ML CLEAR", "normalized_value": "GLASS CUP 300ML CLEAR", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": "item_glass", "line_no": 2, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "quantity", "label": "数量", "raw_text": "QTY+47:800:PCE'", "raw_value": "800", "normalized_value": 800, "unit": "PCS", "confidence": null, "status": "EXTRACTED", "item_id": "item_glass", "line_no": 2, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "packages", "label": "包装件数", "raw_text": "PAC+20++CT'", "raw_value": "20", "normalized_value": 20, "unit": "CARTON", "confidence": null, "status": "EXTRACTED", "item_id": "item_glass", "line_no": 2, "page": null, "bbox": null, "bbox_unit": null}
+      ]
+    },
+    {
+      "file_id": "f_missing",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "parse_method": "EDI_PARSE",
+      "fields": [
+        {"field_key": "packages", "label": "包装件数", "raw_text": "PAC+120++CT'", "raw_value": "120", "normalized_value": 120, "unit": "CARTON", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "total_amount", "label": "总金额", "raw_text": "MOA+77:7200.00'", "raw_value": "7200.00", "normalized_value": 7200, "unit": "USD", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "description", "label": "货物描述", "raw_text": "IMD+F++:::CERAMIC MUG?+SET?:350ML??WHITE?'S <b>TEST</b>'", "raw_value": "CERAMIC MUG?+SET?:350ML??WHITE?'S <b>TEST</b>", "normalized_value": "CERAMIC MUG+SET:350ML?WHITE'S <b>TEST</b>", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 2, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "quantity", "label": "数量", "raw_text": "QTY+47:2400:PCE'", "raw_value": "2400", "normalized_value": 2400, "unit": "PCS", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 2, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "packages", "label": "包装件数", "raw_text": "PAC+100++CT'", "raw_value": "100", "normalized_value": 100, "unit": "CARTON", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 2, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "description", "label": "货物描述", "raw_text": "IMD+F++:::GLASS CUP 300ML CLEAR'", "raw_value": "GLASS CUP 300ML CLEAR", "normalized_value": "GLASS CUP 300ML CLEAR", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": "item_glass", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "quantity", "label": "数量", "raw_text": null, "raw_value": null, "normalized_value": null, "unit": "PCS", "confidence": null, "status": "MISSING_IN_DOC", "item_id": "item_glass", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "packages", "label": "包装件数", "raw_text": "PAC+20++CT'", "raw_value": "20", "normalized_value": 20, "unit": "CARTON", "confidence": null, "status": "EXTRACTED", "item_id": "item_glass", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null}
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "comparison_id": "cmp_mug",
+      "field_key": "quantity",
+      "item_id": "item_mug",
+      "label": "数量",
+      "value_type": "NUMBER",
+      "unit": "PCS",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "MUG350 在两份报文中的原始行号不同，但对应同一商品。",
+      "values": [
+        {"file_id": "f_multi", "file_name": "multi-item.edi", "item_id": "item_mug", "raw_value": "2400", "normalized_value": 2400, "field_status": "EXTRACTED", "page": null, "bbox": null},
+        {"file_id": "f_missing", "file_name": "multi-item-missing.edi", "item_id": "item_mug", "raw_value": "2400", "normalized_value": 2400, "field_status": "EXTRACTED", "page": null, "bbox": null}
+      ]
+    },
+    {
+      "comparison_id": "cmp_glass",
+      "field_key": "quantity",
+      "item_id": "item_glass",
+      "label": "数量",
+      "value_type": "NUMBER",
+      "unit": "PCS",
+      "status": "MISSING_IN_SOME",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": null,
+      "note": "第二份报文的 GLS300 未载数量，不能被另一商品的数量掩盖。",
+      "values": [
+        {"file_id": "f_multi", "file_name": "multi-item.edi", "item_id": "item_glass", "raw_value": "800", "normalized_value": 800, "field_status": "EXTRACTED", "page": null, "bbox": null},
+        {"file_id": "f_missing", "file_name": "multi-item-missing.edi", "item_id": "item_glass", "raw_value": null, "normalized_value": null, "field_status": "MISSING_IN_DOC", "page": null, "bbox": null}
+      ]
+    },
+    {
+      "comparison_id": "cmp_total_packages",
+      "field_key": "packages",
+      "item_id": null,
+      "label": "包装件数",
+      "value_type": "NUMBER",
+      "unit": "CARTON",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "整票包装件数为 120，不与商品行的 100、20 重复相加。",
+      "values": [
+        {"file_id": "f_multi", "file_name": "multi-item.edi", "item_id": null, "raw_value": "120", "normalized_value": 120, "field_status": "EXTRACTED", "page": null, "bbox": null},
+        {"file_id": "f_missing", "file_name": "multi-item-missing.edi", "item_id": null, "raw_value": "120", "normalized_value": 120, "field_status": "EXTRACTED", "page": null, "bbox": null}
+      ]
+    },
+    {
+      "comparison_id": "cmp_mug_packages",
+      "field_key": "packages",
+      "item_id": "item_mug",
+      "label": "包装件数",
+      "value_type": "NUMBER",
+      "unit": "CARTON",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "仅比较 MUG350 的 100 箱。",
+      "values": [
+        {"file_id": "f_multi", "file_name": "multi-item.edi", "item_id": "item_mug", "raw_value": "100", "normalized_value": 100, "field_status": "EXTRACTED", "page": null, "bbox": null},
+        {"file_id": "f_missing", "file_name": "multi-item-missing.edi", "item_id": "item_mug", "raw_value": "100", "normalized_value": 100, "field_status": "EXTRACTED", "page": null, "bbox": null}
+      ]
+    },
+    {
+      "comparison_id": "cmp_glass_packages",
+      "field_key": "packages",
+      "item_id": "item_glass",
+      "label": "包装件数",
+      "value_type": "NUMBER",
+      "unit": "CARTON",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "仅比较 GLS300 的 20 箱。",
+      "values": [
+        {"file_id": "f_multi", "file_name": "multi-item.edi", "item_id": "item_glass", "raw_value": "20", "normalized_value": 20, "field_status": "EXTRACTED", "page": null, "bbox": null},
+        {"file_id": "f_missing", "file_name": "multi-item-missing.edi", "item_id": "item_glass", "raw_value": "20", "normalized_value": 20, "field_status": "EXTRACTED", "page": null, "bbox": null}
+      ]
+    },
+    {
+      "comparison_id": "cmp_description",
+      "field_key": "description",
+      "item_id": "item_mug",
+      "label": "货物描述",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "转义原文与解码值分别按纯文本显示，不解释 HTML。",
+      "values": [
+        {"file_id": "f_multi", "file_name": "multi-item.edi", "item_id": "item_mug", "raw_value": "CERAMIC MUG?+SET?:350ML??WHITE?'S <b>TEST</b>", "normalized_value": "CERAMIC MUG+SET:350ML?WHITE'S <b>TEST</b>", "field_status": "EXTRACTED", "page": null, "bbox": null},
+        {"file_id": "f_missing", "file_name": "multi-item-missing.edi", "item_id": "item_mug", "raw_value": "CERAMIC MUG?+SET?:350ML??WHITE?'S <b>TEST</b>", "normalized_value": "CERAMIC MUG+SET:350ML?WHITE'S <b>TEST</b>", "field_status": "EXTRACTED", "page": null, "bbox": null}
+      ]
+    }
+  ],
+  "risks": [],
+  "summary": {
+    "document_count": 2,
+    "field_count": 16,
+    "conflict_count": 0,
+    "missing_count": 1,
+    "risk_count": 0,
+    "unrecognized_count": 0
+  },
+  "errors": []
+}

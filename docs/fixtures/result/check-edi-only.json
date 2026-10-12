@@ -1,0 +1,106 @@
+{
+  "task_id": "fixture_edi_only",
+  "status": "COMPLETED",
+  "created_at": "2026-10-12T12:00:00+08:00",
+  "finished_at": "2026-10-12T12:00:01+08:00",
+  "input": {
+    "destination_country": "US",
+    "destination_country_name": "美国",
+    "notes": "合成前端验收夹具；非真实接口输出；未进行合规评估，不用于报关或付款。"
+  },
+  "items": [
+    {"item_id": "item_mug", "display_name": "CERAMIC MUG 350ML WHITE", "description": "CERAMIC MUG 350ML WHITE", "line_no": 1}
+  ],
+  "documents": [
+    {"file_id": "f_edi", "file_name": "invoice.edi", "file_type": "EDI", "doc_type": "COMMERCIAL_INVOICE", "process_status": "EXTRACTED", "page_count": null, "error_message": null}
+  ],
+  "extractions": [
+    {
+      "file_id": "f_edi",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "parse_method": "EDI_PARSE",
+      "fields": [
+        {"field_key": "invoice_no", "label": "发票号", "raw_text": "BGM+380+SYN-INVOIC-01+9'", "raw_value": "SYN-INVOIC-01", "normalized_value": "SYN-INVOIC-01", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "shipment_date", "label": "装运日期", "raw_text": "DTM+11:20261014:102'", "raw_value": "20261014", "normalized_value": "2026-10-14", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "shipper", "label": "发货人", "raw_text": "NAD+CZ+++SYNTHETIC SUPPLIER LTD+1 TEST ROAD+TESTCITY++00000+CN'", "raw_value": "SYNTHETIC SUPPLIER LTD", "normalized_value": "SYNTHETIC SUPPLIER LTD", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "consignee", "label": "收货人", "raw_text": "NAD+CN+++SYNTHETIC BUYER LTD+1 TEST ROAD+TESTCITY++00000+US'", "raw_value": "SYNTHETIC BUYER LTD", "normalized_value": "SYNTHETIC BUYER LTD", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "destination_country", "label": "目的国", "raw_text": "NAD+CN+++SYNTHETIC BUYER LTD+1 TEST ROAD+TESTCITY++00000+US'", "raw_value": "US", "normalized_value": "US", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "currency", "label": "币种", "raw_text": "CUX+2:USD:4'", "raw_value": "USD", "normalized_value": "USD", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "packages", "label": "包装件数", "raw_text": "PAC+100++CT'", "raw_value": "100", "normalized_value": 100, "unit": "CARTON", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "MEA+AAE+AAD+KGM:1080.00'", "raw_value": "1080.00", "normalized_value": 1080, "unit": "KGS", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "net_weight", "label": "净重", "raw_text": "MEA+AAE+AAC+KGM:900.00'", "raw_value": "900.00", "normalized_value": 900, "unit": "KGS", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "volume", "label": "体积", "raw_text": "MEA+AAE+AAW+MTQ:4.80'", "raw_value": "4.80", "normalized_value": 4.8, "unit": "CBM", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "total_amount", "label": "总金额", "raw_text": "MOA+77:4800.00'", "raw_value": "4800.00", "normalized_value": 4800, "unit": "USD", "confidence": null, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "item_code", "label": "货号", "raw_text": "LIN+1++MUG350:SA'", "raw_value": "MUG350", "normalized_value": "MUG350", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "description", "label": "货物描述", "raw_text": "IMD+F++:::CERAMIC MUG 350ML WHITE'", "raw_value": "CERAMIC MUG 350ML WHITE", "normalized_value": "CERAMIC MUG 350ML WHITE", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "hs_code", "label": "HS 编码", "raw_text": "PIA+1+691110:HS'", "raw_value": "691110", "normalized_value": "691110", "unit": null, "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "quantity", "label": "数量", "raw_text": "QTY+47:2400:PCE'", "raw_value": "2400", "normalized_value": 2400, "unit": "PCS", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "unit_price", "label": "单价", "raw_text": "PRI+AAA:2.00:::1:PCE'", "raw_value": "2.00", "normalized_value": 2, "unit": "USD", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "total_amount", "label": "总金额", "raw_text": "MOA+203:4800.00'", "raw_value": "4800.00", "normalized_value": 4800, "unit": "USD", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "packages", "label": "包装件数", "raw_text": "PAC+100++CT'", "raw_value": "100", "normalized_value": 100, "unit": "CARTON", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "MEA+AAE+AAE+KGM:1080.00'", "raw_value": "1080.00", "normalized_value": 1080, "unit": "KGS", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "net_weight", "label": "净重", "raw_text": "MEA+AAE+AAL+KGM:900.00'", "raw_value": "900.00", "normalized_value": 900, "unit": "KGS", "confidence": null, "status": "EXTRACTED", "item_id": "item_mug", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null}
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "comparison_id": "cmp_quantity",
+      "field_key": "quantity",
+      "item_id": "item_mug",
+      "label": "数量",
+      "value_type": "NUMBER",
+      "unit": "PCS",
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有一份 EDI 提供商品数量，未完成跨文件比对。",
+      "values": [
+        {"file_id": "f_edi", "file_name": "invoice.edi", "item_id": "item_mug", "raw_value": "2400", "normalized_value": 2400, "field_status": "EXTRACTED", "page": null, "bbox": null}
+      ]
+    },
+    {
+      "comparison_id": "cmp_amount",
+      "field_key": "total_amount",
+      "item_id": null,
+      "label": "总金额",
+      "value_type": "MONEY",
+      "unit": "USD",
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "仅有票级金额来源，不与商品行金额重复相加。",
+      "values": [
+        {"file_id": "f_edi", "file_name": "invoice.edi", "item_id": null, "raw_value": "4800.00", "normalized_value": 4800, "field_status": "EXTRACTED", "page": null, "bbox": null}
+      ]
+    },
+    {
+      "comparison_id": "cmp_date",
+      "field_key": "shipment_date",
+      "item_id": null,
+      "label": "装运日期",
+      "value_type": "DATE",
+      "unit": null,
+      "status": "NOT_CHECKED",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": null,
+      "note": "缺少第二来源；该日期未经交叉校验。",
+      "values": [
+        {"file_id": "f_edi", "file_name": "invoice.edi", "item_id": null, "raw_value": "20261014", "normalized_value": "2026-10-14", "field_status": "EXTRACTED", "page": null, "bbox": null}
+      ]
+    }
+  ],
+  "risks": [],
+  "summary": {
+    "document_count": 1,
+    "field_count": 20,
+    "conflict_count": 0,
+    "missing_count": 0,
+    "risk_count": 0,
+    "unrecognized_count": 0
+  },
+  "errors": []
+}
