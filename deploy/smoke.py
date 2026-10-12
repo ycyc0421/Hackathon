@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 import sys
 import time
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 import httpx
 
@@ -17,10 +17,10 @@ def verify_response(response, origin, description):
 def verify_frontend(client, origin):
     page = client.get(origin + '/')
     assert page.is_success and 'id="app"' in page.text, '前端首页不可用'
-    assets = re.findall(r'(?:src|href)="(/assets/[^"]+)"', page.text)
+    assets = re.findall(r'(?:src|href)="(\.?/assets/[^"]+)"', page.text)
     assert any(path.endswith('.js') for path in assets), '前端首页缺少构建脚本'
     for path in assets:
-        response = client.get(origin + path)
+        response = client.get(urljoin(origin + '/', path))
         expected = 'javascript' if path.endswith('.js') else 'text/css'
         assert response.is_success and expected in response.headers.get('content-type', ''), f'前端资源不可用：{path}'
     print('联调通过：前端首页与静态资源', flush=True)

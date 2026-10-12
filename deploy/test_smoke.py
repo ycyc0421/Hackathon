@@ -130,6 +130,18 @@ class PublicSmokeTests(unittest.TestCase):
                     with self.assertRaisesRegex(AssertionError, '前端资源不可用'):
                         smoke.verify_frontend(client, self.origin)
 
+    def test_frontend_accepts_vite_relative_script_and_stylesheet(self):
+        paths = []
+        def handler(request):
+            paths.append(request.url.path)
+            if request.url.path == '/':
+                return httpx.Response(200, text='<div id="app"></div><script src="./assets/app.js"></script><link href="./assets/app.css">')
+            content_type = 'application/javascript' if request.url.path.endswith('.js') else 'text/css'
+            return httpx.Response(200, headers={'content-type': content_type})
+        with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+            smoke.verify_frontend(client, self.origin)
+        self.assertEqual(paths, ['/', '/assets/app.js', '/assets/app.css'])
+
 
 if __name__ == '__main__':
     unittest.main()
