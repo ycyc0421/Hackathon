@@ -637,7 +637,8 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
             <span class="inline-spinner" aria-hidden="true" />
             已处理 {{ extractProgress.done }} / {{ extractProgress.total }} 份文件
           </p>
-          <ul v-if="displayDocs.length" class="doc-list">
+          <!-- 未达终态时列表带扫描光束动画：标明这些文件正在流水线上 -->
+          <ul v-if="displayDocs.length" class="doc-list" :class="{ 'doc-list--scanning': taskPending }">
             <li v-for="d in displayDocs" :key="d.key" class="doc-item">
               <div class="doc-main">
                 <span class="doc-name">{{ d.name }}</span>
