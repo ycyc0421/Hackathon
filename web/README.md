@@ -1,74 +1,65 @@
-# 跨境单证合规校验 - 前端
+# 前端：单证上传、差异、报告与评测
 
-Vue 3 单页应用，四个页面：上传、差异、报告、评测。
+Vue 3 + Vite 单页应用，四个页面通过条件渲染切换。公开数据结构见[数据契约](../docs/数据契约.md)，后端启动见[后端说明](../backend/README.md)。
 
-## 开发
+## 本地开发
 
-```sh
-npm install
-npm run dev      # http://localhost:5173
-```
-
-开发期默认使用 `src/mock/` 下的示例数据。
-
-## 构建
+命令从仓库根目录运行，需要 Node.js 20：
 
 ```sh
-npm run build    # 产出 dist/
+npm ci
+npm --prefix web ci
+npm --prefix web run dev
 ```
 
-## 部署
-
-### Cloudflare Workers（当前方案）
-
-根目录的 `wrangler.toml` 已配置 Workers + Assets 绑定。推送到 `main` 分支时 GitHub Actions 自动部署（见 `.github/workflows/deploy.yml`）。
-
-手动部署：
+访问 Vite 输出的本地地址。真实模式需要另开终端启动后端。使用环境变量启用 Vite 开发代理，无需改源码：
 
 ```sh
-# 仓库根目录
-cd web && npm run build && cd ..
-npx wrangler deploy
+VITE_PROXY_API=http://127.0.0.1:8000 npm --prefix web run dev
 ```
 
-### 其他静态托管
+PowerShell 先设置 `$env:VITE_PROXY_API = 'http://127.0.0.1:8000'`，再运行开发命令。也可把代理目标设为 `https://hackathon.ychome.net` 连接已部署后端；目标地址不带 /api/v1。代理只在开发服务器生效，浏览器仍请求同源 /api/v1，无需额外跨域配置。
 
-`dist/` 可直接部署到任何静态服务器：
+## 示例与真实模式
 
-- Nginx / Apache：设为根目录或子目录均可（已配置 `base: './'`）
-- GitHub Pages / Vercel / Netlify：上传 `dist/` 内容
+默认示例模式使用 `src/mock/`，不会上传文件至后端。顶栏可切换模式，选择保存到浏览器；URL 参数优先于保存值：`?mock=0` 使用真实接口，`?mock=1` 使用示例数据。
 
-## 接口切换
+前端默认请求同源 `/api/v1`。本地确需连接其他服务时，可在启动或构建前设置 `VITE_API_BASE` 为含 `/api/v1` 的基础地址；这是构建时配置，变更后重启开发服务或重新构建。跨源服务还需正确配置 CORS。
 
-默认 Mock 数据。接真实后端：
+线上统一使用 `https://hackathon.ychome.net`。首次访问默认示例不表示后端不可用，验收必须切到真实模式。
 
-1. 修改 `src/api/config.js`：`USE_MOCK = false`
-2. 修改 `vite.config.js`：取消注释 `proxy` 配置并填入后端地址
-3. 重启 dev server
+## 验证与构建
 
-前端代码无需改动。
-
-## 目录结构
-
-```
-src/
-├── api/
-│   ├── config.js       Mock 开关、后端地址、轮询参数
-│   ├── index.js        数据访问层
-│   ├── labels.js       状态枚举中文文案
-│   └── formatters.js   字段渲染
-├── components/         StatusBadge、NoticeBar、EmptyState、SkeletonBlock、ErrorBoundary
-├── pages/              UploadPage、DiffPage、ReportPage、EvalPage
-├── mock/               示例数据
-└── styles.css          全局样式
+```sh
+npm run validate
+node --test tests/*.test.mjs
+npm --prefix web run build
 ```
 
-## 技术约束
+构建产物为 `web/dist`，不提交 Git。CI 构建后与同一提交的后端一起打包，Nginx 提供静态文件并代理 API，见[工作流说明](../.github/workflows/README.md)。仓库保留的 Worker、wrangler 与旧 npm deploy 命令是历史路径，不是当前生产发布入口。
 
-- 依赖：仅 `vue` + `vite` + `@vitejs/plugin-vue`
-- 无路由库（四页用条件渲染）
-- 无状态管理库
-- 无 UI 组件库
-- 无 HTTP 客户端库
+纯静态托管只提供页面；真实模式仍需可访问的 API 及对应代理或跨源配置。构建成功不能代替上传、差异查看、失败状态与评测空态的浏览器检查。
 
-设计上保持轻量，便于快速迭代。
+## 目录与边界
+
+| 位置 | 职责 |
+|---|---|
+| `src/api/config.js` | 模式选择、API 地址、轮询参数 |
+| `src/api/index.js` | 统一请求入口，页面不直接 fetch |
+| `src/api/labels.js` | 枚举的中文文案与状态样式 |
+| `src/api/formatters.js` | 字段显示格式 |
+| `src/pages/` | 上传、差异、报告、评测 |
+| `src/components/` | 共享交互组件 |
+| `src/utils/needsReview.js` | 人工复核条目口径 |
+| `src/design-tokens.css`、`src/styles.css` | 设计变量与全站样式 |
+
+- 上传到终态共用一个任务视图；阶段条、文件列表与等待时间持续可见，完成后就地更新。上传 100% 只代表字节发完，创建任务仍可能等待。
+- 后端逐份发布 PARSING 及文件终态，前端用已选文件名补齐尚未开始的条目；已处理计数包括 EXTRACTED、FAILED、UNSUPPORTED。短任务可能在两次轮询间完成，页面不补播未观察到的状态。
+- 多品名依赖后端商品目录与 item_id；字段中文名直接使用 label。
+- MATCH 表示参与值一致，含 LOW_CONFIDENCE 时仍需人工复核；不能据此宣布整票合规。
+- 缺置信度、页码或坐标时降级显示；未评测显示“尚未评测”，不能填假数字。
+- 报告页展示结果，尚无报告文件导出或人工修正接口。
+- 当前轮询 1.5 秒一次、最多 60 次，耗时 OCR 可能超出窗口；停止轮询不等于取消任务。
+- 上传页扫描件提示仍有“后端仅支持文本 PDF”的旧文案，和已启用 OCR 的生产环境不一致，后续应用改动需修正。
+
+依赖保持 vue、vite、@vitejs/plugin-vue，不引入路由、状态库、UI 库或 HTTP 客户端。设计与动效规范见[设计系统](DESIGN.md)。
