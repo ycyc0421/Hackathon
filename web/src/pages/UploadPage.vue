@@ -241,7 +241,10 @@ const stageIndex = computed(() => {
   if (t.status === 'PENDING') return 0
   if (t.status === 'PROCESSING') {
     const docs = t.documents ?? []
-    if (docs.length && docs.every((d) => d.process_status === 'EXTRACTED')) return 2
+    // 后端增量回写时 documents 是部分列表，「全部已抽取」必须等份数到齐再判，
+    // 否则第一批成功后阶段条会提前跳到「交叉比对中」
+    const expected = files.value.length || docs.length
+    if (docs.length && docs.length >= expected && docs.every((d) => d.process_status === 'EXTRACTED')) return 2
     return 1
   }
   return TASK_STAGES.length - 1
@@ -350,10 +353,59 @@ const failedDocs = computed(
     ) ?? []
 )
 
-/** 逐文件处理状态的展示对象 */
-function docStatus(d) {
-  return processStatus(d.process_status)
-}
+/**
+ * 进行态下逐文件的真实状态列表。后端一旦返回 documents 就用它替换骨架屏，
+ * 每轮轮询就地刷新（解析中 → 已抽取），让用户看到任务确实在推进。
+ */
+const liveDocs = computed(() => task.value?.documents ?? [])
+
+/**
+ * 进行态文件行：与终态完全同一结构（左文件名、右状态徽章），从上传到终态零跳变。
+ * 后端还没返回 documents 时（上传中 / 排队中）先用本地已选文件的名字占位——
+ * 文件名是前端一提交就知道的信息，不该用骨架屏藏着。
+ */
+const displayDocs = computed(() => {
+  const live = liveDocs.value.map((d) => ({
+    key: d.file_id,
+    name: d.file_name,
+    error: d.error_message,
+    status: processStatus(d.process_status),
+  }))
+  if (!live.length) {
+    return files.value.map((f) => ({
+      key: fileKey(f),
+      name: f.name,
+      error: null,
+      status: phase.value === 'uploading'
+        ? { text: '上传中', tone: 'running' }
+        : { text: '排队中', tone: 'muted' },
+    }))
+  }
+  // 后端按处理进度增量回写 documents（逐份 PARSING → EXTRACTED）：
+  // 已返回的用真实状态，还没轮到的用本地文件名补在队尾，状态「排队中」。
+  // 后端不回写中间态时 live 要么为空（走上面的本地占位）要么一次全量，
+  // 两种后端行为下列表都完整且顺序稳定。
+  const seen = new Set(live.map((d) => d.name))
+  const queued = files.value
+    .filter((f) => !seen.has(f.name))
+    .map((f) => ({
+      key: fileKey(f),
+      name: f.name,
+      error: null,
+      status: { text: '排队中', tone: 'muted' },
+    }))
+  return [...live, ...queued]
+})
+
+/** 解析进度计数：已处理 x / n 份。后端增量回写时 documents 是部分列表，
+    总数以本地已选文件数为准（mock 未选文件时退回 documents 数） */
+const extractProgress = computed(() => {
+  if (!liveDocs.value.length) return null
+  const done = liveDocs.value.filter(
+    (d) => d.process_status === 'EXTRACTED' || d.process_status === 'FAILED' || d.process_status === 'UNSUPPORTED'
+  ).length
+  return { done, total: Math.max(files.value.length, liveDocs.value.length) }
+})
 
 /** 待复核条目数：与差异页「需关注」、顶栏角标同一口径 */
 const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).length ?? 0)
@@ -503,74 +555,62 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
           </NoticeBar>
         </div>
 
-        <div v-else-if="task" key="result" class="task-status-body">
-          <div class="status-row">
-            <StatusBadge :status="statusInfo" />
-            <span class="status-meta">任务 {{ task.task_id }}</span>
-            <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
-            <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
-          </div>
+        <!--
+          任务全生命周期单视图：进行中 → 终态不换分支、不整体刷新。
+          各区域就地更新——阶段条常驻（终态全部置完成）、文件列表行结构
+          全程一致、终态才出现的区块（警示条 / CTA / 耗时）各自动画入场。
+          只有错误态例外，整区淡出替换。
+        -->
+        <div v-else key="task" class="task-status-body">
+          <!--
+            任务创建后头部出现；「耗时」在终态淡入。
+            整行用收合动画入场：与进度条收起同帧发生时，
+            硬插入会把文件列表瞬间顶开，看起来像卡片尺寸异常抖动。
+          -->
+          <Transition :css="false" v-bind="collapseHooks">
+            <div v-if="task" class="status-row">
+              <StatusBadge :status="statusInfo" />
+              <span class="status-meta">任务 {{ task.task_id }}</span>
+              <Transition name="fade">
+                <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
+              </Transition>
+              <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
+            </div>
+          </Transition>
 
-          <!-- 部分成功：最容易做成静默忽略的状态 -->
-          <NoticeBar
-            v-if="task.status === 'PARTIAL'"
-            tone="warn"
-            title="本次检查未包含全部文件"
-            :detail="`${failedDocs.length} 份文件未能处理成功。以下比对结果缺少这些文件的数据，不代表它们一致。`"
-          />
-
-          <NoticeBar
-            v-if="task.status === 'FAILED'"
-            tone="bad"
-            title="检查失败"
-            detail="未产生任何比对结果。请检查文件格式后重试。"
-          />
-
-          <!-- 慢提示/重连提示：任务未达终态即可见，task 写入后也不能消失 -->
-          <p v-if="isRunning && taskPending && retryHint" class="processing-hint">网络异常，正在自动重连…</p>
-          <p v-else-if="isRunning && taskPending && slowHint" class="processing-hint">
-            处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
-          </p>
-
-          <ul class="doc-list">
-            <li v-for="d in task.documents" :key="d.file_id" class="doc-item">
-              <div class="doc-main">
-                <span class="doc-name">{{ d.file_name }}</span>
-                <span v-if="d.error_message" class="doc-error">{{ d.error_message }}</span>
-              </div>
-              <StatusBadge :status="docStatus(d)" />
-            </li>
-          </ul>
-
-          <!-- 完成态主路径：直接给去差异页的按钮，不让用户自己找下一屏 -->
-          <div v-if="task.status === 'COMPLETED' || task.status === 'PARTIAL'" class="next-actions">
-            <button class="btn primary" @click="navigate.go('diff')">
-              {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
-            </button>
-            <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
-          </div>
-        </div>
-
-        <!-- 处理中：分阶段进度 + 上传百分比 + 已等待时长 + 骨架屏 -->
-        <div v-else key="processing" class="task-status-body">
+          <!--
+            阶段条常驻：进行态标出当前阶段（活动点脉冲），终态全部置为完成——
+            它是任务走过路径的记录。FAILED 没走完流程，不展示。
+          -->
           <div class="stage-header">
-            <ol class="stage-row">
+            <ol v-if="task?.status !== 'FAILED'" class="stage-row">
               <li
                 v-for="(s, i) in TASK_STAGES"
                 :key="s.key"
                 class="stage-item"
-                :class="{ done: i < stageIndex, active: i === stageIndex }"
+                :class="{
+                  done: i < stageIndex || !taskPending,
+                  active: taskPending && i === stageIndex,
+                }"
               >
                 <span class="stage-dot" aria-hidden="true" />
                 <span class="stage-text">{{ s.text }}</span>
               </li>
             </ol>
-            <span class="wait-line">已等待 {{ elapsedText }}</span>
+            <Transition name="fade">
+              <span v-if="taskPending" class="wait-line">已等待 {{ elapsedText }}</span>
+            </Transition>
           </div>
 
-          <!-- 进度条只在上传阶段存在；结束时高度收起而不是瞬间消失 -->
+          <!--
+            上传进度条：仅代表「文件字节传到后端」的进度，与任务处理进度无关。
+            100% 只说明字节发完了，浏览器还在等 /checks 创建任务的响应——
+            此时把百分比换成「等待创建任务」，避免"拉满了却没开始"的误读。
+            进度条只在上传阶段存在；结束时高度收起而不是瞬间消失。
+          -->
           <div class="upload-progress-wrap" :class="{ collapsed: phase !== 'uploading' }">
             <div class="upload-progress">
+              <span class="progress-label">上传文件</span>
               <div class="progress-track">
                 <div
                   class="progress-fill"
@@ -581,23 +621,87 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
                   aria-valuemax="100"
                 />
               </div>
-              <span class="progress-num">
-                {{ uploadPercent === null ? '上传中…' : `${uploadPercent}%` }}
+              <span class="progress-num" :class="{ 'progress-num--text': uploadPercent === null || uploadPercent >= 100 }">
+                {{ uploadPercent === null ? '连接中…' : uploadPercent >= 100 ? '等待创建任务…' : `${uploadPercent}%` }}
               </span>
             </div>
           </div>
 
-          <p v-if="retryHint" class="processing-hint">网络异常，正在自动重连…</p>
-          <p v-else-if="slowHint" class="processing-hint">
+          <p v-if="taskPending && retryHint" class="processing-hint">网络异常，正在自动重连…</p>
+          <p v-else-if="taskPending && slowHint" class="processing-hint">
             处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
           </p>
 
-          <ul class="doc-list skeleton-list" aria-hidden="true">
+          <!-- 终态警示条：收合动画入场，不硬插（部分成功是最容易做成静默忽略的状态） -->
+          <Transition :css="false" v-bind="collapseHooks">
+            <NoticeBar
+              v-if="task?.status === 'PARTIAL'"
+              tone="warn"
+              title="本次检查未包含全部文件"
+              :detail="`${failedDocs.length} 份文件未能处理成功。以下比对结果缺少这些文件的数据，不代表它们一致。`"
+            />
+          </Transition>
+          <Transition :css="false" v-bind="collapseHooks">
+            <NoticeBar
+              v-if="task?.status === 'FAILED'"
+              tone="bad"
+              title="检查失败"
+              detail="未产生任何比对结果。请检查文件格式后重试。"
+            />
+          </Transition>
+
+          <!--
+            文件列表全程同一结构（左文件名、右状态徽章），零跳变：
+            - 后端未返回 documents：用本地已选文件的真实文件名，状态为上传中/排队中
+            - 后端已返回 documents：随每轮轮询就地刷新（解析中 → 已抽取/处理失败）
+            处理进度计数紧贴列表上方， spinner 标明仍在处理；
+            只有完全拿不到文件名时（mock 未选文件）才落回骨架屏。
+          -->
+          <!-- 计数行同样收合动画入场/离场，不硬插顶开列表 -->
+          <Transition :css="false" v-bind="collapseHooks">
+            <p v-if="taskPending && extractProgress" class="extract-progress">
+              <span class="inline-spinner" aria-hidden="true" />
+              已处理 {{ extractProgress.done }} / {{ extractProgress.total }} 份文件
+            </p>
+          </Transition>
+          <ul v-if="displayDocs.length" class="doc-list">
+            <li v-for="d in displayDocs" :key="d.key" class="doc-item">
+              <div class="doc-main">
+                <span class="doc-name">{{ d.name }}</span>
+                <span v-if="d.error" class="doc-error">{{ d.error }}</span>
+              </div>
+              <span class="doc-status">
+                <!-- 未达终态且该文件也未达终态（解析中/排队中/上传中）都带 spinner，
+                     没有转动的等待态看起来像卡死 -->
+                <span
+                  v-if="taskPending && (d.status.tone === 'running' || d.status.tone === 'muted')"
+                  class="inline-spinner"
+                  :class="{ 'inline-spinner--muted': d.status.tone === 'muted' }"
+                  aria-hidden="true"
+                />
+                <StatusBadge :status="d.status" />
+              </span>
+            </li>
+          </ul>
+          <ul v-else class="doc-list skeleton-list" aria-hidden="true">
             <li v-for="i in skeletonRows" :key="i" class="doc-item">
               <SkeletonBlock width="42%" height="13px" />
               <SkeletonBlock width="56px" height="20px" />
             </li>
           </ul>
+
+          <!-- 完成态主路径：收合动画入场，直接给去差异页的按钮 -->
+          <Transition :css="false" v-bind="collapseHooks">
+            <div
+              v-if="task && (task.status === 'COMPLETED' || task.status === 'PARTIAL')"
+              class="next-actions"
+            >
+              <button class="btn primary" @click="navigate.go('diff')">
+                {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
+              </button>
+              <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
+            </div>
+          </Transition>
         </div>
       </Transition>
     </section>

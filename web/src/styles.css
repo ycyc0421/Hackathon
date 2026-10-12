@@ -2115,3 +2115,91 @@ textarea {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ---------- 上传页任务状态流统一（web/fix-upload-progress-flow） ---------- */
+
+/* 上传进度条的用途标签：这条进度只是「传文件」，与任务处理进度无关 */
+.progress-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* 百分比换成文字状态（连接中… / 等待创建任务…）时取消定宽，避免挤压换行 */
+.progress-num--text {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* 解析进度计数：紧贴文件列表上方，spinner 标明仍在处理 */
+.extract-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 阶段条与文件列表之间的间距：进行态/终态同一紧凑节奏（覆盖上方 space-4 的默认值） */
+.stage-header {
+  margin-bottom: var(--space-3);
+}
+
+.task-status-body .doc-list {
+  margin-top: var(--space-2);
+}
+
+/* 文件行右侧状态区：spinner + 徽章横向对齐 */
+.doc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+}
+
+/* 进行中的活动阶段点：脉冲动画，标明任务仍在推进 */
+@keyframes stage-dot-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(37, 99, 235, 0);
+  }
+}
+
+.stage-item.active .stage-dot {
+  animation: stage-dot-pulse 1.6s var(--ease) infinite;
+}
+
+/* 行内小 spinner：用于处理计数与「解析中/上传中」徽章旁 */
+@keyframes inline-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.inline-spinner {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border: 2px solid var(--gray-300);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: inline-spin 0.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-item.active .stage-dot,
+  .inline-spinner {
+    animation: none;
+  }
+}
+
+
+/* 排队中（muted）徽章旁的 spinner 用灰色，与徽章语气一致；
+   running 态保持主色，区分「正在干活」与「在队伍里等」 */
+.inline-spinner--muted {
+  border-top-color: var(--gray-500, #6b7280);
+}

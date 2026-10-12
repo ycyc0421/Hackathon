@@ -1,6 +1,8 @@
 # CI/CD 工作流
 
-PR 只验证，main 的 push CI 成功后自动发布。前端静态资源与 Python 后端部署在同一服务器，通过同一 IP 或 HTTPS 源地址访问。
+PR 只验证，main 的 push CI 成功后自动发布。前端静态资源与 Python 后端部署在同一服务器，当前生产统一使用 `https://hackathon.ychome.net`，前端同源请求 API。
+
+文档修改也会触发 main CI 与部署，目前没有文档路径豁免。维护、备份、故障排查见[部署运维](../../docs/部署运维.md)。
 
 ## ci.yml
 

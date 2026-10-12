@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import copy
 import logging
 import traceback
 
@@ -83,6 +84,16 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
     errors: list[dict] = []
     row_unparsed = False  # 有文件的品名明细表没能解析干净
 
+    def publish_documents() -> None:
+        """同步逐文件进度；深拷贝避免读线程序列化时受到后续修改影响。"""
+        store.update(
+            task_id,
+            {
+                "documents": copy.deepcopy(documents),
+                "summary": {**task["summary"], "document_count": len(documents)},
+            },
+        )
+
     for index, (filename, data) in enumerate(uploads, start=1):
         file_id = make_file_id(index)
         file_type = guess_file_type(filename)
@@ -94,19 +105,29 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
         except Exception:  # noqa: BLE001
             log.warning("上传文件落盘失败：%s", filename)
 
+        doc_entry = {
+            "file_id": file_id,
+            "file_name": filename,
+            "file_type": file_type.value,
+            "doc_type": None,
+            "process_status": "PARSING",
+            "page_count": None,
+            "error_message": None,
+        }
+        documents.append(doc_entry)
+        publish_documents()
+
         # 暂不支持的格式（如 EDI、Word）显式标出，不静默丢弃
         if file_type.value == "OTHER":
-            documents.append(
+            doc_entry.update(
                 {
-                    "file_id": file_id,
-                    "file_name": filename,
-                    "file_type": "OTHER",
                     "doc_type": None,
                     "process_status": "UNSUPPORTED",
                     "page_count": None,
                     "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片",
                 }
             )
+            publish_documents()
             errors.append(
                 {
                     "code": "UNSUPPORTED_FILE_TYPE",
@@ -120,17 +141,15 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
         result = read_document(filename, data)
 
         if not result.ok:
-            documents.append(
+            doc_entry.update(
                 {
-                    "file_id": file_id,
-                    "file_name": filename,
-                    "file_type": file_type.value,
                     "doc_type": None,
                     "process_status": "FAILED",
                     "page_count": result.page_count,
                     "error_message": result.error_message,
                 }
             )
+            publish_documents()
             errors.append(
                 {
                     "code": "DOC_PARSE_FAILED",
@@ -206,17 +225,15 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
                     if f["field_key"] in ("amount", "unit_price") and f["normalized_value"] is not None:
                         f["unit"] = currency
 
-        documents.append(
+        doc_entry.update(
             {
-                "file_id": file_id,
-                "file_name": filename,
-                "file_type": file_type.value,
                 "doc_type": doc_type,
                 "process_status": "EXTRACTED",
                 "page_count": result.page_count,
                 "error_message": None,
             }
         )
+        publish_documents()
         extractions.append(
             {
                 "file_id": file_id,
