@@ -28,23 +28,23 @@ CI 验证数据契约、前端逻辑与构建、后端语义及接口、数据�
 
 ## GitHub production 环境配置
 
-Variables：
+地址配置也保存在 production Secrets 中：
 
 | 名称 | 示例 |
 |---|---|
 | `FRONTEND_ORIGIN` | `http://192.0.2.10` 或 `https://app.example.com` |
 | `VITE_API_BASE` | 同源地址加 `/api/v1`，不带尾斜杠 |
 
-地址会进入前端构建产物。修改后需要重新运行完整部署，不能仅修改服务器环境。
+地址会进入前端构建产物，Secrets 只负责集中配置及工作流日志遮蔽，不会让浏览器中的 API 地址保密。修改后需要重新运行完整部署，不能仅修改服务器环境。
 
-Secrets：
+SSH 部署 Secrets：
 
 - `BACKEND_SSH_HOST`：部署主机域名或 IPv4，SSH 使用 22 端口。
 - `BACKEND_SSH_USER`：已初始化的普通维护用户，不允许 root。
 - `BACKEND_SSH_KEY`：专用部署私钥，使用对应公钥登录，不使用共享密码。
 - `BACKEND_SSH_KNOWN_HOSTS`：经可信连接核验的主机公钥记录。
 
-当前整站流程不使用 Cloudflare 发布凭据。
+当前整站流程不使用 Cloudflare Worker 发布凭据。域名可使用 Cloudflare 代理及源站证书；DNS、证书与源站访问限制由管理员维护。
 
 ## 服务器首次初始化
 
