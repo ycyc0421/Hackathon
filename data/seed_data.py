@@ -73,6 +73,13 @@ def adapt_task(source):
     }
 
 
+def _risk_item_ids(risk):
+    values = risk.get("related_item_ids")
+    if values is None:
+        values = [risk["item_id"]] if risk.get("item_id") is not None else []
+    return list(dict.fromkeys(values))
+
+
 def validate_references(data):
     """Validate task-local references before writing any rows."""
     def unique(rows, key):
@@ -94,17 +101,39 @@ def validate_references(data):
         if value not in file_ids:
             raise ValueError(f"unknown file_id: {value}")
 
+    row_ids = set()
+    for extraction in data["extractions"]:
+        file_ref(extraction["file_id"])
+        for row in extraction.get("line_items", []):
+            identity = (extraction["file_id"], row["item_no"])
+            if type(row["item_no"]) is not int or row["item_no"] < 1:
+                raise ValueError(f"invalid item_no: {identity}")
+            if identity in row_ids:
+                raise ValueError(f"duplicate item_no: {identity}")
+            row_ids.add(identity)
+
+    member_item_ids = {}
     for item in data["items"]:
         for member in item.get("members", []):
             file_ref(member["file_id"])
-
+            identity = (member["file_id"], member["item_no"])
+            if type(member["item_no"]) is not int or identity not in row_ids:
+                raise ValueError(f"unknown member row: {identity}")
+            if identity in member_item_ids:
+                raise ValueError(f"duplicate member row: {identity}")
+            member_item_ids[identity] = item["item_id"]
     for extraction in data["extractions"]:
         file_ref(extraction["file_id"])
         for field in extraction.get("fields", []):
             item_ref(field)
         for line_item in extraction.get("line_items", []):
+            item_id = member_item_ids.get((extraction["file_id"], line_item["item_no"]))
             for field in line_item.get("fields", []):
                 item_ref(field)
+                if item_id is not None and field.get("item_id") not in (None, item_id):
+                    raise ValueError("field item_id differs from its row owner")
+                if field.get("line_no") not in (None, line_item["item_no"]):
+                    raise ValueError("field line_no differs from its row")
     for comparison in data["comparisons"]:
         item_ref(comparison)
         for value in comparison["values"]:
@@ -114,10 +143,7 @@ def validate_references(data):
                 raise ValueError("comparison value item_id differs from its comparison")
     for risk in data["risks"]:
         item_ref(risk)
-        related_item_ids = risk.get("related_item_ids")
-        if related_item_ids is None:
-            related_item_ids = [risk["item_id"]] if risk.get("item_id") is not None else []
-        for item_id in related_item_ids:
+        for item_id in _risk_item_ids(risk):
             if item_id not in item_ids:
                 raise ValueError(f"unknown item_id: {item_id}")
         if risk.get("comparison_id") is not None and risk["comparison_id"] not in comparison_ids:
@@ -127,11 +153,80 @@ def validate_references(data):
     for error in data.get("errors", []):
         for file_id in error.get("file_ids", []):
             file_ref(file_id)
+    return member_item_ids
+
+
+def _insert_fields(conn, data, member_item_ids):
+    task_id = data["task_id"]
+    for extraction in data["extractions"]:
+        fields = [(field, field.get("item_id"), field.get("line_no"))
+                  for field in extraction.get("fields", [])]
+        for row in extraction.get("line_items", []):
+            item_id = member_item_ids.get((extraction["file_id"], row["item_no"]))
+            fields.extend((field, field.get("item_id") or item_id, row["item_no"])
+                          for field in row.get("fields", []))
+        for field, item_id, line_no in fields:
+            conn.execute(
+                """INSERT INTO extracted_fields
+                (task_id,file_id,item_id,line_no,field_key,label,raw_text,raw_value,
+                 normalized_value_json,unit,confidence,status,page,bbox_json,bbox_unit)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (task_id, scoped_id(task_id, extraction["file_id"]), item_id, line_no,
+                 field["field_key"], field.get("label", field["field_key"]),
+                 field.get("raw_text", field.get("raw_value")), field.get("raw_value"),
+                 dump_json(field.get("normalized_value")), field.get("unit"), field.get("confidence"),
+                 field["status"], field.get("page"), dump_json(field.get("bbox")), field.get("bbox_unit")),
+            )
+
+
+def _insert_risk_items(conn, task_id, risk):
+    for position, item_id in enumerate(_risk_item_ids(risk)):
+        conn.execute(
+            "INSERT INTO risk_items (risk_id,task_id,item_id,position) VALUES (?,?,?,?)",
+            (scoped_id(task_id, risk["risk_id"]), task_id, item_id, position),
+        )
+
+
+def backfill_task_relations(conn):
+    """只补关系表，不重导任务，保留完整快照及人工修正审计。"""
+    with conn:
+        conn.execute("BEGIN IMMEDIATE")
+        pending = conn.execute(
+            """SELECT task_id FROM tasks WHERE task_id NOT IN
+               (SELECT task_id FROM task_relation_state) ORDER BY task_id"""
+        ).fetchall()
+        has_payloads = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='api_task_payloads'"
+        ).fetchone() is not None
+        for (task_id,) in pending:
+            payload = conn.execute(
+                "SELECT payload_json FROM api_task_payloads WHERE task_id=?", (task_id,)
+            ).fetchone() if has_payloads else None
+            if payload is not None:
+                data = adapt_task(json.loads(payload[0]))
+                if data["task_id"] != task_id:
+                    raise ValueError("payload task_id differs from its stored task")
+                member_item_ids = validate_references(data)
+                conn.execute("DELETE FROM extracted_fields WHERE task_id=?", (task_id,))
+                _insert_fields(conn, data, member_item_ids)
+                conn.execute("DELETE FROM risk_items WHERE task_id=?", (task_id,))
+                for risk in data["risks"]:
+                    _insert_risk_items(conn, task_id, risk)
+            else:
+                # 没有快照时仅补已知的旧单商品关系，不猜测丢失的行字段。
+                conn.execute(
+                    """INSERT INTO risk_items (risk_id,task_id,item_id,position)
+                       SELECT risk_id,task_id,item_id,0 FROM risks r
+                       WHERE task_id=? AND item_id IS NOT NULL AND NOT EXISTS
+                       (SELECT 1 FROM risk_items ri WHERE ri.risk_id=r.risk_id)""", (task_id,),
+                )
+            conn.execute("INSERT INTO task_relation_state(task_id) VALUES (?)", (task_id,))
+    return len(pending)
 
 
 def import_task(conn, source, *, payload_json=None):
     data = adapt_task(source)
-    validate_references(data)
+    member_item_ids = validate_references(data)
     task_id = data["task_id"]
     storage_id = lambda value: scoped_id(task_id, value)
     parse_methods = {e["file_id"]: e.get("parse_method") for e in data["extractions"]}
@@ -164,36 +259,7 @@ def import_task(conn, source, *, payload_json=None):
                  doc.get("doc_type"), doc["process_status"], doc.get("page_count"), doc.get("error_message"),
                  parse_methods.get(doc["file_id"])),
             )
-        member_item_ids = {}
-        for item in data["items"]:
-            for member in item.get("members", []):
-                member_item_ids[(member["file_id"], member["item_no"])] = item["item_id"]
-
-        for extraction in data["extractions"]:
-            fields = [
-                (field, field.get("item_id"), field.get("line_no"))
-                for field in extraction.get("fields", [])
-            ]
-            for line_item in extraction.get("line_items", []):
-                item_no = line_item["item_no"]
-                item_id = member_item_ids.get((extraction["file_id"], item_no))
-                fields.extend(
-                    (field, field.get("item_id", item_id), field.get("line_no", item_no))
-                    for field in line_item.get("fields", [])
-                )
-
-            for field, item_id, line_no in fields:
-                conn.execute(
-                    """INSERT INTO extracted_fields
-                    (task_id,file_id,item_id,line_no,field_key,label,raw_text,raw_value,
-                     normalized_value_json,unit,confidence,status,page,bbox_json,bbox_unit)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                    (task_id, storage_id(extraction["file_id"]), item_id, line_no,
-                     field["field_key"], field.get("label", field["field_key"]),
-                     field.get("raw_text", field.get("raw_value")), field.get("raw_value"),
-                     dump_json(field.get("normalized_value")), field.get("unit"), field.get("confidence"),
-                     field["status"], field.get("page"), dump_json(field.get("bbox")), field.get("bbox_unit")),
-                )
+        _insert_fields(conn, data, member_item_ids)
         for comparison in data["comparisons"]:
             comparison_id = storage_id(comparison["comparison_id"])
             conn.execute(
@@ -237,14 +303,7 @@ def import_task(conn, source, *, payload_json=None):
                     "INSERT INTO risk_files (risk_id,file_id,position) VALUES (?,?,?)",
                     (risk_id, storage_id(file_id), position),
                 )
-            related_item_ids = risk.get("related_item_ids")
-            if related_item_ids is None:
-                related_item_ids = [risk["item_id"]] if risk.get("item_id") is not None else []
-            for position, item_id in enumerate(related_item_ids):
-                conn.execute(
-                    "INSERT INTO risk_items (risk_id,task_id,item_id,position) VALUES (?,?,?,?)",
-                    (risk_id, task_id, item_id, position),
-                )
+            _insert_risk_items(conn, task_id, risk)
         expected = (len(data["comparisons"]), sum(len(c["values"]) for c in data["comparisons"]))
         actual = tuple(
             conn.execute(f"SELECT COUNT(*) FROM {table} WHERE task_id = ?", (task_id,)).fetchone()[0]
@@ -254,6 +313,7 @@ def import_task(conn, source, *, payload_json=None):
             raise RuntimeError(f"comparison import count mismatch: expected {expected}, got {actual}")
         if payload_json is not None:
             conn.execute("INSERT INTO api_task_payloads(task_id,payload_json) VALUES (?,?)", (task_id, payload_json))
+        conn.execute("INSERT INTO task_relation_state(task_id) VALUES (?)", (task_id,))
     return task_id
 
 

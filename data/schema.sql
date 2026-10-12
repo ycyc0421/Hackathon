@@ -145,6 +145,12 @@ CREATE TABLE IF NOT EXISTS risk_items (
 
 CREATE INDEX IF NOT EXISTS idx_risk_items_item ON risk_items(task_id, item_id);
 
+-- 随任务删除清除标记，旧版本重写任务后再次升级时仍可补齐关系。
+CREATE TABLE IF NOT EXISTS task_relation_state (
+    task_id TEXT PRIMARY KEY NOT NULL,
+    FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS hs_dictionary (
     hs_code TEXT PRIMARY KEY,
     description TEXT,
