@@ -350,6 +350,12 @@ const failedDocs = computed(
     ) ?? []
 )
 
+/**
+ * 进行态下逐文件的真实状态列表。后端一旦返回 documents 就用它替换骨架屏，
+ * 每轮轮询就地刷新（解析中 → 已抽取），让用户看到任务确实在推进。
+ */
+const liveDocs = computed(() => task.value?.documents ?? [])
+
 /** 逐文件处理状态的展示对象 */
 function docStatus(d) {
   return processStatus(d.process_status)
@@ -503,7 +509,8 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
           </NoticeBar>
         </div>
 
-        <div v-else-if="task" key="result" class="task-status-body">
+        <!-- 终态结果：任务到达 COMPLETED / PARTIAL / FAILED 才进入这个分支 -->
+        <div v-else-if="task && !taskPending" key="result" class="task-status-body">
           <div class="status-row">
             <StatusBadge :status="statusInfo" />
             <span class="status-meta">任务 {{ task.task_id }}</span>
@@ -526,12 +533,6 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
             detail="未产生任何比对结果。请检查文件格式后重试。"
           />
 
-          <!-- 慢提示/重连提示：任务未达终态即可见，task 写入后也不能消失 -->
-          <p v-if="isRunning && taskPending && retryHint" class="processing-hint">网络异常，正在自动重连…</p>
-          <p v-else-if="isRunning && taskPending && slowHint" class="processing-hint">
-            处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
-          </p>
-
           <ul class="doc-list">
             <li v-for="d in task.documents" :key="d.file_id" class="doc-item">
               <div class="doc-main">
@@ -551,8 +552,21 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
           </div>
         </div>
 
-        <!-- 处理中：分阶段进度 + 上传百分比 + 已等待时长 + 骨架屏 -->
+        <!--
+          进行态统一视图：覆盖上传中 → 排队 → 逐份解析 → 交叉比对的整段等待。
+          关键约束是"轮询拿到第一次响应后界面不能跳变"——
+          阶段条/已等待时长/提示在整个未达终态期间持续在屏，
+          文件列表在后端返回 documents 后就地由骨架换成真实逐文件状态，
+          只有到达终态才整体淡出到结果视图，保证加载动画与结果在视觉上连续。
+        -->
         <div v-else key="processing" class="task-status-body">
+          <!-- 任务已创建（拿到首次轮询）后补充徽章与任务号，与终态头部同一形态 -->
+          <div v-if="task" class="status-row">
+            <StatusBadge :status="statusInfo" />
+            <span class="status-meta">任务 {{ task.task_id }}</span>
+            <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
+          </div>
+
           <div class="stage-header">
             <ol class="stage-row">
               <li
@@ -592,7 +606,21 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
             处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
           </p>
 
-          <ul class="doc-list skeleton-list" aria-hidden="true">
+          <!--
+            后端已返回 documents 就展示真实逐文件状态（每轮轮询就地刷新），
+            尚未返回（排队中/刚开始）保持骨架屏。绝不渲染空的带边框列表——
+            空盒子看起来就像界面卡死。
+          -->
+          <ul v-if="liveDocs.length" class="doc-list">
+            <li v-for="d in liveDocs" :key="d.file_id" class="doc-item">
+              <div class="doc-main">
+                <span class="doc-name">{{ d.file_name }}</span>
+                <span v-if="d.error_message" class="doc-error">{{ d.error_message }}</span>
+              </div>
+              <StatusBadge :status="docStatus(d)" />
+            </li>
+          </ul>
+          <ul v-else class="doc-list skeleton-list" aria-hidden="true">
             <li v-for="i in skeletonRows" :key="i" class="doc-item">
               <SkeletonBlock width="42%" height="13px" />
               <SkeletonBlock width="56px" height="20px" />
