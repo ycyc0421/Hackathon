@@ -2115,3 +2115,31 @@ textarea {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ---------- 上传页任务状态流统一（web/fix-upload-progress-flow） ---------- */
+
+/* 上传进度条的用途标签：这条进度只是「传文件」，与任务处理进度无关 */
+.progress-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* 百分比换成文字状态（连接中… / 等待创建任务…）时取消定宽，避免挤压换行 */
+.progress-num--text {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* 解析进度计数：已处理 x / n 份文件 */
+.extract-progress {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 终态保留的阶段条：与进行态同一位置同一形态，全部置为完成态 */
+.stage-row--settled {
+  margin-bottom: var(--space-2);
+}

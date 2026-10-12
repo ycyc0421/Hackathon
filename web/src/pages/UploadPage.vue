@@ -356,6 +356,39 @@ const failedDocs = computed(
  */
 const liveDocs = computed(() => task.value?.documents ?? [])
 
+/**
+ * 进行态文件行：与终态完全同一结构（左文件名、右状态徽章），从上传到终态零跳变。
+ * 后端还没返回 documents 时（上传中 / 排队中）先用本地已选文件的名字占位——
+ * 文件名是前端一提交就知道的信息，不该用骨架屏藏着。
+ */
+const displayDocs = computed(() => {
+  if (liveDocs.value.length) {
+    return liveDocs.value.map((d) => ({
+      key: d.file_id,
+      name: d.file_name,
+      error: d.error_message,
+      status: processStatus(d.process_status),
+    }))
+  }
+  return files.value.map((f) => ({
+    key: fileKey(f),
+    name: f.name,
+    error: null,
+    status: phase.value === 'uploading'
+      ? { text: '上传中', tone: 'running' }
+      : { text: '排队中', tone: 'muted' },
+  }))
+})
+
+/** 解析进度计数：已抽取 x / n 份，任务进入 PROCESSING 且后端回了 documents 时展示 */
+const extractProgress = computed(() => {
+  if (!liveDocs.value.length) return null
+  const done = liveDocs.value.filter(
+    (d) => d.process_status === 'EXTRACTED' || d.process_status === 'FAILED' || d.process_status === 'UNSUPPORTED'
+  ).length
+  return { done, total: liveDocs.value.length }
+})
+
 /** 逐文件处理状态的展示对象 */
 function docStatus(d) {
   return processStatus(d.process_status)
@@ -518,6 +551,18 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
             <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
           </div>
 
+          <!--
+            阶段条在终态保留（全部置为完成），与进行态同一位置同一形态：
+            它是这次任务走过的路径的记录，不是只在加载时才有意义的动画。
+            FAILED 没走完流程，不展示，错误说明见下方 NoticeBar。
+          -->
+          <ol v-if="task.status !== 'FAILED'" class="stage-row stage-row--settled">
+            <li v-for="s in TASK_STAGES" :key="s.key" class="stage-item done">
+              <span class="stage-dot" aria-hidden="true" />
+              <span class="stage-text">{{ s.text }}</span>
+            </li>
+          </ol>
+
           <!-- 部分成功：最容易做成静默忽略的状态 -->
           <NoticeBar
             v-if="task.status === 'PARTIAL'"
@@ -582,9 +627,15 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
             <span class="wait-line">已等待 {{ elapsedText }}</span>
           </div>
 
-          <!-- 进度条只在上传阶段存在；结束时高度收起而不是瞬间消失 -->
+          <!--
+            上传进度条：仅代表「文件字节传到后端」的进度，与任务处理进度无关。
+            100% 只说明字节发完了，浏览器还在等 /checks 创建任务的响应——
+            此时把百分比换成「等待创建任务」，避免"拉满了却没开始"的误读。
+            进度条只在上传阶段存在；结束时高度收起而不是瞬间消失。
+          -->
           <div class="upload-progress-wrap" :class="{ collapsed: phase !== 'uploading' }">
             <div class="upload-progress">
+              <span class="progress-label">上传文件</span>
               <div class="progress-track">
                 <div
                   class="progress-fill"
@@ -595,8 +646,8 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
                   aria-valuemax="100"
                 />
               </div>
-              <span class="progress-num">
-                {{ uploadPercent === null ? '上传中…' : `${uploadPercent}%` }}
+              <span class="progress-num" :class="{ 'progress-num--text': uploadPercent === null || uploadPercent >= 100 }">
+                {{ uploadPercent === null ? '连接中…' : uploadPercent >= 100 ? '等待创建任务…' : `${uploadPercent}%` }}
               </span>
             </div>
           </div>
@@ -607,17 +658,21 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
           </p>
 
           <!--
-            后端已返回 documents 就展示真实逐文件状态（每轮轮询就地刷新），
-            尚未返回（排队中/刚开始）保持骨架屏。绝不渲染空的带边框列表——
-            空盒子看起来就像界面卡死。
+            文件列表与终态同一结构（左文件名、右状态徽章），全程零跳变：
+            - 后端未返回 documents：用本地已选文件的真实文件名，状态为上传中/排队中
+            - 后端已返回 documents：随每轮轮询就地刷新（解析中 → 已抽取/处理失败）
+            只有完全拿不到文件名时（mock 场景未选文件）才落回骨架屏。
           -->
-          <ul v-if="liveDocs.length" class="doc-list">
-            <li v-for="d in liveDocs" :key="d.file_id" class="doc-item">
+          <p v-if="extractProgress" class="extract-progress">
+            已处理 {{ extractProgress.done }} / {{ extractProgress.total }} 份文件
+          </p>
+          <ul v-if="displayDocs.length" class="doc-list">
+            <li v-for="d in displayDocs" :key="d.key" class="doc-item">
               <div class="doc-main">
-                <span class="doc-name">{{ d.file_name }}</span>
-                <span v-if="d.error_message" class="doc-error">{{ d.error_message }}</span>
+                <span class="doc-name">{{ d.name }}</span>
+                <span v-if="d.error" class="doc-error">{{ d.error }}</span>
               </div>
-              <StatusBadge :status="docStatus(d)" />
+              <StatusBadge :status="d.status" />
             </li>
           </ul>
           <ul v-else class="doc-list skeleton-list" aria-hidden="true">
