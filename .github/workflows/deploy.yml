@@ -120,7 +120,7 @@ jobs:
       - name: 打包前端并发布 Python 3.12 后端，预检 OCR
         id: backend
         run: |
-          ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
+          ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=20 -o ServerAliveCountMax=6 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
           target="$BACKEND_SSH_USER@$BACKEND_SSH_HOST"
           git archive --format=tar --output="$RUNNER_TEMP/$RELEASE_ID.tar" HEAD
           tar --append --file="$RUNNER_TEMP/$RELEASE_ID.tar" --directory="$GITHUB_WORKSPACE" web/dist
@@ -135,7 +135,7 @@ jobs:
           SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
         run: |
           npm ci
-          ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
+          ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=20 -o ServerAliveCountMax=6 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
           target="$BACKEND_SSH_USER@$BACKEND_SSH_HOST"
           python3 - <<'PY' | ssh "${ssh_options[@]}" "$target" "cd app/releases/$RELEASE_ID && .venv/bin/python deploy/smoke.py smoke-output"
           import json, os
@@ -148,7 +148,7 @@ jobs:
       - name: 公网联调失败时回退整站
         if: failure() && steps.backend.outcome == 'success' && steps.smoke.outcome == 'failure'
         run: |
-          ssh -i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts" "$BACKEND_SSH_USER@$BACKEND_SSH_HOST" "python3 - $RELEASE_ID --rollback" < deploy/backend.py
+          ssh -i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=20 -o ServerAliveCountMax=6 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts" "$BACKEND_SSH_USER@$BACKEND_SSH_HOST" "python3 - $RELEASE_ID --rollback" < deploy/backend.py
 
       - name: 清理临时密钥
         if: always()

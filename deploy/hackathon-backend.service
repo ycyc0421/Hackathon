@@ -16,7 +16,7 @@ UMask=0077
 NoNewPrivileges=yes
 MemoryHigh=6G
 MemoryMax=8G
-CPUQuota=200%
+CPUQuota=400%
 TasksMax=128
 
 [Install]
