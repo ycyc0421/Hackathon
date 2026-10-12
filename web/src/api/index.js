@@ -23,15 +23,23 @@ import {
   requestWithUploadProgress,
   pollTask,
 } from './request.js'
-import { UPLOAD_LIMITS, validateFiles, splitByName } from './uploadLimits.js'
+import { UPLOAD_LIMITS, validateFiles, splitByName, isEdiName } from './uploadLimits.js'
 import completedSample from '../mock/check-completed.json'
 import partialSample from '../mock/check-partial.json'
 import multiItemSample from '../mock/check-multi-item.json'
 import cleanSample from '../mock/check-clean.json'
 import evaluationDoneSample from '../mock/evaluation-done.json'
+// EDI 合成场景夹具（issue #40）：手工构造的 API 形状数据，非真实接口输出，
+// input.notes 中保留了合成标识。注册进示例体系供页面验收，不表示后端已解析 EDI。
+import ediOnlySample from '../mock/check-edi-only.json'
+import ediMixedSample from '../mock/check-edi-mixed.json'
+import ediMultiItemSample from '../mock/check-edi-multi-item.json'
+import ediPartialSample from '../mock/check-edi-partial.json'
+import ediUnsupportedSample from '../mock/check-edi-unsupported.json'
+import ediFailedSample from '../mock/check-edi-failed.json'
 
-// 错误类型、上传校验与同名拆分在此处统一出口，页面只从 api/index.js 引入
-export { ApiError, UPLOAD_LIMITS, validateFiles, splitByName }
+// 错误类型、上传校验、同名拆分与 EDI 识别在此处统一出口，页面只从 api/index.js 引入
+export { ApiError, UPLOAD_LIMITS, validateFiles, splitByName, isEdiName }
 
 // —— mock 实现 ——
 
@@ -44,6 +52,12 @@ const MOCK_SAMPLES = {
   'partial-fail': partialSample, // 单品名 · 一份文件处理失败
   'multi-item': multiItemSample, // 双品名 · 冲突/一致/不适用混合
   clean: cleanSample, // 全部一致 · 零风险
+  'edi-only': ediOnlySample, // EDI · 单份报文（0 冲突不等于通过）
+  'edi-mixed': ediMixedSample, // EDI + PDF + 图片 · 数量冲突
+  'edi-multi-item': ediMultiItemSample, // EDI · 双商品顺序与缺失
+  'edi-partial': ediPartialSample, // EDI · 有效 + 截断并存
+  'edi-unsupported': ediUnsupportedSample, // EDI · 后端不支持（整票失败）
+  'edi-failed': ediFailedSample, // EDI · 报文截断解析失败
 }
 
 let mockScenario = 'single-item'

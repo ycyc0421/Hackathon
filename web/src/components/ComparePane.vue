@@ -16,7 +16,9 @@ import { computed, inject, onBeforeUnmount } from 'vue'
 import { formatValue, fieldStatus } from '../api/formatters.js'
 import { divergenceInfo } from '../utils/divergence.js'
 import { evidenceRawText } from '../utils/evidence.js'
+import { isEdiName } from '../api/uploadLimits.js'
 import StatusBadge from './StatusBadge.vue'
+import EdiSourceView from './EdiSourceView.vue'
 
 const props = defineProps({
   comparison: { type: Object, required: true },
@@ -122,8 +124,15 @@ onBeforeUnmount(() => {
 
         <div class="compare-foot">
           <StatusBadge :status="fileStatusOf(v)" />
+          <!-- EDI 走共享查看组件：纯文本 + 下载，不拼 #page、不新开窗口（#40）；
+               PDF/图片保持原有的新窗口 objectURL 路径 -->
+          <EdiSourceView
+            v-if="sourceFileOf(v) && isEdiName(v.file_name)"
+            :file="sourceFileOf(v)"
+            class="compare-foot-source"
+          />
           <button
-            v-if="sourceFileOf(v)"
+            v-else-if="sourceFileOf(v)"
             class="link-btn"
             @click="openSource(v)"
           >
