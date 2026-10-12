@@ -87,6 +87,7 @@ def activate(root, release):
         run("systemctl", "--user", "is-active", "--quiet", SERVICE)
     except BaseException:
         print("新版本启动失败，正在恢复旧版本。", flush=True)
+        run("systemctl", "--user", "stop", SERVICE)
         switch_release(current, previous)
         unit.write_bytes(previous_unit)
         run("systemctl", "--user", "daemon-reload")
@@ -102,6 +103,8 @@ def rollback(root, release):
     previous = Path((release / "previous-release.txt").read_text().strip())
     if not previous.is_dir():
         raise RuntimeError("旧版本目录已不存在，无法回退")
+    # 先停新进程，避免恢复较低的旧内存上限时触发 OOM。
+    run("systemctl", "--user", "stop", SERVICE)
     unit = root.parent / ".config/systemd/user" / SERVICE
     unit.write_bytes((release / "previous-service.conf").read_bytes())
     switch_release(current, previous)

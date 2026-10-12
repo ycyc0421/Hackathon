@@ -63,7 +63,7 @@ class DeploymentTests(unittest.TestCase):
     @patch("backend.wait_healthy")
     @patch("backend.run")
     def test_failed_restart_also_restores_previous_service(self, run, health):
-        run.side_effect = [None, subprocess.CalledProcessError(1, "restart"), None, None]
+        run.side_effect = [None, subprocess.CalledProcessError(1, "restart"), None, None, None]
         with self.assertRaises(subprocess.CalledProcessError):
             backend.activate(self.root, self.new)
         self.assertEqual((self.root / "current").resolve(), self.old)
@@ -79,7 +79,13 @@ class DeploymentTests(unittest.TestCase):
     @patch("backend.run")
     def test_public_probe_failure_can_rollback_activated_release(self, run, health):
         backend.activate(self.root, self.new)
+        def check_stop_order(*args, **kwargs):
+            if args == ("systemctl", "--user", "stop", backend.SERVICE):
+                self.assertEqual(self.unit.read_text(), "新服务配置")
+                self.assertEqual((self.root / "current").resolve(), self.new)
+        run.side_effect = check_stop_order
         backend.rollback(self.root, self.new)
+        self.assertIn(("systemctl", "--user", "stop", backend.SERVICE), [call.args for call in run.call_args_list])
         self.assertEqual((self.root / "current").resolve(), self.old)
         self.assertEqual(self.unit.read_text(), "旧服务配置")
         self.assertEqual((self.root / "current/web/dist/index.html").read_text(), "旧页面")

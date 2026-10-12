@@ -181,7 +181,7 @@ def _get_ocr():
     with _model_lock:
         if _ocr is None:
             from paddleocr import PaddleOCR
-            _ocr = PaddleOCR(use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False)
+            _ocr = PaddleOCR(cpu_threads=4, use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False)
     return _ocr
 
 
@@ -190,7 +190,7 @@ def _get_structure():
     with _model_lock:
         if _structure is None:
             from paddleocr import PPStructureV3
-            _structure = PPStructureV3(use_doc_orientation_classify=False, use_doc_unwarping=False, use_formula_recognition=False, use_seal_recognition=False)
+            _structure = PPStructureV3(cpu_threads=4, use_doc_orientation_classify=False, use_doc_unwarping=False, use_formula_recognition=False, use_seal_recognition=False)
     return _structure
 
 
