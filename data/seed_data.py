@@ -116,7 +116,7 @@ def validate_references(data):
             file_ref(file_id)
 
 
-def import_task(conn, source):
+def import_task(conn, source, *, payload_json=None):
     data = adapt_task(source)
     validate_references(data)
     task_id = data["task_id"]
@@ -139,7 +139,7 @@ def import_task(conn, source):
             conn.execute(
                 """INSERT INTO items (task_id,item_id,display_name,description,line_no)
                 VALUES (?,?,?,?,?)""",
-                (task_id, item["item_id"], item["display_name"], item.get("description"),
+                (task_id, item["item_id"], item.get("display_name", item.get("label", item["item_id"])), item.get("description"),
                  item.get("line_no", item.get("item_order"))),
             )
         for doc in data["documents"]:
@@ -214,6 +214,8 @@ def import_task(conn, source):
         )
         if actual != expected:
             raise RuntimeError(f"comparison import count mismatch: expected {expected}, got {actual}")
+        if payload_json is not None:
+            conn.execute("INSERT INTO api_task_payloads(task_id,payload_json) VALUES (?,?)", (task_id, payload_json))
     return task_id
 
 

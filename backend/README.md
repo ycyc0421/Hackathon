@@ -57,7 +57,7 @@ Windows PowerShell 用 `python -m venv backend/.venv` 创建环境，随后执�
 
 每次发布对 documents 深拷贝，防止后续原地更新影响读取快照，并同步 summary.document_count 为已发布条目数（不是上传总数）。extractions、comparisons、risks 和最终任务状态仍在收尾发布；调用方不可把处理中空结果当作没有问题。失败分支保留原错误信息。
 
-当前 JSON 存储只在收尾 persist；进度回写不会新增中间态结果文件。这是当前存储实现的行为，后续接入 SQLite 后须复核写入成本。短文件可能在两轮轮询间完成，接口不保证客户端观察到每一次状态转换。
+任务创建与进度回写立即提交 SQLite；JSON 兼容导出仍只在收尾 persist，不生成中间态 JSON 文件。短文件可能在两轮轮询间完成，接口不保证客户端观察到每一次状态转换。
 
 ## 结果判读与前端联调
 
@@ -116,7 +116,7 @@ python backend/tools/run_challenge.py  # 09–11 挑战样例与金标断言
 - 图片和无文本层 PDF 可选用本地 PaddleOCR。默认关闭，未配置识别通道时显式返回解析失败。
 - 目的国规则是未核实的演示规则，结果保留“演示规则·未经核实”标记，不能作为正式合规结论。
 - `confidence` 与 `bbox` 暂为 `null`；人工修正、报告导出和 EDI 解析尚未实现。
-- 当前 main 使用内存任务表与 JSON 结果文件；完成结果可重启后读取，进行中任务不能恢复。SQLite 接入尚待合并；数据库本身也不等于可恢复任务队列。
+- 任务与结果使用 SQLite 持久化，并保留终态 JSON 兼容导出；重启时进行中任务标记为 FAILED / TASK_INTERRUPTED，需重新上传，不支持自动续跑。
 - `app/doc_profile.py` 的商业发票、装箱单、提单按已确认最小规则区分必需/可选；其他单证类型及更完整的适用字段表待数据侧确认。
 
 ## 本地 PaddleOCR（可选）
@@ -156,3 +156,7 @@ PDF 验证见 [工作流说明](../.github/workflows/README.md#服务器首次�
 生产环境已启用本地 OCR，本地默认关闭。PowerShell 设置开关使用 `$env:PADDLE_OCR_ENABLED = '1'`。远程视觉模型配置见 `.env.example`；若同时启用 Paddle，代码优先选择 Paddle，失败不会自动切换到远程模型。
 
 扫描 PDF 当前按 200 DPI 渲染页面，复杂或多页文件可能占用较多内存，不能据单个样例承诺任意页数或并发容量。OCR 在线程内串行复用，但任务创建没有持久队列。服务配额、上线验证与备份见[部署运维](../docs/部署运维.md)。
+
+## SQLite 任务存储
+
+任务与结果已接入 SQLite；默认运行库位于共享 `.data/tasks.sqlite3`，旧 JSON 结果保留并迁入。商品组成员、OCR 证据及警告保存在同事务完整快照中。启动时未完成任务标记为 `FAILED / TASK_INTERRUPTED`，需重新上传。部署迁移与回退说明见根目录 `SQLITE_INTEGRATION.md`。

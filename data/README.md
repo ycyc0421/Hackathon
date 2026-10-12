@@ -1,6 +1,6 @@
 # SQLite 数据工具
 
-当前目录提供独立 SQLite 初始化、样例导入和回归工具；main 后端仍使用 JSON 任务存储，数据库接入尚待合并。数据层按 `items[]` 组织，公开 API 的单品名票也可能使用空目录和票级字段。`schema.sql` 定义表结构，`init_db.py` 创建数据库，`seed_data.py` 将任务样例导入 SQLite。
+当前目录提供独立 SQLite 初始化、样例导入和回归工具；后端任务存储已复用此处的表结构与导入器，运行库和样例库分离，见 [SQLite 接入说明](../SQLITE_INTEGRATION.md)。数据层按 `items[]` 组织，公开 API 的单品名票也可能使用空目录和票级字段。`schema.sql` 定义表结构，`init_db.py` 创建数据库，`seed_data.py` 将任务样例导入 SQLite。
 
 ## 运行
 
