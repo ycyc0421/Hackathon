@@ -1,0 +1,11 @@
+test_bad_number_explicit (__main__.TradeJsonTests.test_bad_number_explicit) ... ok
+test_duplicate_keys_rejected (__main__.TradeJsonTests.test_duplicate_keys_rejected) ... ok
+test_http_pipeline_and_schema (__main__.TradeJsonTests.test_http_pipeline_and_schema) ... skipped 'HTTP integration runs on Linux CI'
+test_no_standard_edi_claim (__main__.TradeJsonTests.test_no_standard_edi_claim) ... ok
+test_structured_preserves_values_and_contract (__main__.TradeJsonTests.test_structured_preserves_values_and_contract) ... ok
+test_unknown_and_invalid_rows_rejected (__main__.TradeJsonTests.test_unknown_and_invalid_rows_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.002s
+
+OK (skipped=1)

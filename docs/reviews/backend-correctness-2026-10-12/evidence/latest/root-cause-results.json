@@ -1,0 +1,2137 @@
+{
+  "commit": "685d6e15618cb882b5586cea1341f16527dee18d",
+  "source_repo": "https://github.com/ycyc0421/Hackathon/tree/685d6e15618cb882b5586cea1341f16527dee18d",
+  "ocr_invoked": false,
+  "files": [
+    {
+      "file": "commercial_invoice.pdf",
+      "sha256": "3b81c1b31b3534ab6022766b31b872e6d2fe583b58c4f9883ff962fedd45ee36",
+      "read_method": "TEXT_LAYER",
+      "table": {
+        "line_items": [],
+        "doc_text": "SYNTHETIC - NOT FOR TRADE\nCOMMERCIAL INVOICE\n Document No.: CI-00002\nDate: 2026-04-25\nShipment: SHP-00002 | PO: PO-646778-2\nSELLER / EXPORTER\nHarbor Distribution 0002 Co., Ltd.\n385 River Road, Suite 41\nShanghai, Shanghai 200000, China\nEmail: orders0002@orion.example\nTel: +86 21 4671164 | Mei Zhou\nBUYER / IMPORTER\nJuniper Import 1002 Inc.\n43 Union Street, Suite 65\nNew York, NY 10001, United States\nEmail: orders1002@silver.example\nTel: +1 212 4007421 | Robin Lee\nINCOTERM\nCIF New York\nPAYMENT TERMS\nT/T 50% deposit, 50% before shipment\nPORT OF LOADING\nShanghai, China\nDESTINATION\nNew York, United States\nSHIPPING MARK\nJUNIPER / SHP-00002 / C.NO.1-55\nORIGIN\nChina\nVESSEL / FLIGHT\nMV Meridian / V806\nCURRENCY\nGBP\nNO.\nDESCRIPTION / SKU\nHS CODE\nQUANTITY\nUNIT PRICE\nAMOUNT\n1\nPaper hardcover notebook, assorted colors / SKU:\nSKU-0002-1\n482010\n880 PCS\n3.42\n3009.60\n2\nManual toothbrush, nylon bristles, export retail pack /\nSKU: SKU-0002-2\n960321\n5000 PCS\n0.36\n1800.00\n3\nSteel hexagon bolt, M8 x 30 mm, blue finish / SKU:\nSKU-0002-3\n731815\n4000 PCS\n0.06\n240.00\nTOTAL AMOUNT (GBP): 5049.60\nREFERENCES: CI CI-00002 | PI PI-00002 | PL PL-00002\nNOTES: Goods packed in corrugated cartons; no wooden packaging.\nAttached certificate references: COO-SHP-00002\nAuthorized Signature\nAll parties, addresses and contacts are fictional. HS codes are illustrative 6-digit candidates.\nLayout independently recreated from user-provided ExportDoc demonstration samples; not an issued document.",
+        "header_keys": [],
+        "has_table": false,
+        "suspected": false
+      },
+      "fields": [
+        {
+          "field_key": "packages",
+          "label": "件数",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CARTON",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "net_weight",
+          "label": "净重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "volume",
+          "label": "体积",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CBM",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "quantity",
+          "label": "数量",
+          "raw_text": "QUANTITY",
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "PCS",
+          "confidence": null,
+          "status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "hs_code",
+          "label": "HS 编码",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": "AMOUNT",
+          "raw_value": "1",
+          "normalized_value": 1,
+          "unit": "GBP",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "currency",
+          "label": "币种",
+          "raw_text": "GBP",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "description",
+          "label": "货物描述",
+          "raw_text": "DESCRIPTION / SKU",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "MISSING_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipment_date",
+          "label": "装运日期",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "destination_country",
+          "label": "目的国",
+          "raw_text": "DESTINATION",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "port_of_loading",
+          "label": "起运港",
+          "raw_text": "PORT OF LOADING",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      ]
+    },
+    {
+      "file": "packing_list.pdf",
+      "sha256": "3551090c458a1f45e6931f7286fc3cd5bcef2865d398a244510195524828d04c",
+      "read_method": "TEXT_LAYER",
+      "table": {
+        "line_items": [],
+        "doc_text": "SYNTHETIC - NOT FOR TRADE\nPACKING LIST\n Document No.: PL-00002\nDate: 2026-04-26\nShipment: SHP-00002 | PO: PO-646778-2\nSELLER / EXPORTER\nHarbor Distribution 0002 Co., Ltd.\n385 River Road, Suite 41\nShanghai, Shanghai 200000, China\nEmail: orders0002@orion.example\nTel: +86 21 4671164 | Mei Zhou\nBUYER / IMPORTER\nJuniper Import 1002 Inc.\n43 Union Street, Suite 65\nNew York, NY 10001, United States\nEmail: orders1002@silver.example\nTel: +1 212 4007421 | Robin Lee\nINCOTERM\nCIF New York\nPAYMENT TERMS\nT/T 50% deposit, 50% before shipment\nPORT OF LOADING\nShanghai, China\nDESTINATION\nNew York, United States\nSHIPPING MARK\nJUNIPER / SHP-00002 / C.NO.1-55\nORIGIN\nChina\nVESSEL / FLIGHT\nMV Meridian / V806\nCURRENCY\nGBP\nNO.\nDESCRIPTION / SKU\nQTY\nPKGS\nNET KG\nGROSS KG\nCBM\n1\nPaper hardcover notebook, assorted colors / SKU:\nSKU-0002-1\n888 PCS\n22\n281.60\n293.11\n0.562\n2\nManual toothbrush, nylon bristles, export retail pack /\nSKU: SKU-0002-2\n5000 PCS\n25\n110.00\n133.30\n0.432\n3\nSteel hexagon bolt, M8 x 30 mm, blue finish / SKU:\nSKU-0002-3\n4000 PCS\n8\n72.00\n77.02\n0.079\nTOTAL: 9888 PCS | 55 CARTONS | NET 463.60 KG | GROSS 503.43 KG | 1.073 CBM\nREFERENCES: CI CI-00002 | PI PI-00002 | PL PL-00002\nNOTES: Goods packed in corrugated cartons; no wooden packaging.\nAttached certificate references: COO-SHP-00002\nAuthorized Signature\nAll parties, addresses and contacts are fictional. HS codes are illustrative 6-digit candidates.\nLayout independently recreated from user-provided ExportDoc demonstration samples; not an issued document.",
+        "header_keys": [],
+        "has_table": false,
+        "suspected": false
+      },
+      "fields": [
+        {
+          "field_key": "packages",
+          "label": "件数",
+          "raw_text": "TOTAL: 9888 PCS | 55 CARTONS | NET 463.60 KG | GROSS 503.43 KG | 1.073 CBM",
+          "raw_value": "55 CARTONS | NET 463.60 KG | GROSS 503.43 KG | 1.073 CBM",
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NORMALIZE_FAILED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "raw_text": "TOTAL: 9888 PCS | 55 CARTONS | NET 463.60 KG | GROSS 503.43 KG | 1.073 CBM",
+          "raw_value": "463.60 KG",
+          "normalized_value": 463.6,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "LOW_CONFIDENCE",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "net_weight",
+          "label": "净重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "volume",
+          "label": "体积",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CBM",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "quantity",
+          "label": "数量",
+          "raw_text": "QTY",
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "PCS",
+          "confidence": null,
+          "status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "hs_code",
+          "label": "HS 编码",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "currency",
+          "label": "币种",
+          "raw_text": "GBP",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "description",
+          "label": "货物描述",
+          "raw_text": "DESCRIPTION / SKU",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipment_date",
+          "label": "装运日期",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "destination_country",
+          "label": "目的国",
+          "raw_text": "DESTINATION",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "port_of_loading",
+          "label": "起运港",
+          "raw_text": "PORT OF LOADING",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      ]
+    },
+    {
+      "file": "proforma_invoice.pdf",
+      "sha256": "185ee512b2b354db2d0c9c432f3df588d0d1368bf425d1f10829e7c834b7a113",
+      "read_method": "TEXT_LAYER",
+      "table": {
+        "line_items": [],
+        "doc_text": "SYNTHETIC - NOT FOR TRADE\nPROFORMA INVOICE\n Document No.: PI-00002\nDate: 2026-04-18\nShipment: SHP-00002 | PO: PO-646778-2\nSELLER / EXPORTER\nHarbor Distribution 0002 Co., Ltd.\n385 River Road, Suite 41\nShanghai, Shanghai 200000, China\nEmail: orders0002@orion.example\nTel: +86 21 4671164 | Mei Zhou\nBUYER / IMPORTER\nJuniper Import 1002 Inc.\n43 Union Street, Suite 65\nNew York, NY 10001, United States\nEmail: orders1002@silver.example\nTel: +1 212 4007421 | Robin Lee\nINCOTERM\nCIF New York\nPAYMENT TERMS\nT/T 50% deposit, 50% before shipment\nPORT OF LOADING\nShanghai, China\nDESTINATION\nNew York, United States\nSHIPPING MARK\nJUNIPER / SHP-00002 / C.NO.1-55\nORIGIN\nChina\nVESSEL / FLIGHT\nMV Meridian / V806\nCURRENCY\nGBP\nNO.\nDESCRIPTION / SKU\nHS CODE\nQUANTITY\nUNIT PRICE\nAMOUNT\n1\nPaper hardcover notebook, assorted colors / SKU:\nSKU-0002-1\n482010\n880 PCS\n3.42\n3009.60\n2\nManual toothbrush, nylon bristles, export retail pack /\nSKU: SKU-0002-2\n960321\n5000 PCS\n0.36\n1800.00\n3\nSteel hexagon bolt, M8 x 30 mm, blue finish / SKU:\nSKU-0002-3\n731815\n4000 PCS\n0.06\n240.00\nTOTAL AMOUNT (GBP): 5049.60\nREFERENCES: CI CI-00002 | PI PI-00002 | PL PL-00002\nNOTES: Goods packed in corrugated cartons; no wooden packaging.\nAttached certificate references: COO-SHP-00002\nBANK DETAILS: Synthetic Test Bank / reference TEST-34269381 (non-operational)\nAuthorized Signature\nAll parties, addresses and contacts are fictional. HS codes are illustrative 6-digit candidates.\nLayout independently recreated from user-provided ExportDoc demonstration samples; not an issued document.",
+        "header_keys": [],
+        "has_table": false,
+        "suspected": false
+      },
+      "fields": [
+        {
+          "field_key": "packages",
+          "label": "件数",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CARTON",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "net_weight",
+          "label": "净重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "volume",
+          "label": "体积",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CBM",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "quantity",
+          "label": "数量",
+          "raw_text": "QUANTITY",
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "PCS",
+          "confidence": null,
+          "status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "hs_code",
+          "label": "HS 编码",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": "AMOUNT",
+          "raw_value": "1",
+          "normalized_value": 1,
+          "unit": "GBP",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "currency",
+          "label": "币种",
+          "raw_text": "GBP",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "description",
+          "label": "货物描述",
+          "raw_text": "DESCRIPTION / SKU",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "MISSING_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipment_date",
+          "label": "装运日期",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "destination_country",
+          "label": "目的国",
+          "raw_text": "DESTINATION",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "port_of_loading",
+          "label": "起运港",
+          "raw_text": "PORT OF LOADING",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "file_id": "f1",
+      "file_name": "commercial_invoice.pdf",
+      "file_type": "PDF",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "process_status": "EXTRACTED",
+      "page_count": 1,
+      "error_message": null
+    },
+    {
+      "file_id": "f2",
+      "file_name": "packing_list.pdf",
+      "file_type": "PDF",
+      "doc_type": "PACKING_LIST",
+      "process_status": "EXTRACTED",
+      "page_count": 1,
+      "error_message": null
+    },
+    {
+      "file_id": "f3",
+      "file_name": "proforma_invoice.pdf",
+      "file_type": "PDF",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "process_status": "EXTRACTED",
+      "page_count": 1,
+      "error_message": null
+    }
+  ],
+  "extractions": [
+    {
+      "file_id": "f1",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "parse_method": "TEXT_LAYER",
+      "fields": [
+        {
+          "field_key": "packages",
+          "label": "件数",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CARTON",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "net_weight",
+          "label": "净重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "volume",
+          "label": "体积",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CBM",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "quantity",
+          "label": "数量",
+          "raw_text": "QUANTITY",
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "PCS",
+          "confidence": null,
+          "status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "hs_code",
+          "label": "HS 编码",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": "AMOUNT",
+          "raw_value": "1",
+          "normalized_value": 1,
+          "unit": "GBP",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "currency",
+          "label": "币种",
+          "raw_text": "GBP",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "description",
+          "label": "货物描述",
+          "raw_text": "DESCRIPTION / SKU",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "MISSING_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipment_date",
+          "label": "装运日期",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "destination_country",
+          "label": "目的国",
+          "raw_text": "DESTINATION",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "port_of_loading",
+          "label": "起运港",
+          "raw_text": "PORT OF LOADING",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      ],
+      "line_items": []
+    },
+    {
+      "file_id": "f2",
+      "doc_type": "PACKING_LIST",
+      "parse_method": "TEXT_LAYER",
+      "fields": [
+        {
+          "field_key": "packages",
+          "label": "件数",
+          "raw_text": "TOTAL: 9888 PCS | 55 CARTONS | NET 463.60 KG | GROSS 503.43 KG | 1.073 CBM",
+          "raw_value": "55 CARTONS | NET 463.60 KG | GROSS 503.43 KG | 1.073 CBM",
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NORMALIZE_FAILED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "raw_text": "TOTAL: 9888 PCS | 55 CARTONS | NET 463.60 KG | GROSS 503.43 KG | 1.073 CBM",
+          "raw_value": "463.60 KG",
+          "normalized_value": 463.6,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "LOW_CONFIDENCE",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "net_weight",
+          "label": "净重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "volume",
+          "label": "体积",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CBM",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "quantity",
+          "label": "数量",
+          "raw_text": "QTY",
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "PCS",
+          "confidence": null,
+          "status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "hs_code",
+          "label": "HS 编码",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "currency",
+          "label": "币种",
+          "raw_text": "GBP",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "description",
+          "label": "货物描述",
+          "raw_text": "DESCRIPTION / SKU",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipment_date",
+          "label": "装运日期",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "destination_country",
+          "label": "目的国",
+          "raw_text": "DESTINATION",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "port_of_loading",
+          "label": "起运港",
+          "raw_text": "PORT OF LOADING",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      ],
+      "line_items": []
+    },
+    {
+      "file_id": "f3",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "parse_method": "TEXT_LAYER",
+      "fields": [
+        {
+          "field_key": "packages",
+          "label": "件数",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CARTON",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "net_weight",
+          "label": "净重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "volume",
+          "label": "体积",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CBM",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "quantity",
+          "label": "数量",
+          "raw_text": "QUANTITY",
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "PCS",
+          "confidence": null,
+          "status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "hs_code",
+          "label": "HS 编码",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": "AMOUNT",
+          "raw_value": "1",
+          "normalized_value": 1,
+          "unit": "GBP",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "currency",
+          "label": "币种",
+          "raw_text": "GBP",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "description",
+          "label": "货物描述",
+          "raw_text": "DESCRIPTION / SKU",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "MISSING_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipment_date",
+          "label": "装运日期",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "destination_country",
+          "label": "目的国",
+          "raw_text": "DESTINATION",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "port_of_loading",
+          "label": "起运港",
+          "raw_text": "PORT OF LOADING",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      ],
+      "line_items": []
+    }
+  ],
+  "items": [],
+  "comparisons": [
+    {
+      "comparison_id": "cmp_1",
+      "field_key": "packages",
+      "label": "件数",
+      "value_type": "NUMBER",
+      "unit": "CARTON",
+      "status": "UNRECOGNIZED",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": null,
+      "note": "packing_list.pdf（读出值但无法归一），无法完成比对。",
+      "values": [
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": "55 CARTONS | NET 463.60 KG | GROSS 503.43 KG | 1.073 CBM",
+          "normalized_value": null,
+          "field_status": "NORMALIZE_FAILED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_2",
+      "field_key": "gross_weight",
+      "label": "毛重",
+      "value_type": "NUMBER",
+      "unit": "KGS",
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+      "values": [
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": "463.60 KG",
+          "normalized_value": 463.6,
+          "field_status": "LOW_CONFIDENCE",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_3",
+      "field_key": "quantity",
+      "label": "数量",
+      "value_type": "NUMBER",
+      "unit": "PCS",
+      "status": "UNRECOGNIZED",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": null,
+      "note": "commercial_invoice.pdf（定位到了但读不出值）；packing_list.pdf（定位到了但读不出值）；proforma_invoice.pdf（定位到了但读不出值），无法完成比对。",
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": null,
+          "normalized_value": null,
+          "field_status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": null,
+          "normalized_value": null,
+          "field_status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": null,
+          "normalized_value": null,
+          "field_status": "UNRECOGNIZED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_4",
+      "field_key": "total_amount",
+      "label": "总金额",
+      "value_type": "MONEY",
+      "unit": "GBP",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": "1",
+          "normalized_value": 1,
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": "1",
+          "normalized_value": 1,
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_5",
+      "field_key": "currency",
+      "label": "币种",
+      "value_type": "CODE",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": "GBP",
+          "normalized_value": "GBP",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_6",
+      "field_key": "description",
+      "label": "货物描述",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": "/ SKU",
+          "normalized_value": "SKU",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_7",
+      "field_key": "invoice_no",
+      "label": "发票号",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "UNRECOGNIZED",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": null,
+      "note": "commercial_invoice.pdf（按规则应有但文件中未找到）；proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": null,
+          "normalized_value": null,
+          "field_status": "MISSING_IN_DOC",
+          "page": null,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": null,
+          "normalized_value": null,
+          "field_status": "MISSING_IN_DOC",
+          "page": null,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_8",
+      "field_key": "consignee",
+      "label": "收货人",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": "/ IMPORTER",
+          "normalized_value": "/ IMPORTER",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_9",
+      "field_key": "destination_country",
+      "label": "目的国",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": "New York, United States",
+          "normalized_value": "US",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_10",
+      "field_key": "port_of_loading",
+      "label": "起运港",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": "Shanghai, China",
+          "normalized_value": "上海",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_11",
+      "field_key": "shipper",
+      "label": "发货人",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "commercial_invoice.pdf",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "packing_list.pdf",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        },
+        {
+          "file_id": "f3",
+          "file_name": "proforma_invoice.pdf",
+          "raw_value": "/ EXPORTER",
+          "normalized_value": "/ EXPORTER",
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": null
+        }
+      ]
+    }
+  ],
+  "adapter_probes": {
+    "ordinary": {
+      "result": [
+        "SKU   QTY",
+        "SKU-A1   500"
+      ]
+    },
+    "valid_colspan": {
+      "error": "合并单元格无法可靠对应字段列"
+    },
+    "actual_correct_vl_output": {
+      "error": "未识别出唯一的商品明细表"
+    },
+    "actual_ocr_header_detection": {
+      "table_start": null
+    }
+  },
+  "source_map": {
+    "reader.py": {
+      "sha256_lf": "955b136d84fe8889b3246abe4854b42edebd39adfd26e0de0ff034771e0a951a",
+      "functions": {
+        "ReadResult": {
+          "start": 44,
+          "end": 56
+        },
+        "guess_file_type": {
+          "start": 59,
+          "end": 67
+        },
+        "read_document": {
+          "start": 70,
+          "end": 86
+        },
+        "_pdf_image_coverage": {
+          "start": 92,
+          "end": 136
+        },
+        "_read_pdf": {
+          "start": 139,
+          "end": 235
+        },
+        "_pdf_pages_to_images": {
+          "start": 238,
+          "end": 251
+        },
+        "_read_image": {
+          "start": 257,
+          "end": 274
+        },
+        "_sniff_mime": {
+          "start": 277,
+          "end": 284
+        },
+        "_image_size": {
+          "start": 287,
+          "end": 307
+        },
+        "_transcribe_with_llm": {
+          "start": 313,
+          "end": 363
+        },
+        "ok": {
+          "start": 55,
+          "end": 56
+        },
+        "bounds": {
+          "start": 101,
+          "end": 104
+        },
+        "intersect": {
+          "start": 106,
+          "end": 107
+        },
+        "walk": {
+          "start": 109,
+          "end": 130
+        }
+      }
+    },
+    "rows.py": {
+      "sha256_lf": "9bbb0984d47cd798fcedb99c08546ee6c7d63fa515e4260c22db6a6fbb932ec7",
+      "functions": {
+        "TableResult": {
+          "start": 74,
+          "end": 80
+        },
+        "_looks_like_header": {
+          "start": 86,
+          "end": 92
+        },
+        "_header_columns": {
+          "start": 95,
+          "end": 106
+        },
+        "split_table": {
+          "start": 109,
+          "end": 143
+        },
+        "_cells": {
+          "start": 149,
+          "end": 153
+        },
+        "_number_of": {
+          "start": 156,
+          "end": 160
+        },
+        "_assign_from_cells": {
+          "start": 163,
+          "end": 206
+        },
+        "_assign_from_text": {
+          "start": 209,
+          "end": 242
+        },
+        "_field": {
+          "start": 245,
+          "end": 259
+        },
+        "_row_fields": {
+          "start": 275,
+          "end": 299
+        },
+        "parse_line_items": {
+          "start": 305,
+          "end": 378
+        },
+        "take": {
+          "start": 214,
+          "end": 218
+        }
+      }
+    },
+    "extract.py": {
+      "sha256_lf": "410bfdb3e1c47afacd8e669cf09edfdbbcc53c1dc0beb7c4b218dbc47d0c2e7c",
+      "functions": {
+        "Found": {
+          "start": 38,
+          "end": 45
+        },
+        "_line_of": {
+          "start": 51,
+          "end": 56
+        },
+        "_tail": {
+          "start": 59,
+          "end": 63
+        },
+        "_clip": {
+          "start": 66,
+          "end": 72
+        },
+        "_first_number": {
+          "start": 75,
+          "end": 79
+        },
+        "_has_unit": {
+          "start": 82,
+          "end": 83
+        },
+        "_next_nonempty_line": {
+          "start": 86,
+          "end": 93
+        },
+        "_measure_tail": {
+          "start": 119,
+          "end": 127
+        },
+        "_m_packages": {
+          "start": 130,
+          "end": 145
+        },
+        "_labeled_number": {
+          "start": 148,
+          "end": 167
+        },
+        "_m_gross_weight": {
+          "start": 170,
+          "end": 178
+        },
+        "_m_net_weight": {
+          "start": 181,
+          "end": 182
+        },
+        "_m_volume": {
+          "start": 185,
+          "end": 188
+        },
+        "_m_quantity": {
+          "start": 191,
+          "end": 202
+        },
+        "_m_hs_code": {
+          "start": 205,
+          "end": 214
+        },
+        "_m_total_amount": {
+          "start": 217,
+          "end": 252
+        },
+        "_m_currency": {
+          "start": 255,
+          "end": 262
+        },
+        "_m_description": {
+          "start": 278,
+          "end": 300
+        },
+        "_m_invoice_no": {
+          "start": 303,
+          "end": 311
+        },
+        "_m_shipment_date": {
+          "start": 314,
+          "end": 323
+        },
+        "_m_bill_of_lading_no": {
+          "start": 326,
+          "end": 335
+        },
+        "_m_contract_no": {
+          "start": 338,
+          "end": 346
+        },
+        "_m_container_no": {
+          "start": 349,
+          "end": 353
+        },
+        "_m_shipper": {
+          "start": 356,
+          "end": 357
+        },
+        "_m_consignee": {
+          "start": 360,
+          "end": 361
+        },
+        "_m_port_of_loading": {
+          "start": 364,
+          "end": 371
+        },
+        "_m_port_of_discharge": {
+          "start": 374,
+          "end": 381
+        },
+        "_m_destination_country": {
+          "start": 384,
+          "end": 394
+        },
+        "_labeled_text": {
+          "start": 397,
+          "end": 407
+        },
+        "_norm_number": {
+          "start": 436,
+          "end": 437
+        },
+        "_norm_hs": {
+          "start": 440,
+          "end": 441
+        },
+        "_norm_currency": {
+          "start": 444,
+          "end": 445
+        },
+        "_norm_date": {
+          "start": 448,
+          "end": 449
+        },
+        "_norm_description": {
+          "start": 452,
+          "end": 453
+        },
+        "_norm_port": {
+          "start": 456,
+          "end": 457
+        },
+        "_norm_country": {
+          "start": 460,
+          "end": 461
+        },
+        "_norm_text": {
+          "start": 464,
+          "end": 465
+        },
+        "extract_fields": {
+          "start": 488,
+          "end": 596
+        },
+        "_normalized_of": {
+          "start": 599,
+          "end": 604
+        },
+        "_field": {
+          "start": 607,
+          "end": 631
+        }
+      }
+    },
+    "paddle_reader.py": {
+      "sha256_lf": "6471c899cad2a8f8b02aa6b965e33929bb5f2f24528e498e8f1397b67b98628d",
+      "functions": {
+        "_TableParser": {
+          "start": 22,
+          "end": 53
+        },
+        "_table_lines": {
+          "start": 56,
+          "end": 68
+        },
+        "_header_key": {
+          "start": 71,
+          "end": 73
+        },
+        "_table_start": {
+          "start": 76,
+          "end": 91
+        },
+        "_replace_table": {
+          "start": 94,
+          "end": 99
+        },
+        "_sequential_packing_table": {
+          "start": 102,
+          "end": 132
+        },
+        "_correct_zero_confusion": {
+          "start": 135,
+          "end": 141
+        },
+        "_check_descriptions": {
+          "start": 144,
+          "end": 176
+        },
+        "_get_ocr": {
+          "start": 179,
+          "end": 185
+        },
+        "_get_structure": {
+          "start": 188,
+          "end": 194
+        },
+        "read_image": {
+          "start": 197,
+          "end": 199
+        },
+        "_recognize_image": {
+          "start": 202,
+          "end": 232
+        },
+        "__init__": {
+          "start": 23,
+          "end": 28
+        },
+        "handle_starttag": {
+          "start": 30,
+          "end": 38
+        },
+        "handle_data": {
+          "start": 40,
+          "end": 42
+        },
+        "handle_endtag": {
+          "start": 44,
+          "end": 53
+        }
+      }
+    },
+    "compare.py": {
+      "sha256_lf": "72f739afaf04d5c0468600dc10de5728a4d89729c962701d6edf515c09a1cb81",
+      "functions": {
+        "_canonical": {
+          "start": 66,
+          "end": 69
+        },
+        "_tokens": {
+          "start": 72,
+          "end": 75
+        },
+        "_similarity": {
+          "start": 78,
+          "end": 82
+        },
+        "_has_digit": {
+          "start": 85,
+          "end": 86
+        },
+        "_agree_description": {
+          "start": 89,
+          "end": 111
+        },
+        "_agree": {
+          "start": 114,
+          "end": 129
+        },
+        "_currency_of": {
+          "start": 132,
+          "end": 135
+        },
+        "_agree_money": {
+          "start": 138,
+          "end": 167
+        },
+        "_severity_for_conflict": {
+          "start": 170,
+          "end": 172
+        },
+        "build_comparisons": {
+          "start": 175,
+          "end": 318
+        },
+        "_comparison_value": {
+          "start": 321,
+          "end": 330
+        },
+        "_lacking_note": {
+          "start": 333,
+          "end": 342
+        },
+        "_not_checked_note": {
+          "start": 345,
+          "end": 347
+        },
+        "build_item_comparisons": {
+          "start": 353,
+          "end": 519
+        },
+        "_rule_uncovered": {
+          "start": 522,
+          "end": 531
+        },
+        "rule_uncovered": {
+          "start": 188,
+          "end": 193
+        }
+      }
+    },
+    "runner.py": {
+      "sha256_lf": "4e0d8ebcd35548c73c4a2ca2f1ce420077c6ce24ec8063ce0ca20a5e74cad4dd",
+      "functions": {
+        "_apply_ocr_corrections": {
+          "start": 30,
+          "end": 43
+        },
+        "run_check": {
+          "start": 46,
+          "end": 68
+        },
+        "_run": {
+          "start": 71,
+          "end": 343
+        },
+        "_currency_of": {
+          "start": 346,
+          "end": 353
+        }
+      }
+    }
+  },
+  "summary": {
+    "items": 0,
+    "comparisons": 11,
+    "conflicts": 0,
+    "unrecognized": 3
+  }
+}

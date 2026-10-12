@@ -1,0 +1,1288 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>单证检查报告</title><style>body{font-family:system-ui;margin:32px;line-height:1.5}pre,td{white-space:pre-wrap;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:8px;text-align:left}section{border-top:1px solid #ccc}@media print{body{margin:0}}</style><h1>单证检查报告</h1><p>处理完成不代表合规通过；单一来源、未检查和失败必须分别核对。原始值是来源证据，有效归一值可能经人工修改。</p><h2>文件处理情况</h2><table><thead><tr><th>文件</th><th>类型</th><th>处理状态</th><th>错误</th></tr></thead><tbody><tr><td>invoice.json</td><td>COMMERCIAL_INVOICE</td><td>EXTRACTED</td><td>—</td></tr><tr><td>packing.json</td><td>PACKING_LIST</td><td>EXTRACTED</td><td>—</td></tr></tbody></table><h2>逐项检查</h2><table><thead><tr><th>范围/品名</th><th>字段</th><th>结论</th><th>各文件有效值</th><th>说明</th></tr></thead><tbody><tr><td>整票</td><td>件数</td><td>CONFLICT</td><td>invoice.json: 121；packing.json: 120</td><td>—</td></tr><tr><td>整票</td><td>毛重</td><td>MATCH</td><td>invoice.json: 2800；packing.json: 2800</td><td>—</td></tr><tr><td>整票</td><td>总金额</td><td>UNRECOGNIZED</td><td>invoice.json: None</td><td>invoice.json（按规则应有但文件中未找到），无法完成比对。</td></tr><tr><td>整票</td><td>币种</td><td>UNRECOGNIZED</td><td>invoice.json: None</td><td>invoice.json（按规则应有但文件中未找到），无法完成比对。</td></tr><tr><td>整票</td><td>发票号</td><td>UNRECOGNIZED</td><td>invoice.json: None</td><td>invoice.json（按规则应有但文件中未找到），无法完成比对。</td></tr><tr><td>itm_1</td><td>货号/型号</td><td>MATCH</td><td>invoice.json: MUG-1；packing.json: MUG-1</td><td>—</td></tr><tr><td>itm_1</td><td>货物描述</td><td>MATCH</td><td>invoice.json: 陶瓷 马克杯 白；packing.json: 陶瓷 马克杯 白</td><td>—</td></tr><tr><td>itm_1</td><td>数量</td><td>MATCH</td><td>invoice.json: 100；packing.json: 100</td><td>—</td></tr></tbody></table><h2>风险提示（非合规结论）</h2><table><thead><tr><th>级别</th><th>提示</th><th>适用条件与说明</th><th>来源</th></tr></thead><tbody></tbody></table><h2>版本与来源记录</h2><pre>{
+  &quot;report_version&quot;: &quot;1&quot;,
+  &quot;generated_at&quot;: &quot;2026-10-12T14:55:35+08:00&quot;,
+  &quot;result_hash&quot;: &quot;0349b8ae80a8b932d09e533cac005c5f333d290f46102a31482b436ed83d6804&quot;,
+  &quot;rule_version&quot;: &quot;static-source-candidates-v3&quot;,
+  &quot;rule_version_note&quot;: &quot;原任务未记录历史规则版本时为 null；修正任务使用重算审计中的版本。&quot;,
+  &quot;current_catalog&quot;: {
+    &quot;source_catalog&quot;: {
+      &quot;version&quot;: &quot;official-sources-v2&quot;,
+      &quot;sources&quot;: [
+        {
+          &quot;source_id&quot;: &quot;EU-FCM-LEGISLATION&quot;,
+          &quot;url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+          &quot;authority&quot;: &quot;European Commission&quot;,
+          &quot;kind&quot;: &quot;official regulatory overview&quot;,
+          &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;
+        },
+        {
+          &quot;source_id&quot;: &quot;EU-CERAMICS-84-500&quot;,
+          &quot;url&quot;: &quot;https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:01984L0500-20050520&quot;,
+          &quot;authority&quot;: &quot;EUR-Lex&quot;,
+          &quot;fallback_urls&quot;: [
+            &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;
+          ],
+          &quot;accept&quot;: &quot;application/pdf&quot;,
+          &quot;accept_language&quot;: &quot;eng&quot;,
+          &quot;expected_pdf_text&quot;: [
+            &quot;84/500/EEC&quot;,
+            &quot;2005&quot;
+          ],
+          &quot;kind&quot;: &quot;consolidated directive&quot;,
+          &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;
+        },
+        {
+          &quot;source_id&quot;: &quot;FDA-CPG-545450&quot;,
+          &quot;url&quot;: &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;,
+          &quot;authority&quot;: &quot;FDA&quot;,
+          &quot;kind&quot;: &quot;enforcement guidance; not a universal import certificate&quot;,
+          &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;
+        },
+        {
+          &quot;source_id&quot;: &quot;GB-FOOD-PACKAGING&quot;,
+          &quot;url&quot;: &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;,
+          &quot;authority&quot;: &quot;GOV.UK&quot;,
+          &quot;kind&quot;: &quot;official overview; territorial scope requires review&quot;,
+          &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;
+        },
+        {
+          &quot;source_id&quot;: &quot;EU-FCM-REVISION&quot;,
+          &quot;url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/revision-eu-rules_en&quot;,
+          &quot;authority&quot;: &quot;European Commission&quot;,
+          &quot;kind&quot;: &quot;revision programme; proposed changes are not enacted law&quot;,
+          &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;
+        }
+      ]
+    },
+    &quot;fetch_manifest&quot;: {
+      &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.952961+00:00&quot;,
+      &quot;sources&quot;: [
+        {
+          &quot;source_id&quot;: &quot;EU-FCM-LEGISLATION&quot;,
+          &quot;url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.182220+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;FETCHED&quot;,
+          &quot;sha256&quot;: &quot;6fdc9d6b69d13cc7535d9c120468bc208d1fb71c11368db58333384fa29cd47d&quot;,
+          &quot;bytes&quot;: 112060,
+          &quot;content_type&quot;: &quot;text/html&quot;,
+          &quot;retrieval_url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+          &quot;final_url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+          &quot;etag&quot;: null,
+          &quot;last_modified&quot;: null,
+          &quot;snapshot&quot;: &quot;snapshots/6fdc9d6b69d13cc7535d9c120468bc208d1fb71c11368db58333384fa29cd47d.html&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T06:01:08.316129+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.316146+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        },
+        {
+          &quot;source_id&quot;: &quot;EU-CERAMICS-84-500&quot;,
+          &quot;url&quot;: &quot;https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:01984L0500-20050520&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.316296+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;NOT_MODIFIED&quot;,
+          &quot;sha256&quot;: &quot;179cfddb429b5dc7adc2136c71c6e940671cf9badd1b4b8515f6ecd97441db98&quot;,
+          &quot;bytes&quot;: 50987,
+          &quot;content_type&quot;: &quot;application/pdf&quot;,
+          &quot;retrieval_url&quot;: &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;,
+          &quot;final_url&quot;: &quot;https://publications.europa.eu/resource/cellar/60011874-0099-4dfd-aba7-46e1e41d92b0.0006.01/DOC_1&quot;,
+          &quot;etag&quot;: &quot;\&quot;Con-20190720014324000\&quot;&quot;,
+          &quot;last_modified&quot;: &quot;Fri, 19 Jul 2019 23:43:24 GMT&quot;,
+          &quot;snapshot&quot;: &quot;snapshots/179cfddb429b5dc7adc2136c71c6e940671cf9badd1b4b8515f6ecd97441db98.pdf&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T05:59:28.613245+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.614247+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        },
+        {
+          &quot;source_id&quot;: &quot;FDA-CPG-545450&quot;,
+          &quot;url&quot;: &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.614657+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;NOT_MODIFIED&quot;,
+          &quot;sha256&quot;: &quot;d9c9585d9560a150f1a0b8c9d7890decfd167c58b66aea7fc97e1209fb499655&quot;,
+          &quot;bytes&quot;: 35315,
+          &quot;content_type&quot;: &quot;text/html&quot;,
+          &quot;retrieval_url&quot;: &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;,
+          &quot;final_url&quot;: &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;,
+          &quot;etag&quot;: &quot;\&quot;1791716802\&quot;&quot;,
+          &quot;last_modified&quot;: &quot;Sun, 11 Oct 2026 11:06:42 GMT&quot;,
+          &quot;snapshot&quot;: &quot;snapshots/d9c9585d9560a150f1a0b8c9d7890decfd167c58b66aea7fc97e1209fb499655.html&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T05:54:22.349589+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.839137+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        },
+        {
+          &quot;source_id&quot;: &quot;GB-FOOD-PACKAGING&quot;,
+          &quot;url&quot;: &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.839472+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;NOT_MODIFIED&quot;,
+          &quot;sha256&quot;: &quot;b6fbbfba96609208c9627251e7c3f5185119a301d350e5e80bc797a5fb14b5d4&quot;,
+          &quot;bytes&quot;: 104260,
+          &quot;content_type&quot;: &quot;text/html&quot;,
+          &quot;retrieval_url&quot;: &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;,
+          &quot;final_url&quot;: &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;,
+          &quot;etag&quot;: &quot;W/\&quot;b6fbbfba96609208c9627251e7c3f518\&quot;&quot;,
+          &quot;last_modified&quot;: null,
+          &quot;snapshot&quot;: &quot;snapshots/b6fbbfba96609208c9627251e7c3f5185119a301d350e5e80bc797a5fb14b5d4.html&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T05:59:28.864619+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.902058+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        },
+        {
+          &quot;source_id&quot;: &quot;EU-FCM-REVISION&quot;,
+          &quot;url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/revision-eu-rules_en&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.902402+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;FETCHED&quot;,
+          &quot;sha256&quot;: &quot;dc71bc472c399956185337e8a8883e1ed0e611f8f0f2d507ba741b41d52f63e5&quot;,
+          &quot;bytes&quot;: 113154,
+          &quot;content_type&quot;: &quot;text/html&quot;,
+          &quot;retrieval_url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/revision-eu-rules_en&quot;,
+          &quot;final_url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/revision-eu-rules_en&quot;,
+          &quot;etag&quot;: null,
+          &quot;last_modified&quot;: null,
+          &quot;snapshot&quot;: &quot;snapshots/dc71bc472c399956185337e8a8883e1ed0e611f8f0f2d507ba741b41d52f63e5.html&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T06:01:08.952099+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.952117+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        }
+      ],
+      &quot;automatic_activation&quot;: false,
+      &quot;pending_review_count&quot;: 1
+    },
+    &quot;rule_metadata&quot;: {
+      &quot;version&quot;: &quot;static-source-candidates-v3&quot;,
+      &quot;_readme&quot;: [
+        &quot;Official source retrieval does not verify applicability or legal compliance. HS prefixes select review candidates only. No unconditional missing-certificate conclusion. Archived demo rules are not executed.&quot;
+      ],
+      &quot;countries&quot;: {
+        &quot;DE&quot;: {
+          &quot;name&quot;: &quot;德国&quot;,
+          &quot;required_documents&quot;: [],
+          &quot;hs_rules&quot;: [
+            {
+              &quot;rule_id&quot;: &quot;DE-CERAMICS-6911&quot;,
+              &quot;source_ids&quot;: [
+                &quot;EU-FCM-LEGISLATION&quot;,
+                &quot;EU-CERAMICS-84-500&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+                &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true,
+                &quot;document_version&quot;: &quot;84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review&quot;
+              }
+            },
+            {
+              &quot;rule_id&quot;: &quot;DE-CERAMICS-6912&quot;,
+              &quot;source_ids&quot;: [
+                &quot;EU-FCM-LEGISLATION&quot;,
+                &quot;EU-CERAMICS-84-500&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+                &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true,
+                &quot;document_version&quot;: &quot;84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review&quot;
+              }
+            }
+          ]
+        },
+        &quot;NL&quot;: {
+          &quot;name&quot;: &quot;荷兰&quot;,
+          &quot;required_documents&quot;: [],
+          &quot;hs_rules&quot;: [
+            {
+              &quot;rule_id&quot;: &quot;NL-CERAMICS-6911&quot;,
+              &quot;source_ids&quot;: [
+                &quot;EU-FCM-LEGISLATION&quot;,
+                &quot;EU-CERAMICS-84-500&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+                &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true,
+                &quot;document_version&quot;: &quot;84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review&quot;
+              }
+            },
+            {
+              &quot;rule_id&quot;: &quot;NL-CERAMICS-6912&quot;,
+              &quot;source_ids&quot;: [
+                &quot;EU-FCM-LEGISLATION&quot;,
+                &quot;EU-CERAMICS-84-500&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+                &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true,
+                &quot;document_version&quot;: &quot;84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review&quot;
+              }
+            }
+          ]
+        },
+        &quot;FR&quot;: {
+          &quot;name&quot;: &quot;法国&quot;,
+          &quot;required_documents&quot;: [],
+          &quot;hs_rules&quot;: [
+            {
+              &quot;rule_id&quot;: &quot;FR-CERAMICS-6911&quot;,
+              &quot;source_ids&quot;: [
+                &quot;EU-FCM-LEGISLATION&quot;,
+                &quot;EU-CERAMICS-84-500&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+                &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true,
+                &quot;document_version&quot;: &quot;84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review&quot;
+              }
+            },
+            {
+              &quot;rule_id&quot;: &quot;FR-CERAMICS-6912&quot;,
+              &quot;source_ids&quot;: [
+                &quot;EU-FCM-LEGISLATION&quot;,
+                &quot;EU-CERAMICS-84-500&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+                &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true,
+                &quot;document_version&quot;: &quot;84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review&quot;
+              }
+            }
+          ]
+        },
+        &quot;GB&quot;: {
+          &quot;name&quot;: &quot;英国&quot;,
+          &quot;required_documents&quot;: [],
+          &quot;hs_rules&quot;: [
+            {
+              &quot;rule_id&quot;: &quot;GB-CERAMICS-6911&quot;,
+              &quot;source_ids&quot;: [
+                &quot;GB-FOOD-PACKAGING&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true
+              }
+            },
+            {
+              &quot;rule_id&quot;: &quot;GB-CERAMICS-6912&quot;,
+              &quot;source_ids&quot;: [
+                &quot;GB-FOOD-PACKAGING&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true
+              }
+            }
+          ]
+        },
+        &quot;US&quot;: {
+          &quot;name&quot;: &quot;美国&quot;,
+          &quot;required_documents&quot;: [],
+          &quot;hs_rules&quot;: [
+            {
+              &quot;rule_id&quot;: &quot;US-CERAMICS-6911&quot;,
+              &quot;source_ids&quot;: [
+                &quot;FDA-CPG-545450&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true
+              }
+            },
+            {
+              &quot;rule_id&quot;: &quot;US-CERAMICS-6912&quot;,
+              &quot;source_ids&quot;: [
+                &quot;FDA-CPG-545450&quot;
+              ],
+              &quot;source_urls&quot;: [
+                &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;
+              ],
+              &quot;review_status&quot;: &quot;APPLICABILITY_REVIEW_REQUIRED&quot;,
+              &quot;applicability&quot;: {
+                &quot;hs_prefix_is_candidate_only&quot;: true,
+                &quot;required_facts&quot;: [
+                  &quot;food_contact_use&quot;,
+                  &quot;product_category&quot;,
+                  &quot;test_evidence&quot;,
+                  &quot;market_stage&quot;
+                ],
+                &quot;national_implementation_review_required&quot;: true
+              }
+            }
+          ]
+        }
+      }
+    },
+    &quot;notice&quot;: &quot;导出时当前静态来源目录与抓取记录，仅用于追溯来源和适用条件；不代表原任务运行时版本，也不代表法律适用已经核实。&quot;,
+    &quot;monitor_status&quot;: {
+      &quot;mode&quot;: &quot;bundled_static&quot;,
+      &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.952961+00:00&quot;,
+      &quot;automatic_activation&quot;: false,
+      &quot;sources&quot;: [
+        {
+          &quot;source_id&quot;: &quot;EU-FCM-LEGISLATION&quot;,
+          &quot;url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.182220+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;FETCHED&quot;,
+          &quot;sha256&quot;: &quot;6fdc9d6b69d13cc7535d9c120468bc208d1fb71c11368db58333384fa29cd47d&quot;,
+          &quot;bytes&quot;: 112060,
+          &quot;content_type&quot;: &quot;text/html&quot;,
+          &quot;retrieval_url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+          &quot;final_url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en&quot;,
+          &quot;etag&quot;: null,
+          &quot;last_modified&quot;: null,
+          &quot;snapshot&quot;: &quot;snapshots/6fdc9d6b69d13cc7535d9c120468bc208d1fb71c11368db58333384fa29cd47d.html&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T06:01:08.316129+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.316146+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        },
+        {
+          &quot;source_id&quot;: &quot;EU-CERAMICS-84-500&quot;,
+          &quot;url&quot;: &quot;https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:01984L0500-20050520&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.316296+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;NOT_MODIFIED&quot;,
+          &quot;sha256&quot;: &quot;179cfddb429b5dc7adc2136c71c6e940671cf9badd1b4b8515f6ecd97441db98&quot;,
+          &quot;bytes&quot;: 50987,
+          &quot;content_type&quot;: &quot;application/pdf&quot;,
+          &quot;retrieval_url&quot;: &quot;https://publications.europa.eu/resource/celex/01984L0500-20050520&quot;,
+          &quot;final_url&quot;: &quot;https://publications.europa.eu/resource/cellar/60011874-0099-4dfd-aba7-46e1e41d92b0.0006.01/DOC_1&quot;,
+          &quot;etag&quot;: &quot;\&quot;Con-20190720014324000\&quot;&quot;,
+          &quot;last_modified&quot;: &quot;Fri, 19 Jul 2019 23:43:24 GMT&quot;,
+          &quot;snapshot&quot;: &quot;snapshots/179cfddb429b5dc7adc2136c71c6e940671cf9badd1b4b8515f6ecd97441db98.pdf&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T05:59:28.613245+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.614247+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        },
+        {
+          &quot;source_id&quot;: &quot;FDA-CPG-545450&quot;,
+          &quot;url&quot;: &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.614657+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;NOT_MODIFIED&quot;,
+          &quot;sha256&quot;: &quot;d9c9585d9560a150f1a0b8c9d7890decfd167c58b66aea7fc97e1209fb499655&quot;,
+          &quot;bytes&quot;: 35315,
+          &quot;content_type&quot;: &quot;text/html&quot;,
+          &quot;retrieval_url&quot;: &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;,
+          &quot;final_url&quot;: &quot;https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination&quot;,
+          &quot;etag&quot;: &quot;\&quot;1791716802\&quot;&quot;,
+          &quot;last_modified&quot;: &quot;Sun, 11 Oct 2026 11:06:42 GMT&quot;,
+          &quot;snapshot&quot;: &quot;snapshots/d9c9585d9560a150f1a0b8c9d7890decfd167c58b66aea7fc97e1209fb499655.html&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T05:54:22.349589+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.839137+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        },
+        {
+          &quot;source_id&quot;: &quot;GB-FOOD-PACKAGING&quot;,
+          &quot;url&quot;: &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.839472+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;NOT_MODIFIED&quot;,
+          &quot;sha256&quot;: &quot;b6fbbfba96609208c9627251e7c3f5185119a301d350e5e80bc797a5fb14b5d4&quot;,
+          &quot;bytes&quot;: 104260,
+          &quot;content_type&quot;: &quot;text/html&quot;,
+          &quot;retrieval_url&quot;: &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;,
+          &quot;final_url&quot;: &quot;https://www.gov.uk/food-labelling-and-packaging/overview&quot;,
+          &quot;etag&quot;: &quot;W/\&quot;b6fbbfba96609208c9627251e7c3f518\&quot;&quot;,
+          &quot;last_modified&quot;: null,
+          &quot;snapshot&quot;: &quot;snapshots/b6fbbfba96609208c9627251e7c3f5185119a301d350e5e80bc797a5fb14b5d4.html&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T05:59:28.864619+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.902058+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        },
+        {
+          &quot;source_id&quot;: &quot;EU-FCM-REVISION&quot;,
+          &quot;url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/revision-eu-rules_en&quot;,
+          &quot;checked_at&quot;: &quot;2026-10-12T06:01:08.902402+00:00&quot;,
+          &quot;legal_verified&quot;: false,
+          &quot;status&quot;: &quot;FETCHED&quot;,
+          &quot;sha256&quot;: &quot;dc71bc472c399956185337e8a8883e1ed0e611f8f0f2d507ba741b41d52f63e5&quot;,
+          &quot;bytes&quot;: 113154,
+          &quot;content_type&quot;: &quot;text/html&quot;,
+          &quot;retrieval_url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/revision-eu-rules_en&quot;,
+          &quot;final_url&quot;: &quot;https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/revision-eu-rules_en&quot;,
+          &quot;etag&quot;: null,
+          &quot;last_modified&quot;: null,
+          &quot;snapshot&quot;: &quot;snapshots/dc71bc472c399956185337e8a8883e1ed0e611f8f0f2d507ba741b41d52f63e5.html&quot;,
+          &quot;fetched_at&quot;: &quot;2026-10-12T06:01:08.952099+00:00&quot;,
+          &quot;last_success_at&quot;: &quot;2026-10-12T06:01:08.952117+00:00&quot;,
+          &quot;consecutive_failures&quot;: 0,
+          &quot;attempts&quot;: [],
+          &quot;changed&quot;: false
+        }
+      ],
+      &quot;pending_updates&quot;: [],
+      &quot;notice&quot;: &quot;来源内容变化不等于法规修订；待复核记录不会自动替换运行规则。&quot;
+    }
+  },
+  &quot;notice&quot;: &quot;处理完成不代表合规通过；单一来源、未检查和失败必须分别核对。原始值是来源证据，有效归一值可能经人工修改。&quot;
+}</pre><section><h2>任务与输入</h2><pre>{
+  &quot;task_id&quot;: &quot;tsk_20261012_0002_4e6d50dd6a88&quot;,
+  &quot;status&quot;: &quot;COMPLETED&quot;,
+  &quot;created_at&quot;: &quot;2026-10-12T14:55:35+08:00&quot;,
+  &quot;finished_at&quot;: &quot;2026-10-12T14:55:35+08:00&quot;,
+  &quot;input&quot;: {
+    &quot;destination_country&quot;: &quot;DE&quot;,
+    &quot;destination_country_name&quot;: &quot;德国&quot;,
+    &quot;trade_mode&quot;: null,
+    &quot;declared_currency&quot;: null,
+    &quot;notes&quot;: null
+  },
+  &quot;summary&quot;: {
+    &quot;document_count&quot;: 2,
+    &quot;field_count&quot;: 28,
+    &quot;item_count&quot;: 1,
+    &quot;conflict_count&quot;: 1,
+    &quot;missing_count&quot;: 0,
+    &quot;risk_count&quot;: 0,
+    &quot;unrecognized_count&quot;: 3
+  }
+}</pre></section><section><h2>文件清单与失败</h2><pre>[
+  {
+    &quot;file_id&quot;: &quot;f1&quot;,
+    &quot;file_name&quot;: &quot;invoice.json&quot;,
+    &quot;file_type&quot;: &quot;EDI&quot;,
+    &quot;doc_type&quot;: &quot;COMMERCIAL_INVOICE&quot;,
+    &quot;process_status&quot;: &quot;EXTRACTED&quot;,
+    &quot;page_count&quot;: null,
+    &quot;error_message&quot;: null
+  },
+  {
+    &quot;file_id&quot;: &quot;f2&quot;,
+    &quot;file_name&quot;: &quot;packing.json&quot;,
+    &quot;file_type&quot;: &quot;EDI&quot;,
+    &quot;doc_type&quot;: &quot;PACKING_LIST&quot;,
+    &quot;process_status&quot;: &quot;EXTRACTED&quot;,
+    &quot;page_count&quot;: null,
+    &quot;error_message&quot;: null
+  }
+]</pre></section><section><h2>原始证据与有效抽取值</h2><pre>[
+  {
+    &quot;file_id&quot;: &quot;f1&quot;,
+    &quot;doc_type&quot;: &quot;COMMERCIAL_INVOICE&quot;,
+    &quot;parse_method&quot;: &quot;EDI_PARSE&quot;,
+    &quot;fields&quot;: [
+      {
+        &quot;field_key&quot;: &quot;packages&quot;,
+        &quot;label&quot;: &quot;件数&quot;,
+        &quot;raw_text&quot;: &quot;packages: 120 CARTONS&quot;,
+        &quot;raw_value&quot;: &quot;120 CARTONS&quot;,
+        &quot;normalized_value&quot;: 121,
+        &quot;unit&quot;: &quot;CARTON&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;LOW_CONFIDENCE&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;gross_weight&quot;,
+        &quot;label&quot;: &quot;毛重&quot;,
+        &quot;raw_text&quot;: &quot;gross_weight: 2800 KGS&quot;,
+        &quot;raw_value&quot;: &quot;2800 KGS&quot;,
+        &quot;normalized_value&quot;: 2800,
+        &quot;unit&quot;: &quot;KGS&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;net_weight&quot;,
+        &quot;label&quot;: &quot;净重&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: &quot;KGS&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;volume&quot;,
+        &quot;label&quot;: &quot;体积&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: &quot;CBM&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;quantity&quot;,
+        &quot;label&quot;: &quot;数量&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: &quot;PCS&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;hs_code&quot;,
+        &quot;label&quot;: &quot;HS 编码&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;total_amount&quot;,
+        &quot;label&quot;: &quot;总金额&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;MISSING_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;currency&quot;,
+        &quot;label&quot;: &quot;币种&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;MISSING_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;description&quot;,
+        &quot;label&quot;: &quot;货物描述&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;invoice_no&quot;,
+        &quot;label&quot;: &quot;发票号&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;MISSING_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;shipment_date&quot;,
+        &quot;label&quot;: &quot;装运日期&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      }
+    ],
+    &quot;line_items&quot;: [
+      {
+        &quot;item_no&quot;: 1,
+        &quot;raw_text&quot;: &quot;{\&quot;item_no\&quot;: 1, \&quot;fields\&quot;: {\&quot;item_code\&quot;: \&quot;MUG-1\&quot;, \&quot;description\&quot;: \&quot;CERAMIC MUG WHITE\&quot;, \&quot;quantity\&quot;: \&quot;100 PCS\&quot;}}&quot;,
+        &quot;fields&quot;: [
+          {
+            &quot;field_key&quot;: &quot;item_code&quot;,
+            &quot;label&quot;: &quot;货号/型号&quot;,
+            &quot;raw_text&quot;: &quot;item_code: MUG-1&quot;,
+            &quot;raw_value&quot;: &quot;MUG-1&quot;,
+            &quot;normalized_value&quot;: &quot;MUG-1&quot;,
+            &quot;unit&quot;: null,
+            &quot;confidence&quot;: null,
+            &quot;status&quot;: &quot;EXTRACTED&quot;,
+            &quot;page&quot;: null,
+            &quot;bbox&quot;: null,
+            &quot;bbox_unit&quot;: null
+          },
+          {
+            &quot;field_key&quot;: &quot;description&quot;,
+            &quot;label&quot;: &quot;货物描述&quot;,
+            &quot;raw_text&quot;: &quot;description: CERAMIC MUG WHITE&quot;,
+            &quot;raw_value&quot;: &quot;CERAMIC MUG WHITE&quot;,
+            &quot;normalized_value&quot;: &quot;陶瓷 马克杯 白&quot;,
+            &quot;unit&quot;: null,
+            &quot;confidence&quot;: null,
+            &quot;status&quot;: &quot;EXTRACTED&quot;,
+            &quot;page&quot;: null,
+            &quot;bbox&quot;: null,
+            &quot;bbox_unit&quot;: null
+          },
+          {
+            &quot;field_key&quot;: &quot;quantity&quot;,
+            &quot;label&quot;: &quot;数量&quot;,
+            &quot;raw_text&quot;: &quot;quantity: 100 PCS&quot;,
+            &quot;raw_value&quot;: &quot;100 PCS&quot;,
+            &quot;normalized_value&quot;: 100,
+            &quot;unit&quot;: &quot;PCS&quot;,
+            &quot;confidence&quot;: null,
+            &quot;status&quot;: &quot;EXTRACTED&quot;,
+            &quot;page&quot;: null,
+            &quot;bbox&quot;: null,
+            &quot;bbox_unit&quot;: null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    &quot;file_id&quot;: &quot;f2&quot;,
+    &quot;doc_type&quot;: &quot;PACKING_LIST&quot;,
+    &quot;parse_method&quot;: &quot;EDI_PARSE&quot;,
+    &quot;fields&quot;: [
+      {
+        &quot;field_key&quot;: &quot;packages&quot;,
+        &quot;label&quot;: &quot;件数&quot;,
+        &quot;raw_text&quot;: &quot;packages: 120 CARTONS&quot;,
+        &quot;raw_value&quot;: &quot;120 CARTONS&quot;,
+        &quot;normalized_value&quot;: 120,
+        &quot;unit&quot;: &quot;CARTON&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;gross_weight&quot;,
+        &quot;label&quot;: &quot;毛重&quot;,
+        &quot;raw_text&quot;: &quot;gross_weight: 2800 KGS&quot;,
+        &quot;raw_value&quot;: &quot;2800 KGS&quot;,
+        &quot;normalized_value&quot;: 2800,
+        &quot;unit&quot;: &quot;KGS&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;net_weight&quot;,
+        &quot;label&quot;: &quot;净重&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: &quot;KGS&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;volume&quot;,
+        &quot;label&quot;: &quot;体积&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: &quot;CBM&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;quantity&quot;,
+        &quot;label&quot;: &quot;数量&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: &quot;PCS&quot;,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;hs_code&quot;,
+        &quot;label&quot;: &quot;HS 编码&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;total_amount&quot;,
+        &quot;label&quot;: &quot;总金额&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;currency&quot;,
+        &quot;label&quot;: &quot;币种&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;description&quot;,
+        &quot;label&quot;: &quot;货物描述&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;invoice_no&quot;,
+        &quot;label&quot;: &quot;发票号&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      },
+      {
+        &quot;field_key&quot;: &quot;shipment_date&quot;,
+        &quot;label&quot;: &quot;装运日期&quot;,
+        &quot;raw_text&quot;: null,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;unit&quot;: null,
+        &quot;confidence&quot;: null,
+        &quot;status&quot;: &quot;NOT_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null,
+        &quot;bbox_unit&quot;: null
+      }
+    ],
+    &quot;line_items&quot;: [
+      {
+        &quot;item_no&quot;: 1,
+        &quot;raw_text&quot;: &quot;{\&quot;item_no\&quot;: 1, \&quot;fields\&quot;: {\&quot;item_code\&quot;: \&quot;MUG-1\&quot;, \&quot;description\&quot;: \&quot;CERAMIC MUG WHITE\&quot;, \&quot;quantity\&quot;: \&quot;100 PCS\&quot;}}&quot;,
+        &quot;fields&quot;: [
+          {
+            &quot;field_key&quot;: &quot;item_code&quot;,
+            &quot;label&quot;: &quot;货号/型号&quot;,
+            &quot;raw_text&quot;: &quot;item_code: MUG-1&quot;,
+            &quot;raw_value&quot;: &quot;MUG-1&quot;,
+            &quot;normalized_value&quot;: &quot;MUG-1&quot;,
+            &quot;unit&quot;: null,
+            &quot;confidence&quot;: null,
+            &quot;status&quot;: &quot;EXTRACTED&quot;,
+            &quot;page&quot;: null,
+            &quot;bbox&quot;: null,
+            &quot;bbox_unit&quot;: null
+          },
+          {
+            &quot;field_key&quot;: &quot;description&quot;,
+            &quot;label&quot;: &quot;货物描述&quot;,
+            &quot;raw_text&quot;: &quot;description: CERAMIC MUG WHITE&quot;,
+            &quot;raw_value&quot;: &quot;CERAMIC MUG WHITE&quot;,
+            &quot;normalized_value&quot;: &quot;陶瓷 马克杯 白&quot;,
+            &quot;unit&quot;: null,
+            &quot;confidence&quot;: null,
+            &quot;status&quot;: &quot;EXTRACTED&quot;,
+            &quot;page&quot;: null,
+            &quot;bbox&quot;: null,
+            &quot;bbox_unit&quot;: null
+          },
+          {
+            &quot;field_key&quot;: &quot;quantity&quot;,
+            &quot;label&quot;: &quot;数量&quot;,
+            &quot;raw_text&quot;: &quot;quantity: 100 PCS&quot;,
+            &quot;raw_value&quot;: &quot;100 PCS&quot;,
+            &quot;normalized_value&quot;: 100,
+            &quot;unit&quot;: &quot;PCS&quot;,
+            &quot;confidence&quot;: null,
+            &quot;status&quot;: &quot;EXTRACTED&quot;,
+            &quot;page&quot;: null,
+            &quot;bbox&quot;: null,
+            &quot;bbox_unit&quot;: null
+          }
+        ]
+      }
+    ]
+  }
+]</pre></section><section><h2>多品名行组</h2><pre>[
+  {
+    &quot;item_id&quot;: &quot;itm_1&quot;,
+    &quot;label&quot;: &quot;陶瓷 马克杯 白&quot;,
+    &quot;alignment_status&quot;: &quot;ALIGNED&quot;,
+    &quot;alignment_basis&quot;: &quot;ITEM_CODE&quot;,
+    &quot;alignment_note&quot;: null,
+    &quot;members&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;item_no&quot;: 1,
+        &quot;match_score&quot;: 1.0
+      },
+      {
+        &quot;file_id&quot;: &quot;f2&quot;,
+        &quot;item_no&quot;: 1,
+        &quot;match_score&quot;: 1.0
+      }
+    ]
+  }
+]</pre></section><section><h2>逐字段比对及未检查项</h2><pre>[
+  {
+    &quot;comparison_id&quot;: &quot;cmp_1&quot;,
+    &quot;scope&quot;: &quot;DOCUMENT&quot;,
+    &quot;item_id&quot;: null,
+    &quot;field_key&quot;: &quot;packages&quot;,
+    &quot;label&quot;: &quot;件数&quot;,
+    &quot;value_type&quot;: &quot;NUMBER&quot;,
+    &quot;unit&quot;: &quot;CARTON&quot;,
+    &quot;status&quot;: &quot;CONFLICT&quot;,
+    &quot;canonical_value&quot;: null,
+    &quot;severity&quot;: &quot;ERROR&quot;,
+    &quot;rule_id&quot;: &quot;CROSS_CHECK_001&quot;,
+    &quot;note&quot;: null,
+    &quot;values&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;file_name&quot;: &quot;invoice.json&quot;,
+        &quot;raw_value&quot;: &quot;120 CARTONS&quot;,
+        &quot;normalized_value&quot;: 121,
+        &quot;field_status&quot;: &quot;LOW_CONFIDENCE&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      },
+      {
+        &quot;file_id&quot;: &quot;f2&quot;,
+        &quot;file_name&quot;: &quot;packing.json&quot;,
+        &quot;raw_value&quot;: &quot;120 CARTONS&quot;,
+        &quot;normalized_value&quot;: 120,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      }
+    ]
+  },
+  {
+    &quot;comparison_id&quot;: &quot;cmp_2&quot;,
+    &quot;scope&quot;: &quot;DOCUMENT&quot;,
+    &quot;item_id&quot;: null,
+    &quot;field_key&quot;: &quot;gross_weight&quot;,
+    &quot;label&quot;: &quot;毛重&quot;,
+    &quot;value_type&quot;: &quot;NUMBER&quot;,
+    &quot;unit&quot;: &quot;KGS&quot;,
+    &quot;status&quot;: &quot;MATCH&quot;,
+    &quot;canonical_value&quot;: null,
+    &quot;severity&quot;: &quot;INFO&quot;,
+    &quot;rule_id&quot;: &quot;CROSS_CHECK_001&quot;,
+    &quot;note&quot;: null,
+    &quot;values&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;file_name&quot;: &quot;invoice.json&quot;,
+        &quot;raw_value&quot;: &quot;2800 KGS&quot;,
+        &quot;normalized_value&quot;: 2800,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      },
+      {
+        &quot;file_id&quot;: &quot;f2&quot;,
+        &quot;file_name&quot;: &quot;packing.json&quot;,
+        &quot;raw_value&quot;: &quot;2800 KGS&quot;,
+        &quot;normalized_value&quot;: 2800,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      }
+    ]
+  },
+  {
+    &quot;comparison_id&quot;: &quot;cmp_3&quot;,
+    &quot;scope&quot;: &quot;DOCUMENT&quot;,
+    &quot;item_id&quot;: null,
+    &quot;field_key&quot;: &quot;total_amount&quot;,
+    &quot;label&quot;: &quot;总金额&quot;,
+    &quot;value_type&quot;: &quot;MONEY&quot;,
+    &quot;unit&quot;: null,
+    &quot;status&quot;: &quot;UNRECOGNIZED&quot;,
+    &quot;canonical_value&quot;: null,
+    &quot;severity&quot;: &quot;WARNING&quot;,
+    &quot;rule_id&quot;: null,
+    &quot;note&quot;: &quot;invoice.json（按规则应有但文件中未找到），无法完成比对。&quot;,
+    &quot;values&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;file_name&quot;: &quot;invoice.json&quot;,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;field_status&quot;: &quot;MISSING_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      }
+    ]
+  },
+  {
+    &quot;comparison_id&quot;: &quot;cmp_4&quot;,
+    &quot;scope&quot;: &quot;DOCUMENT&quot;,
+    &quot;item_id&quot;: null,
+    &quot;field_key&quot;: &quot;currency&quot;,
+    &quot;label&quot;: &quot;币种&quot;,
+    &quot;value_type&quot;: &quot;CODE&quot;,
+    &quot;unit&quot;: null,
+    &quot;status&quot;: &quot;UNRECOGNIZED&quot;,
+    &quot;canonical_value&quot;: null,
+    &quot;severity&quot;: &quot;WARNING&quot;,
+    &quot;rule_id&quot;: null,
+    &quot;note&quot;: &quot;invoice.json（按规则应有但文件中未找到），无法完成比对。&quot;,
+    &quot;values&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;file_name&quot;: &quot;invoice.json&quot;,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;field_status&quot;: &quot;MISSING_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      }
+    ]
+  },
+  {
+    &quot;comparison_id&quot;: &quot;cmp_5&quot;,
+    &quot;scope&quot;: &quot;DOCUMENT&quot;,
+    &quot;item_id&quot;: null,
+    &quot;field_key&quot;: &quot;invoice_no&quot;,
+    &quot;label&quot;: &quot;发票号&quot;,
+    &quot;value_type&quot;: &quot;STRING&quot;,
+    &quot;unit&quot;: null,
+    &quot;status&quot;: &quot;UNRECOGNIZED&quot;,
+    &quot;canonical_value&quot;: null,
+    &quot;severity&quot;: &quot;WARNING&quot;,
+    &quot;rule_id&quot;: null,
+    &quot;note&quot;: &quot;invoice.json（按规则应有但文件中未找到），无法完成比对。&quot;,
+    &quot;values&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;file_name&quot;: &quot;invoice.json&quot;,
+        &quot;raw_value&quot;: null,
+        &quot;normalized_value&quot;: null,
+        &quot;field_status&quot;: &quot;MISSING_IN_DOC&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      }
+    ]
+  },
+  {
+    &quot;comparison_id&quot;: &quot;cmp_6&quot;,
+    &quot;scope&quot;: &quot;ITEM&quot;,
+    &quot;item_id&quot;: &quot;itm_1&quot;,
+    &quot;field_key&quot;: &quot;item_code&quot;,
+    &quot;label&quot;: &quot;货号/型号&quot;,
+    &quot;value_type&quot;: &quot;CODE&quot;,
+    &quot;unit&quot;: null,
+    &quot;status&quot;: &quot;MATCH&quot;,
+    &quot;canonical_value&quot;: null,
+    &quot;severity&quot;: &quot;INFO&quot;,
+    &quot;rule_id&quot;: &quot;CROSS_CHECK_001&quot;,
+    &quot;note&quot;: null,
+    &quot;values&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;file_name&quot;: &quot;invoice.json&quot;,
+        &quot;raw_value&quot;: &quot;MUG-1&quot;,
+        &quot;normalized_value&quot;: &quot;MUG-1&quot;,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      },
+      {
+        &quot;file_id&quot;: &quot;f2&quot;,
+        &quot;file_name&quot;: &quot;packing.json&quot;,
+        &quot;raw_value&quot;: &quot;MUG-1&quot;,
+        &quot;normalized_value&quot;: &quot;MUG-1&quot;,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      }
+    ]
+  },
+  {
+    &quot;comparison_id&quot;: &quot;cmp_7&quot;,
+    &quot;scope&quot;: &quot;ITEM&quot;,
+    &quot;item_id&quot;: &quot;itm_1&quot;,
+    &quot;field_key&quot;: &quot;description&quot;,
+    &quot;label&quot;: &quot;货物描述&quot;,
+    &quot;value_type&quot;: &quot;STRING&quot;,
+    &quot;unit&quot;: null,
+    &quot;status&quot;: &quot;MATCH&quot;,
+    &quot;canonical_value&quot;: null,
+    &quot;severity&quot;: &quot;INFO&quot;,
+    &quot;rule_id&quot;: &quot;CROSS_CHECK_001&quot;,
+    &quot;note&quot;: null,
+    &quot;values&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;file_name&quot;: &quot;invoice.json&quot;,
+        &quot;raw_value&quot;: &quot;CERAMIC MUG WHITE&quot;,
+        &quot;normalized_value&quot;: &quot;陶瓷 马克杯 白&quot;,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      },
+      {
+        &quot;file_id&quot;: &quot;f2&quot;,
+        &quot;file_name&quot;: &quot;packing.json&quot;,
+        &quot;raw_value&quot;: &quot;CERAMIC MUG WHITE&quot;,
+        &quot;normalized_value&quot;: &quot;陶瓷 马克杯 白&quot;,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      }
+    ]
+  },
+  {
+    &quot;comparison_id&quot;: &quot;cmp_8&quot;,
+    &quot;scope&quot;: &quot;ITEM&quot;,
+    &quot;item_id&quot;: &quot;itm_1&quot;,
+    &quot;field_key&quot;: &quot;quantity&quot;,
+    &quot;label&quot;: &quot;数量&quot;,
+    &quot;value_type&quot;: &quot;NUMBER&quot;,
+    &quot;unit&quot;: &quot;PCS&quot;,
+    &quot;status&quot;: &quot;MATCH&quot;,
+    &quot;canonical_value&quot;: null,
+    &quot;severity&quot;: &quot;INFO&quot;,
+    &quot;rule_id&quot;: &quot;CROSS_CHECK_001&quot;,
+    &quot;note&quot;: null,
+    &quot;values&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;file_name&quot;: &quot;invoice.json&quot;,
+        &quot;raw_value&quot;: &quot;100 PCS&quot;,
+        &quot;normalized_value&quot;: 100,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      },
+      {
+        &quot;file_id&quot;: &quot;f2&quot;,
+        &quot;file_name&quot;: &quot;packing.json&quot;,
+        &quot;raw_value&quot;: &quot;100 PCS&quot;,
+        &quot;normalized_value&quot;: 100,
+        &quot;field_status&quot;: &quot;EXTRACTED&quot;,
+        &quot;page&quot;: null,
+        &quot;bbox&quot;: null
+      }
+    ]
+  }
+]</pre></section><section><h2>规则风险及来源</h2><pre>[]</pre></section><section><h2>错误与警告</h2><pre>[
+  {
+    &quot;code&quot;: &quot;HUMAN_CORRECTED&quot;,
+    &quot;message&quot;: &quot;有效抽取值经人工修正并重算；原始证据保留，操作者身份未认证&quot;,
+    &quot;level&quot;: &quot;WARNING&quot;,
+    &quot;file_ids&quot;: [
+      &quot;f1&quot;
+    ]
+  }
+]</pre></section><section><h2>人工修正审计</h2><pre>[
+  {
+    &quot;source_task_id&quot;: &quot;tsk_20261012_0001_9a097234ec37&quot;,
+    &quot;derived_task_id&quot;: &quot;tsk_20261012_0002_4e6d50dd6a88&quot;,
+    &quot;source_hash&quot;: &quot;0e2c284287aeb6194f5f90b52c30c66fa9f2a7c6eea503ac156ee8182168819e&quot;,
+    &quot;request_id&quot;: &quot;accept-packages-1&quot;,
+    &quot;reason&quot;: &quot;验收样例：模拟核对原件后修正件数&quot;,
+    &quot;actor&quot;: &quot;anonymous&quot;,
+    &quot;actor_verified&quot;: false,
+    &quot;created_at&quot;: &quot;2026-10-12T14:55:35+08:00&quot;,
+    &quot;rule_version&quot;: &quot;static-source-candidates-v3&quot;,
+    &quot;changes&quot;: [
+      {
+        &quot;file_id&quot;: &quot;f1&quot;,
+        &quot;item_no&quot;: null,
+        &quot;field_key&quot;: &quot;packages&quot;,
+        &quot;value&quot;: &quot;121 CARTONS&quot;,
+        &quot;before&quot;: {
+          &quot;field_key&quot;: &quot;packages&quot;,
+          &quot;label&quot;: &quot;件数&quot;,
+          &quot;raw_text&quot;: &quot;packages: 120 CARTONS&quot;,
+          &quot;raw_value&quot;: &quot;120 CARTONS&quot;,
+          &quot;normalized_value&quot;: 120,
+          &quot;unit&quot;: &quot;CARTON&quot;,
+          &quot;confidence&quot;: null,
+          &quot;status&quot;: &quot;EXTRACTED&quot;,
+          &quot;page&quot;: null,
+          &quot;bbox&quot;: null,
+          &quot;bbox_unit&quot;: null
+        },
+        &quot;after&quot;: {
+          &quot;field_key&quot;: &quot;packages&quot;,
+          &quot;label&quot;: &quot;件数&quot;,
+          &quot;raw_text&quot;: &quot;packages: 120 CARTONS&quot;,
+          &quot;raw_value&quot;: &quot;120 CARTONS&quot;,
+          &quot;normalized_value&quot;: 121,
+          &quot;unit&quot;: &quot;CARTON&quot;,
+          &quot;confidence&quot;: null,
+          &quot;status&quot;: &quot;LOW_CONFIDENCE&quot;,
+          &quot;page&quot;: null,
+          &quot;bbox&quot;: null,
+          &quot;bbox_unit&quot;: null
+        }
+      }
+    ]
+  }
+]</pre></section></html>

@@ -1,0 +1,20 @@
+test_304_reuses_verified_snapshot_and_validators (__main__.RuleMonitorTests.test_304_reuses_verified_snapshot_and_validators) ... ok
+test FETCHED changed= False
+test FETCHED changed= True
+test_api_metadata_distinguishes_live_and_static_and_exposes_review_queue (__main__.RuleMonitorTests.test_api_metadata_distinguishes_live_and_static_and_exposes_review_queue) ... ok
+test_cellar_identifier_redirect_fetched_only_over_https (__main__.RuleMonitorTests.test_cellar_identifier_redirect_fetched_only_over_https) ... ok
+test FETCHED changed= False
+test FETCHED changed= True
+test FETCHED changed= False
+test_changed_content_queues_review_without_legal_activation (__main__.RuleMonitorTests.test_changed_content_queues_review_without_legal_activation) ... ok
+test_failure_retains_last_good_version (__main__.RuleMonitorTests.test_failure_retains_last_good_version) ... ok
+test_missing_snapshot_does_not_send_conditional_request (__main__.RuleMonitorTests.test_missing_snapshot_does_not_send_conditional_request) ... ok
+test_official_fallback_and_retry_preferred_resource (__main__.RuleMonitorTests.test_official_fallback_and_retry_preferred_resource) ... ok
+test_pdf_challenge_and_oversize_rejected (__main__.RuleMonitorTests.test_pdf_challenge_and_oversize_rejected) ... ok
+test_pdf_identity_mismatch_rejected (__main__.RuleMonitorTests.test_pdf_identity_mismatch_rejected) ... ok
+test_untrusted_fallback_and_redirect_rejected (__main__.RuleMonitorTests.test_untrusted_fallback_and_redirect_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.198s
+
+OK

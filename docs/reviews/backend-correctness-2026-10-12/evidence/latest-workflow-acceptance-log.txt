@@ -1,0 +1,37 @@
+{
+  "status": "PASSED",
+  "checks": [
+    "upload_http_200",
+    "two_documents_completed",
+    "original_packages_match",
+    "correction_http_200",
+    "derived_task_and_original_unchanged",
+    "recomputed_packages_conflict",
+    "raw_evidence_retained",
+    "effective_value_cautious",
+    "retry_idempotent",
+    "stale_hash_rejected",
+    "json_report_and_audit",
+    "html_report_download",
+    "unknown_task_404",
+    "reopened_database_readable"
+  ],
+  "sample_type": "synthetic structured JSON",
+  "limits": [
+    "Not browser UI acceptance",
+    "Not production restart acceptance",
+    "Not OCR accuracy evaluation"
+  ],
+  "source_task_id": "tsk_20261012_0001_9a097234ec37",
+  "derived_task_id": "tsk_20261012_0002_4e6d50dd6a88"
+}
+2026-10-12 14:55:35,637 INFO [backend.api] 规则集版本：static-source-candidates-v3
+2026-10-12 14:55:35,714 INFO [httpx2] HTTP Request: POST http://testserver/api/v1/checks "HTTP/1.1 200 OK"
+2026-10-12 14:55:35,722 INFO [httpx2] HTTP Request: GET http://testserver/api/v1/checks/tsk_20261012_0001_9a097234ec37/corrections "HTTP/1.1 200 OK"
+2026-10-12 14:55:35,741 INFO [httpx2] HTTP Request: POST http://testserver/api/v1/checks/tsk_20261012_0001_9a097234ec37/corrections "HTTP/1.1 200 OK"
+2026-10-12 14:55:35,753 INFO [httpx2] HTTP Request: POST http://testserver/api/v1/checks/tsk_20261012_0001_9a097234ec37/corrections "HTTP/1.1 200 OK"
+2026-10-12 14:55:35,758 INFO [httpx2] HTTP Request: POST http://testserver/api/v1/checks/tsk_20261012_0001_9a097234ec37/corrections "HTTP/1.1 409 Conflict"
+2026-10-12 14:55:35,762 INFO [httpx2] HTTP Request: GET http://testserver/api/v1/checks/tsk_20261012_0002_4e6d50dd6a88/report?format=json "HTTP/1.1 200 OK"
+2026-10-12 14:55:35,769 INFO [httpx2] HTTP Request: GET http://testserver/api/v1/checks/tsk_20261012_0002_4e6d50dd6a88/report?format=html "HTTP/1.1 200 OK"
+2026-10-12 14:55:35,774 INFO [httpx2] HTTP Request: GET http://testserver/api/v1/checks/accept-missing "HTTP/1.1 404 Not Found"
+2026-10-12 14:55:35,783 INFO [httpx2] HTTP Request: GET http://testserver/api/v1/checks/tsk_20261012_0002_4e6d50dd6a88 "HTTP/1.1 200 OK"

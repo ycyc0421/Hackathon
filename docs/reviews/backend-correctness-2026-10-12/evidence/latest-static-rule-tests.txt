@@ -1,0 +1,8 @@
+test_broad_demo_rules_inactive (__main__.StaticRulesTests.test_broad_demo_rules_inactive) ... ok
+test_crawler_rejects_untrusted_sources_and_redirects (__main__.StaticRulesTests.test_crawler_rejects_untrusted_sources_and_redirects) ... ok
+test_source_in_risk_and_no_missing_certificate (__main__.StaticRulesTests.test_source_in_risk_and_no_missing_certificate) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK

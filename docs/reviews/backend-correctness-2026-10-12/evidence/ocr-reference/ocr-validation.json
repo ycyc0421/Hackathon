@@ -1,0 +1,918 @@
+{
+  "bf16": {
+    "passed": 57,
+    "checks": 57,
+    "failures": [],
+    "parsed": {
+      "commercial_invoice": {
+        "file": "<local>/commercial_invoice_0.md",
+        "document_id": "CI-00002",
+        "rows": [
+          {
+            "sku": "SKU-0002-1",
+            "quantity": 880.0,
+            "raw_cells": {
+              "NO.": "1",
+              "DESCRIPTION / SKU": "Paper hardcover notebook, assorted colors / SKU: SKU-0002-1",
+              "HS CODE": "482010",
+              "QUANTITY": "880 PCS",
+              "UNIT PRICE": "3.42",
+              "AMOUNT": "3009.60"
+            }
+          },
+          {
+            "sku": "SKU-0002-2",
+            "quantity": 5000.0,
+            "raw_cells": {
+              "NO.": "2",
+              "DESCRIPTION / SKU": "Manual toothbrush, nylon bristles, export retail pack / SKU: SKU-0002-2",
+              "HS CODE": "960321",
+              "QUANTITY": "5000 PCS",
+              "UNIT PRICE": "0.36",
+              "AMOUNT": "1800.00"
+            }
+          },
+          {
+            "sku": "SKU-0002-3",
+            "quantity": 4000.0,
+            "raw_cells": {
+              "NO.": "3",
+              "DESCRIPTION / SKU": "Steel hexagon bolt, M8 x 30 mm, blue finish / SKU: SKU-0002-3",
+              "HS CODE": "731815",
+              "QUANTITY": "4000 PCS",
+              "UNIT PRICE": "0.06",
+              "AMOUNT": "240.00"
+            }
+          }
+        ],
+        "tables_in_page": 2
+      },
+      "proforma_invoice": {
+        "file": "<local>/proforma_invoice_0.md",
+        "document_id": "PI-00002",
+        "rows": [
+          {
+            "sku": "SKU-0002-1",
+            "quantity": 880.0,
+            "raw_cells": {
+              "NO.": "1",
+              "DESCRIPTION / SKU": "Paper hardcover notebook, assorted colors / SKU: SKU-0002-1",
+              "HS CODE": "482010",
+              "QUANTITY": "880 PCS",
+              "UNIT PRICE": "3.42",
+              "AMOUNT": "3009.60"
+            }
+          },
+          {
+            "sku": "SKU-0002-2",
+            "quantity": 5000.0,
+            "raw_cells": {
+              "NO.": "2",
+              "DESCRIPTION / SKU": "Manual toothbrush, nylon bristles, export retail pack / SKU: SKU-0002-2",
+              "HS CODE": "960321",
+              "QUANTITY": "5000 PCS",
+              "UNIT PRICE": "0.36",
+              "AMOUNT": "1800.00"
+            }
+          },
+          {
+            "sku": "SKU-0002-3",
+            "quantity": 4000.0,
+            "raw_cells": {
+              "NO.": "3",
+              "DESCRIPTION / SKU": "Steel hexagon bolt, M8 x 30 mm, blue finish / SKU: SKU-0002-3",
+              "HS CODE": "731815",
+              "QUANTITY": "4000 PCS",
+              "UNIT PRICE": "0.06",
+              "AMOUNT": "240.00"
+            }
+          }
+        ],
+        "tables_in_page": 2
+      },
+      "packing_list": {
+        "file": "<local>/packing_list_0.md",
+        "document_id": "PL-00002",
+        "rows": [
+          {
+            "sku": "SKU-0002-1",
+            "quantity": 888.0,
+            "raw_cells": {
+              "NO.": "1",
+              "DESCRIPTION / SKU": "Paper hardcover notebook, assorted colors / SKU: SKU-0002-1",
+              "QTY": "888 PCS",
+              "PKGS": "22",
+              "NET KG": "281.60",
+              "GROSS KG": "293.11",
+              "CBM": "0.562"
+            }
+          },
+          {
+            "sku": "SKU-0002-2",
+            "quantity": 5000.0,
+            "raw_cells": {
+              "NO.": "2",
+              "DESCRIPTION / SKU": "Manual toothbrush, nylon bristles, export retail pack / SKU: SKU-0002-2",
+              "QTY": "5000 PCS",
+              "PKGS": "25",
+              "NET KG": "110.00",
+              "GROSS KG": "133.30",
+              "CBM": "0.432"
+            }
+          },
+          {
+            "sku": "SKU-0002-3",
+            "quantity": 4000.0,
+            "raw_cells": {
+              "NO.": "3",
+              "DESCRIPTION / SKU": "Steel hexagon bolt, M8 x 30 mm, blue finish / SKU: SKU-0002-3",
+              "QTY": "4000 PCS",
+              "PKGS": "8",
+              "NET KG": "72.00",
+              "GROSS KG": "77.02",
+              "CBM": "0.079"
+            }
+          }
+        ],
+        "tables_in_page": 2
+      }
+    },
+    "details": [
+      {
+        "field": "commercial_invoice.document_id",
+        "expected": "CI-00002",
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1",
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1.quantity",
+        "expected": 880,
+        "actual": 880.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1.HS CODE",
+        "expected": 482010,
+        "actual": 482010.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1.UNIT PRICE",
+        "expected": 3.42,
+        "actual": 3.42,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1.AMOUNT",
+        "expected": 3009.6,
+        "actual": 3009.6,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2",
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2.quantity",
+        "expected": 5000,
+        "actual": 5000.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2.HS CODE",
+        "expected": 960321,
+        "actual": 960321.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2.UNIT PRICE",
+        "expected": 0.36,
+        "actual": 0.36,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2.AMOUNT",
+        "expected": 1800,
+        "actual": 1800.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3",
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3.quantity",
+        "expected": 4000,
+        "actual": 4000.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3.HS CODE",
+        "expected": 731815,
+        "actual": 731815.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3.UNIT PRICE",
+        "expected": 0.06,
+        "actual": 0.06,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3.AMOUNT",
+        "expected": 240,
+        "actual": 240.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.total.TOTAL AMOUNT (GBP): 5049.60",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.document_id",
+        "expected": "PI-00002",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1.quantity",
+        "expected": 880,
+        "actual": 880.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1.HS CODE",
+        "expected": 482010,
+        "actual": 482010.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1.UNIT PRICE",
+        "expected": 3.42,
+        "actual": 3.42,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1.AMOUNT",
+        "expected": 3009.6,
+        "actual": 3009.6,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2.quantity",
+        "expected": 5000,
+        "actual": 5000.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2.HS CODE",
+        "expected": 960321,
+        "actual": 960321.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2.UNIT PRICE",
+        "expected": 0.36,
+        "actual": 0.36,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2.AMOUNT",
+        "expected": 1800,
+        "actual": 1800.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3.quantity",
+        "expected": 4000,
+        "actual": 4000.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3.HS CODE",
+        "expected": 731815,
+        "actual": 731815.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3.UNIT PRICE",
+        "expected": 0.06,
+        "actual": 0.06,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3.AMOUNT",
+        "expected": 240,
+        "actual": 240.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.total.TOTAL AMOUNT (GBP): 5049.60",
+        "passed": true
+      },
+      {
+        "field": "packing_list.document_id",
+        "expected": "PL-00002",
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1",
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.quantity",
+        "expected": 888,
+        "actual": 888.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.PKGS",
+        "expected": 22,
+        "actual": 22.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.NET KG",
+        "expected": 281.6,
+        "actual": 281.6,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.GROSS KG",
+        "expected": 293.11,
+        "actual": 293.11,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.CBM",
+        "expected": 0.562,
+        "actual": 0.562,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2",
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.quantity",
+        "expected": 5000,
+        "actual": 5000.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.PKGS",
+        "expected": 25,
+        "actual": 25.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.NET KG",
+        "expected": 110,
+        "actual": 110.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.GROSS KG",
+        "expected": 133.3,
+        "actual": 133.3,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.CBM",
+        "expected": 0.432,
+        "actual": 0.432,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3",
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.quantity",
+        "expected": 4000,
+        "actual": 4000.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.PKGS",
+        "expected": 8,
+        "actual": 8.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.NET KG",
+        "expected": 72,
+        "actual": 72.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.GROSS KG",
+        "expected": 77.02,
+        "actual": 77.02,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.CBM",
+        "expected": 0.079,
+        "actual": 0.079,
+        "passed": true
+      },
+      {
+        "field": "packing_list.total.55 CARTONS",
+        "passed": true
+      },
+      {
+        "field": "packing_list.total.NET 463.60 KG",
+        "passed": true
+      },
+      {
+        "field": "packing_list.total.GROSS 503.43 KG",
+        "passed": true
+      },
+      {
+        "field": "packing_list.total.1.073 CBM",
+        "passed": true
+      }
+    ]
+  },
+  "q8": {
+    "passed": 57,
+    "checks": 57,
+    "failures": [],
+    "parsed": {
+      "commercial_invoice": {
+        "file": "<local>/commercial_invoice_0.md",
+        "document_id": "CI-00002",
+        "rows": [
+          {
+            "sku": "SKU-0002-1",
+            "quantity": 880.0,
+            "raw_cells": {
+              "NO.": "1",
+              "DESCRIPTION / SKU": "Paper hardcover notebook, assorted colors / SKU: SKU-0002-1",
+              "HS CODE": "482010",
+              "QUANTITY": "880 PCS",
+              "UNIT PRICE": "3.42",
+              "AMOUNT": "3009.60"
+            }
+          },
+          {
+            "sku": "SKU-0002-2",
+            "quantity": 5000.0,
+            "raw_cells": {
+              "NO.": "2",
+              "DESCRIPTION / SKU": "Manual toothbrush, nylon bristles, export retail pack / SKU: SKU-0002-2",
+              "HS CODE": "960321",
+              "QUANTITY": "5000 PCS",
+              "UNIT PRICE": "0.36",
+              "AMOUNT": "1800.00"
+            }
+          },
+          {
+            "sku": "SKU-0002-3",
+            "quantity": 4000.0,
+            "raw_cells": {
+              "NO.": "3",
+              "DESCRIPTION / SKU": "Steel hexagon bolt, M8 x 30 mm, blue finish / SKU: SKU-0002-3",
+              "HS CODE": "731815",
+              "QUANTITY": "4000 PCS",
+              "UNIT PRICE": "0.06",
+              "AMOUNT": "240.00"
+            }
+          }
+        ],
+        "tables_in_page": 2
+      },
+      "proforma_invoice": {
+        "file": "<local>/proforma_invoice_0.md",
+        "document_id": "PI-00002",
+        "rows": [
+          {
+            "sku": "SKU-0002-1",
+            "quantity": 880.0,
+            "raw_cells": {
+              "NO.": "1",
+              "DESCRIPTION / SKU": "Paper hardcover notebook, assorted colors / SKU: SKU-0002-1",
+              "HS CODE": "482010",
+              "QUANTITY": "880 PCS",
+              "UNIT PRICE": "3.42",
+              "AMOUNT": "3009.60"
+            }
+          },
+          {
+            "sku": "SKU-0002-2",
+            "quantity": 5000.0,
+            "raw_cells": {
+              "NO.": "2",
+              "DESCRIPTION / SKU": "Manual toothbrush, nylon bristles, export retail pack / SKU: SKU-0002-2",
+              "HS CODE": "960321",
+              "QUANTITY": "5000 PCS",
+              "UNIT PRICE": "0.36",
+              "AMOUNT": "1800.00"
+            }
+          },
+          {
+            "sku": "SKU-0002-3",
+            "quantity": 4000.0,
+            "raw_cells": {
+              "NO.": "3",
+              "DESCRIPTION / SKU": "Steel hexagon bolt, M8 x 30 mm, blue finish / SKU: SKU-0002-3",
+              "HS CODE": "731815",
+              "QUANTITY": "4000 PCS",
+              "UNIT PRICE": "0.06",
+              "AMOUNT": "240.00"
+            }
+          }
+        ],
+        "tables_in_page": 2
+      },
+      "packing_list": {
+        "file": "<local>/packing_list_0.md",
+        "document_id": "PL-00002",
+        "rows": [
+          {
+            "sku": "SKU-0002-1",
+            "quantity": 888.0,
+            "raw_cells": {
+              "NO.": "1",
+              "DESCRIPTION / SKU": "Paper hardcover notebook, assorted colors / SKU: SKU-0002-1",
+              "QTY": "888 PCS",
+              "PKGS": "22",
+              "NET KG": "281.60",
+              "GROSS KG": "293.11",
+              "CBM": "0.562"
+            }
+          },
+          {
+            "sku": "SKU-0002-2",
+            "quantity": 5000.0,
+            "raw_cells": {
+              "NO.": "2",
+              "DESCRIPTION / SKU": "Manual toothbrush, nylon bristles, export retail pack / SKU: SKU-0002-2",
+              "QTY": "5000 PCS",
+              "PKGS": "25",
+              "NET KG": "110.00",
+              "GROSS KG": "133.30",
+              "CBM": "0.432"
+            }
+          },
+          {
+            "sku": "SKU-0002-3",
+            "quantity": 4000.0,
+            "raw_cells": {
+              "NO.": "3",
+              "DESCRIPTION / SKU": "Steel hexagon bolt, M8 x 30 mm, blue finish / SKU: SKU-0002-3",
+              "QTY": "4000 PCS",
+              "PKGS": "8",
+              "NET KG": "72.00",
+              "GROSS KG": "77.02",
+              "CBM": "0.079"
+            }
+          }
+        ],
+        "tables_in_page": 2
+      }
+    },
+    "details": [
+      {
+        "field": "commercial_invoice.document_id",
+        "expected": "CI-00002",
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1",
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1.quantity",
+        "expected": 880,
+        "actual": 880.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1.HS CODE",
+        "expected": 482010,
+        "actual": 482010.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1.UNIT PRICE",
+        "expected": 3.42,
+        "actual": 3.42,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-1.AMOUNT",
+        "expected": 3009.6,
+        "actual": 3009.6,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2",
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2.quantity",
+        "expected": 5000,
+        "actual": 5000.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2.HS CODE",
+        "expected": 960321,
+        "actual": 960321.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2.UNIT PRICE",
+        "expected": 0.36,
+        "actual": 0.36,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-2.AMOUNT",
+        "expected": 1800,
+        "actual": 1800.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3",
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3.quantity",
+        "expected": 4000,
+        "actual": 4000.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3.HS CODE",
+        "expected": 731815,
+        "actual": 731815.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3.UNIT PRICE",
+        "expected": 0.06,
+        "actual": 0.06,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.SKU-0002-3.AMOUNT",
+        "expected": 240,
+        "actual": 240.0,
+        "passed": true
+      },
+      {
+        "field": "commercial_invoice.total.TOTAL AMOUNT (GBP): 5049.60",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.document_id",
+        "expected": "PI-00002",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1.quantity",
+        "expected": 880,
+        "actual": 880.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1.HS CODE",
+        "expected": 482010,
+        "actual": 482010.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1.UNIT PRICE",
+        "expected": 3.42,
+        "actual": 3.42,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-1.AMOUNT",
+        "expected": 3009.6,
+        "actual": 3009.6,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2.quantity",
+        "expected": 5000,
+        "actual": 5000.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2.HS CODE",
+        "expected": 960321,
+        "actual": 960321.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2.UNIT PRICE",
+        "expected": 0.36,
+        "actual": 0.36,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-2.AMOUNT",
+        "expected": 1800,
+        "actual": 1800.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3",
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3.quantity",
+        "expected": 4000,
+        "actual": 4000.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3.HS CODE",
+        "expected": 731815,
+        "actual": 731815.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3.UNIT PRICE",
+        "expected": 0.06,
+        "actual": 0.06,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.SKU-0002-3.AMOUNT",
+        "expected": 240,
+        "actual": 240.0,
+        "passed": true
+      },
+      {
+        "field": "proforma_invoice.total.TOTAL AMOUNT (GBP): 5049.60",
+        "passed": true
+      },
+      {
+        "field": "packing_list.document_id",
+        "expected": "PL-00002",
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1",
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.quantity",
+        "expected": 888,
+        "actual": 888.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.PKGS",
+        "expected": 22,
+        "actual": 22.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.NET KG",
+        "expected": 281.6,
+        "actual": 281.6,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.GROSS KG",
+        "expected": 293.11,
+        "actual": 293.11,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-1.CBM",
+        "expected": 0.562,
+        "actual": 0.562,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2",
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.quantity",
+        "expected": 5000,
+        "actual": 5000.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.PKGS",
+        "expected": 25,
+        "actual": 25.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.NET KG",
+        "expected": 110,
+        "actual": 110.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.GROSS KG",
+        "expected": 133.3,
+        "actual": 133.3,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-2.CBM",
+        "expected": 0.432,
+        "actual": 0.432,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3",
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.quantity",
+        "expected": 4000,
+        "actual": 4000.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.PKGS",
+        "expected": 8,
+        "actual": 8.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.NET KG",
+        "expected": 72,
+        "actual": 72.0,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.GROSS KG",
+        "expected": 77.02,
+        "actual": 77.02,
+        "passed": true
+      },
+      {
+        "field": "packing_list.SKU-0002-3.CBM",
+        "expected": 0.079,
+        "actual": 0.079,
+        "passed": true
+      },
+      {
+        "field": "packing_list.total.55 CARTONS",
+        "passed": true
+      },
+      {
+        "field": "packing_list.total.NET 463.60 KG",
+        "passed": true
+      },
+      {
+        "field": "packing_list.total.GROSS 503.43 KG",
+        "passed": true
+      },
+      {
+        "field": "packing_list.total.1.073 CBM",
+        "passed": true
+      }
+    ]
+  },
+  "existing_adapter_on_correct_vl_output": {
+    "error": "未识别出唯一的商品明细表",
+    "input": "Actual PaddleOCR-VL output containing a parties table and a goods table"
+  },
+  "text_layer_comparison": {
+    "conflicts": 0,
+    "comparisons": 11,
+    "unrecognized": 3
+  },
+  "scope": {
+    "shipment": "SHP-00002",
+    "pages": 3,
+    "second_tshirt_case": "not present in supplied archive; not evaluated",
+    "production_writes": false,
+    "scoring": "Literal selected-field checks after model predictions; not an overall OCR accuracy estimate"
+  }
+}

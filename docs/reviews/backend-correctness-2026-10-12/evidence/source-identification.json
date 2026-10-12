@@ -1,0 +1,13 @@
+{
+  "previous": {
+    "commit": "76ffb556af2c6fa0193172bcf5f71cd72d7cf912",
+    "snapshot_matching_python_files": 20
+  },
+  "latest": {
+    "branch": "feat/backend-workflow-rules",
+    "commit": "685d6e15618cb882b5586cea1341f16527dee18d",
+    "pull_request": 37
+  },
+  "input_archive_sha256": "cae50c038ceb4b220731a9b176c2507858d3165d32891d877f8da4a3a04d0138",
+  "review_scope": "offline source and component review; no production writes"
+}

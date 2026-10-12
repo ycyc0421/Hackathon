@@ -1,0 +1,14 @@
+test_bad_batch_atomic (__main__.WorkflowTests.test_bad_batch_atomic) ... ok
+test_http_contract_and_unsupported_export (__main__.WorkflowTests.test_http_contract_and_unsupported_export) ... skipped 'Windows sandbox TestClient transport hangs; execute HTTP integration on Linux'
+test_import_failure_rolls_back_audit (__main__.WorkflowTests.test_import_failure_rolls_back_audit) ... ok
+test_item_revision_real_conflict_and_audit_chain (__main__.WorkflowTests.test_item_revision_real_conflict_and_audit_chain) ... ok
+test_preserves_evidence_recomputes_and_idempotency (__main__.WorkflowTests.test_preserves_evidence_recomputes_and_idempotency) ... ok
+test_reject_duplicate_and_uneditable (__main__.WorkflowTests.test_reject_duplicate_and_uneditable) ... ok
+test_report_escapes_and_retains_failure (__main__.WorkflowTests.test_report_escapes_and_retains_failure) ... ok
+test_running_not_editable_or_exportable (__main__.WorkflowTests.test_running_not_editable_or_exportable) ... ok
+test_source_and_idempotency_conflict (__main__.WorkflowTests.test_source_and_idempotency_conflict) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.429s
+
+OK (skipped=1)

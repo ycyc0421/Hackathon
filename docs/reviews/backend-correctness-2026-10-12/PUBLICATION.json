@@ -1,0 +1,21 @@
+{
+  "source_bundle_sha256": "ab25f4440cfcab09a98a70753b1595f4ced61610f638c3b2745a3ac7e1d22bdf",
+  "publication_normalization": "UTF-8 text, portable script defaults, local path metadata removed, NOT_IN_DOC wording clarified; original PDF bytes unchanged",
+  "converted_log_encodings": [
+    "evidence/latest-workflow-acceptance-log.txt"
+  ],
+  "updated_text_files": [
+    "evidence/latest/root-cause-results.json",
+    "evidence/latest-json-missing-row-quantity.json",
+    "evidence/latest-workflow-acceptance/acceptance.json",
+    "evidence/latest-workflow-acceptance/report.json",
+    "evidence/latest-workflow-acceptance/samples/invoice.json",
+    "evidence/latest-workflow-acceptance/samples/packing.json",
+    "evidence/ocr-reference/ocr-validation.json",
+    "evidence/previous/root-cause-results.json",
+    "evidence/source-identification.json",
+    "reproduce_root_causes.py",
+    "旧版后端审核报告.md",
+    "最新后端分支审核报告.md"
+  ]
+}

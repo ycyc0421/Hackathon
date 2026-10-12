@@ -1,0 +1,15 @@
+test_atomic_database_failure (__main__.StoreTests.test_atomic_database_failure) ... ok
+test_concurrent_updates_do_not_lose_independent_changes (__main__.StoreTests.test_concurrent_updates_do_not_lose_independent_changes) ... ok
+test_duplicate_and_task_local_ids (__main__.StoreTests.test_duplicate_and_task_local_ids) ... ok
+test_migration_idempotent_does_not_overwrite (__main__.StoreTests.test_migration_idempotent_does_not_overwrite) ... ok
+test_ocr_evidence_and_item_members_preserved (__main__.StoreTests.test_ocr_evidence_and_item_members_preserved) ... ok
+test_recovery (__main__.StoreTests.test_recovery) ... ok
+test_restart_exact_payload_and_relations (__main__.StoreTests.test_restart_exact_payload_and_relations) ... ok
+test_result_readable_in_another_python_process (__main__.StoreTests.test_result_readable_in_another_python_process) ... ok
+test_terminal_json_compatible_with_old_release (__main__.StoreTests.test_terminal_json_compatible_with_old_release) ... ok
+test_unsupported_database_unchanged (__main__.StoreTests.test_unsupported_database_unchanged) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.640s
+
+OK

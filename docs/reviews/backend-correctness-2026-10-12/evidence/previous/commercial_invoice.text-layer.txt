@@ -1,0 +1,67 @@
+SYNTHETIC - NOT FOR TRADE
+COMMERCIAL INVOICE
+ Document No.: CI-00002
+Date: 2026-04-25
+Shipment: SHP-00002 | PO: PO-646778-2
+SELLER / EXPORTER
+Harbor Distribution 0002 Co., Ltd.
+385 River Road, Suite 41
+Shanghai, Shanghai 200000, China
+Email: orders0002@orion.example
+Tel: +86 21 4671164 | Mei Zhou
+BUYER / IMPORTER
+Juniper Import 1002 Inc.
+43 Union Street, Suite 65
+New York, NY 10001, United States
+Email: orders1002@silver.example
+Tel: +1 212 4007421 | Robin Lee
+INCOTERM
+CIF New York
+PAYMENT TERMS
+T/T 50% deposit, 50% before shipment
+PORT OF LOADING
+Shanghai, China
+DESTINATION
+New York, United States
+SHIPPING MARK
+JUNIPER / SHP-00002 / C.NO.1-55
+ORIGIN
+China
+VESSEL / FLIGHT
+MV Meridian / V806
+CURRENCY
+GBP
+NO.
+DESCRIPTION / SKU
+HS CODE
+QUANTITY
+UNIT PRICE
+AMOUNT
+1
+Paper hardcover notebook, assorted colors / SKU:
+SKU-0002-1
+482010
+880 PCS
+3.42
+3009.60
+2
+Manual toothbrush, nylon bristles, export retail pack /
+SKU: SKU-0002-2
+960321
+5000 PCS
+0.36
+1800.00
+3
+Steel hexagon bolt, M8 x 30 mm, blue finish / SKU:
+SKU-0002-3
+731815
+4000 PCS
+0.06
+240.00
+TOTAL AMOUNT (GBP): 5049.60
+REFERENCES: CI CI-00002 | PI PI-00002 | PL PL-00002
+NOTES: Goods packed in corrugated cartons; no wooden packaging.
+Attached certificate references: COO-SHP-00002
+Authorized Signature
+All parties, addresses and contacts are fictional. HS codes are illustrative 6-digit candidates.
+Layout independently recreated from user-provided ExportDoc demonstration samples; not an issued document.

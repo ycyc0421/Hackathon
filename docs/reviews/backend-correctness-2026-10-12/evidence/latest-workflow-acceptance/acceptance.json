@@ -1,0 +1,27 @@
+{
+  "status": "PASSED",
+  "checks": [
+    "upload_http_200",
+    "two_documents_completed",
+    "original_packages_match",
+    "correction_http_200",
+    "derived_task_and_original_unchanged",
+    "recomputed_packages_conflict",
+    "raw_evidence_retained",
+    "effective_value_cautious",
+    "retry_idempotent",
+    "stale_hash_rejected",
+    "json_report_and_audit",
+    "html_report_download",
+    "unknown_task_404",
+    "reopened_database_readable"
+  ],
+  "sample_type": "synthetic structured JSON",
+  "limits": [
+    "Not browser UI acceptance",
+    "Not production restart acceptance",
+    "Not OCR accuracy evaluation"
+  ],
+  "source_task_id": "tsk_20261012_0001_9a097234ec37",
+  "derived_task_id": "tsk_20261012_0002_4e6d50dd6a88"
+}

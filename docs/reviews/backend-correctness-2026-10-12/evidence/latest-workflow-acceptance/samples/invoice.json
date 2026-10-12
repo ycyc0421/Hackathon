@@ -1,0 +1,18 @@
+{
+  "format": "hackathon-trade-json-v1",
+  "doc_type": "COMMERCIAL_INVOICE",
+  "fields": {
+    "packages": "120 CARTONS",
+    "gross_weight": "2800 KGS"
+  },
+  "line_items": [
+    {
+      "item_no": 1,
+      "fields": {
+        "item_code": "MUG-1",
+        "description": "CERAMIC MUG WHITE",
+        "quantity": "100 PCS"
+      }
+    }
+  ]
+}

@@ -1,0 +1,791 @@
+{
+  "input_files": [
+    {
+      "format": "hackathon-trade-json-v1",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "fields": {
+        "invoice_no": "INV-001",
+        "currency": "USD",
+        "total_amount": "30.00"
+      },
+      "line_items": [
+        {
+          "item_no": 1,
+          "fields": {
+            "item_code": "SKU-A1",
+            "description": "CERAMIC MUG BLUE",
+            "quantity": "100 PCS"
+          }
+        },
+        {
+          "item_no": 2,
+          "fields": {
+            "item_code": "SKU-B2",
+            "description": "GLASS CUP WHITE",
+            "quantity": "200 PCS"
+          }
+        }
+      ]
+    },
+    {
+      "format": "hackathon-trade-json-v1",
+      "doc_type": "PACKING_LIST",
+      "fields": {
+        "packages": "1 CARTON",
+        "gross_weight": "10 KGS"
+      },
+      "line_items": [
+        {
+          "item_no": 1,
+          "fields": {
+            "item_code": "SKU-A1",
+            "description": "CERAMIC MUG BLUE",
+            "quantity": "100 PCS"
+          }
+        },
+        {
+          "item_no": 2,
+          "fields": {
+            "item_code": "SKU-B2",
+            "description": "GLASS CUP WHITE"
+          }
+        }
+      ]
+    }
+  ],
+  "extractions": [
+    {
+      "doc_type": "COMMERCIAL_INVOICE",
+      "fields": [
+        {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": "invoice_no: INV-001",
+          "raw_value": "INV-001",
+          "normalized_value": "INV-001",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "currency",
+          "label": "币种",
+          "raw_text": "currency: USD",
+          "raw_value": "USD",
+          "normalized_value": "USD",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": "total_amount: 30.00",
+          "raw_value": "30.00",
+          "normalized_value": 30,
+          "unit": "USD",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "packages",
+          "label": "件数",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CARTON",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "net_weight",
+          "label": "净重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "volume",
+          "label": "体积",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CBM",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "quantity",
+          "label": "数量",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "PCS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "hs_code",
+          "label": "HS 编码",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "description",
+          "label": "货物描述",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipment_date",
+          "label": "装运日期",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      ],
+      "line_items": [
+        {
+          "item_no": 1,
+          "raw_text": "{\"item_no\": 1, \"fields\": {\"item_code\": \"SKU-A1\", \"description\": \"CERAMIC MUG BLUE\", \"quantity\": \"100 PCS\"}}",
+          "fields": [
+            {
+              "field_key": "item_code",
+              "label": "货号/型号",
+              "raw_text": "item_code: SKU-A1",
+              "raw_value": "SKU-A1",
+              "normalized_value": "SKU-A1",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            {
+              "field_key": "description",
+              "label": "货物描述",
+              "raw_text": "description: CERAMIC MUG BLUE",
+              "raw_value": "CERAMIC MUG BLUE",
+              "normalized_value": "陶瓷 马克杯 蓝",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            {
+              "field_key": "quantity",
+              "label": "数量",
+              "raw_text": "quantity: 100 PCS",
+              "raw_value": "100 PCS",
+              "normalized_value": 100,
+              "unit": "PCS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            }
+          ]
+        },
+        {
+          "item_no": 2,
+          "raw_text": "{\"item_no\": 2, \"fields\": {\"item_code\": \"SKU-B2\", \"description\": \"GLASS CUP WHITE\", \"quantity\": \"200 PCS\"}}",
+          "fields": [
+            {
+              "field_key": "item_code",
+              "label": "货号/型号",
+              "raw_text": "item_code: SKU-B2",
+              "raw_value": "SKU-B2",
+              "normalized_value": "SKU-B2",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            {
+              "field_key": "description",
+              "label": "货物描述",
+              "raw_text": "description: GLASS CUP WHITE",
+              "raw_value": "GLASS CUP WHITE",
+              "normalized_value": "玻璃 杯 白",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            {
+              "field_key": "quantity",
+              "label": "数量",
+              "raw_text": "quantity: 200 PCS",
+              "raw_value": "200 PCS",
+              "normalized_value": 200,
+              "unit": "PCS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            }
+          ]
+        }
+      ],
+      "file_id": "f1"
+    },
+    {
+      "doc_type": "PACKING_LIST",
+      "fields": [
+        {
+          "field_key": "packages",
+          "label": "件数",
+          "raw_text": "packages: 1 CARTON",
+          "raw_value": "1 CARTON",
+          "normalized_value": 1,
+          "unit": "CARTON",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "raw_text": "gross_weight: 10 KGS",
+          "raw_value": "10 KGS",
+          "normalized_value": 10,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "net_weight",
+          "label": "净重",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "KGS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "volume",
+          "label": "体积",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "CBM",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "quantity",
+          "label": "数量",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": "PCS",
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "hs_code",
+          "label": "HS 编码",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "currency",
+          "label": "币种",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "description",
+          "label": "货物描述",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        {
+          "field_key": "shipment_date",
+          "label": "装运日期",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "NOT_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      ],
+      "line_items": [
+        {
+          "item_no": 1,
+          "raw_text": "{\"item_no\": 1, \"fields\": {\"item_code\": \"SKU-A1\", \"description\": \"CERAMIC MUG BLUE\", \"quantity\": \"100 PCS\"}}",
+          "fields": [
+            {
+              "field_key": "item_code",
+              "label": "货号/型号",
+              "raw_text": "item_code: SKU-A1",
+              "raw_value": "SKU-A1",
+              "normalized_value": "SKU-A1",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            {
+              "field_key": "description",
+              "label": "货物描述",
+              "raw_text": "description: CERAMIC MUG BLUE",
+              "raw_value": "CERAMIC MUG BLUE",
+              "normalized_value": "陶瓷 马克杯 蓝",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            {
+              "field_key": "quantity",
+              "label": "数量",
+              "raw_text": "quantity: 100 PCS",
+              "raw_value": "100 PCS",
+              "normalized_value": 100,
+              "unit": "PCS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            }
+          ]
+        },
+        {
+          "item_no": 2,
+          "raw_text": "{\"item_no\": 2, \"fields\": {\"item_code\": \"SKU-B2\", \"description\": \"GLASS CUP WHITE\"}}",
+          "fields": [
+            {
+              "field_key": "item_code",
+              "label": "货号/型号",
+              "raw_text": "item_code: SKU-B2",
+              "raw_value": "SKU-B2",
+              "normalized_value": "SKU-B2",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            {
+              "field_key": "description",
+              "label": "货物描述",
+              "raw_text": "description: GLASS CUP WHITE",
+              "raw_value": "GLASS CUP WHITE",
+              "normalized_value": "玻璃 杯 白",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            }
+          ]
+        }
+      ],
+      "file_id": "f2"
+    }
+  ],
+  "items": [
+    {
+      "item_id": "itm_1",
+      "label": "陶瓷 马克杯 蓝",
+      "alignment_status": "ALIGNED",
+      "alignment_basis": "ITEM_CODE",
+      "alignment_note": null,
+      "members": [
+        {
+          "file_id": "f1",
+          "item_no": 1,
+          "match_score": 1.0
+        },
+        {
+          "file_id": "f2",
+          "item_no": 1,
+          "match_score": 1.0
+        }
+      ]
+    },
+    {
+      "item_id": "itm_2",
+      "label": "玻璃 杯 白",
+      "alignment_status": "ALIGNED",
+      "alignment_basis": "ITEM_CODE",
+      "alignment_note": null,
+      "members": [
+        {
+          "file_id": "f1",
+          "item_no": 2,
+          "match_score": 1.0
+        },
+        {
+          "file_id": "f2",
+          "item_no": 2,
+          "match_score": 1.0
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "comparison_id": "cmp_1",
+      "scope": "ITEM",
+      "item_id": "itm_1",
+      "field_key": "item_code",
+      "label": "货号/型号",
+      "value_type": "CODE",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "1.json",
+          "raw_value": "SKU-A1",
+          "normalized_value": "SKU-A1",
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "2.json",
+          "raw_value": "SKU-A1",
+          "normalized_value": "SKU-A1",
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_2",
+      "scope": "ITEM",
+      "item_id": "itm_1",
+      "field_key": "description",
+      "label": "货物描述",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "1.json",
+          "raw_value": "CERAMIC MUG BLUE",
+          "normalized_value": "陶瓷 马克杯 蓝",
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "2.json",
+          "raw_value": "CERAMIC MUG BLUE",
+          "normalized_value": "陶瓷 马克杯 蓝",
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_3",
+      "scope": "ITEM",
+      "item_id": "itm_1",
+      "field_key": "quantity",
+      "label": "数量",
+      "value_type": "NUMBER",
+      "unit": "PCS",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "1.json",
+          "raw_value": "100 PCS",
+          "normalized_value": 100,
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "2.json",
+          "raw_value": "100 PCS",
+          "normalized_value": 100,
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_4",
+      "scope": "ITEM",
+      "item_id": "itm_2",
+      "field_key": "item_code",
+      "label": "货号/型号",
+      "value_type": "CODE",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "1.json",
+          "raw_value": "SKU-B2",
+          "normalized_value": "SKU-B2",
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "2.json",
+          "raw_value": "SKU-B2",
+          "normalized_value": "SKU-B2",
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_5",
+      "scope": "ITEM",
+      "item_id": "itm_2",
+      "field_key": "description",
+      "label": "货物描述",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "1.json",
+          "raw_value": "GLASS CUP WHITE",
+          "normalized_value": "玻璃 杯 白",
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        },
+        {
+          "file_id": "f2",
+          "file_name": "2.json",
+          "raw_value": "GLASS CUP WHITE",
+          "normalized_value": "玻璃 杯 白",
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        }
+      ]
+    },
+    {
+      "comparison_id": "cmp_6",
+      "scope": "ITEM",
+      "item_id": "itm_2",
+      "field_key": "quantity",
+      "label": "数量",
+      "value_type": "NUMBER",
+      "unit": "PCS",
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有 1.json 按品名行提供该项，无法交叉比对。",
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "1.json",
+          "raw_value": "200 PCS",
+          "normalized_value": 200,
+          "field_status": "EXTRACTED",
+          "page": null,
+          "bbox": null
+        }
+      ]
+    }
+  ],
+  "expected": "PL SKU-B2 quantity=MISSING_IN_DOC; comparison=MISSING_IN_SOME",
+  "actual": {
+    "comparison_id": "cmp_6",
+    "scope": "ITEM",
+    "item_id": "itm_2",
+    "field_key": "quantity",
+    "label": "数量",
+    "value_type": "NUMBER",
+    "unit": "PCS",
+    "status": "SINGLE_SOURCE",
+    "canonical_value": null,
+    "severity": "INFO",
+    "rule_id": null,
+    "note": "只有 1.json 按品名行提供该项，无法交叉比对。",
+    "values": [
+      {
+        "file_id": "f1",
+        "file_name": "1.json",
+        "raw_value": "200 PCS",
+        "normalized_value": 200,
+        "field_status": "EXTRACTED",
+        "page": null,
+        "bbox": null
+      }
+    ]
+  },
+  "bug_reproduced": true
+}

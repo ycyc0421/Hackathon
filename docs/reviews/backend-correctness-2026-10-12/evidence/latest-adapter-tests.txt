@@ -1,0 +1,11 @@
+test_header_aliases_preserve_product_rows (__main__.ReviewRegressions.test_header_aliases_preserve_product_rows) ... ok
+test_long_description_retains_correction_evidence_and_warning (__main__.ReviewRegressions.test_long_description_retains_correction_evidence_and_warning) ... ok
+test_missing_item_code_does_not_hide_ocr_disagreement (__main__.ReviewRegressions.test_missing_item_code_does_not_hide_ocr_disagreement) ... ok
+test_model_creation_and_inference_stay_on_one_thread_across_tasks (__main__.ReviewRegressions.test_model_creation_and_inference_stay_on_one_thread_across_tasks) ... ok
+test_multiple_tables_fail_instead_of_discarding_rows (__main__.ReviewRegressions.test_multiple_tables_fail_instead_of_discarding_rows) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.034s
+
+OK
+OCR table adapter guards passed
