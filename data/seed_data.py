@@ -94,10 +94,17 @@ def validate_references(data):
         if value not in file_ids:
             raise ValueError(f"unknown file_id: {value}")
 
+    for item in data["items"]:
+        for member in item.get("members", []):
+            file_ref(member["file_id"])
+
     for extraction in data["extractions"]:
         file_ref(extraction["file_id"])
-        for field in extraction["fields"]:
+        for field in extraction.get("fields", []):
             item_ref(field)
+        for line_item in extraction.get("line_items", []):
+            for field in line_item.get("fields", []):
+                item_ref(field)
     for comparison in data["comparisons"]:
         item_ref(comparison)
         for value in comparison["values"]:
@@ -107,6 +114,12 @@ def validate_references(data):
                 raise ValueError("comparison value item_id differs from its comparison")
     for risk in data["risks"]:
         item_ref(risk)
+        related_item_ids = risk.get("related_item_ids")
+        if related_item_ids is None:
+            related_item_ids = [risk["item_id"]] if risk.get("item_id") is not None else []
+        for item_id in related_item_ids:
+            if item_id not in item_ids:
+                raise ValueError(f"unknown item_id: {item_id}")
         if risk.get("comparison_id") is not None and risk["comparison_id"] not in comparison_ids:
             raise ValueError(f"unknown comparison_id: {risk['comparison_id']}")
         for file_id in risk.get("related_file_ids", []):
@@ -151,14 +164,31 @@ def import_task(conn, source, *, payload_json=None):
                  doc.get("doc_type"), doc["process_status"], doc.get("page_count"), doc.get("error_message"),
                  parse_methods.get(doc["file_id"])),
             )
+        member_item_ids = {}
+        for item in data["items"]:
+            for member in item.get("members", []):
+                member_item_ids[(member["file_id"], member["item_no"])] = item["item_id"]
+
         for extraction in data["extractions"]:
-            for field in extraction["fields"]:
+            fields = [
+                (field, field.get("item_id"), field.get("line_no"))
+                for field in extraction.get("fields", [])
+            ]
+            for line_item in extraction.get("line_items", []):
+                item_no = line_item["item_no"]
+                item_id = member_item_ids.get((extraction["file_id"], item_no))
+                fields.extend(
+                    (field, field.get("item_id", item_id), field.get("line_no", item_no))
+                    for field in line_item.get("fields", [])
+                )
+
+            for field, item_id, line_no in fields:
                 conn.execute(
                     """INSERT INTO extracted_fields
                     (task_id,file_id,item_id,line_no,field_key,label,raw_text,raw_value,
                      normalized_value_json,unit,confidence,status,page,bbox_json,bbox_unit)
                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                    (task_id, storage_id(extraction["file_id"]), field.get("item_id"), field.get("line_no"),
+                    (task_id, storage_id(extraction["file_id"]), item_id, line_no,
                      field["field_key"], field.get("label", field["field_key"]),
                      field.get("raw_text", field.get("raw_value")), field.get("raw_value"),
                      dump_json(field.get("normalized_value")), field.get("unit"), field.get("confidence"),
@@ -206,6 +236,14 @@ def import_task(conn, source, *, payload_json=None):
                 conn.execute(
                     "INSERT INTO risk_files (risk_id,file_id,position) VALUES (?,?,?)",
                     (risk_id, storage_id(file_id), position),
+                )
+            related_item_ids = risk.get("related_item_ids")
+            if related_item_ids is None:
+                related_item_ids = [risk["item_id"]] if risk.get("item_id") is not None else []
+            for position, item_id in enumerate(related_item_ids):
+                conn.execute(
+                    "INSERT INTO risk_items (risk_id,task_id,item_id,position) VALUES (?,?,?,?)",
+                    (risk_id, task_id, item_id, position),
                 )
         expected = (len(data["comparisons"]), sum(len(c["values"]) for c in data["comparisons"]))
         actual = tuple(

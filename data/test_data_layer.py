@@ -182,6 +182,53 @@ class DataLayerTests(unittest.TestCase):
             ("field_ownership",),
         ).fetchall(), [("item_001", 7), ("item_001", 8), ("item_001", 9)])
 
+    def test_line_items_and_multi_item_risks_are_imported(self):
+        source = {
+            "task_id": "line_items_and_risks",
+            "status": "COMPLETED",
+            "created_at": "2026-10-11T00:00:00+00:00",
+            "finished_at": None,
+            "input": {"destination_country": "DE"},
+            "items": [
+                {"item_id": "item_a", "display_name": "商品 A",
+                 "members": [{"file_id": "f1", "item_no": 1}]},
+                {"item_id": "item_b", "display_name": "商品 B",
+                 "members": [{"file_id": "f1", "item_no": 2}]},
+            ],
+            "documents": [{
+                "file_id": "f1", "file_name": "invoice.json", "file_type": "OTHER",
+                "doc_type": "COMMERCIAL_INVOICE", "process_status": "EXTRACTED",
+            }],
+            "extractions": [{
+                "file_id": "f1", "line_items": [
+                    {"item_no": 1, "fields": [{
+                        "field_key": "quantity", "label": "数量", "raw_text": "10",
+                        "raw_value": "10", "normalized_value": 10, "status": "EXTRACTED",
+                    }]},
+                    {"item_no": 2, "fields": [{
+                        "field_key": "quantity", "label": "数量", "raw_text": "20",
+                        "raw_value": "20", "normalized_value": 20, "status": "EXTRACTED",
+                    }]},
+                ],
+            }],
+            "comparisons": [],
+            "risks": [{
+                "risk_id": "risk_multi_item", "type": "OTHER", "severity": "WARNING",
+                "title": "需复核多个商品", "detail": "同一风险关联两个商品",
+                "related_field_keys": ["quantity"],
+                "related_item_ids": ["item_a", "item_b"], "related_file_ids": [],
+            }],
+        }
+        import_task(self.conn, source)
+        self.assertEqual(self.conn.execute(
+            "SELECT item_id, line_no FROM extracted_fields WHERE task_id=? ORDER BY line_no",
+            ("line_items_and_risks",),
+        ).fetchall(), [("item_a", 1), ("item_b", 2)])
+        self.assertEqual(self.conn.execute(
+            "SELECT item_id, position FROM risk_items WHERE task_id=? ORDER BY position",
+            ("line_items_and_risks",),
+        ).fetchall(), [("item_a", 0), ("item_b", 1)])
+
 
 class InitializationTests(unittest.TestCase):
     def test_initialization_is_repeatable_without_losing_data(self):
