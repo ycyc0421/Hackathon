@@ -22,6 +22,11 @@ class DeploymentTests(unittest.TestCase):
         (self.old / ".venv/unchanged").write_text("旧依赖")
         (self.new / "deploy").mkdir(parents=True)
         (self.new / "deploy" / backend.SERVICE).write_text("新服务配置")
+        (self.new / "web/dist/assets").mkdir(parents=True)
+        (self.new / "web/dist/index.html").write_text("新页面")
+        (self.new / "web/dist/assets/app.js").write_text("新脚本")
+        (self.old / "web/dist").mkdir(parents=True)
+        (self.old / "web/dist/index.html").write_text("旧页面")
         (self.root / "current").symlink_to(self.old, target_is_directory=True)
         (self.root / "shared/data").mkdir(parents=True)
         (self.root / "shared/data/task.json").write_text("已有任务")
@@ -77,6 +82,7 @@ class DeploymentTests(unittest.TestCase):
         backend.rollback(self.root, self.new)
         self.assertEqual((self.root / "current").resolve(), self.old)
         self.assertEqual(self.unit.read_text(), "旧服务配置")
+        self.assertEqual((self.root / "current/web/dist/index.html").read_text(), "旧页面")
         self.assert_shared_unchanged()
 
     @patch("backend.run")
@@ -136,6 +142,17 @@ class DeploymentTests(unittest.TestCase):
         self.assertTrue(any(str(args[-1]).endswith("backend/requirements.txt") for args in calls))
         self.assertFalse(any("paddlepaddle==3.2.0" in args or "run_ocr_probe.py" in str(args) for args in calls))
         activate.assert_called_once()
+
+    @patch("backend.activate")
+    @patch("backend.run")
+    def test_missing_frontend_stops_before_dependency_install_and_activation(self, run, activate):
+        (self.new / "web/dist/index.html").unlink()
+        release_id = self.prepare_archive("PADDLE_OCR_ENABLED=0\n")
+        with self.assertRaisesRegex(RuntimeError, "前端构建产物"):
+            backend.deploy(self.root, release_id)
+        activate.assert_not_called()
+        self.assertFalse(any("install" in call.args for call in run.call_args_list))
+        self.assertEqual((self.root / "current").resolve(), self.old)
 
     @patch("backend.activate")
     @patch("backend.run")

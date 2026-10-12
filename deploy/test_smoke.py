@@ -78,6 +78,10 @@ class PublicSmokeTests(unittest.TestCase):
         uploads = []
         def handler(request):
             headers = {'access-control-allow-origin': self.origin, 'access-control-allow-methods': 'GET, POST'}
+            if request.url.path == '/':
+                return httpx.Response(200, text='<div id="app"></div><script src="/assets/app.js"></script>')
+            if request.url.path == '/assets/app.js':
+                return httpx.Response(200, headers={'content-type': 'application/javascript'}, text='export {}')
             if request.method == 'OPTIONS':
                 return httpx.Response(200, headers=headers)
             if request.method == 'POST':
@@ -114,6 +118,17 @@ class PublicSmokeTests(unittest.TestCase):
         handler, uploads = self.ocr_handler()
         self.run_probe(handler)
         self.assertEqual(len(uploads), 3)
+
+    def test_frontend_missing_asset_or_html_fallback_fails_deployment(self):
+        for status, content_type in ((404, 'text/plain'), (200, 'text/html')):
+            with self.subTest(status=status, content_type=content_type):
+                def handler(request):
+                    if request.url.path == '/':
+                        return httpx.Response(200, text='<div id="app"></div><script src="/assets/app.js"></script>')
+                    return httpx.Response(status, headers={'content-type': content_type})
+                with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+                    with self.assertRaisesRegex(AssertionError, '前端资源不可用'):
+                        smoke.verify_frontend(client, self.origin)
 
 
 if __name__ == '__main__':

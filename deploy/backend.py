@@ -59,6 +59,18 @@ def switch_release(current, target):
     temporary.replace(current)
 
 
+def prepare_frontend(release):
+    """只开放静态产物的读取权限，供反向代理通过 current 提供前端。"""
+    frontend = release / "web/dist"
+    if not (frontend / "index.html").is_file():
+        raise RuntimeError("发布归档缺少前端构建产物")
+    release.chmod(0o711)
+    (release / "web").chmod(0o711)
+    frontend.chmod(0o755)
+    for path in frontend.rglob("*"):
+        path.chmod(0o755 if path.is_dir() else 0o644)
+
+
 def activate(root, release):
     current = root / "current"
     previous = current.resolve(strict=True)
@@ -119,6 +131,7 @@ def deploy(root, release_id):
     release.mkdir()
     with tarfile.open(archive) as source:
         source.extractall(release, filter="data")
+    prepare_frontend(release)
 
     # 每个版本使用独立依赖，失败时不会污染仍在运行的旧环境。
     run(interpreter, "-m", "venv", "--without-pip", str(release / ".venv"))

@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 import sys
 import time
 from urllib.parse import quote
@@ -11,6 +12,18 @@ def verify_response(response, origin, description):
     challenge = '，Cloudflare 人机验证拦截' if response.headers.get('cf-mitigated') == 'challenge' else ''
     assert response.is_success, f'{description} 返回 HTTP {response.status_code}{challenge}'
     assert response.headers.get('access-control-allow-origin') in ('*', origin), f'{description} 未允许前端跨域读取'
+
+
+def verify_frontend(client, origin):
+    page = client.get(origin + '/')
+    assert page.is_success and 'id="app"' in page.text, '前端首页不可用'
+    assets = re.findall(r'(?:src|href)="(/assets/[^"]+)"', page.text)
+    assert any(path.endswith('.js') for path in assets), '前端首页缺少构建脚本'
+    for path in assets:
+        response = client.get(origin + path)
+        expected = 'javascript' if path.endswith('.js') else 'text/css'
+        assert response.is_success and expected in response.headers.get('content-type', ''), f'前端资源不可用：{path}'
+    print('联调通过：前端首页与静态资源', flush=True)
 
 
 def ocr_uploads(scan=False):
@@ -41,7 +54,7 @@ def run(base, origin, output, ocr_enabled=False):
             verify_response(response, origin, path)
             return response.json()
 
-        # 从部署服务器访问公开 HTTPS 域名，完整经过边缘代理和跨域检查。
+        # 从部署服务器访问公开地址，完整经过反向代理和跨域检查。
         preflight = client.options(f'{base}/checks', headers={
             'Access-Control-Request-Method': 'POST',
             'Access-Control-Request-Headers': 'content-type',
@@ -92,6 +105,7 @@ def run(base, origin, output, ocr_enabled=False):
             (output / f'{name}.json').write_text(json.dumps(task, ensure_ascii=False), encoding='utf-8')
             print(f'联调通过：{name}，{task["status"]}', flush=True)
 
+        verify_frontend(client, origin)
         missing = client.get(f'{base}/checks/tsk_missing_deployment_probe', timeout=15)
         assert missing.status_code == 404
         assert missing.json()['error']['code'] == 'TASK_NOT_FOUND'
