@@ -77,9 +77,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
 
-      - name: 安装依赖
-        working-directory: web
-        run: npm ci
+      - name: 安装契约与前端依赖
+        run: |
+          npm ci
+          npm ci --prefix web
 
       - name: 前端逻辑回归
         run: node --test tests/*.test.mjs

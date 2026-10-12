@@ -2210,13 +2210,20 @@ textarea {
    列表与对照面板三处的 EDI 原件查看/下载入口与纯文本预览。
    ========================================================================== */
 
-/* 原件入口按钮组：与文件名/状态同行，靠右对齐，不破坏宿主 flex 布局 */
+/* 原件区域随宿主宽度收缩，按钮与文本纵向排列，避免窄屏被长报文撑开 */
 .file-item-source,
 .doc-item-source,
 .compare-foot-source {
   display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.edi-source-bar {
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
-  flex: none;
 }
 
 /* 已选文件项是单行 flex，原件预览需另起整行 */
@@ -2227,7 +2234,7 @@ textarea {
 /* 列表内的 EDI 预览：占满整行，等宽纯文本，保留换行与连续空格。
    文本插值已转义 HTML 形似内容，这里只呈现原始字节对应的字符。 */
 .edi-source-body {
-  flex-basis: 100%;
+  min-width: 0;
   width: 100%;
   margin-top: 6px;
 }

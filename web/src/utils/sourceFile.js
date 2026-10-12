@@ -44,12 +44,12 @@ export function createObjectUrlPool() {
 /**
  * 读取 EDI 文本内容。样例为 ASCII / 无 BOM UTF-8，按 UTF-8 解码；
  * 其他编码由后端声明后再支持（见 #40），解码失败不静默修正，抛错由调用方降级。
- * 只用于展示与拼 blob，不回写、不改变上传/下载字节。
+ * 只用于文本预览，不回写、不改变上传/下载字节。
  * @returns {Promise<string>} 解码后的文本
  */
 export async function readEdiText(file) {
-  // File.text() 以 UTF-8 解码；遇不可解码字节抛 TypeError，调用方如实提示
-  return file.text()
+  // 严格解码：非法字节交由组件提示，不能静默替换成看似原文的字符。
+  return new TextDecoder('utf-8', { fatal: true }).decode(await file.arrayBuffer())
 }
 
 /**
