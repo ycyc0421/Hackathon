@@ -139,3 +139,6 @@ python backend/tools/run_ocr_probe.py
 文本层 PDF 与纯逻辑回归。探针要求所选样例的文件全部经过 OCR 成功处理；11 号
 还须保留 4 个商品行并检出颜色差异。自动部署的 Python 选择、OCR 开关和公网扫描
 PDF 验证见 [工作流说明](../.github/workflows/README.md#后端主机初始化)。
+## SQLite 任务存储
+
+任务与结果已接入 SQLite；默认运行库位于共享 `.data/tasks.sqlite3`，旧 JSON 结果保留并迁入。商品组成员、OCR 证据及警告保存在同事务完整快照中。启动时未完成任务标记为 `FAILED / TASK_INTERRUPTED`，需重新上传。部署迁移与回退说明见根目录 `SQLITE_INTEGRATION.md`。

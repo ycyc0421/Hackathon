@@ -46,6 +46,8 @@ log = logging.getLogger("backend.api")
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     ensure_dirs()
+    store.migrate_legacy()
+    store.recover_interrupted()
     log.info("规则集版本：%s", rules.rule_version())
     yield
 

@@ -152,7 +152,7 @@ def deploy(root, release_id):
     # 候选版本先用自己的临时数据自检，避免测试读写共享的运行中任务。
     env = {**os.environ, "LLM_BASE_URL": "", "LLM_API_KEY": "", "LLM_MODEL": "",
            "PADDLE_OCR_ENABLED": "0", "PYTHONDONTWRITEBYTECODE": "1"}
-    for script, args in (("test_compare.py", []), ("test_review_regressions.py", []),
+    for script, args in (("test_sqlite_store.py", []), ("test_compare.py", []), ("test_review_regressions.py", []),
                          ("test_paddle_adapter.py", []), ("selftest.py", ["--no-node"]), ("run_challenge.py", [])):
         run(python, str(release / "backend/tools" / script), *args, cwd=release, env=env)
     if ocr_enabled:
