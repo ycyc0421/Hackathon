@@ -1,0 +1,263 @@
+{
+  "proposal_status": "PENDING_C_CONFIRMATION",
+  "source": "https://github.com/ycyc0421/Hackathon/issues/40#issuecomment-6123316495",
+  "proposed_message_type": "INVOIC:D:96A:UN",
+  "maximum_messages_per_file": 1,
+  "current_runtime_acceptance": "NOT_RUN",
+  "files": [
+    {
+      "path": "01_consistent/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "01_consistent/02_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "02_quantity_conflict/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "02_quantity_conflict/02_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "03_net_gross_swapped/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "03_net_gross_swapped/02_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "04_amount_conflict/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "04_amount_conflict/02_invoic_copy.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "04_amount_conflict/03_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "05_currency_conflict/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "05_currency_conflict/02_invoic_copy.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "05_currency_conflict/03_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "06_missing_hs_currency/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "06_missing_hs_currency/02_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "07_multiitem_reordered/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "07_multiitem_reordered/02_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "08_release_characters/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "08_release_characters/02_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "09_decimal_comma_compact/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "IN_SCOPE_PENDING_C_CONFIRMATION",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "09_decimal_comma_compact/02_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "10_multi_message/shipment.edi",
+      "message_types": [
+        "INVOIC",
+        "DESADV"
+      ],
+      "authored_message_count": 2,
+      "fixture_syntax_expected": "ACCEPT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MULTIPLE_UNH",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "11_bad_unt_count/01_invoic.edi",
+      "message_types": [
+        "INVOIC"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "REJECT",
+      "proposed_first_batch_expectation": "REJECT_INVALID_MESSAGE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    },
+    {
+      "path": "12_truncated/01_desadv.edi",
+      "message_types": [
+        "DESADV"
+      ],
+      "authored_message_count": 1,
+      "fixture_syntax_expected": "REJECT",
+      "proposed_first_batch_expectation": "OUT_OF_SCOPE_MESSAGE_TYPE",
+      "specific_error_code": "PENDING_C_F_CONTRACT",
+      "encoding": "ASCII / UTF-8 subset; no BOM"
+    }
+  ]
+}

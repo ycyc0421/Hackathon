@@ -1,0 +1,9 @@
+# Keep published EDI input bytes and reproducible metadata stable on Windows.
+backend/samples/edi/**/*.edi -text
+backend/samples/edi/*.json text eol=lf
+backend/samples/edi/*.md text eol=lf
+backend/samples/edi/SHA256SUMS text eol=lf
+backend/tools/*edi_samples.py text eol=lf
+docs/fixtures/edi-full/*.zip -text
+docs/fixtures/edi-full/*.md text eol=lf
+docs/fixtures/edi-full/*.sha256 text eol=lf

@@ -1,0 +1,91 @@
+{
+  "passed": true,
+  "dataset_version": "edi-synthetic-v1",
+  "case_count": 12,
+  "edi_file_count": 23,
+  "limitations": [
+    "selected fixture-profile checks only",
+    "not complete D.96A/MIG certification",
+    "no current application EDI support or acceptance"
+  ],
+  "failures": [],
+  "cases": [
+    {
+      "case_id": "01_consistent",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "02_quantity_conflict",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "03_net_gross_swapped",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "04_amount_conflict",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "05_currency_conflict",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "06_missing_hs_currency",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "07_multiitem_reordered",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "08_release_characters",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "09_decimal_comma_compact",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "10_multi_message",
+      "passed": true,
+      "syntax_expected": "ACCEPT",
+      "observed_errors": []
+    },
+    {
+      "case_id": "11_bad_unt_count",
+      "passed": true,
+      "syntax_expected": "REJECT",
+      "observed_errors": [
+        "UNT_COUNT_MISMATCH"
+      ]
+    },
+    {
+      "case_id": "12_truncated",
+      "passed": true,
+      "syntax_expected": "REJECT",
+      "observed_errors": [
+        "MISSING_UNT",
+        "MISSING_UNZ"
+      ]
+    }
+  ]
+}
