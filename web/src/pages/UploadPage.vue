@@ -544,15 +544,21 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
           只有错误态例外，整区淡出替换。
         -->
         <div v-else key="task" class="task-status-body">
-          <!-- 任务创建后出现头部；「耗时」在终态淡入，不硬插 -->
-          <div v-if="task" class="status-row">
-            <StatusBadge :status="statusInfo" />
-            <span class="status-meta">任务 {{ task.task_id }}</span>
-            <Transition name="fade">
-              <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
-            </Transition>
-            <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
-          </div>
+          <!--
+            任务创建后头部出现；「耗时」在终态淡入。
+            整行用收合动画入场：与进度条收起同帧发生时，
+            硬插入会把文件列表瞬间顶开，看起来像卡片尺寸异常抖动。
+          -->
+          <Transition :css="false" v-bind="collapseHooks">
+            <div v-if="task" class="status-row">
+              <StatusBadge :status="statusInfo" />
+              <span class="status-meta">任务 {{ task.task_id }}</span>
+              <Transition name="fade">
+                <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
+              </Transition>
+              <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
+            </div>
+          </Transition>
 
           <!--
             阶段条常驻：进行态标出当前阶段（活动点脉冲），终态全部置为完成——
@@ -633,10 +639,13 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
             处理进度计数紧贴列表上方， spinner 标明仍在处理；
             只有完全拿不到文件名时（mock 未选文件）才落回骨架屏。
           -->
-          <p v-if="taskPending && extractProgress" class="extract-progress">
-            <span class="inline-spinner" aria-hidden="true" />
-            已处理 {{ extractProgress.done }} / {{ extractProgress.total }} 份文件
-          </p>
+          <!-- 计数行同样收合动画入场/离场，不硬插顶开列表 -->
+          <Transition :css="false" v-bind="collapseHooks">
+            <p v-if="taskPending && extractProgress" class="extract-progress">
+              <span class="inline-spinner" aria-hidden="true" />
+              已处理 {{ extractProgress.done }} / {{ extractProgress.total }} 份文件
+            </p>
+          </Transition>
           <ul v-if="displayDocs.length" class="doc-list">
             <li v-for="d in displayDocs" :key="d.key" class="doc-item">
               <div class="doc-main">
