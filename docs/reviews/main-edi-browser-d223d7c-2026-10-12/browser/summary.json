@@ -1,0 +1,73 @@
+{
+  "frontend_and_backend_commit": "d223d7cfe94acccc60b96656f2f93f866b63e087",
+  "evidence": "real Chromium browser -> Vite proxy -> isolated current-main FastAPI; no response mocking",
+  "checks": 30,
+  "failed": [],
+  "cases": [
+    {
+      "test": "edi-only",
+      "task_id": "tsk_20261012_0001_c833f05cd9d1",
+      "status": "FAILED",
+      "documents": [
+        {
+          "file_id": "f1",
+          "file_name": "INVOICE.EDI",
+          "file_type": "OTHER",
+          "doc_type": null,
+          "process_status": "UNSUPPORTED",
+          "page_count": null,
+          "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+        }
+      ],
+      "summary": {
+        "document_count": 1,
+        "field_count": 0,
+        "conflict_count": 0,
+        "missing_count": 0,
+        "risk_count": 1,
+        "unrecognized_count": 0
+      }
+    },
+    {
+      "test": "mixed-pdf-edi",
+      "task_id": "tsk_20261012_0002_044dca946209",
+      "status": "PARTIAL",
+      "documents": [
+        {
+          "file_id": "f1",
+          "file_name": "INVOICE.EDI",
+          "file_type": "OTHER",
+          "doc_type": null,
+          "process_status": "UNSUPPORTED",
+          "page_count": null,
+          "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+        },
+        {
+          "file_id": "f2",
+          "file_name": "synthetic-packing-list.pdf",
+          "file_type": "PDF",
+          "doc_type": "PACKING_LIST",
+          "process_status": "EXTRACTED",
+          "page_count": 1,
+          "error_message": null
+        }
+      ],
+      "summary": {
+        "document_count": 2,
+        "field_count": 11,
+        "conflict_count": 0,
+        "missing_count": 0,
+        "risk_count": 1,
+        "unrecognized_count": 0
+      }
+    }
+  ],
+  "page_errors": [],
+  "limits": [
+    "EDI successful parsing not supported/tested",
+    "no OCR invoked",
+    "not production UI acceptance",
+    "one synthetic UTF-8 negative input",
+    "refresh resets in-memory task/File; candidate source-download API not integrated"
+  ]
+}

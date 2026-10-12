@@ -1,0 +1,57 @@
+[
+  {
+    "request": "1.json",
+    "headers": {
+      "host": "127.0.0.1:64893",
+      "connection": "close",
+      "content-length": "1060",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryyjqFw3HiisFEs244",
+      "sec-ch-ua-mobile": "?0",
+      "accept": "*/*",
+      "origin": "http://127.0.0.1:64894",
+      "sec-fetch-site": "same-origin",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-dest": "empty",
+      "referer": "http://127.0.0.1:64894/?mock=0",
+      "accept-encoding": "gzip, deflate, br, zstd"
+    },
+    "body_base64": "LS0tLS0tV2ViS2l0Rm9ybUJvdW5kYXJ5eWpxRnczSGlpc0ZFczI0NA0KQ29udGVudC1EaXNwb3NpdGlvbjogZm9ybS1kYXRhOyBuYW1lPSJmaWxlcyI7IGZpbGVuYW1lPSJJTlZPSUNFLkVESSINCkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtDQoNClVOQTorLj8gJw0KVU5CK1VOT0M6MytTWU5USEVUSUMtU0VOREVSK1NZTlRIRVRJQy1SRUNFSVZFUisyNjEwMTI6MTIwMCtTWU4wMTAxJw0KVU5IKzAxMDErSU5WT0lDOkQ6OTZBOlVOJw0KQkdNKzM4MCtTWU4tSU5WT0lDLTAxKzknDQpEVE0rMTM3OjIwMjYxMDEyOjEwMicNCkRUTSsxMToyMDI2MTAxNDoxMDInDQpGVFgrQUFJKysrU1lOVEhFVElDIFRFU1QgREFUQSAtIE5PVCBGT1IgQ1VTVE9NUyBPUiBQQVlNRU5UJw0KUkZGK09OOlNZTi1PUkRFUi0wMScNCk5BRCtDWisrK1NZTlRIRVRJQyBTVVBQTElFUiBMVEQrMSBURVNUIFJPQUQrVEVTVENJVFkrKzAwMDAwK0NOJw0KTkFEK0NOKysrU1lOVEhFVElDIEJVWUVSIExURCsxIFRFU1QgUk9BRCtURVNUQ0lUWSsrMDAwMDArVVMnDQpDVVgrMjpVU0Q6NCcNClBBQysxMDArK0NUJw0KTUVBK0FBRStBQUQrS0dNOjEwODAuMDAnDQpNRUErQUFFK0FBQytLR006OTAwLjAwJw0KTUVBK0FBRStBQVcrTVRROjQuODAnDQpMSU4rMSsrTVVHMzUwOlNBJw0KUElBKzErNjkxMTEwOkhTJw0KSU1EK0YrKzo6OkNFUkFNSUMgTVVHIDM1ME1MIFdISVRFJw0KTUVBK0FBRStBQUUrS0dNOjEwODAuMDAnDQpNRUErQUFFK0FBTCtLR006OTAwLjAwJw0KUVRZKzQ3OjI0MDA6UENFJw0KTU9BKzIwMzo0ODAwLjAwJw0KUFJJK0FBQToyLjAwOjo6MTpQQ0UnDQpQQUMrMTAwKytDVCcNClVOUytTJw0KQ05UKzI6MScNCk1PQSs3Nzo0ODAwLjAwJw0KVU5UKzI2KzAxMDEnDQpVTlorMStTWU4wMTAxJw0KDQotLS0tLS1XZWJLaXRGb3JtQm91bmRhcnl5anFGdzNIaWlzRkVzMjQ0DQpDb250ZW50LURpc3Bvc2l0aW9uOiBmb3JtLWRhdGE7IG5hbWU9ImRlc3RpbmF0aW9uX2NvdW50cnkiDQoNCkRFDQotLS0tLS1XZWJLaXRGb3JtQm91bmRhcnl5anFGdzNIaWlzRkVzMjQ0LS0NCg==",
+    "files": [
+      "INVOICE.EDI"
+    ],
+    "form_fields": {
+      "destination_country": "DE"
+    }
+  },
+  {
+    "request": "2.json",
+    "headers": {
+      "host": "127.0.0.1:64893",
+      "connection": "close",
+      "content-length": "2109",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryFZo8bQGFWcqsjRIl",
+      "sec-ch-ua-mobile": "?0",
+      "accept": "*/*",
+      "origin": "http://127.0.0.1:64894",
+      "sec-fetch-site": "same-origin",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-dest": "empty",
+      "referer": "http://127.0.0.1:64894/?mock=0",
+      "accept-encoding": "gzip, deflate, br, zstd"
+    },
+    "body_base64": "LS0tLS0tV2ViS2l0Rm9ybUJvdW5kYXJ5RlpvOGJRR0ZXY3FzalJJbA0KQ29udGVudC1EaXNwb3NpdGlvbjogZm9ybS1kYXRhOyBuYW1lPSJmaWxlcyI7IGZpbGVuYW1lPSJJTlZPSUNFLkVESSINCkNvbnRlbnQtVHlwZTogYXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtDQoNClVOQTorLj8gJw0KVU5CK1VOT0M6MytTWU5USEVUSUMtU0VOREVSK1NZTlRIRVRJQy1SRUNFSVZFUisyNjEwMTI6MTIwMCtTWU4wMTAxJw0KVU5IKzAxMDErSU5WT0lDOkQ6OTZBOlVOJw0KQkdNKzM4MCtTWU4tSU5WT0lDLTAxKzknDQpEVE0rMTM3OjIwMjYxMDEyOjEwMicNCkRUTSsxMToyMDI2MTAxNDoxMDInDQpGVFgrQUFJKysrU1lOVEhFVElDIFRFU1QgREFUQSAtIE5PVCBGT1IgQ1VTVE9NUyBPUiBQQVlNRU5UJw0KUkZGK09OOlNZTi1PUkRFUi0wMScNCk5BRCtDWisrK1NZTlRIRVRJQyBTVVBQTElFUiBMVEQrMSBURVNUIFJPQUQrVEVTVENJVFkrKzAwMDAwK0NOJw0KTkFEK0NOKysrU1lOVEhFVElDIEJVWUVSIExURCsxIFRFU1QgUk9BRCtURVNUQ0lUWSsrMDAwMDArVVMnDQpDVVgrMjpVU0Q6NCcNClBBQysxMDArK0NUJw0KTUVBK0FBRStBQUQrS0dNOjEwODAuMDAnDQpNRUErQUFFK0FBQytLR006OTAwLjAwJw0KTUVBK0FBRStBQVcrTVRROjQuODAnDQpMSU4rMSsrTVVHMzUwOlNBJw0KUElBKzErNjkxMTEwOkhTJw0KSU1EK0YrKzo6OkNFUkFNSUMgTVVHIDM1ME1MIFdISVRFJw0KTUVBK0FBRStBQUUrS0dNOjEwODAuMDAnDQpNRUErQUFFK0FBTCtLR006OTAwLjAwJw0KUVRZKzQ3OjI0MDA6UENFJw0KTU9BKzIwMzo0ODAwLjAwJw0KUFJJK0FBQToyLjAwOjo6MTpQQ0UnDQpQQUMrMTAwKytDVCcNClVOUytTJw0KQ05UKzI6MScNCk1PQSs3Nzo0ODAwLjAwJw0KVU5UKzI2KzAxMDEnDQpVTlorMStTWU4wMTAxJw0KDQotLS0tLS1XZWJLaXRGb3JtQm91bmRhcnlGWm84YlFHRldjcXNqUklsDQpDb250ZW50LURpc3Bvc2l0aW9uOiBmb3JtLWRhdGE7IG5hbWU9ImZpbGVzIjsgZmlsZW5hbWU9InN5bnRoZXRpYy1wYWNraW5nLWxpc3QucGRmIg0KQ29udGVudC1UeXBlOiBhcHBsaWNhdGlvbi9wZGYNCg0KJVBERi0xLjQKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVudHMgNSAwIFIgPj4KZW5kb2JqCjQgMCBvYmoKPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+CmVuZG9iago1IDAgb2JqCjw8IC9MZW5ndGggMzIxIC9GaWx0ZXIgL0ZsYXRlRGVjb2RlID4+CnN0cmVhbQp4nGWQT1PCMBDF73yKd0RngBRlhN5CCKVD/9luRY6dtmrVJgwNB769QWfag5fMbt7v7ctmTZhtHThz0BsWDE8rBqowt30wGmfHiHaSfAGSGWHDiWOCKCZs4xQizygOM9gy4cdQRnQH+hzRPcYJF3s/8hD41jZD7oMLIRPikZDY+q+Up7KHN7q8tLUyiLQLGzlJgglzetk3dYtSV7WLMPceFmww1l15bk6m0cqFkCkP7UstAwuFAQ47n4aUZzq6mC8YQyKy/tZL4yzDQfrejlw4bMmmlth7AxFJ6vUV+yffNuWezG5mBsFTiqNefImDPJQuHqdLq63DYahGq1VtivMVRasvdvmmQ2cKU1doFMyHbU9F+dWod3w3nZkOgZstClUhsd9bamWKX7xGV7T2uCpbm6ZEpy/nsv6zSRr9ABIag+0KZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMDkgMDAwMDAgbiAKMDAwMDAwMDA1OCAwMDAwMCBuIAowMDAwMDAwMTE1IDAwMDAwIG4gCjAwMDAwMDAyNDEgMDAwMDAgbiAKMDAwMDAwMDMxMSAwMDAwMCBuIAp0cmFpbGVyCjw8IC9TaXplIDYgL1Jvb3QgMSAwIFIgPj4Kc3RhcnR4cmVmCjcwNAolJUVPRgoNCi0tLS0tLVdlYktpdEZvcm1Cb3VuZGFyeUZabzhiUUdGV2Nxc2pSSWwNCkNvbnRlbnQtRGlzcG9zaXRpb246IGZvcm0tZGF0YTsgbmFtZT0iZGVzdGluYXRpb25fY291bnRyeSINCg0KREUNCi0tLS0tLVdlYktpdEZvcm1Cb3VuZGFyeUZabzhiUUdGV2Nxc2pSSWwtLQ0K",
+    "files": [
+      "INVOICE.EDI",
+      "synthetic-packing-list.pdf"
+    ],
+    "form_fields": {
+      "destination_country": "DE"
+    }
+  }
+]

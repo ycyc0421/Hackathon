@@ -1,0 +1,234 @@
+[
+  {
+    "test": "preflight",
+    "name": "real backend mode",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "preflight",
+    "name": "EDI allowed and TXT excluded",
+    "passed": true,
+    "actual": ".pdf,.png,.jpg,.jpeg,.webp,.edi"
+  },
+  {
+    "test": "source-preview",
+    "name": "exact text preview preserves separators/escaping/newlines",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "source-preview",
+    "name": "HTML-looking text creates no script or b nodes",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "source-preview",
+    "name": "390px viewport has no horizontal overflow",
+    "passed": true,
+    "actual": {
+      "viewport": 390,
+      "document": 375,
+      "body": 375
+    }
+  },
+  {
+    "test": "source-preview",
+    "name": "download byte identity",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "txt-rejected",
+    "name": "TXT has explicit rejection",
+    "passed": true,
+    "actual": "创建检查\n\n选择属于同一票货物的多份单证。系统将逐份抽取字段，再交叉比对它们之间是否一致。\n\n点击选择文件\n支持 .pdf / .png / .jpg / .jpeg / .webp / .edi，单个不超过 20MB，最多 10 份\n目的国\n德国\n▾\n规则覆盖范围为演示配置，未经核实，不作为正式合规结论。\n备注（可选）\n请先处理以下问题\n格式不支持：INVOICE.txt。当前仅支持 .pdf,.png,.jpg,.jpeg,.webp,.edi 格式的单证。\n请至少选择一份文件\n开始检查\n清空\n尚未上传单证\n\n把同一票货物的发票、箱单、提单等单证拖到上方虚线框，选好目的国后点「开始检查」。支持 .pdf / .png / .jpg / .jpeg / .webp / .edi，单个不超过 20MB，最多 10 份。"
+  },
+  {
+    "test": "txt-rejected",
+    "name": "rejected TXT cannot submit",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "bad-utf8-preview",
+    "name": "bad UTF-8 produces explicit preview error",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "bad-utf8-preview",
+    "name": "bad UTF-8 download preserves original bytes",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "edi-only",
+    "name": "real terminal task status",
+    "passed": true,
+    "actual": "FAILED"
+  },
+  {
+    "test": "edi-only",
+    "name": "explicit unsupported file state",
+    "passed": true,
+    "actual": [
+      {
+        "file_id": "f1",
+        "file_name": "INVOICE.EDI",
+        "file_type": "OTHER",
+        "doc_type": null,
+        "process_status": "UNSUPPORTED",
+        "page_count": null,
+        "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+      }
+    ]
+  },
+  {
+    "test": "edi-only",
+    "name": "uppercase filename retained",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "edi-only",
+    "name": "EDI declared dependency and failure visible",
+    "passed": true,
+    "actual": "创建检查\n\n选择属于同一票货物的多份单证。系统将逐份抽取字段，再交叉比对它们之间是否一致。\n\n点击选择文件\n支持 .pdf / .png / .jpg / .jpeg / .webp / .edi，单个不超过 20MB，最多 10 份\nINVOICE.EDI\n1 KB\n移除\n查看原文\n下载原件\n目的国\n德国\n▾\n规则覆盖范围为演示配置，未经核实，不作为正式合规结论。\n备注（可选）\n已选择 EDI 报文\nEDI 解析依赖后端能力：若后端暂不支持，任务会如实标记为失败/不支持，不会当作通过。\n开始检查\n清空\n任务状态\n处理失败\n任务 tsk_20261012_0001_c833f05cd9d1\n耗时 0.0 秒\n创建于 2026-10-12 22:55:06\n上传文件\n等待创建任务…\n检查失败\n未产生任何比对结果。请检查文件格式后重试。\nINVOICE.EDI\n暂不支持该文件格式，当前仅支持 PDF 与图片\n查看原文\n下载原件\n格式不支持"
+  },
+  {
+    "test": "edi-only",
+    "name": "no false global approval",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "edi-only",
+    "name": "source actions retained after terminal failure",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "edi-only",
+    "name": "terminal file-status source download retains bytes",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "edi-only",
+    "name": "diff page displays failure",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "edi-only",
+    "name": "report preserves failure",
+    "passed": true,
+    "actual": "检查失败，无报告可出\n未产生任何比对结果。\n检查概要\n任务编号\ntsk_20261012_0001_c833f05cd9d1\n目的国\n德国\n创建时间\n2026-10-12 22:55:06\n耗时\n0.0 秒\n1\n文件\n0\n抽取字段\n0\n不一致\n0\n部分缺失\n0\n无法比对\n1\n风险提示\n文件清单\nINVOICE.EDI\n类型未识别\n暂不支持该文件格式，当前仅支持 PDF 与图片\n需要处理的条目 0\n未经规则校验的提示\n\n以下提示没有对应的规则编号，仅供参考，不作为合规结论。\n\n其他提示\n注意\n【演示规则·未经核实】有 1 份文件未能解析，无法确认是否缺少：原产地证明\n\n本票有 1 份文件未能解析（INVOICE.EDI）。未解析的文件可能正是所需的 原产地证明，因此**无法确认**这些单证是否已提供，不作「未提供」的结论。请先修复解析（配置多模态兜底或改用带文本层的 PDF），或人工核对原件后再判断合规性。（说明：本提示来自团队自拟的演示规则，来源与适用条件尚未核实，不得作为合规依据。）\n\n错误记录\nUNSUPPORTED_FILE_TYPE\nINVOICE.EDI 暂不支持：当前仅支持 PDF 与图片\nRULES_UNVERIFIED\n本票合规提示来自团队自拟的演示规则集，来源与适用条件尚未核实，不得作为合规依据。\nALL_DOCUMENTS_FAILED\n全部文件均未能处理成功，无法完成比对与合规校验\n报告导出尚未实现\n导出由哪个接口提供、采用何种格式尚未确认，因此本页暂不提供导出按钮。"
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "real terminal task status",
+    "passed": true,
+    "actual": "PARTIAL"
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "explicit unsupported file state",
+    "passed": true,
+    "actual": [
+      {
+        "file_id": "f1",
+        "file_name": "INVOICE.EDI",
+        "file_type": "OTHER",
+        "doc_type": null,
+        "process_status": "UNSUPPORTED",
+        "page_count": null,
+        "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+      },
+      {
+        "file_id": "f2",
+        "file_name": "synthetic-packing-list.pdf",
+        "file_type": "PDF",
+        "doc_type": "PACKING_LIST",
+        "process_status": "EXTRACTED",
+        "page_count": 1,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "uppercase filename retained",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "EDI declared dependency and failure visible",
+    "passed": true,
+    "actual": "创建检查\n\n选择属于同一票货物的多份单证。系统将逐份抽取字段，再交叉比对它们之间是否一致。\n\n点击选择文件\n支持 .pdf / .png / .jpg / .jpeg / .webp / .edi，单个不超过 20MB，最多 10 份\nINVOICE.EDI\n1 KB\n移除\n查看原文\n下载原件\nsynthetic-packing-list.pdf\n1 KB\n移除\n目的国\n德国\n▾\n规则覆盖范围为演示配置，未经核实，不作为正式合规结论。\n备注（可选）\n已选择 EDI 报文\nEDI 解析依赖后端能力：若后端暂不支持，任务会如实标记为失败/不支持，不会当作通过。\n开始检查\n清空\n任务状态\n部分完成\n任务 tsk_20261012_0002_044dca946209\n耗时 0.0 秒\n创建于 2026-10-12 22:55:09\n排队中\n解析文件中\n交叉比对中\n已生成结果\n上传文件\n等待创建任务…\n本次检查未包含全部文件\n1 份文件未能处理成功。以下比对结果缺少这些文件的数据，不代表它们一致。\nINVOICE.EDI\n暂不支持该文件格式，当前仅支持 PDF 与图片\n查看原文\n下载原件\n格式不支持\nsynthetic-packing-list.pdf\n已抽取\n查看比对结果\n\n差异页默认按「需关注」筛选，可切换查看全部比对。"
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "no false global approval",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "source actions retained after terminal failure",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "terminal file-status source download retains bytes",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "text PDF actually extracted",
+    "passed": true,
+    "actual": [
+      {
+        "file_id": "f1",
+        "file_name": "INVOICE.EDI",
+        "file_type": "OTHER",
+        "doc_type": null,
+        "process_status": "UNSUPPORTED",
+        "page_count": null,
+        "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+      },
+      {
+        "file_id": "f2",
+        "file_name": "synthetic-packing-list.pdf",
+        "file_type": "PDF",
+        "doc_type": "PACKING_LIST",
+        "process_status": "EXTRACTED",
+        "page_count": 1,
+        "error_message": null
+      }
+    ]
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "name": "partial warning visible",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "refresh",
+    "name": "no fake source reconstructed after refresh",
+    "passed": true,
+    "actual": null
+  },
+  {
+    "test": "refresh",
+    "name": "no page crash",
+    "passed": true,
+    "actual": []
+  }
+]

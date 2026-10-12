@@ -1,0 +1,44 @@
+[
+  {
+    "request": "1.json",
+    "filename": "INVOICE.EDI",
+    "size_bytes": 752,
+    "sha256": "3ad56cda9b7064a01a5e4ec9f4990620478c5e456afc9955b8dfc289545f4553",
+    "original_sha256": "3ad56cda9b7064a01a5e4ec9f4990620478c5e456afc9955b8dfc289545f4553",
+    "byte_identity": true
+  },
+  {
+    "request": "2.json",
+    "filename": "INVOICE.EDI",
+    "size_bytes": 752,
+    "sha256": "3ad56cda9b7064a01a5e4ec9f4990620478c5e456afc9955b8dfc289545f4553",
+    "original_sha256": "3ad56cda9b7064a01a5e4ec9f4990620478c5e456afc9955b8dfc289545f4553",
+    "byte_identity": true
+  },
+  {
+    "request": "2.json",
+    "filename": "synthetic-packing-list.pdf",
+    "size_bytes": 887,
+    "sha256": "a97f1480589ebd134052408b1048c39d88f94f8adf466fa78631a548dd7bdbc0",
+    "original_sha256": "a97f1480589ebd134052408b1048c39d88f94f8adf466fa78631a548dd7bdbc0",
+    "byte_identity": true
+  },
+  {
+    "task_id": "tsk_20261012_0001_c833f05cd9d1",
+    "filename": "INVOICE.EDI",
+    "server_saved_byte_identity": true,
+    "sha256": "3ad56cda9b7064a01a5e4ec9f4990620478c5e456afc9955b8dfc289545f4553"
+  },
+  {
+    "task_id": "tsk_20261012_0002_044dca946209",
+    "filename": "INVOICE.EDI",
+    "server_saved_byte_identity": true,
+    "sha256": "3ad56cda9b7064a01a5e4ec9f4990620478c5e456afc9955b8dfc289545f4553"
+  },
+  {
+    "task_id": "tsk_20261012_0002_044dca946209",
+    "filename": "synthetic-packing-list.pdf",
+    "server_saved_byte_identity": true,
+    "sha256": "a97f1480589ebd134052408b1048c39d88f94f8adf466fa78631a548dd7bdbc0"
+  }
+]

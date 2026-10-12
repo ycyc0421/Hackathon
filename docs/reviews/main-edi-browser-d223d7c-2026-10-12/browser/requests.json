@@ -1,0 +1,32 @@
+[
+  {
+    "test": "edi-only",
+    "url": "http://127.0.0.1:64894/api/v1/checks",
+    "method": "POST",
+    "headers": {
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "http://127.0.0.1:64894/?mock=0",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryyjqFw3HiisFEs244",
+      "sec-ch-ua-mobile": "?0"
+    },
+    "body_file": null,
+    "body_capture": "Chromium omitted multipart file body; see server audit"
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "url": "http://127.0.0.1:64894/api/v1/checks",
+    "method": "POST",
+    "headers": {
+      "sec-ch-ua-platform": "\"Windows\"",
+      "referer": "http://127.0.0.1:64894/?mock=0",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+      "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+      "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryFZo8bQGFWcqsjRIl",
+      "sec-ch-ua-mobile": "?0"
+    },
+    "body_file": null,
+    "body_capture": "Chromium omitted multipart file body; see server audit"
+  }
+]
