@@ -1,0 +1,1123 @@
+{
+  "commit": "6a526985162b90a6757fa5f447ac2e976623f64e",
+  "model_invoked": false,
+  "production_accessed": false,
+  "source_files_modified": false,
+  "controlled_inputs_are_diagnostic_only": true,
+  "probes": {
+    "pdf_empty_cell": {
+      "sha256": "0a418d0f2af01b6556893da9ab85531703b40644670df9fa8139b657544de181",
+      "original_text": "SYNTHETIC - NOT FOR TRADE\nCOMMERCIAL INVOICE\n Document No.: CI-00017\nDate: 2026-08-01\nShipment: SHP-00017 | PO: PO-661070-17\nSELLER / EXPORTER\nJuniper Distribution 0017 Co., Ltd.\n795 River Road, Suite 64\nShenzhen, Guangdong 518000, China\nEmail: orders0017@juniper.example\nTel: +86 755 2167483 | Jamie Taylor\nBUYER / IMPORTER\nVela Commerce 1017 GmbH\n379 Warehouse Street, Suite 49\nHamburg, Hamburg 20095, Germany\nEmail: orders1017@lumen.example\nTel: +49 40 1030873 | Mei Zhou\nINCOTERM\nFOB Shenzhen\nPAYMENT TERMS\nT/T 50% deposit, 50% before shipment\nPORT OF LOADING\nShenzhen, China\nDESTINATION\nHamburg, Germany\nSHIPPING MARK\nVELA / SHP-00017 / C.NO.1-5\nORIGIN\nChina\nVESSEL / FLIGHT\nMV Meridian / V502\nCURRENCY\nGBP\nNO.\nDESCRIPTION / SKU\nHS CODE\nQUANTITY\nUNIT PRICE\nAMOUNT\n1\nPaper hardcover notebook, assorted colors / SKU:\nSKU-0017-1\n200 PCS\n2.27\n454.00\nTOTAL AMOUNT (GBP): 454.00\nREFERENCES: CI CI-00017 | PI PI-00017 | PL PL-00017\nNOTES: Goods packed in corrugated cartons; no wooden packaging.\nAttached certificate references: COO-SHP-00017\nAuthorized Signature\nAll parties, addresses and contacts are fictional. HS codes are illustrative 6-digit candidates.\nLayout independently recreated from user-provided ExportDoc demonstration samples; not an issued document.\n",
+      "actual": {
+        "line_items": [],
+        "doc_text": "SYNTHETIC - NOT FOR TRADE\nCOMMERCIAL INVOICE\n Document No.: CI-00017\nDate: 2026-08-01\nShipment: SHP-00017 | PO: PO-661070-17\nSELLER / EXPORTER\nJuniper Distribution 0017 Co., Ltd.\n795 River Road, Suite 64\nShenzhen, Guangdong 518000, China\nEmail: orders0017@juniper.example\nTel: +86 755 2167483 | Jamie Taylor\nBUYER / IMPORTER\nVela Commerce 1017 GmbH\n379 Warehouse Street, Suite 49\nHamburg, Hamburg 20095, Germany\nEmail: orders1017@lumen.example\nTel: +49 40 1030873 | Mei Zhou\nINCOTERM\nFOB Shenzhen\nPAYMENT TERMS\nT/T 50% deposit, 50% before shipment\nPORT OF LOADING\nShenzhen, China\nDESTINATION\nHamburg, Germany\nSHIPPING MARK\nVELA / SHP-00017 / C.NO.1-5\nORIGIN\nChina\nVESSEL / FLIGHT\nMV Meridian / V502\nCURRENCY\nGBP\nNO.\nDESCRIPTION / SKU\nHS CODE\nQUANTITY\nUNIT PRICE\nAMOUNT\n1\nPaper hardcover notebook, assorted colors / SKU:\nSKU-0017-1\n200 PCS\n2.27\n454.00\nTOTAL AMOUNT (GBP): 454.00\nREFERENCES: CI CI-00017 | PI PI-00017 | PL PL-00017\nNOTES: Goods packed in corrugated cartons; no wooden packaging.\nAttached certificate references: COO-SHP-00017\nAuthorized Signature\nAll parties, addresses and contacts are fictional. HS codes are illustrative 6-digit candidates.\nLayout independently recreated from user-provided ExportDoc demonstration samples; not an issued document.\n",
+        "header_keys": [],
+        "has_table": false,
+        "suspected": true
+      },
+      "exact_rejection": [
+        {
+          "return_line": 340,
+          "header_keys": [
+            "description",
+            "hs_code",
+            "quantity",
+            "unit_price",
+            "amount"
+          ],
+          "position": 42,
+          "numeric_slice": [
+            "200 PCS",
+            "2.27",
+            "454.00",
+            "TOTAL AMOUNT (GBP): 454.00"
+          ],
+          "nearby_lines": [
+            "Paper hardcover notebook, assorted colors / SKU:",
+            "SKU-0017-1",
+            "200 PCS",
+            "2.27",
+            "454.00",
+            "TOTAL AMOUNT (GBP): 454.00",
+            "REFERENCES: CI CI-00017 | PI PI-00017 | PL PL-00017",
+            "NOTES: Goods packed in corrugated cartons; no wooden packaging."
+          ]
+        }
+      ]
+    },
+    "html_empty_cell_loss": {
+      "filled": {
+        "html": "<table><tr><td>NO.</td><td>SKU</td><td>DESCRIPTION</td><td>HS CODE</td><td>QTY</td><td>UNIT PRICE</td><td>AMOUNT</td></tr><tr><td>1</td><td>SKU-0017-1</td><td>Paper notebook</td><td>482010</td><td>200 PCS</td><td>2.27</td><td>454.00</td></tr></table>",
+        "adapter_lines": [
+          "NO.   SKU   DESCRIPTION   HS CODE   QTY   UNIT PRICE   AMOUNT",
+          "1   SKU-0017-1   Paper notebook   482010   200 PCS   2.27   454.00"
+        ],
+        "data_cells_after_split": [
+          "SKU-0017-1",
+          "Paper notebook",
+          "482010",
+          "200 PCS",
+          "2.27",
+          "454.00"
+        ],
+        "parsed": {
+          "line_items": [
+            {
+              "item_no": 1,
+              "raw_text": "1   SKU-0017-1   Paper notebook   482010   200 PCS   2.27   454.00",
+              "fields": [
+                {
+                  "field_key": "item_code",
+                  "label": "货号/型号",
+                  "raw_text": "1   SKU-0017-1   Paper notebook   482010   200 PCS   2.27   454.00",
+                  "raw_value": "SKU-0017-1",
+                  "normalized_value": "SKU-0017-1",
+                  "unit": null,
+                  "confidence": null,
+                  "status": "EXTRACTED",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "description",
+                  "label": "货物描述",
+                  "raw_text": "1   SKU-0017-1   Paper notebook   482010   200 PCS   2.27   454.00",
+                  "raw_value": "Paper notebook",
+                  "normalized_value": "纸 NOTEBOOK",
+                  "unit": null,
+                  "confidence": null,
+                  "status": "EXTRACTED",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "hs_code",
+                  "label": "HS 编码",
+                  "raw_text": "1   SKU-0017-1   Paper notebook   482010   200 PCS   2.27   454.00",
+                  "raw_value": "482010",
+                  "normalized_value": "482010",
+                  "unit": null,
+                  "confidence": null,
+                  "status": "EXTRACTED",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "quantity",
+                  "label": "数量",
+                  "raw_text": "1   SKU-0017-1   Paper notebook   482010   200 PCS   2.27   454.00",
+                  "raw_value": "200 PCS",
+                  "normalized_value": 200,
+                  "unit": "PCS",
+                  "confidence": null,
+                  "status": "EXTRACTED",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "packages",
+                  "label": "件数",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "NOT_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "net_weight",
+                  "label": "净重",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "NOT_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "gross_weight",
+                  "label": "毛重",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "NOT_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "volume",
+                  "label": "体积",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "NOT_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "unit_price",
+                  "label": "单价",
+                  "raw_text": "1   SKU-0017-1   Paper notebook   482010   200 PCS   2.27   454.00",
+                  "raw_value": "2.27",
+                  "normalized_value": 2.27,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "EXTRACTED",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "amount",
+                  "label": "行金额",
+                  "raw_text": "1   SKU-0017-1   Paper notebook   482010   200 PCS   2.27   454.00",
+                  "raw_value": "454.00",
+                  "normalized_value": 454,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "EXTRACTED",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                }
+              ]
+            }
+          ],
+          "doc_text": "TOTAL AMOUNT (GBP): 454.00",
+          "header_keys": [
+            "amount",
+            "description",
+            "hs_code",
+            "item_code",
+            "quantity",
+            "unit_price"
+          ],
+          "has_table": true,
+          "suspected": false
+        }
+      },
+      "empty": {
+        "html": "<table><tr><td>NO.</td><td>SKU</td><td>DESCRIPTION</td><td>HS CODE</td><td>QTY</td><td>UNIT PRICE</td><td>AMOUNT</td></tr><tr><td>1</td><td>SKU-0017-1</td><td>Paper notebook</td><td></td><td>200 PCS</td><td>2.27</td><td>454.00</td></tr></table>",
+        "adapter_lines": [
+          "NO.   SKU   DESCRIPTION   HS CODE   QTY   UNIT PRICE   AMOUNT",
+          "1   SKU-0017-1   Paper notebook      200 PCS   2.27   454.00"
+        ],
+        "data_cells_after_split": [
+          "SKU-0017-1",
+          "Paper notebook",
+          "200 PCS",
+          "2.27",
+          "454.00"
+        ],
+        "parsed": {
+          "line_items": [
+            {
+              "item_no": 1,
+              "raw_text": "1   SKU-0017-1   Paper notebook      200 PCS   2.27   454.00",
+              "fields": [
+                {
+                  "field_key": "item_code",
+                  "label": "货号/型号",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "MISSING_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "description",
+                  "label": "货物描述",
+                  "raw_text": "1   SKU-0017-1   Paper notebook      200 PCS   2.27   454.00",
+                  "raw_value": "SKU-0017-1   Paper notebook",
+                  "normalized_value": "SKU 0017 1 纸 NOTEBOOK",
+                  "unit": null,
+                  "confidence": null,
+                  "status": "LOW_CONFIDENCE",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "hs_code",
+                  "label": "HS 编码",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "MISSING_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "quantity",
+                  "label": "数量",
+                  "raw_text": "1   SKU-0017-1   Paper notebook      200 PCS   2.27   454.00",
+                  "raw_value": "200 PCS",
+                  "normalized_value": 200,
+                  "unit": "PCS",
+                  "confidence": null,
+                  "status": "LOW_CONFIDENCE",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "packages",
+                  "label": "件数",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "NOT_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "net_weight",
+                  "label": "净重",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "NOT_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "gross_weight",
+                  "label": "毛重",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "NOT_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "volume",
+                  "label": "体积",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "NOT_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "unit_price",
+                  "label": "单价",
+                  "raw_text": null,
+                  "raw_value": null,
+                  "normalized_value": null,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "MISSING_IN_DOC",
+                  "page": null,
+                  "bbox": null,
+                  "bbox_unit": null
+                },
+                {
+                  "field_key": "amount",
+                  "label": "行金额",
+                  "raw_text": "1   SKU-0017-1   Paper notebook      200 PCS   2.27   454.00",
+                  "raw_value": "454.00",
+                  "normalized_value": 454,
+                  "unit": null,
+                  "confidence": null,
+                  "status": "LOW_CONFIDENCE",
+                  "page": 1,
+                  "bbox": null,
+                  "bbox_unit": null
+                }
+              ]
+            }
+          ],
+          "doc_text": "TOTAL AMOUNT (GBP): 454.00",
+          "header_keys": [
+            "amount",
+            "description",
+            "hs_code",
+            "item_code",
+            "quantity",
+            "unit_price"
+          ],
+          "has_table": true,
+          "suspected": true
+        }
+      }
+    },
+    "party_reading_order": {
+      "variants": {
+        "grouped": {
+          "input_text": "SELLER / EXPORTER\nHarbor Industrial 0001 Co., Ltd.\nBUYER / IMPORTER\nAster Distribution 1001 Inc.",
+          "fields": {
+            "invoice_no": {
+              "field_key": "invoice_no",
+              "label": "发票号",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "MISSING_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            "consignee": {
+              "field_key": "consignee",
+              "label": "收货人",
+              "raw_text": "BUYER / IMPORTER\nAster Distribution 1001 Inc.",
+              "raw_value": "Aster Distribution 1001 Inc.",
+              "normalized_value": "ASTER DISTRIBUTION 1001 INC",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            "shipper": {
+              "field_key": "shipper",
+              "label": "发货人",
+              "raw_text": "SELLER / EXPORTER\nHarbor Industrial 0001 Co., Ltd.",
+              "raw_value": "Harbor Industrial 0001 Co., Ltd.",
+              "normalized_value": "HARBOR INDUSTRIAL 0001 CO., LTD",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null
+            }
+          }
+        },
+        "interleaved": {
+          "input_text": "SELLER / EXPORTER\nBUYER / IMPORTER\nHarbor Industrial 0001 Co., Ltd.\nAster Distribution 1001 Inc.",
+          "fields": {
+            "invoice_no": {
+              "field_key": "invoice_no",
+              "label": "发票号",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "MISSING_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            "consignee": {
+              "field_key": "consignee",
+              "label": "收货人",
+              "raw_text": "BUYER / IMPORTER\nHarbor Industrial 0001 Co., Ltd.",
+              "raw_value": "Harbor Industrial 0001 Co., Ltd.",
+              "normalized_value": "HARBOR INDUSTRIAL 0001 CO., LTD",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null
+            },
+            "shipper": {
+              "field_key": "shipper",
+              "label": "发货人",
+              "raw_text": "SELLER / EXPORTER\nBUYER / IMPORTER",
+              "raw_value": "BUYER / IMPORTER",
+              "normalized_value": "BUYER / IMPORTER",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null
+            }
+          }
+        }
+      },
+      "label_guard_rejects_buyer_label": false
+    },
+    "invoice_reference_and_classification": {
+      "sha256": "1b4b57059f109f869dcee5672fd46f5e243d25048aac0bbef4a2285e255310b7",
+      "reference_line": "REFERENCES: CI CI-00011 | PI PI-00011 | PL PL-00011",
+      "type_with_original_filename": "COMMERCIAL_INVOICE",
+      "type_with_neutral_filename": null,
+      "actual_fields": {
+        "invoice_no": {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": null,
+          "raw_value": null,
+          "normalized_value": null,
+          "unit": null,
+          "confidence": null,
+          "status": "MISSING_IN_DOC",
+          "page": null,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        "consignee": {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER\nCedar Supply 1011 Pty Ltd",
+          "raw_value": "Cedar Supply 1011 Pty Ltd",
+          "normalized_value": "CEDAR SUPPLY 1011 PTY LTD",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        "document_no": {
+          "field_key": "document_no",
+          "label": "本单据编号（不做跨单据相等比较）",
+          "raw_text": "Document No.: PI-00011",
+          "raw_value": "PI-00011",
+          "normalized_value": "PI-00011",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        "shipper": {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER\nOrion Commerce 0011 Co., Ltd.",
+          "raw_value": "Orion Commerce 0011 Co., Ltd.",
+          "normalized_value": "ORION COMMERCE 0011 CO., LTD",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      },
+      "fields_with_other_type": {
+        "document_no": {
+          "field_key": "document_no",
+          "label": "本单据编号（不做跨单据相等比较）",
+          "raw_text": "Document No.: PI-00011",
+          "raw_value": "PI-00011",
+          "normalized_value": "PI-00011",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        "shipper": {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER\nOrion Commerce 0011 Co., Ltd.",
+          "raw_value": "Orion Commerce 0011 Co., Ltd.",
+          "normalized_value": "ORION COMMERCE 0011 CO., LTD",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        "consignee": {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER\nCedar Supply 1011 Pty Ltd",
+          "raw_value": "Cedar Supply 1011 Pty Ltd",
+          "normalized_value": "CEDAR SUPPLY 1011 PTY LTD",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      },
+      "same_number_with_supported_label": {
+        "invoice_no": {
+          "field_key": "invoice_no",
+          "label": "发票号",
+          "raw_text": "INVOICE NO.: CI-00011",
+          "raw_value": "CI-00011",
+          "normalized_value": "CI-00011",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        "consignee": {
+          "field_key": "consignee",
+          "label": "收货人",
+          "raw_text": "BUYER / IMPORTER\nCedar Supply 1011 Pty Ltd",
+          "raw_value": "Cedar Supply 1011 Pty Ltd",
+          "normalized_value": "CEDAR SUPPLY 1011 PTY LTD",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        "document_no": {
+          "field_key": "document_no",
+          "label": "本单据编号（不做跨单据相等比较）",
+          "raw_text": "Document No.: PI-00011",
+          "raw_value": "PI-00011",
+          "normalized_value": "PI-00011",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        },
+        "shipper": {
+          "field_key": "shipper",
+          "label": "发货人",
+          "raw_text": "SELLER / EXPORTER\nOrion Commerce 0011 Co., Ltd.",
+          "raw_value": "Orion Commerce 0011 Co., Ltd.",
+          "normalized_value": "ORION COMMERCE 0011 CO., LTD",
+          "unit": null,
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null
+        }
+      }
+    },
+    "page_argument": {
+      "sha256": "c0ce75061ef79c0fc54f7026ffce5645776e2a45dc2f335f5c3f8e8009a90a8b",
+      "values_unchanged": true,
+      "pages_with_default_argument": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "pages_with_explicit_argument": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "description_lookup": {
+      "sku": "SKU-0001-1",
+      "structured_description": "Cotton terry bath towelassorted color/SKU SKU-0001-1",
+      "actual_next_line": "TOTAL AMOUNT (USD): 922.08",
+      "actual_uncertain_codes": [
+        "SKU-0001-1"
+      ],
+      "same_description_after_sku_uncertain_codes": [],
+      "total_after_sku_uncertain_codes": [
+        "SKU-0001-1"
+      ]
+    }
+  },
+  "source_map": {
+    "rows.py": {
+      "sha256_lf": "f6b6195a38dc17d1d36bbcbb0514156470e3249ebc6c8007547168061d599e7e",
+      "functions": {
+        "TableResult": {
+          "start": 74,
+          "end": 80
+        },
+        "_looks_like_header": {
+          "start": 86,
+          "end": 92
+        },
+        "_header_columns": {
+          "start": 95,
+          "end": 106
+        },
+        "split_table": {
+          "start": 109,
+          "end": 143
+        },
+        "_cells": {
+          "start": 149,
+          "end": 153
+        },
+        "_number_of": {
+          "start": 156,
+          "end": 160
+        },
+        "_assign_from_cells": {
+          "start": 163,
+          "end": 206
+        },
+        "_assign_from_text": {
+          "start": 209,
+          "end": 242
+        },
+        "_field": {
+          "start": 245,
+          "end": 259
+        },
+        "_row_fields": {
+          "start": 275,
+          "end": 299
+        },
+        "_stacked_table": {
+          "start": 305,
+          "end": 351
+        },
+        "parse_line_items": {
+          "start": 354,
+          "end": 435
+        },
+        "take": {
+          "start": 214,
+          "end": 218
+        }
+      }
+    },
+    "extract.py": {
+      "sha256_lf": "648fa7571ab00891792079ad577f3c6dbd9d7d09a5401a01752979c8d58effdd",
+      "functions": {
+        "Found": {
+          "start": 38,
+          "end": 45
+        },
+        "_line_of": {
+          "start": 51,
+          "end": 56
+        },
+        "_tail": {
+          "start": 59,
+          "end": 63
+        },
+        "_clip": {
+          "start": 66,
+          "end": 72
+        },
+        "_first_number": {
+          "start": 75,
+          "end": 79
+        },
+        "_has_unit": {
+          "start": 82,
+          "end": 83
+        },
+        "_next_nonempty_line": {
+          "start": 86,
+          "end": 93
+        },
+        "_measure_tail": {
+          "start": 119,
+          "end": 128
+        },
+        "_m_packages": {
+          "start": 131,
+          "end": 146
+        },
+        "_labeled_number": {
+          "start": 149,
+          "end": 168
+        },
+        "_m_gross_weight": {
+          "start": 171,
+          "end": 181
+        },
+        "_m_net_weight": {
+          "start": 184,
+          "end": 185
+        },
+        "_m_volume": {
+          "start": 188,
+          "end": 195
+        },
+        "_m_quantity": {
+          "start": 198,
+          "end": 209
+        },
+        "_m_hs_code": {
+          "start": 212,
+          "end": 221
+        },
+        "_m_total_amount": {
+          "start": 224,
+          "end": 256
+        },
+        "_m_currency": {
+          "start": 259,
+          "end": 266
+        },
+        "_m_description": {
+          "start": 282,
+          "end": 304
+        },
+        "_m_document_no": {
+          "start": 307,
+          "end": 309
+        },
+        "_m_invoice_no": {
+          "start": 312,
+          "end": 324
+        },
+        "_m_shipment_date": {
+          "start": 327,
+          "end": 336
+        },
+        "_m_bill_of_lading_no": {
+          "start": 339,
+          "end": 348
+        },
+        "_m_contract_no": {
+          "start": 351,
+          "end": 359
+        },
+        "_m_container_no": {
+          "start": 362,
+          "end": 366
+        },
+        "_m_shipper": {
+          "start": 369,
+          "end": 370
+        },
+        "_m_consignee": {
+          "start": 373,
+          "end": 374
+        },
+        "_m_port_of_loading": {
+          "start": 377,
+          "end": 384
+        },
+        "_m_port_of_discharge": {
+          "start": 387,
+          "end": 394
+        },
+        "_m_destination_country": {
+          "start": 397,
+          "end": 407
+        },
+        "_labeled_text": {
+          "start": 410,
+          "end": 420
+        },
+        "_norm_number": {
+          "start": 450,
+          "end": 451
+        },
+        "_norm_hs": {
+          "start": 454,
+          "end": 455
+        },
+        "_norm_currency": {
+          "start": 458,
+          "end": 459
+        },
+        "_norm_date": {
+          "start": 462,
+          "end": 463
+        },
+        "_norm_description": {
+          "start": 466,
+          "end": 467
+        },
+        "_norm_port": {
+          "start": 470,
+          "end": 471
+        },
+        "_norm_country": {
+          "start": 474,
+          "end": 475
+        },
+        "_norm_text": {
+          "start": 478,
+          "end": 479
+        },
+        "extract_fields": {
+          "start": 502,
+          "end": 610
+        },
+        "_normalized_of": {
+          "start": 613,
+          "end": 618
+        },
+        "_field": {
+          "start": 621,
+          "end": 645
+        }
+      }
+    },
+    "classify.py": {
+      "sha256_lf": "943556709f20006d2ea2739d50fd3100324257e08b6f83d793735a3b093c4bab",
+      "functions": {
+        "classify": {
+          "start": 35,
+          "end": 60
+        },
+        "has_reference": {
+          "start": 63,
+          "end": 64
+        }
+      }
+    },
+    "paddle_reader.py": {
+      "sha256_lf": "38ea0b731645cbd13bbb2a481bad8b6d963cdca4f4a234bac4f915d57e08704a",
+      "functions": {
+        "_TableParser": {
+          "start": 22,
+          "end": 91
+        },
+        "_table_lines": {
+          "start": 94,
+          "end": 127
+        },
+        "_header_key": {
+          "start": 130,
+          "end": 132
+        },
+        "_table_start": {
+          "start": 135,
+          "end": 150
+        },
+        "_replace_table": {
+          "start": 153,
+          "end": 158
+        },
+        "_sequential_packing_table": {
+          "start": 161,
+          "end": 191
+        },
+        "_correct_zero_confusion": {
+          "start": 194,
+          "end": 200
+        },
+        "_check_descriptions": {
+          "start": 203,
+          "end": 235
+        },
+        "_get_ocr": {
+          "start": 238,
+          "end": 244
+        },
+        "_get_structure": {
+          "start": 247,
+          "end": 253
+        },
+        "read_image": {
+          "start": 256,
+          "end": 258
+        },
+        "_recognize_image": {
+          "start": 261,
+          "end": 291
+        },
+        "__init__": {
+          "start": 23,
+          "end": 31
+        },
+        "handle_starttag": {
+          "start": 33,
+          "end": 48
+        },
+        "handle_data": {
+          "start": 50,
+          "end": 52
+        },
+        "handle_endtag": {
+          "start": 54,
+          "end": 91
+        },
+        "carried": {
+          "start": 60,
+          "end": 67
+        }
+      }
+    },
+    "runner.py": {
+      "sha256_lf": "2edafcc7e665152ad5b328b081f32d97a8afed86eb4987b391c7eb545b2ae333",
+      "functions": {
+        "_apply_ocr_corrections": {
+          "start": 31,
+          "end": 44
+        },
+        "run_check": {
+          "start": 47,
+          "end": 69
+        },
+        "_run": {
+          "start": 72,
+          "end": 360
+        },
+        "_currency_of": {
+          "start": 363,
+          "end": 370
+        },
+        "publish_documents": {
+          "start": 87,
+          "end": 95
+        }
+      }
+    },
+    "compare.py": {
+      "sha256_lf": "e8921eec96c4fead362a17dfe04e7976a904551abadb78d0aac584973760b092",
+      "functions": {
+        "_canonical": {
+          "start": 66,
+          "end": 69
+        },
+        "_tokens": {
+          "start": 72,
+          "end": 75
+        },
+        "_similarity": {
+          "start": 78,
+          "end": 82
+        },
+        "_has_digit": {
+          "start": 85,
+          "end": 86
+        },
+        "_agree_description": {
+          "start": 89,
+          "end": 111
+        },
+        "_agree": {
+          "start": 114,
+          "end": 129
+        },
+        "_currency_of": {
+          "start": 132,
+          "end": 135
+        },
+        "_agree_money": {
+          "start": 138,
+          "end": 167
+        },
+        "_severity_for_conflict": {
+          "start": 170,
+          "end": 172
+        },
+        "build_comparisons": {
+          "start": 175,
+          "end": 320
+        },
+        "_comparison_value": {
+          "start": 323,
+          "end": 332
+        },
+        "_lacking_note": {
+          "start": 335,
+          "end": 344
+        },
+        "_not_checked_note": {
+          "start": 347,
+          "end": 349
+        },
+        "build_item_comparisons": {
+          "start": 355,
+          "end": 527
+        },
+        "_rule_uncovered": {
+          "start": 530,
+          "end": 539
+        },
+        "rule_uncovered": {
+          "start": 188,
+          "end": 193
+        }
+      }
+    },
+    "rules.py": {
+      "sha256_lf": "a6562f7939b56b150b6514afcbe30da2e20b2ea9a5d401460d9d0c9d3e83e118",
+      "functions": {
+        "load_rules": {
+          "start": 49,
+          "end": 50
+        },
+        "ruleset_verified": {
+          "start": 53,
+          "end": 63
+        },
+        "rule_version": {
+          "start": 66,
+          "end": 67
+        },
+        "rule_source_text": {
+          "start": 70,
+          "end": 75
+        },
+        "_mark": {
+          "start": 78,
+          "end": 80
+        },
+        "_with_disclaimer": {
+          "start": 83,
+          "end": 84
+        },
+        "country_rules": {
+          "start": 87,
+          "end": 90
+        },
+        "match_hs_rule": {
+          "start": 93,
+          "end": 106
+        },
+        "hs_covered": {
+          "start": 109,
+          "end": 111
+        },
+        "evaluate_risks": {
+          "start": 114,
+          "end": 278
+        },
+        "add": {
+          "start": 134,
+          "end": 138
+        },
+        "hs_risk": {
+          "start": 209,
+          "end": 240
+        }
+      }
+    }
+  }
+}

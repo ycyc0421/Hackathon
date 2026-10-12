@@ -1,0 +1,288 @@
+{
+  "categories": {
+    "clean": 10,
+    "quantity_mismatch": 10,
+    "buyer_address_mismatch": 10,
+    "hs_mismatch": 10,
+    "amount_arithmetic_error": 10,
+    "gross_below_net": 10,
+    "missing_hs": 10,
+    "missing_certificate_fixture": 10,
+    "benign_format_variation": 10,
+    "multi_error": 10
+  },
+  "currencies_document_counts": {
+    "USD": 84,
+    "GBP": 126,
+    "EUR": 90
+  },
+  "items_per_task_counts": {
+    "1": 27,
+    "3": 34,
+    "4": 22,
+    "2": 17
+  },
+  "invoice_reference_false_missing_groups": 100,
+  "hs_empty_column_failed_groups": [
+    "SHP-00007",
+    "SHP-00017",
+    "SHP-00027",
+    "SHP-00037",
+    "SHP-00047",
+    "SHP-00057",
+    "SHP-00067",
+    "SHP-00077",
+    "SHP-00087",
+    "SHP-00097"
+  ],
+  "row_page_missing_groups": 100,
+  "row_page_missing_fields": 4631,
+  "gross_below_net_rows": [
+    {
+      "group": "SHP-00006",
+      "file_id": "f2",
+      "sku": "SKU-0006-1",
+      "net": 234,
+      "gross": 187.2,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00016",
+      "file_id": "f2",
+      "sku": "SKU-0016-1",
+      "net": 149.76,
+      "gross": 119.81,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00026",
+      "file_id": "f2",
+      "sku": "SKU-0026-1",
+      "net": 179.2,
+      "gross": 143.36,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00036",
+      "file_id": "f2",
+      "sku": "SKU-0036-1",
+      "net": 73.44,
+      "gross": 58.75,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00046",
+      "file_id": "f2",
+      "sku": "SKU-0046-1",
+      "net": 216,
+      "gross": 172.8,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00056",
+      "file_id": "f2",
+      "sku": "SKU-0056-1",
+      "net": 173.28,
+      "gross": 138.62,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00066",
+      "file_id": "f2",
+      "sku": "SKU-0066-1",
+      "net": 83.6,
+      "gross": 66.88,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00076",
+      "file_id": "f2",
+      "sku": "SKU-0076-1",
+      "net": 332.8,
+      "gross": 266.24,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00086",
+      "file_id": "f2",
+      "sku": "SKU-0086-1",
+      "net": 8.64,
+      "gross": 6.91,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    },
+    {
+      "group": "SHP-00096",
+      "file_id": "f2",
+      "sku": "SKU-0096-1",
+      "net": 30.24,
+      "gross": 24.19,
+      "task_status": "COMPLETED",
+      "conflicts": 0,
+      "specific_warning_found": false
+    }
+  ],
+  "address_gap_groups": [
+    {
+      "group": "SHP-00003",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00010",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00013",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00020",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00023",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00030",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00033",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00040",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00043",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00050",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00053",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00060",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00063",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00070",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00073",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00080",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00083",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00090",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    },
+    {
+      "group": "SHP-00093",
+      "category": "buyer_address_mismatch",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 0
+    },
+    {
+      "group": "SHP-00100",
+      "category": "multi_error",
+      "address_field_present": false,
+      "address_comparison_present": false,
+      "conflicts": 1
+    }
+  ],
+  "quantity_conflict_groups": 20,
+  "hs_conflict_groups": 10,
+  "amount_conflict_groups": 10,
+  "clean_or_benign_false_numeric_conflicts": []
+}

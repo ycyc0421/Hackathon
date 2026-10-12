@@ -1,0 +1,101 @@
+{
+  "commit": "6a526985162b90a6757fa5f447ac2e976623f64e",
+  "mode": "local HTTP TestClient plus real pipeline and isolated SQLite",
+  "ocr_enabled": false,
+  "external_llm_enabled": false,
+  "input_kind": "digital",
+  "groups": 100,
+  "documents": 300,
+  "task_statuses": {
+    "COMPLETED": 90,
+    "PARTIAL": 10
+  },
+  "field_checks": 5806,
+  "failed_field_checks": 105,
+  "groups_with_failed_field_checks": [
+    "SHP-00007",
+    "SHP-00017",
+    "SHP-00027",
+    "SHP-00037",
+    "SHP-00047",
+    "SHP-00057",
+    "SHP-00067",
+    "SHP-00077",
+    "SHP-00087",
+    "SHP-00097"
+  ],
+  "row_count_mismatches": [
+    {
+      "group": "SHP-00007",
+      "file": "commercial_invoice.pdf",
+      "expected": 4,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00017",
+      "file": "commercial_invoice.pdf",
+      "expected": 1,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00027",
+      "file": "commercial_invoice.pdf",
+      "expected": 1,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00037",
+      "file": "commercial_invoice.pdf",
+      "expected": 1,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00047",
+      "file": "commercial_invoice.pdf",
+      "expected": 2,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00057",
+      "file": "commercial_invoice.pdf",
+      "expected": 3,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00067",
+      "file": "commercial_invoice.pdf",
+      "expected": 1,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00077",
+      "file": "commercial_invoice.pdf",
+      "expected": 3,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00087",
+      "file": "commercial_invoice.pdf",
+      "expected": 3,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    },
+    {
+      "group": "SHP-00097",
+      "file": "commercial_invoice.pdf",
+      "expected": 4,
+      "actual": 0,
+      "process_status": "EXTRACTED"
+    }
+  ],
+  "single_page_row_fields_missing_page": 4631,
+  "note": "Synthetic one-template regression; gold is generated expectation, not a model output or legal truth. Certificate TEST_ONLY rule is not loaded."
+}

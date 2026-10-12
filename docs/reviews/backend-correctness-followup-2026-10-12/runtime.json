@@ -1,0 +1,21 @@
+{
+  "python": "3.13.12",
+  "platform": "Windows",
+  "platform_release": "11",
+  "backend_commit": "6a526985162b90a6757fa5f447ac2e976623f64e",
+  "original_archive_sha256": "cae50c038ceb4b220731a9b176c2507858d3165d32891d877f8da4a3a04d0138",
+  "dependencies": {
+    "fastapi": "0.143.0",
+    "pydantic": "2.14.1",
+    "httpx": "0.28.1",
+    "pypdf": "6.20.0",
+    "paddleocr": "3.7.0",
+    "paddlepaddle": "3.3.1",
+    "paddlex": "3.7.2"
+  },
+  "digital_mode": "unmodified candidate backend, TestClient HTTP, isolated SQLite, no OCR or external LLM",
+  "scan_default": "3 files failed at Windows oneDNN runtime",
+  "scan_diagnostic": "same adapter and extraction code; constructors override enable_mkldnn=False; raw outputs traced",
+  "scan_cold_attempt": "300-second application wait expired during cold model downloads/initialization; no terminal acceptance result counted",
+  "scope": "system correctness only; one synthetic template; no production changes, no legal-rule assessment"
+}

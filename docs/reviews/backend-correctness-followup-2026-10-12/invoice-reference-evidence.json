@@ -1,0 +1,3902 @@
+[
+  {
+    "group": "SHP-00001",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00001",
+            "normalized_value": "CI-00001",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00002",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00002",
+            "normalized_value": "CI-00002",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00003",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00003",
+            "normalized_value": "CI-00003",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00004",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00004",
+            "normalized_value": "CI-00004",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00005",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00005",
+            "normalized_value": "CI-00005",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00006",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00006",
+            "normalized_value": "CI-00006",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00007",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00007",
+            "normalized_value": "CI-00007",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00008",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00008",
+            "normalized_value": "CI-00008",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00009",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00009",
+            "normalized_value": "CI-00009",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00010",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00010",
+            "normalized_value": "CI-00010",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00011",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00011",
+            "normalized_value": "CI-00011",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00012",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00012",
+            "normalized_value": "CI-00012",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00013",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00013",
+            "normalized_value": "CI-00013",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00014",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00014",
+            "normalized_value": "CI-00014",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00015",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00015",
+            "normalized_value": "CI-00015",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00016",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00016",
+            "normalized_value": "CI-00016",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00017",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00017",
+            "normalized_value": "CI-00017",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00018",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00018",
+            "normalized_value": "CI-00018",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00019",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00019",
+            "normalized_value": "CI-00019",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00020",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00020",
+            "normalized_value": "CI-00020",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00021",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00021",
+            "normalized_value": "CI-00021",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00022",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00022",
+            "normalized_value": "CI-00022",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00023",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00023",
+            "normalized_value": "CI-00023",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00024",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00024",
+            "normalized_value": "CI-00024",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00025",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00025",
+            "normalized_value": "CI-00025",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00026",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00026",
+            "normalized_value": "CI-00026",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00027",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00027",
+            "normalized_value": "CI-00027",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00028",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00028",
+            "normalized_value": "CI-00028",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00029",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00029",
+            "normalized_value": "CI-00029",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00030",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00030",
+            "normalized_value": "CI-00030",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00031",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00031",
+            "normalized_value": "CI-00031",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00032",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00032",
+            "normalized_value": "CI-00032",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00033",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00033",
+            "normalized_value": "CI-00033",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00034",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00034",
+            "normalized_value": "CI-00034",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00035",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00035",
+            "normalized_value": "CI-00035",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00036",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00036",
+            "normalized_value": "CI-00036",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00037",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00037",
+            "normalized_value": "CI-00037",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00038",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00038",
+            "normalized_value": "CI-00038",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00039",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00039",
+            "normalized_value": "CI-00039",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00040",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00040",
+            "normalized_value": "CI-00040",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00041",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00041",
+            "normalized_value": "CI-00041",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00042",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00042",
+            "normalized_value": "CI-00042",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00043",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00043",
+            "normalized_value": "CI-00043",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00044",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00044",
+            "normalized_value": "CI-00044",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00045",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00045",
+            "normalized_value": "CI-00045",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00046",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00046",
+            "normalized_value": "CI-00046",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00047",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00047",
+            "normalized_value": "CI-00047",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00048",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00048",
+            "normalized_value": "CI-00048",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00049",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00049",
+            "normalized_value": "CI-00049",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00050",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00050",
+            "normalized_value": "CI-00050",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00051",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00051",
+            "normalized_value": "CI-00051",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00052",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00052",
+            "normalized_value": "CI-00052",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00053",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00053",
+            "normalized_value": "CI-00053",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00054",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00054",
+            "normalized_value": "CI-00054",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00055",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00055",
+            "normalized_value": "CI-00055",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00056",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00056",
+            "normalized_value": "CI-00056",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00057",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00057",
+            "normalized_value": "CI-00057",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00058",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00058",
+            "normalized_value": "CI-00058",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00059",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00059",
+            "normalized_value": "CI-00059",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00060",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00060",
+            "normalized_value": "CI-00060",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00061",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00061",
+            "normalized_value": "CI-00061",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00062",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00062",
+            "normalized_value": "CI-00062",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00063",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00063",
+            "normalized_value": "CI-00063",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00064",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00064",
+            "normalized_value": "CI-00064",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00065",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00065",
+            "normalized_value": "CI-00065",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00066",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00066",
+            "normalized_value": "CI-00066",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00067",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00067",
+            "normalized_value": "CI-00067",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00068",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00068",
+            "normalized_value": "CI-00068",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00069",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00069",
+            "normalized_value": "CI-00069",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00070",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00070",
+            "normalized_value": "CI-00070",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00071",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00071",
+            "normalized_value": "CI-00071",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00072",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00072",
+            "normalized_value": "CI-00072",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00073",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00073",
+            "normalized_value": "CI-00073",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00074",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00074",
+            "normalized_value": "CI-00074",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00075",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00075",
+            "normalized_value": "CI-00075",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00076",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00076",
+            "normalized_value": "CI-00076",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00077",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00077",
+            "normalized_value": "CI-00077",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00078",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00078",
+            "normalized_value": "CI-00078",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00079",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00079",
+            "normalized_value": "CI-00079",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00080",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00080",
+            "normalized_value": "CI-00080",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00081",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00081",
+            "normalized_value": "CI-00081",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00082",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00082",
+            "normalized_value": "CI-00082",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00083",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00083",
+            "normalized_value": "CI-00083",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00084",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00084",
+            "normalized_value": "CI-00084",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00085",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00085",
+            "normalized_value": "CI-00085",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00086",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00086",
+            "normalized_value": "CI-00086",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00087",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00087",
+            "normalized_value": "CI-00087",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00088",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00088",
+            "normalized_value": "CI-00088",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00089",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00089",
+            "normalized_value": "CI-00089",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00090",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00090",
+            "normalized_value": "CI-00090",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00091",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00091",
+            "normalized_value": "CI-00091",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00092",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00092",
+            "normalized_value": "CI-00092",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00093",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00093",
+            "normalized_value": "CI-00093",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00094",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00094",
+            "normalized_value": "CI-00094",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00095",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00095",
+            "normalized_value": "CI-00095",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00096",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00096",
+            "normalized_value": "CI-00096",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00097",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00097",
+            "normalized_value": "CI-00097",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00098",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00098",
+            "normalized_value": "CI-00098",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00099",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00099",
+            "normalized_value": "CI-00099",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  },
+  {
+    "group": "SHP-00100",
+    "comparisons": [
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00100",
+            "normalized_value": "CI-00100",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      }
+    ]
+  }
+]

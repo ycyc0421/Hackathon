@@ -1,0 +1,53 @@
+SYNTHETIC - NOT FOR TRADE
+COMMERCIAL INVOICE
+Document No.: CI-00001
+Date: 2026-06-06
+Shipment: SHP-00001 | PO: PO-369981-1
+SELLER / EXPORTER
+BUYER / IMPORTER
+Harbor Industrial 0001 Co., Ltd.
+Aster Distribution 1001 Inc.
+358 River Road, Suite 8
+234 Union Street, Suite 68
+Shanghai, Shanghai 200000, China
+Seattle, WA 98101, United States
+Email: orders0001@harbor.example
+Email: orders1001@atlas.example
+Tel: +86 21 9052001 | Alex Morgan
+Tel: +1 206 1441590 | Sam Chen
+INCOTERM
+FOB Shanghai
+PAYMENT TERMS
+T/T 100% before shipment
+PORT OF LOADING
+Shanghai, China
+DESTINATION
+Seattle, United States
+SHIPPING MARK
+ASTER / SHP-00001 / C.NO.1-17
+ORIGIN
+China
+VESSEL / FLIGHT
+MV Meridian / V890
+CURRENCY
+USD
+NO.
+DESCRIPTION / SKU
+HS CODE
+QUANTITY
+UNIT PRICE
+AMOUNT
+1
+Cotton terry bath towel, assorted colors / SKU:
+630260
+204 PCS
+4.52
+922.08
+SKU-0001-1
+TOTAL AMOUNT (USD): 922.08
+REFERENCES: CI CI-00001 | PI PI-00001 | PL PL-00001
+NOTES: Goods packed in corrugated cartons; no wooden packaging.
+Attached certificate references: COO-SHP-00001
+Authorized Signature
+All parties, addresses and contacts are fictional. HS codes are illustrative 6-digit candidates.
+Layout independently recreated from user-provided ExportDoc demonstration samples; not an issued document.

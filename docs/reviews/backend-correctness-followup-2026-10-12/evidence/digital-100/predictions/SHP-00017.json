@@ -1,0 +1,3594 @@
+{
+  "group": "SHP-00017",
+  "kind": "digital",
+  "category": "missing_hs",
+  "seconds": 0.136,
+  "request": {
+    "destination_country": "DE",
+    "destination_country_name": "Germany"
+  },
+  "originals": [
+    {
+      "name": "commercial_invoice.pdf",
+      "source_path": "backend/samples/SHP-00017/commercial_invoice.pdf",
+      "sha256": "0a418d0f2af01b6556893da9ab85531703b40644670df9fa8139b657544de181",
+      "fixture_path": "docs/fixtures/raw/f_ci_00017.json",
+      "document_id": "f_ci_00017"
+    },
+    {
+      "name": "packing_list.pdf",
+      "source_path": "backend/samples/SHP-00017/packing_list.pdf",
+      "sha256": "3e232d4c92ae13ff7a49098ea3988da4faf498f6ade80cec55f75d0ce232f0a0",
+      "fixture_path": "docs/fixtures/raw/f_pl_00017.json",
+      "document_id": "f_pl_00017"
+    },
+    {
+      "name": "proforma_invoice.pdf",
+      "source_path": "backend/samples/SHP-00017/proforma_invoice.pdf",
+      "sha256": "f4939e8fbe2d314115b55c580aa4d3ce7d8f5058d547d4e3216814bd5b591123",
+      "fixture_path": "docs/fixtures/raw/f_pi_00017.json",
+      "document_id": "f_pi_00017"
+    }
+  ],
+  "api_task": {
+    "task_id": "tsk_20261012_0017_676dd6f7eab0",
+    "status": "PARTIAL",
+    "created_at": "2026-10-12T16:38:09+08:00",
+    "finished_at": "2026-10-12T16:38:09+08:00",
+    "input": {
+      "destination_country": "DE",
+      "destination_country_name": "Germany",
+      "trade_mode": null,
+      "declared_currency": null,
+      "notes": null
+    },
+    "documents": [
+      {
+        "file_id": "f1",
+        "file_name": "commercial_invoice.pdf",
+        "file_type": "PDF",
+        "doc_type": "COMMERCIAL_INVOICE",
+        "process_status": "EXTRACTED",
+        "page_count": 1,
+        "error_message": null
+      },
+      {
+        "file_id": "f2",
+        "file_name": "packing_list.pdf",
+        "file_type": "PDF",
+        "doc_type": "PACKING_LIST",
+        "process_status": "EXTRACTED",
+        "page_count": 1,
+        "error_message": null
+      },
+      {
+        "file_id": "f3",
+        "file_name": "proforma_invoice.pdf",
+        "file_type": "PDF",
+        "doc_type": "COMMERCIAL_INVOICE",
+        "process_status": "EXTRACTED",
+        "page_count": 1,
+        "error_message": null
+      }
+    ],
+    "extractions": [
+      {
+        "file_id": "f1",
+        "doc_type": "COMMERCIAL_INVOICE",
+        "parse_method": "TEXT_LAYER",
+        "fields": [
+          {
+            "field_key": "packages",
+            "label": "件数",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "CARTON",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "gross_weight",
+            "label": "毛重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "net_weight",
+            "label": "净重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "volume",
+            "label": "体积",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "CBM",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "quantity",
+            "label": "数量",
+            "raw_text": "QUANTITY",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "PCS",
+            "confidence": null,
+            "status": "UNRECOGNIZED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "hs_code",
+            "label": "HS 编码",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "total_amount",
+            "label": "总金额",
+            "raw_text": "TOTAL AMOUNT (GBP): 454.00",
+            "raw_value": "GBP 454.00",
+            "normalized_value": 454,
+            "unit": "GBP",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "currency",
+            "label": "币种",
+            "raw_text": "GBP",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "description",
+            "label": "货物描述",
+            "raw_text": "DESCRIPTION / SKU",
+            "raw_value": "/ SKU",
+            "normalized_value": "SKU",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "invoice_no",
+            "label": "发票号",
+            "raw_text": "Document No.: CI-00017",
+            "raw_value": "CI-00017",
+            "normalized_value": "CI-00017",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "shipment_date",
+            "label": "装运日期",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "consignee",
+            "label": "收货人",
+            "raw_text": "BUYER / IMPORTER\nVela Commerce 1017 GmbH",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "destination_country",
+            "label": "目的国",
+            "raw_text": "DESTINATION\nHamburg, Germany",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "document_no",
+            "label": "本单据编号（不做跨单据相等比较）",
+            "raw_text": "Document No.: CI-00017",
+            "raw_value": "CI-00017",
+            "normalized_value": "CI-00017",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "port_of_loading",
+            "label": "起运港",
+            "raw_text": "PORT OF LOADING\nShenzhen, China",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "shipper",
+            "label": "发货人",
+            "raw_text": "SELLER / EXPORTER\nJuniper Distribution 0017 Co., Ltd.",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          }
+        ]
+      },
+      {
+        "file_id": "f2",
+        "doc_type": "PACKING_LIST",
+        "parse_method": "TEXT_LAYER",
+        "fields": [
+          {
+            "field_key": "packages",
+            "label": "件数",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "5 CARTONS",
+            "normalized_value": 5,
+            "unit": "CARTON",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "gross_weight",
+            "label": "毛重",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "69.13 KG",
+            "normalized_value": 69.13,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "net_weight",
+            "label": "净重",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "64.00 KG",
+            "normalized_value": 64,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "volume",
+            "label": "体积",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "0.128 CBM",
+            "normalized_value": 0.128,
+            "unit": "CBM",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "quantity",
+            "label": "数量",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "unit": "PCS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "hs_code",
+            "label": "HS 编码",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "total_amount",
+            "label": "总金额",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "currency",
+            "label": "币种",
+            "raw_text": "GBP",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "description",
+            "label": "货物描述",
+            "raw_text": "本单证为多品名，该项按品名行给出（见 line_items[]），票级不适用。",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "invoice_no",
+            "label": "发票号",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "shipment_date",
+            "label": "装运日期",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "consignee",
+            "label": "收货人",
+            "raw_text": "BUYER / IMPORTER\nVela Commerce 1017 GmbH",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "destination_country",
+            "label": "目的国",
+            "raw_text": "DESTINATION\nHamburg, Germany",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "document_no",
+            "label": "本单据编号（不做跨单据相等比较）",
+            "raw_text": "Document No.: PL-00017",
+            "raw_value": "PL-00017",
+            "normalized_value": "PL-00017",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "port_of_loading",
+            "label": "起运港",
+            "raw_text": "PORT OF LOADING\nShenzhen, China",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "shipper",
+            "label": "发货人",
+            "raw_text": "SELLER / EXPORTER\nJuniper Distribution 0017 Co., Ltd.",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "item_code",
+            "label": "货号/型号",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+            "raw_value": "SKU-0017-1",
+            "normalized_value": "SKU-0017-1",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "description",
+            "label": "货物描述",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+            "raw_value": "Paper hardcover notebook, assorted colors / SKU: SKU-0017-1",
+            "normalized_value": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "hs_code",
+            "label": "HS 编码",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "quantity",
+            "label": "数量",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "unit": "PCS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "packages",
+            "label": "件数",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+            "raw_value": "5",
+            "normalized_value": 5,
+            "unit": "CARTON",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "net_weight",
+            "label": "净重",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+            "raw_value": "64.00 KG",
+            "normalized_value": 64,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "gross_weight",
+            "label": "毛重",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+            "raw_value": "69.13 KG",
+            "normalized_value": 69.13,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "volume",
+            "label": "体积",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+            "raw_value": "0.128 CBM",
+            "normalized_value": 0.128,
+            "unit": "CBM",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "unit_price",
+            "label": "单价",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "amount",
+            "label": "行金额",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          }
+        ]
+      },
+      {
+        "file_id": "f3",
+        "doc_type": "COMMERCIAL_INVOICE",
+        "parse_method": "TEXT_LAYER",
+        "fields": [
+          {
+            "field_key": "packages",
+            "label": "件数",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "CARTON",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "gross_weight",
+            "label": "毛重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "net_weight",
+            "label": "净重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "volume",
+            "label": "体积",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "CBM",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "quantity",
+            "label": "数量",
+            "raw_text": "本单证为多品名，该项按品名行给出（见 line_items[]），票级不适用。",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "PCS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "hs_code",
+            "label": "HS 编码",
+            "raw_text": "本单证为多品名，该项按品名行给出（见 line_items[]），票级不适用。",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "total_amount",
+            "label": "总金额",
+            "raw_text": "TOTAL AMOUNT (GBP): 454.00",
+            "raw_value": "GBP 454.00",
+            "normalized_value": 454,
+            "unit": "GBP",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "currency",
+            "label": "币种",
+            "raw_text": "GBP",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "description",
+            "label": "货物描述",
+            "raw_text": "本单证为多品名，该项按品名行给出（见 line_items[]），票级不适用。",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "invoice_no",
+            "label": "发票号",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "shipment_date",
+            "label": "装运日期",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "consignee",
+            "label": "收货人",
+            "raw_text": "BUYER / IMPORTER\nVela Commerce 1017 GmbH",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "destination_country",
+            "label": "目的国",
+            "raw_text": "DESTINATION\nHamburg, Germany",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "document_no",
+            "label": "本单据编号（不做跨单据相等比较）",
+            "raw_text": "Document No.: PI-00017",
+            "raw_value": "PI-00017",
+            "normalized_value": "PI-00017",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "port_of_loading",
+            "label": "起运港",
+            "raw_text": "PORT OF LOADING\nShenzhen, China",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "shipper",
+            "label": "发货人",
+            "raw_text": "SELLER / EXPORTER\nJuniper Distribution 0017 Co., Ltd.",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": null
+          },
+          {
+            "field_key": "item_code",
+            "label": "货号/型号",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+            "raw_value": "SKU-0017-1",
+            "normalized_value": "SKU-0017-1",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "description",
+            "label": "货物描述",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+            "raw_value": "Paper hardcover notebook, assorted colors / SKU: SKU-0017-1",
+            "normalized_value": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "hs_code",
+            "label": "HS 编码",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+            "raw_value": "482010",
+            "normalized_value": "482010",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "quantity",
+            "label": "数量",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "unit": "PCS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "packages",
+            "label": "件数",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "net_weight",
+            "label": "净重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "gross_weight",
+            "label": "毛重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "volume",
+            "label": "体积",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "unit_price",
+            "label": "单价",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+            "raw_value": "2.27",
+            "normalized_value": 2.27,
+            "unit": "GBP",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          },
+          {
+            "field_key": "amount",
+            "label": "行金额",
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+            "raw_value": "454.00",
+            "normalized_value": 454,
+            "unit": "GBP",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null,
+            "item_id": "item_1",
+            "line_no": 1
+          }
+        ]
+      }
+    ],
+    "items": [
+      {
+        "item_id": "item_1",
+        "display_name": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1"
+      }
+    ],
+    "comparisons": [
+      {
+        "comparison_id": "cmp_1",
+        "item_id": null,
+        "field_key": "packages",
+        "label": "件数",
+        "value_type": "NUMBER",
+        "unit": "CARTON",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "5 CARTONS",
+            "normalized_value": 5,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_2",
+        "item_id": null,
+        "field_key": "gross_weight",
+        "label": "毛重",
+        "value_type": "NUMBER",
+        "unit": "KGS",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "69.13 KG",
+            "normalized_value": 69.13,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_3",
+        "item_id": null,
+        "field_key": "net_weight",
+        "label": "净重",
+        "value_type": "NUMBER",
+        "unit": "KGS",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "64.00 KG",
+            "normalized_value": 64,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_4",
+        "item_id": null,
+        "field_key": "volume",
+        "label": "体积",
+        "value_type": "NUMBER",
+        "unit": "CBM",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "0.128 CBM",
+            "normalized_value": 0.128,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_5",
+        "item_id": null,
+        "field_key": "quantity",
+        "label": "数量",
+        "value_type": "NUMBER",
+        "unit": "PCS",
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "commercial_invoice.pdf（定位到了但读不出值），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "UNRECOGNIZED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      },
+      {
+        "comparison_id": "cmp_6",
+        "item_id": null,
+        "field_key": "total_amount",
+        "label": "总金额",
+        "value_type": "MONEY",
+        "unit": "GBP",
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "GBP 454.00",
+            "normalized_value": 454,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "GBP 454.00",
+            "normalized_value": 454,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_7",
+        "item_id": null,
+        "field_key": "currency",
+        "label": "币种",
+        "value_type": "CODE",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_8",
+        "item_id": null,
+        "field_key": "description",
+        "label": "货物描述",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 commercial_invoice.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "/ SKU",
+            "normalized_value": "SKU",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_9",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00017",
+            "normalized_value": "CI-00017",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": "请检查原件是否填写该字段，或人工补充核验。"
+      },
+      {
+        "comparison_id": "cmp_10",
+        "item_id": null,
+        "field_key": "consignee",
+        "label": "收货人",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_11",
+        "item_id": null,
+        "field_key": "destination_country",
+        "label": "目的国",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_12",
+        "item_id": null,
+        "field_key": "port_of_loading",
+        "label": "起运港",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_13",
+        "item_id": null,
+        "field_key": "shipper",
+        "label": "发货人",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_14",
+        "item_id": "item_1",
+        "field_key": "item_code",
+        "label": "货号/型号",
+        "value_type": "CODE",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "SKU-0017-1",
+            "normalized_value": "SKU-0017-1",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "SKU-0017-1",
+            "normalized_value": "SKU-0017-1",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_15",
+        "item_id": "item_1",
+        "field_key": "description",
+        "label": "货物描述",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Paper hardcover notebook, assorted colors / SKU: SKU-0017-1",
+            "normalized_value": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Paper hardcover notebook, assorted colors / SKU: SKU-0017-1",
+            "normalized_value": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_16",
+        "item_id": "item_1",
+        "field_key": "hs_code",
+        "label": "HS 编码",
+        "value_type": "CODE",
+        "unit": null,
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 proforma_invoice.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "482010",
+            "normalized_value": "482010",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_17",
+        "item_id": "item_1",
+        "field_key": "quantity",
+        "label": "数量",
+        "value_type": "NUMBER",
+        "unit": "PCS",
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_18",
+        "item_id": "item_1",
+        "field_key": "packages",
+        "label": "件数",
+        "value_type": "NUMBER",
+        "unit": "CARTON",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "5",
+            "normalized_value": 5,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_19",
+        "item_id": "item_1",
+        "field_key": "net_weight",
+        "label": "净重",
+        "value_type": "NUMBER",
+        "unit": "KGS",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "64.00 KG",
+            "normalized_value": 64,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_20",
+        "item_id": "item_1",
+        "field_key": "gross_weight",
+        "label": "毛重",
+        "value_type": "NUMBER",
+        "unit": "KGS",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "69.13 KG",
+            "normalized_value": 69.13,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_21",
+        "item_id": "item_1",
+        "field_key": "volume",
+        "label": "体积",
+        "value_type": "NUMBER",
+        "unit": "CBM",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "0.128 CBM",
+            "normalized_value": 0.128,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_22",
+        "item_id": "item_1",
+        "field_key": "unit_price",
+        "label": "单价",
+        "value_type": "MONEY",
+        "unit": null,
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 proforma_invoice.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "2.27",
+            "normalized_value": 2.27,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      },
+      {
+        "comparison_id": "cmp_23",
+        "item_id": "item_1",
+        "field_key": "amount",
+        "label": "行金额",
+        "value_type": "MONEY",
+        "unit": null,
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 proforma_invoice.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "454.00",
+            "normalized_value": 454,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ],
+        "suggested_action": null
+      }
+    ],
+    "risks": [
+      {
+        "risk_id": "rsk_1",
+        "type": "HS_CLASSIFICATION",
+        "severity": "WARNING",
+        "title": "HS 编码 482010 未经规则校验（品名：纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1）",
+        "detail": "该编码来自 proforma_invoice.pdf 第 1 行，当前规则集未覆盖Germany该类商品的归类校验，无法判断是否存在归类风险。",
+        "related_field_keys": [
+          "hs_code"
+        ],
+        "related_file_ids": [
+          "f3"
+        ],
+        "destination_country": "DE",
+        "rule_id": null,
+        "rule_source": "static-source-candidates-v3（团队自拟的演示规则，来源与适用条件未经核实）",
+        "suggested_action": null
+      }
+    ],
+    "summary": {
+      "document_count": 3,
+      "field_count": 68,
+      "conflict_count": 0,
+      "missing_count": 2,
+      "risk_count": 1,
+      "unrecognized_count": 0
+    },
+    "errors": [
+      {
+        "code": "MULTI_LINE_ITEMS_SUSPECTED",
+        "message": "commercial_invoice.pdf 里检测到品名明细表，但未能可靠解析出全部品名行，该文件的品名级比对未完成，请人工核对表格区域。",
+        "level": "WARNING",
+        "file_ids": [
+          "f1"
+        ]
+      },
+      {
+        "code": "RULES_UNVERIFIED",
+        "message": "本票使用静态规则候选；来源与抓取记录可追溯，但商品用途、适用条件与法律版本尚需人工核实，不得作为合规结论。",
+        "level": "WARNING",
+        "file_ids": []
+      }
+    ]
+  },
+  "internal_task": {
+    "task_id": "tsk_20261012_0017_676dd6f7eab0",
+    "status": "PARTIAL",
+    "created_at": "2026-10-12T16:38:09+08:00",
+    "finished_at": "2026-10-12T16:38:09+08:00",
+    "input": {
+      "destination_country": "DE",
+      "destination_country_name": "Germany",
+      "trade_mode": null,
+      "declared_currency": null,
+      "notes": null
+    },
+    "documents": [
+      {
+        "file_id": "f1",
+        "file_name": "commercial_invoice.pdf",
+        "file_type": "PDF",
+        "doc_type": "COMMERCIAL_INVOICE",
+        "process_status": "EXTRACTED",
+        "page_count": 1,
+        "error_message": null
+      },
+      {
+        "file_id": "f2",
+        "file_name": "packing_list.pdf",
+        "file_type": "PDF",
+        "doc_type": "PACKING_LIST",
+        "process_status": "EXTRACTED",
+        "page_count": 1,
+        "error_message": null
+      },
+      {
+        "file_id": "f3",
+        "file_name": "proforma_invoice.pdf",
+        "file_type": "PDF",
+        "doc_type": "COMMERCIAL_INVOICE",
+        "process_status": "EXTRACTED",
+        "page_count": 1,
+        "error_message": null
+      }
+    ],
+    "extractions": [
+      {
+        "file_id": "f1",
+        "doc_type": "COMMERCIAL_INVOICE",
+        "parse_method": "TEXT_LAYER",
+        "fields": [
+          {
+            "field_key": "packages",
+            "label": "件数",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "CARTON",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "gross_weight",
+            "label": "毛重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "net_weight",
+            "label": "净重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "volume",
+            "label": "体积",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "CBM",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "quantity",
+            "label": "数量",
+            "raw_text": "QUANTITY",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "PCS",
+            "confidence": null,
+            "status": "UNRECOGNIZED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "hs_code",
+            "label": "HS 编码",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "total_amount",
+            "label": "总金额",
+            "raw_text": "TOTAL AMOUNT (GBP): 454.00",
+            "raw_value": "GBP 454.00",
+            "normalized_value": 454,
+            "unit": "GBP",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "currency",
+            "label": "币种",
+            "raw_text": "GBP",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "description",
+            "label": "货物描述",
+            "raw_text": "DESCRIPTION / SKU",
+            "raw_value": "/ SKU",
+            "normalized_value": "SKU",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "invoice_no",
+            "label": "发票号",
+            "raw_text": "Document No.: CI-00017",
+            "raw_value": "CI-00017",
+            "normalized_value": "CI-00017",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "shipment_date",
+            "label": "装运日期",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "consignee",
+            "label": "收货人",
+            "raw_text": "BUYER / IMPORTER\nVela Commerce 1017 GmbH",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "destination_country",
+            "label": "目的国",
+            "raw_text": "DESTINATION\nHamburg, Germany",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "document_no",
+            "label": "本单据编号（不做跨单据相等比较）",
+            "raw_text": "Document No.: CI-00017",
+            "raw_value": "CI-00017",
+            "normalized_value": "CI-00017",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "port_of_loading",
+            "label": "起运港",
+            "raw_text": "PORT OF LOADING\nShenzhen, China",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "shipper",
+            "label": "发货人",
+            "raw_text": "SELLER / EXPORTER\nJuniper Distribution 0017 Co., Ltd.",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          }
+        ],
+        "line_items": []
+      },
+      {
+        "file_id": "f2",
+        "doc_type": "PACKING_LIST",
+        "parse_method": "TEXT_LAYER",
+        "fields": [
+          {
+            "field_key": "packages",
+            "label": "件数",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "5 CARTONS",
+            "normalized_value": 5,
+            "unit": "CARTON",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "gross_weight",
+            "label": "毛重",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "69.13 KG",
+            "normalized_value": 69.13,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "net_weight",
+            "label": "净重",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "64.00 KG",
+            "normalized_value": 64,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "volume",
+            "label": "体积",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "0.128 CBM",
+            "normalized_value": 0.128,
+            "unit": "CBM",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "quantity",
+            "label": "数量",
+            "raw_text": "TOTAL: 200 PCS | 5 CARTONS | NET 64.00 KG | GROSS 69.13 KG | 0.128 CBM",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "unit": "PCS",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "hs_code",
+            "label": "HS 编码",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "total_amount",
+            "label": "总金额",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "currency",
+            "label": "币种",
+            "raw_text": "GBP",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "description",
+            "label": "货物描述",
+            "raw_text": "本单证为多品名，该项按品名行给出（见 line_items[]），票级不适用。",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "invoice_no",
+            "label": "发票号",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "shipment_date",
+            "label": "装运日期",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "consignee",
+            "label": "收货人",
+            "raw_text": "BUYER / IMPORTER\nVela Commerce 1017 GmbH",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "destination_country",
+            "label": "目的国",
+            "raw_text": "DESTINATION\nHamburg, Germany",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "document_no",
+            "label": "本单据编号（不做跨单据相等比较）",
+            "raw_text": "Document No.: PL-00017",
+            "raw_value": "PL-00017",
+            "normalized_value": "PL-00017",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "port_of_loading",
+            "label": "起运港",
+            "raw_text": "PORT OF LOADING\nShenzhen, China",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "shipper",
+            "label": "发货人",
+            "raw_text": "SELLER / EXPORTER\nJuniper Distribution 0017 Co., Ltd.",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          }
+        ],
+        "line_items": [
+          {
+            "item_no": 1,
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+            "fields": [
+              {
+                "field_key": "item_code",
+                "label": "货号/型号",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+                "raw_value": "SKU-0017-1",
+                "normalized_value": "SKU-0017-1",
+                "unit": null,
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "description",
+                "label": "货物描述",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+                "raw_value": "Paper hardcover notebook, assorted colors / SKU: SKU-0017-1",
+                "normalized_value": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+                "unit": null,
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "hs_code",
+                "label": "HS 编码",
+                "raw_text": null,
+                "raw_value": null,
+                "normalized_value": null,
+                "unit": null,
+                "confidence": null,
+                "status": "NOT_IN_DOC",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "quantity",
+                "label": "数量",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+                "raw_value": "200 PCS",
+                "normalized_value": 200,
+                "unit": "PCS",
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "packages",
+                "label": "件数",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+                "raw_value": "5",
+                "normalized_value": 5,
+                "unit": "CARTON",
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "net_weight",
+                "label": "净重",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+                "raw_value": "64.00 KG",
+                "normalized_value": 64,
+                "unit": "KGS",
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "gross_weight",
+                "label": "毛重",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+                "raw_value": "69.13 KG",
+                "normalized_value": 69.13,
+                "unit": "KGS",
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "volume",
+                "label": "体积",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   200 PCS   5   64.00 KG   69.13 KG   0.128 CBM",
+                "raw_value": "0.128 CBM",
+                "normalized_value": 0.128,
+                "unit": "CBM",
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "unit_price",
+                "label": "单价",
+                "raw_text": null,
+                "raw_value": null,
+                "normalized_value": null,
+                "unit": null,
+                "confidence": null,
+                "status": "NOT_IN_DOC",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "amount",
+                "label": "行金额",
+                "raw_text": null,
+                "raw_value": null,
+                "normalized_value": null,
+                "unit": null,
+                "confidence": null,
+                "status": "NOT_IN_DOC",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "file_id": "f3",
+        "doc_type": "COMMERCIAL_INVOICE",
+        "parse_method": "TEXT_LAYER",
+        "fields": [
+          {
+            "field_key": "packages",
+            "label": "件数",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "CARTON",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "gross_weight",
+            "label": "毛重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "net_weight",
+            "label": "净重",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "KGS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "volume",
+            "label": "体积",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "CBM",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "quantity",
+            "label": "数量",
+            "raw_text": "本单证为多品名，该项按品名行给出（见 line_items[]），票级不适用。",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": "PCS",
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "hs_code",
+            "label": "HS 编码",
+            "raw_text": "本单证为多品名，该项按品名行给出（见 line_items[]），票级不适用。",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "total_amount",
+            "label": "总金额",
+            "raw_text": "TOTAL AMOUNT (GBP): 454.00",
+            "raw_value": "GBP 454.00",
+            "normalized_value": 454,
+            "unit": "GBP",
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "currency",
+            "label": "币种",
+            "raw_text": "GBP",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "description",
+            "label": "货物描述",
+            "raw_text": "本单证为多品名，该项按品名行给出（见 line_items[]），票级不适用。",
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "invoice_no",
+            "label": "发票号",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "shipment_date",
+            "label": "装运日期",
+            "raw_text": null,
+            "raw_value": null,
+            "normalized_value": null,
+            "unit": null,
+            "confidence": null,
+            "status": "NOT_IN_DOC",
+            "page": null,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "consignee",
+            "label": "收货人",
+            "raw_text": "BUYER / IMPORTER\nVela Commerce 1017 GmbH",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "destination_country",
+            "label": "目的国",
+            "raw_text": "DESTINATION\nHamburg, Germany",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "document_no",
+            "label": "本单据编号（不做跨单据相等比较）",
+            "raw_text": "Document No.: PI-00017",
+            "raw_value": "PI-00017",
+            "normalized_value": "PI-00017",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "port_of_loading",
+            "label": "起运港",
+            "raw_text": "PORT OF LOADING\nShenzhen, China",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          },
+          {
+            "field_key": "shipper",
+            "label": "发货人",
+            "raw_text": "SELLER / EXPORTER\nJuniper Distribution 0017 Co., Ltd.",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "unit": null,
+            "confidence": null,
+            "status": "EXTRACTED",
+            "page": 1,
+            "bbox": null,
+            "bbox_unit": null
+          }
+        ],
+        "line_items": [
+          {
+            "item_no": 1,
+            "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+            "fields": [
+              {
+                "field_key": "item_code",
+                "label": "货号/型号",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+                "raw_value": "SKU-0017-1",
+                "normalized_value": "SKU-0017-1",
+                "unit": null,
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "description",
+                "label": "货物描述",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+                "raw_value": "Paper hardcover notebook, assorted colors / SKU: SKU-0017-1",
+                "normalized_value": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+                "unit": null,
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "hs_code",
+                "label": "HS 编码",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+                "raw_value": "482010",
+                "normalized_value": "482010",
+                "unit": null,
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "quantity",
+                "label": "数量",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+                "raw_value": "200 PCS",
+                "normalized_value": 200,
+                "unit": "PCS",
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "packages",
+                "label": "件数",
+                "raw_text": null,
+                "raw_value": null,
+                "normalized_value": null,
+                "unit": null,
+                "confidence": null,
+                "status": "NOT_IN_DOC",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "net_weight",
+                "label": "净重",
+                "raw_text": null,
+                "raw_value": null,
+                "normalized_value": null,
+                "unit": null,
+                "confidence": null,
+                "status": "NOT_IN_DOC",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "gross_weight",
+                "label": "毛重",
+                "raw_text": null,
+                "raw_value": null,
+                "normalized_value": null,
+                "unit": null,
+                "confidence": null,
+                "status": "NOT_IN_DOC",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "volume",
+                "label": "体积",
+                "raw_text": null,
+                "raw_value": null,
+                "normalized_value": null,
+                "unit": null,
+                "confidence": null,
+                "status": "NOT_IN_DOC",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "unit_price",
+                "label": "单价",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+                "raw_value": "2.27",
+                "normalized_value": 2.27,
+                "unit": "GBP",
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              },
+              {
+                "field_key": "amount",
+                "label": "行金额",
+                "raw_text": "1   SKU-0017-1   Paper hardcover notebook, assorted colors / SKU: SKU-0017-1   482010   200 PCS   2.27   454.00",
+                "raw_value": "454.00",
+                "normalized_value": 454,
+                "unit": "GBP",
+                "confidence": null,
+                "status": "EXTRACTED",
+                "page": null,
+                "bbox": null,
+                "bbox_unit": null
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "comparisons": [
+      {
+        "comparison_id": "cmp_1",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "packages",
+        "label": "件数",
+        "value_type": "NUMBER",
+        "unit": "CARTON",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "5 CARTONS",
+            "normalized_value": 5,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_2",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "gross_weight",
+        "label": "毛重",
+        "value_type": "NUMBER",
+        "unit": "KGS",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "69.13 KG",
+            "normalized_value": 69.13,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_3",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "net_weight",
+        "label": "净重",
+        "value_type": "NUMBER",
+        "unit": "KGS",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "64.00 KG",
+            "normalized_value": 64,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_4",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "volume",
+        "label": "体积",
+        "value_type": "NUMBER",
+        "unit": "CBM",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "0.128 CBM",
+            "normalized_value": 0.128,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_5",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "quantity",
+        "label": "数量",
+        "value_type": "NUMBER",
+        "unit": "PCS",
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "commercial_invoice.pdf（定位到了但读不出值），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "UNRECOGNIZED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_6",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "total_amount",
+        "label": "总金额",
+        "value_type": "MONEY",
+        "unit": "GBP",
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "GBP 454.00",
+            "normalized_value": 454,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "GBP 454.00",
+            "normalized_value": 454,
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_7",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "currency",
+        "label": "币种",
+        "value_type": "CODE",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "GBP",
+            "normalized_value": "GBP",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_8",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "description",
+        "label": "货物描述",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 commercial_invoice.pdf 提供该字段，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "/ SKU",
+            "normalized_value": "SKU",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_9",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "invoice_no",
+        "label": "发票号",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MISSING_IN_SOME",
+        "canonical_value": null,
+        "severity": "WARNING",
+        "rule_id": "CROSS_CHECK_001",
+        "note": "proforma_invoice.pdf（按规则应有但文件中未找到），无法完成比对。",
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "CI-00017",
+            "normalized_value": "CI-00017",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": null,
+            "normalized_value": null,
+            "field_status": "MISSING_IN_DOC",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_10",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "consignee",
+        "label": "收货人",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Vela Commerce 1017 GmbH",
+            "normalized_value": "VELA COMMERCE 1017 GMBH",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_11",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "destination_country",
+        "label": "目的国",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Hamburg, Germany",
+            "normalized_value": "DE",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_12",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "port_of_loading",
+        "label": "起运港",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Shenzhen, China",
+            "normalized_value": "深圳",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_13",
+        "scope": "DOCUMENT",
+        "item_id": null,
+        "field_key": "shipper",
+        "label": "发货人",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f1",
+            "file_name": "commercial_invoice.pdf",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Juniper Distribution 0017 Co., Ltd.",
+            "normalized_value": "JUNIPER DISTRIBUTION 0017 CO., LTD",
+            "field_status": "EXTRACTED",
+            "page": 1,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_14",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "item_code",
+        "label": "货号/型号",
+        "value_type": "CODE",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "SKU-0017-1",
+            "normalized_value": "SKU-0017-1",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "SKU-0017-1",
+            "normalized_value": "SKU-0017-1",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_15",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "description",
+        "label": "货物描述",
+        "value_type": "STRING",
+        "unit": null,
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "Paper hardcover notebook, assorted colors / SKU: SKU-0017-1",
+            "normalized_value": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "Paper hardcover notebook, assorted colors / SKU: SKU-0017-1",
+            "normalized_value": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_16",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "hs_code",
+        "label": "HS 编码",
+        "value_type": "CODE",
+        "unit": null,
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 proforma_invoice.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "482010",
+            "normalized_value": "482010",
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_17",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "quantity",
+        "label": "数量",
+        "value_type": "NUMBER",
+        "unit": "PCS",
+        "status": "MATCH",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": "CROSS_CHECK_001",
+        "note": null,
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          },
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "200 PCS",
+            "normalized_value": 200,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_18",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "packages",
+        "label": "件数",
+        "value_type": "NUMBER",
+        "unit": "CARTON",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "5",
+            "normalized_value": 5,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_19",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "net_weight",
+        "label": "净重",
+        "value_type": "NUMBER",
+        "unit": "KGS",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "64.00 KG",
+            "normalized_value": 64,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_20",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "gross_weight",
+        "label": "毛重",
+        "value_type": "NUMBER",
+        "unit": "KGS",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "69.13 KG",
+            "normalized_value": 69.13,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_21",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "volume",
+        "label": "体积",
+        "value_type": "NUMBER",
+        "unit": "CBM",
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 packing_list.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f2",
+            "file_name": "packing_list.pdf",
+            "raw_value": "0.128 CBM",
+            "normalized_value": 0.128,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_22",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "unit_price",
+        "label": "单价",
+        "value_type": "MONEY",
+        "unit": null,
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 proforma_invoice.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "2.27",
+            "normalized_value": 2.27,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      },
+      {
+        "comparison_id": "cmp_23",
+        "scope": "ITEM",
+        "item_id": "itm_1",
+        "field_key": "amount",
+        "label": "行金额",
+        "value_type": "MONEY",
+        "unit": null,
+        "status": "SINGLE_SOURCE",
+        "canonical_value": null,
+        "severity": "INFO",
+        "rule_id": null,
+        "note": "只有 proforma_invoice.pdf 按品名行提供该项，无法交叉比对。",
+        "values": [
+          {
+            "file_id": "f3",
+            "file_name": "proforma_invoice.pdf",
+            "raw_value": "454.00",
+            "normalized_value": 454,
+            "field_status": "EXTRACTED",
+            "page": null,
+            "bbox": null
+          }
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "risk_id": "rsk_1",
+        "type": "HS_CLASSIFICATION",
+        "severity": "WARNING",
+        "title": "HS 编码 482010 未经规则校验（品名：纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1）",
+        "detail": "该编码来自 proforma_invoice.pdf 第 1 行，当前规则集未覆盖Germany该类商品的归类校验，无法判断是否存在归类风险。",
+        "related_field_keys": [
+          "hs_code"
+        ],
+        "related_item_ids": [
+          "itm_1"
+        ],
+        "related_file_ids": [
+          "f3"
+        ],
+        "destination_country": "DE",
+        "rule_id": null,
+        "rule_source": "static-source-candidates-v3（团队自拟的演示规则，来源与适用条件未经核实）"
+      }
+    ],
+    "summary": {
+      "document_count": 3,
+      "field_count": 68,
+      "item_count": 1,
+      "conflict_count": 0,
+      "missing_count": 2,
+      "risk_count": 1,
+      "unrecognized_count": 0
+    },
+    "errors": [
+      {
+        "code": "MULTI_LINE_ITEMS_SUSPECTED",
+        "message": "commercial_invoice.pdf 里检测到品名明细表，但未能可靠解析出全部品名行，该文件的品名级比对未完成，请人工核对表格区域。",
+        "level": "WARNING",
+        "file_ids": [
+          "f1"
+        ]
+      },
+      {
+        "code": "RULES_UNVERIFIED",
+        "message": "本票使用静态规则候选；来源与抓取记录可追溯，但商品用途、适用条件与法律版本尚需人工核实，不得作为合规结论。",
+        "level": "WARNING",
+        "file_ids": []
+      }
+    ],
+    "items": [
+      {
+        "item_id": "itm_1",
+        "label": "纸 HARDCOVER NOTEBOOK ASSORTED COLORS SKU 0017 1",
+        "alignment_status": "ALIGNED",
+        "alignment_basis": "ITEM_CODE",
+        "alignment_note": null,
+        "members": [
+          {
+            "file_id": "f2",
+            "item_no": 1,
+            "match_score": 1.0
+          },
+          {
+            "file_id": "f3",
+            "item_no": 1,
+            "match_score": 1.0
+          }
+        ]
+      }
+    ]
+  }
+}
