@@ -241,7 +241,10 @@ const stageIndex = computed(() => {
   if (t.status === 'PENDING') return 0
   if (t.status === 'PROCESSING') {
     const docs = t.documents ?? []
-    if (docs.length && docs.every((d) => d.process_status === 'EXTRACTED')) return 2
+    // 后端增量回写时 documents 是部分列表，「全部已抽取」必须等份数到齐再判，
+    // 否则第一批成功后阶段条会提前跳到「交叉比对中」
+    const expected = files.value.length || docs.length
+    if (docs.length && docs.length >= expected && docs.every((d) => d.process_status === 'EXTRACTED')) return 2
     return 1
   }
   return TASK_STAGES.length - 1
@@ -362,31 +365,46 @@ const liveDocs = computed(() => task.value?.documents ?? [])
  * 文件名是前端一提交就知道的信息，不该用骨架屏藏着。
  */
 const displayDocs = computed(() => {
-  if (liveDocs.value.length) {
-    return liveDocs.value.map((d) => ({
-      key: d.file_id,
-      name: d.file_name,
-      error: d.error_message,
-      status: processStatus(d.process_status),
+  const live = liveDocs.value.map((d) => ({
+    key: d.file_id,
+    name: d.file_name,
+    error: d.error_message,
+    status: processStatus(d.process_status),
+  }))
+  if (!live.length) {
+    return files.value.map((f) => ({
+      key: fileKey(f),
+      name: f.name,
+      error: null,
+      status: phase.value === 'uploading'
+        ? { text: '上传中', tone: 'running' }
+        : { text: '排队中', tone: 'muted' },
     }))
   }
-  return files.value.map((f) => ({
-    key: fileKey(f),
-    name: f.name,
-    error: null,
-    status: phase.value === 'uploading'
-      ? { text: '上传中', tone: 'running' }
-      : { text: '排队中', tone: 'muted' },
-  }))
+  // 后端按处理进度增量回写 documents（逐份 PARSING → EXTRACTED）：
+  // 已返回的用真实状态，还没轮到的用本地文件名补在队尾，状态「排队中」。
+  // 后端不回写中间态时 live 要么为空（走上面的本地占位）要么一次全量，
+  // 两种后端行为下列表都完整且顺序稳定。
+  const seen = new Set(live.map((d) => d.name))
+  const queued = files.value
+    .filter((f) => !seen.has(f.name))
+    .map((f) => ({
+      key: fileKey(f),
+      name: f.name,
+      error: null,
+      status: { text: '排队中', tone: 'muted' },
+    }))
+  return [...live, ...queued]
 })
 
-/** 解析进度计数：已抽取 x / n 份，任务进入 PROCESSING 且后端回了 documents 时展示 */
+/** 解析进度计数：已处理 x / n 份。后端增量回写时 documents 是部分列表，
+    总数以本地已选文件数为准（mock 未选文件时退回 documents 数） */
 const extractProgress = computed(() => {
   if (!liveDocs.value.length) return null
   const done = liveDocs.value.filter(
     (d) => d.process_status === 'EXTRACTED' || d.process_status === 'FAILED' || d.process_status === 'UNSUPPORTED'
   ).length
-  return { done, total: liveDocs.value.length }
+  return { done, total: Math.max(files.value.length, liveDocs.value.length) }
 })
 
 /** 待复核条目数：与差异页「需关注」、顶栏角标同一口径 */
