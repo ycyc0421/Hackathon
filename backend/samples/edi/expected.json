@@ -1,0 +1,1276 @@
+{
+  "dataset_version": "edi-synthetic-v1",
+  "synthetic": true,
+  "directory": "D.96A",
+  "business_acceptance": false,
+  "current_api_support": false,
+  "cases": [
+    {
+      "case_id": "01_consistent",
+      "title": "单商品一致",
+      "notes": "数量、包装、重量、HS 一致；金额只由发票提供。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-01",
+          "order_no": "SYN-ORDER-01",
+          "invoice_no": "SYN-INVOIC-01",
+          "destination_country": "US",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0101"
+        },
+        "doc_2": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-01",
+          "order_no": "SYN-ORDER-01",
+          "invoice_no": "SYN-INVOIC-01",
+          "destination_country": "US",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "02_desadv.edi",
+          "message_reference": "0102"
+        }
+      },
+      "expected_discrepancies": []
+    },
+    {
+      "case_id": "02_quantity_conflict",
+      "title": "数量冲突",
+      "notes": "发票 2400 PCE，发运通知 2380 PCE；件数仍均为 100 CT。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-02",
+          "order_no": "SYN-ORDER-02",
+          "invoice_no": "SYN-INVOIC-02",
+          "destination_country": "DE",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0201"
+        },
+        "doc_2": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-02",
+          "order_no": "SYN-ORDER-02",
+          "invoice_no": "SYN-INVOIC-02",
+          "destination_country": "DE",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2380,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2380,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "02_desadv.edi",
+          "message_reference": "0202"
+        }
+      },
+      "expected_discrepancies": [
+        {
+          "scope": "SHIPMENT",
+          "field_key": "quantity",
+          "values": {
+            "doc_1": 2400,
+            "doc_2": 2380
+          }
+        },
+        {
+          "scope": "ITEM",
+          "item_code": "MUG350",
+          "field_key": "quantity",
+          "values": {
+            "doc_1": 2400,
+            "doc_2": 2380
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "03_net_gross_swapped",
+      "title": "净毛重填反",
+      "notes": "发运通知故意交换净毛重；报文语法有效但业务值错误，净重超过毛重。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-03",
+          "order_no": "SYN-ORDER-03",
+          "invoice_no": "SYN-INVOIC-03",
+          "destination_country": "DE",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0301"
+        },
+        "doc_2": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-03",
+          "order_no": "SYN-ORDER-03",
+          "invoice_no": "SYN-INVOIC-03",
+          "destination_country": "DE",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "1080.00",
+              "gross_weight": "900.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "1080.00",
+            "gross_weight": "900.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "02_desadv.edi",
+          "message_reference": "0302"
+        }
+      },
+      "expected_discrepancies": [
+        {
+          "scope": "SHIPMENT",
+          "field_key": "net_weight",
+          "values": {
+            "doc_1": "900.00",
+            "doc_2": "1080.00"
+          }
+        },
+        {
+          "scope": "SHIPMENT",
+          "field_key": "gross_weight",
+          "values": {
+            "doc_1": "1080.00",
+            "doc_2": "900.00"
+          }
+        },
+        {
+          "scope": "ITEM",
+          "item_code": "MUG350",
+          "field_key": "net_weight",
+          "values": {
+            "doc_1": "900.00",
+            "doc_2": "1080.00"
+          }
+        },
+        {
+          "scope": "ITEM",
+          "item_code": "MUG350",
+          "field_key": "gross_weight",
+          "values": {
+            "doc_1": "1080.00",
+            "doc_2": "900.00"
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "04_amount_conflict",
+      "title": "发票金额冲突",
+      "notes": "同发票号的原件与副本：单价 2.00/2.10，总金额 4800.00/5040.00。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-04",
+          "order_no": "SYN-ORDER-04",
+          "invoice_no": "SYN-INVOIC-04",
+          "destination_country": "DE",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0401"
+        },
+        "doc_2": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-04",
+          "order_no": "SYN-ORDER-04",
+          "invoice_no": "SYN-INVOIC-04",
+          "destination_country": "DE",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.10",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "5040.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "5040.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "02_invoic_copy.edi",
+          "message_reference": "0402"
+        },
+        "doc_3": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-04",
+          "order_no": "SYN-ORDER-04",
+          "invoice_no": "SYN-INVOIC-04",
+          "destination_country": "DE",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "03_desadv.edi",
+          "message_reference": "0403"
+        }
+      },
+      "expected_discrepancies": [
+        {
+          "scope": "SHIPMENT",
+          "field_key": "total_amount",
+          "values": {
+            "doc_1": {
+              "value": "4800.00",
+              "currency": "USD"
+            },
+            "doc_2": {
+              "value": "5040.00",
+              "currency": "USD"
+            }
+          }
+        },
+        {
+          "scope": "ITEM",
+          "item_code": "MUG350",
+          "field_key": "unit_price",
+          "values": {
+            "doc_1": {
+              "value": "2.00",
+              "currency": "USD"
+            },
+            "doc_2": {
+              "value": "2.10",
+              "currency": "USD"
+            }
+          }
+        },
+        {
+          "scope": "ITEM",
+          "item_code": "MUG350",
+          "field_key": "amount",
+          "values": {
+            "doc_1": {
+              "value": "4800.00",
+              "currency": "USD"
+            },
+            "doc_2": {
+              "value": "5040.00",
+              "currency": "USD"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "05_currency_conflict",
+      "title": "数值相同币种不同",
+      "notes": "同发票号原件 USD、副本 EUR；不能因数字相同判断金额一致。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-05",
+          "order_no": "SYN-ORDER-05",
+          "invoice_no": "SYN-INVOIC-05",
+          "destination_country": "DE",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0501"
+        },
+        "doc_2": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-05",
+          "order_no": "SYN-ORDER-05",
+          "invoice_no": "SYN-INVOIC-05",
+          "destination_country": "DE",
+          "currency": "EUR",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "02_invoic_copy.edi",
+          "message_reference": "0502"
+        },
+        "doc_3": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-05",
+          "order_no": "SYN-ORDER-05",
+          "invoice_no": "SYN-INVOIC-05",
+          "destination_country": "DE",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "03_desadv.edi",
+          "message_reference": "0503"
+        }
+      },
+      "expected_discrepancies": [
+        {
+          "scope": "SHIPMENT",
+          "field_key": "total_amount",
+          "values": {
+            "doc_1": {
+              "value": "4800.00",
+              "currency": "USD"
+            },
+            "doc_2": {
+              "value": "4800.00",
+              "currency": "EUR"
+            }
+          }
+        },
+        {
+          "scope": "SHIPMENT",
+          "field_key": "currency",
+          "values": {
+            "doc_1": "USD",
+            "doc_2": "EUR"
+          }
+        },
+        {
+          "scope": "ITEM",
+          "item_code": "MUG350",
+          "field_key": "unit_price",
+          "values": {
+            "doc_1": {
+              "value": "2.00",
+              "currency": "USD"
+            },
+            "doc_2": {
+              "value": "2.00",
+              "currency": "EUR"
+            }
+          }
+        },
+        {
+          "scope": "ITEM",
+          "item_code": "MUG350",
+          "field_key": "amount",
+          "values": {
+            "doc_1": {
+              "value": "4800.00",
+              "currency": "USD"
+            },
+            "doc_2": {
+              "value": "4800.00",
+              "currency": "EUR"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case_id": "06_missing_hs_currency",
+      "title": "HS 与币种未提供",
+      "notes": "发票省略 HS 和币种；不得从发运通知复制进发票字段，不得默认 USD。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-06",
+          "order_no": "SYN-ORDER-06",
+          "invoice_no": "SYN-INVOIC-06",
+          "destination_country": "DE",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": null,
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0601"
+        },
+        "doc_2": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-06",
+          "order_no": "SYN-ORDER-06",
+          "invoice_no": "SYN-INVOIC-06",
+          "destination_country": "DE",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "02_desadv.edi",
+          "message_reference": "0602"
+        }
+      },
+      "expected_discrepancies": []
+    },
+    {
+      "case_id": "07_multiitem_reordered",
+      "title": "三商品行顺序不同",
+      "notes": "以货号关联，不能按 LIN 序号配对；票级总重量不得复制给每行。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-07",
+          "order_no": "SYN-ORDER-07",
+          "invoice_no": "SYN-INVOIC-07",
+          "destination_country": "NL",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 1200,
+              "packages": 50,
+              "net_weight": "450.00",
+              "gross_weight": "540.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "2400.00"
+            },
+            {
+              "item_code": "BWL160",
+              "description": "CERAMIC BOWL 160MM BLUE",
+              "hs_code": "691200",
+              "quantity": 600,
+              "packages": 25,
+              "net_weight": "180.00",
+              "gross_weight": "216.00",
+              "unit_price": "3.50",
+              "line_no": 2,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "2100.00"
+            },
+            {
+              "item_code": "BOT750",
+              "description": "GLASS BOTTLE 750ML CLEAR",
+              "hs_code": "701090",
+              "quantity": 300,
+              "packages": 15,
+              "net_weight": "120.00",
+              "gross_weight": "144.00",
+              "unit_price": "4.00",
+              "line_no": 3,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "1200.00"
+            }
+          ],
+          "header": {
+            "packages": 90,
+            "quantity": 2100,
+            "net_weight": "750.00",
+            "gross_weight": "900.00",
+            "volume": "4.50",
+            "total_amount": "5700.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0701"
+        },
+        "doc_2": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-07",
+          "order_no": "SYN-ORDER-07",
+          "invoice_no": "SYN-INVOIC-07",
+          "destination_country": "NL",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "BOT750",
+              "description": "GLASS BOTTLE 750ML CLEAR",
+              "hs_code": "701090",
+              "quantity": 300,
+              "packages": 15,
+              "net_weight": "120.00",
+              "gross_weight": "144.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            },
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 1200,
+              "packages": 50,
+              "net_weight": "450.00",
+              "gross_weight": "540.00",
+              "unit_price": null,
+              "line_no": 2,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            },
+            {
+              "item_code": "BWL160",
+              "description": "CERAMIC BOWL 160MM BLUE",
+              "hs_code": "691200",
+              "quantity": 600,
+              "packages": 25,
+              "net_weight": "180.00",
+              "gross_weight": "216.00",
+              "unit_price": null,
+              "line_no": 3,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 90,
+            "quantity": 2100,
+            "net_weight": "750.00",
+            "gross_weight": "900.00",
+            "volume": "4.50",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "02_desadv.edi",
+          "message_reference": "0702"
+        }
+      },
+      "expected_discrepancies": []
+    },
+    {
+      "case_id": "08_release_characters",
+      "title": "保留字符转义",
+      "notes": "描述包含加号、冒号、问号和撇号；须正确处理 EDIFACT release 字符。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-08",
+          "order_no": "SYN-ORDER-08",
+          "invoice_no": "SYN-INVOIC-08",
+          "destination_country": "GB",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "GIFT SET + CUP: 350ML? WHITE'S",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0801"
+        },
+        "doc_2": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-08",
+          "order_no": "SYN-ORDER-08",
+          "invoice_no": "SYN-INVOIC-08",
+          "destination_country": "GB",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "GIFT SET + CUP: 350ML? WHITE'S",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "02_desadv.edi",
+          "message_reference": "0802"
+        }
+      },
+      "expected_discrepancies": []
+    },
+    {
+      "case_id": "09_decimal_comma_compact",
+      "title": "逗号小数与紧凑报文",
+      "notes": "UNA 指定逗号小数；无行间换行，不能用换行切段。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-09",
+          "order_no": "SYN-ORDER-09",
+          "invoice_no": "SYN-INVOIC-09",
+          "destination_country": "FR",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.25",
+              "gross_weight": "1080.50",
+              "unit_price": "2.05",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4920.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.25",
+            "gross_weight": "1080.50",
+            "volume": "4.85",
+            "total_amount": "4920.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "0901"
+        },
+        "doc_2": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-09",
+          "order_no": "SYN-ORDER-09",
+          "invoice_no": "SYN-INVOIC-09",
+          "destination_country": "FR",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.25",
+              "gross_weight": "1080.50",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.25",
+            "gross_weight": "1080.50",
+            "volume": "4.85",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "02_desadv.edi",
+          "message_reference": "0902"
+        }
+      },
+      "expected_discrepancies": []
+    },
+    {
+      "case_id": "10_multi_message",
+      "title": "一个封装内两份报文",
+      "notes": "同一 UNB/UNZ 中有 INVOIC 与 DESADV，UNZ 消息数为 2。",
+      "syntax_expected": "ACCEPT",
+      "expected_error": null,
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-10",
+          "order_no": "SYN-ORDER-10",
+          "invoice_no": "SYN-INVOIC-10",
+          "destination_country": "US",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "shipment.edi",
+          "message_reference": "1001"
+        },
+        "doc_2": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-10",
+          "order_no": "SYN-ORDER-10",
+          "invoice_no": "SYN-INVOIC-10",
+          "destination_country": "US",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "shipment.edi",
+          "message_reference": "1002"
+        }
+      },
+      "expected_discrepancies": []
+    },
+    {
+      "case_id": "11_bad_unt_count",
+      "title": "故意错误的 UNT 段计数",
+      "notes": "语法负例：UNT 段计数被故意加一，必须显式拒绝。",
+      "syntax_expected": "REJECT",
+      "expected_error": "UNT_COUNT_MISMATCH",
+      "documents": {
+        "doc_1": {
+          "message_type": "INVOIC",
+          "document_no": "SYN-INVOIC-11",
+          "order_no": "SYN-ORDER-11",
+          "invoice_no": "SYN-INVOIC-11",
+          "destination_country": "DE",
+          "currency": "USD",
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": "2.00",
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": "4800.00"
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": "4800.00",
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "header_PAC"
+          },
+          "file_name": "01_invoic.edi",
+          "message_reference": "1101"
+        }
+      },
+      "expected_discrepancies": []
+    },
+    {
+      "case_id": "12_truncated",
+      "title": "故意截断报文",
+      "notes": "语法负例：缺少 UNT 和 UNZ，不得作为空结果或零冲突。",
+      "syntax_expected": "REJECT",
+      "expected_error": "MISSING_TRAILERS",
+      "documents": {
+        "doc_1": {
+          "message_type": "DESADV",
+          "document_no": "SYN-DESADV-12",
+          "order_no": "SYN-ORDER-12",
+          "invoice_no": "SYN-INVOIC-12",
+          "destination_country": "DE",
+          "currency": null,
+          "document_date": "2026-10-12",
+          "shipment_date": "2026-10-14",
+          "items": [
+            {
+              "item_code": "MUG350",
+              "description": "CERAMIC MUG 350ML WHITE",
+              "hs_code": "691110",
+              "quantity": 2400,
+              "packages": 100,
+              "net_weight": "900.00",
+              "gross_weight": "1080.00",
+              "unit_price": null,
+              "line_no": 1,
+              "quantity_unit": "PCE",
+              "weight_unit": "KGM",
+              "package_unit": "CT",
+              "amount": null
+            }
+          ],
+          "header": {
+            "packages": 100,
+            "quantity": 2400,
+            "net_weight": "900.00",
+            "gross_weight": "1080.00",
+            "volume": "4.80",
+            "total_amount": null,
+            "quantity_source": "sum_of_line_quantities",
+            "packages_source": "sum_of_CPS_package_groups"
+          },
+          "file_name": "01_desadv.edi",
+          "message_reference": "1201"
+        }
+      },
+      "expected_discrepancies": []
+    }
+  ]
+}
