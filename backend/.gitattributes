@@ -1,2 +1,3 @@
 *.pdf -diff -text
 *.png -diff -text
+samples/edi/**/*.edi -text
