@@ -2198,63 +2198,8 @@ textarea {
 }
 
 
-/* 文件列表扫描光束：未达终态时一道微蓝光带自上而下扫过，
-   呼应「逐份解析单证」的语义，比转圈更贴合场景 */
-.task-status-body .doc-list {
-  position: relative;
-}
-
-.doc-list--scanning {
-  overflow: hidden;
-}
-
-.doc-list--scanning::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -36%;
-  height: 30%;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(37, 99, 235, 0.05) 35%,
-    rgba(37, 99, 235, 0.1) 50%,
-    rgba(37, 99, 235, 0.05) 65%,
-    transparent
-  );
-  pointer-events: none;
-  animation: doc-scan 2.4s linear infinite;
-}
-
-@keyframes doc-scan {
-  to {
-    top: 106%;
-  }
-}
-
-/* 等待中的徽章呼吸明暗（逐行错相，像流水线在往下走） */
-@keyframes badge-breathe {
-  50% {
-    opacity: 0.55;
-  }
-}
-
-.doc-list--scanning .badge.tone-muted {
-  animation: badge-breathe 2.4s ease-in-out infinite;
-}
-
-.doc-list--scanning li:nth-child(3n + 2) .badge.tone-muted {
-  animation-delay: 0.4s;
-}
-
-.doc-list--scanning li:nth-child(3n) .badge.tone-muted {
-  animation-delay: 0.8s;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .doc-list--scanning::after,
-  .doc-list--scanning .badge.tone-muted {
-    animation: none;
-  }
+/* 排队中（muted）徽章旁的 spinner 用灰色，与徽章语气一致；
+   running 态保持主色，区分「正在干活」与「在队伍里等」 */
+.inline-spinner--muted {
+  border-top-color: var(--gray-500, #6b7280);
 }

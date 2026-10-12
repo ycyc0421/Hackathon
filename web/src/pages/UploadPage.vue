@@ -637,15 +637,21 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
             <span class="inline-spinner" aria-hidden="true" />
             已处理 {{ extractProgress.done }} / {{ extractProgress.total }} 份文件
           </p>
-          <!-- 未达终态时列表带扫描光束动画：标明这些文件正在流水线上 -->
-          <ul v-if="displayDocs.length" class="doc-list" :class="{ 'doc-list--scanning': taskPending }">
+          <ul v-if="displayDocs.length" class="doc-list">
             <li v-for="d in displayDocs" :key="d.key" class="doc-item">
               <div class="doc-main">
                 <span class="doc-name">{{ d.name }}</span>
                 <span v-if="d.error" class="doc-error">{{ d.error }}</span>
               </div>
               <span class="doc-status">
-                <span v-if="d.status.tone === 'running'" class="inline-spinner" aria-hidden="true" />
+                <!-- 未达终态且该文件也未达终态（解析中/排队中/上传中）都带 spinner，
+                     没有转动的等待态看起来像卡死 -->
+                <span
+                  v-if="taskPending && (d.status.tone === 'running' || d.status.tone === 'muted')"
+                  class="inline-spinner"
+                  :class="{ 'inline-spinner--muted': d.status.tone === 'muted' }"
+                  aria-hidden="true"
+                />
                 <StatusBadge :status="d.status" />
               </span>
             </li>
