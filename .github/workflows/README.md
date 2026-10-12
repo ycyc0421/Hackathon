@@ -1,145 +1,83 @@
 # CI/CD 工作流
 
-## 设计原则
-
-**分离验证和部署**：
-- PR 阶段：只做验证（构建、测试、契约校验），不部署
-- main 合并后：先运行 CI，成功后由独立部署工作流发布前后端
-
-这样既保证代码质量，又避免未审查的代码直接上线。
-
-## 在 Actions 中查看什么
-
-| 工作流 | 运行标题 | 用途 |
-|---|---|---|
-| `CI` | `CI 验证（不部署）· 分支名` | 测试、契约校验和构建；成功不代表已上线 |
-| `Deploy frontend and backend` | `前后端部署 · 提交 SHA` | 查看独立的后端、前端部署 job 及发布结果 |
-
-查看 CI 中的「构建前端」job 只能确认构建状态。线上发布请到 **Actions → Deploy frontend and backend**，选择相同提交 SHA 的运行；CI 的 Summary 也提供该工作流入口。PR 不会发布服务，过期主分支提交会跳过部署。
+PR 只验证，main 的 push CI 成功后自动发布。前端静态资源与 Python 后端部署在同一服务器，通过同一 IP 或 HTTPS 源地址访问。
 
 ## ci.yml
 
-**触发条件**：`main`、`web/*` 分支的 push，以及针对 `main` 的 PR
-
-**工作流程**：
-1. **validate-contract**: 校验数据契约（`npm run validate`）
-2. **build-frontend**: 前端逻辑回归并构建（`web/` 目录）
-3. **backend-regression**: 后端语义回归、接口返回校验与挑战样例验证
-4. 后端回归任务还验证数据层、部署回退单元测试和公网联调脚本语法，这些检查不操作线上服务器
-
-**不包含部署**：PR 和 main 的 CI 都只做验证，不访问生产 secrets。只有 main 的 push CI 成功后，独立部署工作流才会继续检查是否应发布。
+CI 验证数据契约、前端逻辑与构建、后端语义及接口、数据层、发布回退和公网探针。它不访问生产凭据，也不发布服务。
 
 ## deploy.yml
 
-**触发条件**：
-- `main` 的 push CI 成功后自动触发；PR 的 CI 不触发部署
-- 支持手动触发（workflow_dispatch），仅允许 `main` 且对应提交已有成功的 push CI
-- 发布前核对当前主分支提交；过期的 CI 结果不会把旧版本覆盖回线上
-- 发布串行执行，不取消正在切换服务的部署
+两个 job 按顺序执行：
 
-**三个 job 按依赖顺序执行**：
+1. `revision`：确认提交仍为最新 main，且已有成功的 push CI。
+2. `deploy-backend`（发布整站与公网验证）：构建前端、发布前后端、验证公网结果与返回契约。
 
-```text
-确认通过 CI 的主分支版本
-  → 部署后端与公网验证
-    → 部署前端到 Cloudflare
-```
+支持手动触发，但仍须使用通过 push CI 的最新 main。发布串行执行，不取消正在切换服务的运行。PR 不部署，过期提交不会覆盖线上。
 
-| Job ID | Actions 显示名称 | 工作内容 |
-|---|---|---|
-| `revision` | 确认通过 CI 的主分支版本 | 检查最新 main 提交及其 CI 结果，跳过过期提交 |
-| `deploy-backend` | 部署后端与公网验证 | 校验配置、预先构建前端、发布后端并验证公网接口及返回契约 |
-| `deploy-frontend` | 部署前端到 Cloudflare | 后端 job 成功后，取回同一次运行的前端产物并发布 Worker |
+### 发布流程
 
-后端 job 在切换服务之前，把 `VITE_API_BASE` 注入前端构建并保存 `frontend-production` 产物；构建或产物上传失败时不会开始发布后端。随后通过专用普通用户上传版本归档，在独立虚拟环境中安装依赖、运行后端自检，保留共享配置和数据并切换用户服务。启动失败自动回退。
+- 检查前端与 API 地址同源。HTTP 仅允许直接访问 IP；域名地址使用 HTTPS。
+- 将 `VITE_API_BASE` 注入前端构建，把 `web/dist` 与同一提交的代码打入一个版本归档。构建失败不会开始发布。
+- 用专用普通用户上传归档，为每个版本创建 Python 3.12 独立虚拟环境并安装依赖。候选版本的测试使用临时数据，不写共享任务目录。
+- 启用 OCR 时，安装 PaddlePaddle 3.2.0、PaddleOCR 3.7.0、PDF 渲染组件和兼容的 setuptools，切换前实跑 11 号 PNG 探针。模型缓存保存在维护用户目录。
+- `current` 同时决定前端静态资源和后端代码。切换后验证首页、脚本及样式、API 跨域预检、上传轮询与返回契约；OCR 开启时额外验证图片和无文本层扫描 PDF，要求全部文件成功、4 个商品完整并检出颜色冲突。
+- 启动或公网验证失败时，恢复前后端旧版本、旧依赖及旧服务配置；共享任务数据不回滚。后端 job 的时间上限为 40 分钟。
 
-后端启动后，从部署服务器通过公开 HTTPS 域名验证跨域、样例上传和任务查询，将结果传回执行器校验契约；验证失败会回退后端，并阻止前端 job 执行。两个部署 job 检出同一提交，前端 job 使用已构建的产物。后端 job 成功仅代表后端通过验证，必须同时确认前端 job 成功，才能判断前后端均已发布。
+公网验证从部署服务器请求公开地址，经过 Nginx；结果传回 GitHub 执行器校验 Schema。该检查不能替代浏览器及其他网络的联调。前端默认仍使用示例模式，真实联调通过顶栏切换或 `?mock=0` 进入。
 
-单独重试部署 job 时会再次核对最新 main；如果主分支已更新，重试将失败并提示重新运行最新版本的完整部署，防止旧产物覆盖新版本。
+## GitHub production 环境配置
 
-当前采用浏览器直连 HTTPS 后端，Worker 继续托管静态资源。后端部署脚本见 [`deploy/backend.py`](../../deploy/backend.py)，公网验证脚本见 [`deploy/smoke.py`](../../deploy/smoke.py)。
+地址配置也保存在 production Secrets 中：
 
-公网验证复用后端版本中的 Python 与 HTTPX，无需在服务器安装 Node。这样可避免 GitHub 托管执行器被边缘人机挑战拦截；请求仍经过公开域名、TLS 和边缘代理。该检查验证部署服务器的出网路径，不能替代浏览器和其他网络的联调检查。
-
-后端 API 地址在前端构建时固定。修改 GitHub 变量后需重新运行完整部署工作流；仅重试前端 job 会复用原构建产物，在 Cloudflare 后台设置同名运行时变量也不会改写已构建的页面。产物保留 7 天，过期后需重新运行完整部署。部署后通过 `?mock=0` 或顶栏切换到“真实后端”，填入 API 地址不会自动关闭示例模式。
-
-**使用 Environment**：`production` environment 提供额外保护层
-
-## 所需配置
-
-### GitHub Environment Variables
-
-在仓库的 **Settings → Environments → production → Environment variables** 添加：
-
-| 名称 | 内容 |
+| 名称 | 示例 |
 |---|---|
-| `VITE_API_BASE` | 后端完整 HTTPS API 前缀，以 `/api/v1` 结尾，不带尾斜杠，如 `https://backend.example.com/api/v1` |
-| `FRONTEND_ORIGIN` | 实际前端站点的 HTTPS 源地址，用于验证该站点的跨域请求，如 `https://app.example.com` |
+| `FRONTEND_ORIGIN` | `http://192.0.2.10` 或 `https://app.example.com` |
+| `VITE_API_BASE` | 同源地址加 `/api/v1`，不带尾斜杠 |
 
-Variables 只保存浏览器需要使用的公开地址。`VITE_API_BASE` 会进入前端构建产物；部署主机地址、维护账号和 SSH 凭据统一保存在下方的 Secrets，不写进仓库，也不放在 Variables 中。
+地址会进入前端构建产物，Secrets 只负责集中配置及工作流日志遮蔽，不会让浏览器中的 API 地址保密。修改后需要重新运行完整部署，不能仅修改服务器环境。
 
-### GitHub Environment Secrets
+SSH 部署 Secrets：
 
-在仓库的 **Settings → Environments → production** 中添加：
+- `BACKEND_SSH_HOST`：部署主机域名或 IPv4，SSH 使用 22 端口。
+- `BACKEND_SSH_USER`：已初始化的普通维护用户，不允许 root。
+- `BACKEND_SSH_KEY`：专用部署私钥，使用对应公钥登录，不使用共享密码。
+- `BACKEND_SSH_KNOWN_HOSTS`：经可信连接核验的主机公钥记录。
 
-- `CLOUDFLARE_API_TOKEN`: Cloudflare API Token
-- `CLOUDFLARE_ACCOUNT_ID`: 部署目标的 Cloudflare 账户 ID
-- `BACKEND_SSH_HOST`: 敏感的部署主机域名或 IPv4 地址，SSH 使用 22 端口
-- `BACKEND_SSH_USER`: 已初始化的普通维护用户，不允许 `root`
-- `BACKEND_SSH_KEY`: 仅用于部署的 SSH 私钥，对应公钥安装到普通维护用户；不使用共享登录密码
-- `BACKEND_SSH_KNOWN_HOSTS`: 经可信连接核验的服务器 SSH 公钥记录；工作流严格校验，不临时接受未知主机
+当前整站流程不使用 Cloudflare Worker 发布凭据。域名可使用 Cloudflare 代理及源站证书；DNS、证书与源站访问限制由管理员维护。
 
-### 后端主机初始化
+## 服务器首次初始化
 
-工作流只负责发布到已有服务。管理员首次准备：
+管理员需先准备：
 
-- Python 3.12+、支持 `systemd --user` 的普通用户，启用该用户的 linger，使服务在退出 SSH 后及重启后继续运行。用户无需 sudo 或 Docker 权限。
-- `~/app/current` 指向已有可用版本；`~/app/shared/backend.env` 保存运行配置，`~/app/shared/data` 保存任务结果。
-- `~/app/venv/bin/python` 中已安装 pip，用于为新版本的 `.venv` 安装依赖；这个引导环境不随发布改动。
-- 已有用户服务 `~/.config/systemd/user/hackathon-backend.service`，首次自动发布会更新为仓库中的[服务定义](../../deploy/hackathon-backend.service)。后端保持单 worker，监听本机 18000 端口。
-- HTTPS 反向代理已连接本机 18000，允许前端跨域访问；TLS、域名和代理配置继续由管理员维护。
+- Python 3.12、普通维护用户与 `systemd --user`，为该用户启用 linger。发布用户无需 sudo 或 Docker 权限。
+- `~/app/current` 指向一个已有可用版本，其中包含 `web/dist` 与后端独立 `.venv`，作为首次发布的回退目标。
+- `~/app/shared/backend.env` 保存配置，`~/app/shared/data` 保存任务；权限仅授予维护用户。
+- `~/app/venv/bin/python` 中安装支持 `--python` 的 pip，作为安装新环境的引导工具。
+- 安装仓库中的 `deploy/hackathon-backend.service` 为用户服务，后端单 worker 监听 `127.0.0.1:18000`。
+- Nginx 静态根目录指向维护用户的 `app/current/web/dist`，将 `/api/`、`/health`、`/docs` 和 `/openapi.json` 反向代理到本机 18000 端口。SPA 页面回退到 `index.html`，缺失的 `/assets/` 文件返回 404。
+- 为 Nginx 提供维护用户 home、`app`、`releases` 目录的穿越权限；发布脚本仅额外开放版本目录的穿越和 `web/dist` 静态产物的读取权限。共享配置、数据及 SSH 私钥保持私有。
+- 上传请求体上限需容纳最多 10 个、每个 20 MiB 的文件及 multipart 开销。
 
-多模态服务配置仅保存在服务器的 `~/app/shared/backend.env`；未配置时图片和扫描件显式失败。工作流的上线验证使用文本层 PDF，不依赖模型密钥。
+IP 访问可直接使用 HTTP 的同源页面与 API；若采用域名，管理员另行维护 TLS。修改 Nginx 前须验证配置，并保留已有站点配置。
 
-### 发布与回退
+### Python 与 OCR
 
-每次发布保存到 `~/app/releases/<提交SHA>-<运行编号>-<重试编号>`，包括独立 `.venv`、依赖版本记录和上一个服务配置。版本目录不会自动删除，共享数据和配置不随代码替换。
+发布默认使用维护用户的 `~/.local/bin/python3.12`，可通过共享文件中的 `BACKEND_PYTHON` 指定其他路径。系统 `python3` 只运行发布脚本，不决定新环境版本。
 
-普通维护用户可执行：
+`PADDLE_OCR_ENABLED` 未配置或为 `0` 时只安装普通依赖，并明确记录仅验证文本 PDF。设为 `1` 时安装完整 OCR 依赖并运行真实模型及公网图片、扫描 PDF 探针。服务器其他虚拟环境中的手工依赖不会被借用。自动发布只读取共享配置。
+
+服务的 `MemoryHigh` / `MemoryMax` 分别为 6 GiB / 8 GiB，CPU 配额为两核；模型固定在线程内创建和串行复用。主机还须为系统、其他服务，以及旧版本运行期间的新版本模型预检保留内存。
+
+### 回退与数据
+
+版本位于 `~/app/releases/<提交SHA>-<运行编号>-<重试编号>`，保存独立环境、依赖版本记录和上一版服务配置。版本目录不会自动删除。
 
 ```sh
 systemctl --user status hackathon-backend --no-pager
-systemctl --user restart hackathon-backend
 journalctl --user -u hackathon-backend -f
-# 将下面的发布标识替换为 current 所指向的目录名
+# 使用 current 所指向的发布标识
 python3 ~/app/current/deploy/backend.py <发布标识> --rollback
 ```
 
-启动或公网验证失败会恢复旧代码、旧服务配置和旧依赖，不回滚共享任务数据。若前端的 Cloudflare 发布失败，但后端已验证正常，保留该后端版本并将工作流标记为失败，修复后重新发布。
-
-当前任务队列在进程内存中，部署重启可能中断处理中的任务，应在无进行中联调任务时发布；已完成的任务保留。自动部署不负责数据库迁移、OCR 模型配置或真实评测。
-
-### Token 权限要求
-
-创建 API Token 时需要以下权限：
-
-1. **Account Settings: Read** - 读取账户信息
-2. **Workers Scripts: Edit** - 部署和更新 Worker
-3. **Workers KV Storage: Edit** - Worker Sites 静态资源存储
-4. **Workers Routes: Edit** - 配置自定义域名路由
-
-### 为什么这样设计？
-
-**安全性**：
-- PR 不访问生产 secrets，防止恶意代码窃取
-- 使用 GitHub Environment 增加审批层（可选配置 reviewers）
-- Token 权限最小化，只给必需的 Workers 权限
-
-**可靠性**：
-- 代码经过审查后才部署
-- main 分支保持可交付状态
-- 支持手动触发部署和回滚
-
-**效率**：
-- PR 快速验证（无部署等待）
-- 合并后自动部署
+任务队列仍在进程内存中，重启可能中断进行中的任务，应在无进行中联调任务时发布；已完成任务保留。自动部署不负责数据库迁移或真实评测。

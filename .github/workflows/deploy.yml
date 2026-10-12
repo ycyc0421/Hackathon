@@ -44,18 +44,18 @@ jobs:
           echo "sha=$REVISION" >> "$GITHUB_OUTPUT"
 
   deploy-backend:
-    name: 部署后端与公网验证
+    name: 发布整站与公网验证
     needs: revision
     if: needs.revision.outputs.sha != ''
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     environment: production
     permissions:
       contents: read
       deployments: write
     env:
-      VITE_API_BASE: ${{ vars.VITE_API_BASE }}
-      FRONTEND_ORIGIN: ${{ vars.FRONTEND_ORIGIN }}
+      VITE_API_BASE: ${{ secrets.VITE_API_BASE }}
+      FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
       BACKEND_SSH_HOST: ${{ secrets.BACKEND_SSH_HOST }}
       BACKEND_SSH_USER: ${{ secrets.BACKEND_SSH_USER }}
       RELEASE_ID: ${{ needs.revision.outputs.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -88,18 +88,13 @@ jobs:
         run: |
           python3 - <<'PY'
           import os, re
-          from urllib.parse import urlsplit
+          from deploy.target import validate_target
 
           required = ("VITE_API_BASE", "FRONTEND_ORIGIN", "BACKEND_SSH_HOST", "BACKEND_SSH_USER", "BACKEND_SSH_KEY", "BACKEND_SSH_KNOWN_HOSTS")
           for name in required:
               if not os.environ.get(name):
                   raise SystemExit(f"production 环境缺少配置：{name}")
-          api = urlsplit(os.environ["VITE_API_BASE"])
-          if api.scheme != "https" or not api.hostname or api.path != "/api/v1" or api.query or api.fragment or api.username or api.password:
-              raise SystemExit("VITE_API_BASE 必须是以 /api/v1 结尾的 HTTPS 地址，不带尾斜杠、查询参数或凭据")
-          origin = urlsplit(os.environ["FRONTEND_ORIGIN"])
-          if origin.scheme != "https" or not origin.hostname or origin.path not in ("", "/") or origin.query or origin.fragment or origin.username or origin.password:
-              raise SystemExit("FRONTEND_ORIGIN 必须是前端站点的 HTTPS 源地址")
+          validate_target(os.environ["VITE_API_BASE"], os.environ["FRONTEND_ORIGIN"])
           if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9.-]*", os.environ["BACKEND_SSH_HOST"]):
               raise SystemExit("BACKEND_SSH_HOST 需为域名或 IPv4 地址")
           user = os.environ["BACKEND_SSH_USER"]
@@ -113,15 +108,6 @@ jobs:
           npm ci
           npm run build
 
-      - name: 保存供前端部署使用的构建产物
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-production
-          path: web/dist/
-          if-no-files-found: error
-          retention-days: 7
-          overwrite: true
-
       - name: 准备部署密钥和服务器指纹
         env:
           BACKEND_SSH_KEY: ${{ secrets.BACKEND_SSH_KEY }}
@@ -131,17 +117,19 @@ jobs:
           printf '%s\n' "$BACKEND_SSH_KEY" > "$RUNNER_TEMP/backend_key"
           printf '%s\n' "$BACKEND_SSH_KNOWN_HOSTS" > "$RUNNER_TEMP/backend_known_hosts"
 
-      - name: 发布独立后端版本
+      - name: 打包前端并发布 Python 3.12 后端，预检 OCR
         id: backend
         run: |
           ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
           target="$BACKEND_SSH_USER@$BACKEND_SSH_HOST"
-          git archive --format=tar.gz --output="$RUNNER_TEMP/$RELEASE_ID.tar.gz" HEAD
+          git archive --format=tar --output="$RUNNER_TEMP/$RELEASE_ID.tar" HEAD
+          tar --append --file="$RUNNER_TEMP/$RELEASE_ID.tar" --directory="$GITHUB_WORKSPACE" web/dist
+          gzip "$RUNNER_TEMP/$RELEASE_ID.tar"
           ssh "${ssh_options[@]}" "$target" 'mkdir -p app/incoming'
           scp "${ssh_options[@]}" "$RUNNER_TEMP/$RELEASE_ID.tar.gz" "$target:app/incoming/$RELEASE_ID.tar.gz"
           ssh "${ssh_options[@]}" "$target" "python3 - $RELEASE_ID" < deploy/backend.py
 
-      - name: 验证公网接口、上传轮询及返回契约
+      - name: 验证前端、公网接口及 OCR 图片和扫描 PDF（启用时）
         id: smoke
         env:
           SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
@@ -157,7 +145,7 @@ jobs:
           scp "${ssh_options[@]}" "$target:app/releases/$RELEASE_ID/smoke-output/*.json" "$SMOKE_OUTPUT_DIR/"
           node backend/tools/validate_outputs.mjs "$SMOKE_OUTPUT_DIR"
 
-      - name: 公网联调失败时回退后端
+      - name: 公网联调失败时回退整站
         if: failure() && steps.backend.outcome == 'success' && steps.smoke.outcome == 'failure'
         run: |
           ssh -i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts" "$BACKEND_SSH_USER@$BACKEND_SSH_HOST" "python3 - $RELEASE_ID --rollback" < deploy/backend.py
@@ -166,66 +154,11 @@ jobs:
         if: always()
         run: rm -f "$RUNNER_TEMP/backend_key" "$RUNNER_TEMP/backend_known_hosts"
 
-      - name: 记录后端部署结果
+      - name: 记录整站部署结果
         run: |
           {
-            echo '## 后端部署与公网验证通过'
-            echo '后端版本已切换，跨域预检、样例上传轮询和返回契约校验均通过。'
-            echo '前端发布结果请查看「部署前端到 Cloudflare」job。'
-          } >> "$GITHUB_STEP_SUMMARY"
-
-  deploy-frontend:
-    name: 部署前端到 Cloudflare
-    needs: [revision, deploy-backend]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: production
-    permissions:
-      contents: read
-      deployments: write
-    steps:
-      - name: 重试时也确认发布版本仍是最新 main
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          REVISION: ${{ needs.revision.outputs.sha }}
-        run: |
-          latest=$(gh api "repos/$GH_REPO/commits/main" --jq .sha)
-          if [ "$REVISION" != "$latest" ]; then
-            echo "::error::main 已更新，请运行最新版本的完整部署。"
-            exit 1
-          fi
-
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.revision.outputs.sha }}
-          persist-credentials: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: 取回同一次部署的前端构建产物
-        uses: actions/download-artifact@v5
-        with:
-          name: frontend-production
-          path: web/dist/
-
-      - name: 安装 Worker 依赖
-        working-directory: worker
-        run: npm ci
-
-      - name: 发布前端静态资源与 Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy
-
-      - name: 记录前端部署结果
-        run: |
-          {
-            echo '## 前后端部署完成'
-            echo '后端已通过公网验证，前端静态资源与 Worker 已发布。'
+            echo '## 前后端部署与公网验证通过'
+            echo '前后端已切换到同一版本，首页与静态资源、跨域预检、样例上传轮询和返回契约校验均通过。'
+            echo '共享配置启用 OCR 时，还须通过真实模型预检、图片与无文本层扫描 PDF 的公网验证；验证模式见步骤日志。'
             echo '前端默认仍使用示例模式；联调时在顶栏切换到「真实后端」，或使用 ?mock=0。'
           } >> "$GITHUB_STEP_SUMMARY"

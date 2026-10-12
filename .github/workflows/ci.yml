@@ -32,6 +32,7 @@ jobs:
         run: |
           python backend/tools/test_compare.py
           python backend/tools/test_review_regressions.py
+          python backend/tools/test_paddle_adapter.py
 
       - name: 接口与金标
         run: |
@@ -100,6 +101,6 @@ jobs:
             echo '## CI 仅验证，不部署'
             echo '本次运行执行测试、契约校验和前端构建；构建产物上传不代表线上服务已更新。'
             echo '只有 main 的 push CI 成功后，才会触发独立的 Deploy frontend and backend 工作流；PR 验证不部署。'
-            echo '请在部署运行中分别查看「部署后端与公网验证」和「部署前端到 Cloudflare」的结果；过期提交会跳过部署。'
+            echo '请在部署运行中查看「发布整站与公网验证」的结果；过期提交会跳过部署。'
             echo "[打开部署工作流]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/workflows/deploy.yml)"
           } >> "$GITHUB_STEP_SUMMARY"

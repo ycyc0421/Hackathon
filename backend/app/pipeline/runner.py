@@ -20,10 +20,27 @@ from . import classify, rules
 from .align import align_items
 from .compare import build_comparisons, build_item_comparisons
 from .extract import extract_fields
+from .normalize import normalize_description
 from .reader import guess_file_type, read_document
 from .rows import parse_line_items
 
 log = logging.getLogger("backend.pipeline")
+
+
+def _apply_ocr_corrections(line_items: list[dict], corrections: list[dict[str, str]]) -> None:
+    """Keep the uncorrected OCR reading as evidence; compare the corrected candidate cautiously."""
+    for correction in corrections:
+        corrected = normalize_description(correction["corrected"])
+        for line in line_items:
+            code = next((field.get("raw_value") for field in line["fields"] if field["field_key"] == "item_code"), None)
+            if code != correction["item_code"]:
+                continue
+            for field in line["fields"]:
+                # raw_value 已截断为 80 字符；归一值仍保留完整品名。
+                if field["field_key"] == "description" and field["normalized_value"] == corrected:
+                    field["raw_text"] = correction["original"]
+                    field["raw_value"] = correction["original"]
+                    field["status"] = "LOW_CONFIDENCE"
 
 
 def run_check(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
@@ -136,6 +153,32 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
             table.doc_text, doc_type, page=page, row_keys=table.header_keys or None
         )
         line_items = table.line_items
+
+        if result.ocr_corrections:
+            _apply_ocr_corrections(line_items, result.ocr_corrections)
+            changes = [f"{c['item_code']}: {c['original']} → {c['corrected']}" for c in result.ocr_corrections]
+            errors.append({
+                "code": "OCR_AUTO_CORRECTED",
+                "message": f"{filename} 的 OCR 数字/字母混淆已按单位格式和另一识别结果校正：{'；'.join(changes)}。原识别值保留在字段证据中，请核对原件。",
+                "level": "WARNING",
+                "file_ids": [file_id],
+            })
+
+        if result.uncertain_item_codes:
+            uncertain_codes = set(result.uncertain_item_codes)
+            for li in line_items:
+                code = next((f.get("raw_value") for f in li["fields"] if f["field_key"] == "item_code"), None)
+                if code in uncertain_codes:
+                    for f in li["fields"]:
+                        if f["field_key"] == "description":
+                            f["status"] = "NORMALIZE_FAILED"
+                            f["normalized_value"] = None
+            errors.append({
+                "code": "OCR_TEXT_DISAGREEMENT",
+                "message": f"{filename} 的商品品名在普通 OCR 与表格识别中不一致（货号：{', '.join(result.uncertain_item_codes)}），品名级比对待人工复核。",
+                "level": "WARNING",
+                "file_ids": [file_id],
+            })
 
         if table.suspected:
             row_unparsed = True

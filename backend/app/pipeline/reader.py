@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import base64
 import struct
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from io import BytesIO
 from pathlib import Path
 
@@ -23,6 +23,7 @@ from ..config import (
     LLM_MODEL,
     LLM_TIMEOUT,
     MIN_TEXT_LAYER_CHARS,
+    PADDLE_OCR_ENABLED,
     PDF_EXT,
     llm_enabled,
 )
@@ -46,6 +47,8 @@ class ReadResult:
     parse_method: ParseMethod | None = None
     error_message: str | None = None
     failed: bool = False
+    uncertain_item_codes: list[str] = field(default_factory=list)
+    ocr_corrections: list[dict[str, str]] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -155,6 +158,21 @@ def _read_pdf(data: bytes) -> ReadResult:
         return ReadResult(error_message=f"PDF 解析失败：{exc}", failed=True)
 
     if unreadable_pages:
+        if PADDLE_OCR_ENABLED:
+            images = _pdf_pages_to_images(data)
+            if images is None:
+                return ReadResult(page_count=page_count, error_message="PaddleOCR 处理扫描页需要 pymupdf", failed=True)
+            from .paddle_reader import read_image as paddle_read_image
+            uncertain_codes: list[str] = []
+            corrections: list[dict[str, str]] = []
+            for index in unreadable_pages:
+                recognized = paddle_read_image(images[index - 1][1])
+                if not recognized.ok:
+                    return ReadResult(page_count=page_count, error_message=f"PDF 第 {index} 页：{recognized.error_message}", failed=True)
+                chunks[index - 1] = recognized.text
+                uncertain_codes.extend(recognized.uncertain_item_codes)
+                corrections.extend(recognized.ocr_corrections)
+            return ReadResult(text="\n".join(chunks).strip(), page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes, ocr_corrections=corrections)
         if llm_enabled():
             images = _pdf_pages_to_images(data)
             if images is not None:
@@ -169,6 +187,23 @@ def _read_pdf(data: bytes) -> ReadResult:
         return ReadResult(text=text, page_count=page_count, parse_method=ParseMethod.TEXT_LAYER)
 
     # 没有文本层 —— 多半是扫描件
+    if PADDLE_OCR_ENABLED:
+        images = _pdf_pages_to_images(data)
+        if images is None:
+            return ReadResult(page_count=page_count, error_message="PaddleOCR 处理扫描 PDF 需要 pymupdf", failed=True)
+        from .paddle_reader import read_image as paddle_read_image
+        chunks = []
+        uncertain_codes: list[str] = []
+        corrections: list[dict[str, str]] = []
+        for index, (_, image) in enumerate(images, start=1):
+            recognized = paddle_read_image(image)
+            if not recognized.ok:
+                return ReadResult(page_count=page_count, error_message=f"PDF 第 {index} 页：{recognized.error_message}", failed=True)
+            chunks.append(recognized.text)
+            uncertain_codes.extend(recognized.uncertain_item_codes)
+            corrections.extend(recognized.ocr_corrections)
+        return ReadResult(text="\n".join(chunks), page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes, ocr_corrections=corrections)
+
     if not llm_enabled():
         return ReadResult(
             page_count=page_count,
@@ -194,7 +229,7 @@ def _read_pdf(data: bytes) -> ReadResult:
 def _pdf_pages_to_images(data: bytes) -> list[tuple[str, bytes]] | None:
     """扫描版 PDF 需要先渲染成图。依赖可选的 pymupdf。"""
     try:
-        import fitz  # pymupdf
+        import pymupdf as fitz
     except ImportError:
         return None
 
@@ -211,6 +246,9 @@ def _pdf_pages_to_images(data: bytes) -> list[tuple[str, bytes]] | None:
 # 图片
 # --------------------------------------------------------------------------
 def _read_image(data: bytes) -> ReadResult:
+    if PADDLE_OCR_ENABLED:
+        from .paddle_reader import read_image as paddle_read_image
+        return paddle_read_image(data)
     size = _image_size(data)
     if not llm_enabled():
         hint = ""
