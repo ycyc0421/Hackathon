@@ -1,0 +1,44 @@
+{
+  "task_id": "fixture_edi_failed",
+  "status": "FAILED",
+  "created_at": "2026-10-12T12:00:00+08:00",
+  "finished_at": "2026-10-12T12:00:01+08:00",
+  "input": {
+    "destination_country": "US",
+    "destination_country_name": "美国",
+    "notes": "合成前端验收夹具；非真实接口输出；未进行合规评估，不用于报关或付款。"
+  },
+  "items": [],
+  "documents": [
+    {"file_id": "f_truncated", "file_name": "invoice-truncated.edi", "file_type": "EDI", "doc_type": null, "process_status": "FAILED", "page_count": null, "error_message": "合成失败场景：报文在金额段中截断，未完成解析。"}
+  ],
+  "extractions": [],
+  "comparisons": [],
+  "risks": [],
+  "summary": {
+    "document_count": 1,
+    "field_count": 0,
+    "conflict_count": 0,
+    "missing_count": 0,
+    "risk_count": 0,
+    "unrecognized_count": 0
+  },
+  "errors": [
+    {
+      "code": "DOC_PARSE_FAILED",
+      "message": "invoice-truncated.edi 报文被截断，解析未完成。",
+      "level": "ERROR",
+      "file_ids": [
+        "f_truncated"
+      ]
+    },
+    {
+      "code": "ALL_DOCUMENTS_FAILED",
+      "message": "全部文件均未能处理成功，无法完成比对与合规校验",
+      "level": "FATAL",
+      "file_ids": [
+        "f_truncated"
+      ]
+    }
+  ]
+}

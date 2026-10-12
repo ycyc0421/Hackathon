@@ -1,0 +1,44 @@
+{
+  "task_id": "fixture_edi_unsupported",
+  "status": "FAILED",
+  "created_at": "2026-10-12T12:00:00+08:00",
+  "finished_at": "2026-10-12T12:00:01+08:00",
+  "input": {
+    "destination_country": "US",
+    "destination_country_name": "美国",
+    "notes": "合成前端验收夹具；非真实接口输出；未进行合规评估，不用于报关或付款。"
+  },
+  "items": [],
+  "documents": [
+    {"file_id": "f_edi", "file_name": "invoice.edi", "file_type": "OTHER", "doc_type": null, "process_status": "UNSUPPORTED", "page_count": null, "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"}
+  ],
+  "extractions": [],
+  "comparisons": [],
+  "risks": [],
+  "summary": {
+    "document_count": 1,
+    "field_count": 0,
+    "conflict_count": 0,
+    "missing_count": 0,
+    "risk_count": 0,
+    "unrecognized_count": 0
+  },
+  "errors": [
+    {
+      "code": "UNSUPPORTED_FILE_TYPE",
+      "message": "invoice.edi 暂不支持：当前仅支持 PDF 与图片",
+      "level": "WARNING",
+      "file_ids": [
+        "f_edi"
+      ]
+    },
+    {
+      "code": "ALL_DOCUMENTS_FAILED",
+      "message": "全部文件均未能处理成功，无法完成比对与合规校验",
+      "level": "FATAL",
+      "file_ids": [
+        "f_edi"
+      ]
+    }
+  ]
+}
