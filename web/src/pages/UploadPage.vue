@@ -389,11 +389,6 @@ const extractProgress = computed(() => {
   return { done, total: liveDocs.value.length }
 })
 
-/** 逐文件处理状态的展示对象 */
-function docStatus(d) {
-  return processStatus(d.process_status)
-}
-
 /** 待复核条目数：与差异页「需关注」、顶栏角标同一口径 */
 const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).length ?? 0)
 </script>
@@ -542,89 +537,45 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
           </NoticeBar>
         </div>
 
-        <!-- 终态结果：任务到达 COMPLETED / PARTIAL / FAILED 才进入这个分支 -->
-        <div v-else-if="task && !taskPending" key="result" class="task-status-body">
-          <div class="status-row">
+        <!--
+          任务全生命周期单视图：进行中 → 终态不换分支、不整体刷新。
+          各区域就地更新——阶段条常驻（终态全部置完成）、文件列表行结构
+          全程一致、终态才出现的区块（警示条 / CTA / 耗时）各自动画入场。
+          只有错误态例外，整区淡出替换。
+        -->
+        <div v-else key="task" class="task-status-body">
+          <!-- 任务创建后出现头部；「耗时」在终态淡入，不硬插 -->
+          <div v-if="task" class="status-row">
             <StatusBadge :status="statusInfo" />
             <span class="status-meta">任务 {{ task.task_id }}</span>
-            <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
+            <Transition name="fade">
+              <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
+            </Transition>
             <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
           </div>
 
           <!--
-            阶段条在终态保留（全部置为完成），与进行态同一位置同一形态：
-            它是这次任务走过的路径的记录，不是只在加载时才有意义的动画。
-            FAILED 没走完流程，不展示，错误说明见下方 NoticeBar。
+            阶段条常驻：进行态标出当前阶段（活动点脉冲），终态全部置为完成——
+            它是任务走过路径的记录。FAILED 没走完流程，不展示。
           -->
-          <ol v-if="task.status !== 'FAILED'" class="stage-row stage-row--settled">
-            <li v-for="s in TASK_STAGES" :key="s.key" class="stage-item done">
-              <span class="stage-dot" aria-hidden="true" />
-              <span class="stage-text">{{ s.text }}</span>
-            </li>
-          </ol>
-
-          <!-- 部分成功：最容易做成静默忽略的状态 -->
-          <NoticeBar
-            v-if="task.status === 'PARTIAL'"
-            tone="warn"
-            title="本次检查未包含全部文件"
-            :detail="`${failedDocs.length} 份文件未能处理成功。以下比对结果缺少这些文件的数据，不代表它们一致。`"
-          />
-
-          <NoticeBar
-            v-if="task.status === 'FAILED'"
-            tone="bad"
-            title="检查失败"
-            detail="未产生任何比对结果。请检查文件格式后重试。"
-          />
-
-          <ul class="doc-list">
-            <li v-for="d in task.documents" :key="d.file_id" class="doc-item">
-              <div class="doc-main">
-                <span class="doc-name">{{ d.file_name }}</span>
-                <span v-if="d.error_message" class="doc-error">{{ d.error_message }}</span>
-              </div>
-              <StatusBadge :status="docStatus(d)" />
-            </li>
-          </ul>
-
-          <!-- 完成态主路径：直接给去差异页的按钮，不让用户自己找下一屏 -->
-          <div v-if="task.status === 'COMPLETED' || task.status === 'PARTIAL'" class="next-actions">
-            <button class="btn primary" @click="navigate.go('diff')">
-              {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
-            </button>
-            <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
-          </div>
-        </div>
-
-        <!--
-          进行态统一视图：覆盖上传中 → 排队 → 逐份解析 → 交叉比对的整段等待。
-          关键约束是"轮询拿到第一次响应后界面不能跳变"——
-          阶段条/已等待时长/提示在整个未达终态期间持续在屏，
-          文件列表在后端返回 documents 后就地由骨架换成真实逐文件状态，
-          只有到达终态才整体淡出到结果视图，保证加载动画与结果在视觉上连续。
-        -->
-        <div v-else key="processing" class="task-status-body">
-          <!-- 任务已创建（拿到首次轮询）后补充徽章与任务号，与终态头部同一形态 -->
-          <div v-if="task" class="status-row">
-            <StatusBadge :status="statusInfo" />
-            <span class="status-meta">任务 {{ task.task_id }}</span>
-            <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
-          </div>
-
           <div class="stage-header">
-            <ol class="stage-row">
+            <ol v-if="task?.status !== 'FAILED'" class="stage-row">
               <li
                 v-for="(s, i) in TASK_STAGES"
                 :key="s.key"
                 class="stage-item"
-                :class="{ done: i < stageIndex, active: i === stageIndex }"
+                :class="{
+                  done: i < stageIndex || !taskPending,
+                  active: taskPending && i === stageIndex,
+                }"
               >
                 <span class="stage-dot" aria-hidden="true" />
                 <span class="stage-text">{{ s.text }}</span>
               </li>
             </ol>
-            <span class="wait-line">已等待 {{ elapsedText }}</span>
+            <Transition name="fade">
+              <span v-if="taskPending" class="wait-line">已等待 {{ elapsedText }}</span>
+            </Transition>
           </div>
 
           <!--
@@ -652,18 +603,38 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
             </div>
           </div>
 
-          <p v-if="retryHint" class="processing-hint">网络异常，正在自动重连…</p>
-          <p v-else-if="slowHint" class="processing-hint">
+          <p v-if="taskPending && retryHint" class="processing-hint">网络异常，正在自动重连…</p>
+          <p v-else-if="taskPending && slowHint" class="processing-hint">
             处理时间较长，仍在等待。可以继续留在本页，也可以稍后回来查看。
           </p>
 
+          <!-- 终态警示条：收合动画入场，不硬插（部分成功是最容易做成静默忽略的状态） -->
+          <Transition :css="false" v-bind="collapseHooks">
+            <NoticeBar
+              v-if="task?.status === 'PARTIAL'"
+              tone="warn"
+              title="本次检查未包含全部文件"
+              :detail="`${failedDocs.length} 份文件未能处理成功。以下比对结果缺少这些文件的数据，不代表它们一致。`"
+            />
+          </Transition>
+          <Transition :css="false" v-bind="collapseHooks">
+            <NoticeBar
+              v-if="task?.status === 'FAILED'"
+              tone="bad"
+              title="检查失败"
+              detail="未产生任何比对结果。请检查文件格式后重试。"
+            />
+          </Transition>
+
           <!--
-            文件列表与终态同一结构（左文件名、右状态徽章），全程零跳变：
+            文件列表全程同一结构（左文件名、右状态徽章），零跳变：
             - 后端未返回 documents：用本地已选文件的真实文件名，状态为上传中/排队中
             - 后端已返回 documents：随每轮轮询就地刷新（解析中 → 已抽取/处理失败）
-            只有完全拿不到文件名时（mock 场景未选文件）才落回骨架屏。
+            处理进度计数紧贴列表上方， spinner 标明仍在处理；
+            只有完全拿不到文件名时（mock 未选文件）才落回骨架屏。
           -->
-          <p v-if="extractProgress" class="extract-progress">
+          <p v-if="taskPending && extractProgress" class="extract-progress">
+            <span class="inline-spinner" aria-hidden="true" />
             已处理 {{ extractProgress.done }} / {{ extractProgress.total }} 份文件
           </p>
           <ul v-if="displayDocs.length" class="doc-list">
@@ -672,7 +643,10 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
                 <span class="doc-name">{{ d.name }}</span>
                 <span v-if="d.error" class="doc-error">{{ d.error }}</span>
               </div>
-              <StatusBadge :status="d.status" />
+              <span class="doc-status">
+                <span v-if="d.status.tone === 'running'" class="inline-spinner" aria-hidden="true" />
+                <StatusBadge :status="d.status" />
+              </span>
             </li>
           </ul>
           <ul v-else class="doc-list skeleton-list" aria-hidden="true">
@@ -681,6 +655,19 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
               <SkeletonBlock width="56px" height="20px" />
             </li>
           </ul>
+
+          <!-- 完成态主路径：收合动画入场，直接给去差异页的按钮 -->
+          <Transition :css="false" v-bind="collapseHooks">
+            <div
+              v-if="task && (task.status === 'COMPLETED' || task.status === 'PARTIAL')"
+              class="next-actions"
+            >
+              <button class="btn primary" @click="navigate.go('diff')">
+                {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
+              </button>
+              <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
+            </div>
+          </Transition>
         </div>
       </Transition>
     </section>
