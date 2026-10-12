@@ -27,6 +27,7 @@ class TaskStore:
             if version != 1 and (version != 0 or tables):
                 raise RuntimeError(f'数据库结构版本不兼容：{version}；请先备份，原库保持不变')
             conn.executescript((DATA_ROOT / 'schema.sql').read_text(encoding='utf-8'))
+            importer.backfill_task_relations(conn)
             conn.execute('CREATE TABLE IF NOT EXISTS api_task_payloads (task_id TEXT PRIMARY KEY REFERENCES tasks(task_id) ON DELETE CASCADE, payload_json TEXT NOT NULL)')
 
     def _connect(self):

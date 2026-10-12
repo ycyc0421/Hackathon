@@ -98,10 +98,11 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(task['finished_at'], '2026-10-12T12:00:00+08:00')
 
     def test_ocr_evidence_and_item_members_preserved(self):
-        for item in self.task['items']:
+        for number, item in enumerate(self.task['items'], 1):
             item['label'] = item.pop('display_name', '陶瓷杯')
             item['alignment_status'] = 'ALIGNED'
-            item['members'] = [{'file_id': self.task['documents'][0]['file_id'], 'item_no': 1, 'match_score': None}]
+            item['members'] = [{'file_id': self.task['documents'][0]['file_id'], 'item_no': number, 'match_score': None}]
+            self.task['extractions'][0].setdefault('line_items', []).append({'item_no': number, 'fields': []})
         self.task['extractions'][0]['fields'][0].update(raw_text='CERAMIC MUG 35OML', raw_value='35OML', normalized_value='350ML', status='LOW_CONFIDENCE')
         self.task['errors'].append({'code': 'OCR_AUTO_CORRECTED', 'message': '核对原件', 'level': 'WARNING', 'file_ids': [self.task['documents'][0]['file_id']]})
         self.store.create(self.task)

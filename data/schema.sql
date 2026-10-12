@@ -130,6 +130,27 @@ CREATE TABLE IF NOT EXISTS risk_files (
     FOREIGN KEY (file_id) REFERENCES documents(file_id) ON DELETE CASCADE
 );
 
+-- A risk may apply to several item groups. Keep the legacy risks.item_id
+-- column for backwards compatibility, and use this relation for the full
+-- API related_item_ids array.
+CREATE TABLE IF NOT EXISTS risk_items (
+    risk_id TEXT NOT NULL,
+    task_id TEXT NOT NULL,
+    item_id TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    PRIMARY KEY (risk_id, item_id),
+    FOREIGN KEY (risk_id) REFERENCES risks(risk_id) ON DELETE CASCADE,
+    FOREIGN KEY (task_id, item_id) REFERENCES items(task_id, item_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_risk_items_item ON risk_items(task_id, item_id);
+
+-- 随任务删除清除标记，旧版本重写任务后再次升级时仍可补齐关系。
+CREATE TABLE IF NOT EXISTS task_relation_state (
+    task_id TEXT PRIMARY KEY NOT NULL,
+    FOREIGN KEY (task_id) REFERENCES tasks(task_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS hs_dictionary (
     hs_code TEXT PRIMARY KEY,
     description TEXT,
