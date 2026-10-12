@@ -1,0 +1,64 @@
+{
+  "source_commit": "fca14f56910333c4bac8c72cfd6428ffe2fb6f2a",
+  "mode": "digital",
+  "evidence": "real loopback TCP HTTP with isolated SQLite and upload paths",
+  "python": "3.12.13 (main, Apr 14 2026, 14:31:26) [MSC v.1944 64 bit (AMD64)]",
+  "checked_at": "2026-10-12T12:27:51.687730+00:00",
+  "external_llm_enabled": false,
+  "fresh_ocr_invoked": false,
+  "ocr_observation": null,
+  "diagnostic_runtime_override": null,
+  "http_tasks": 125,
+  "uploaded_files": 329,
+  "task_statuses": {
+    "COMPLETED": 101,
+    "FAILED": 23,
+    "PARTIAL": 1
+  },
+  "field_checks": 6569,
+  "field_checks_failed": 753,
+  "field_failures_by_key": {
+    "description": 753
+  },
+  "checks": 8053,
+  "checks_failed": 0,
+  "checks_by_category": {
+    "source_integrity": 629,
+    "integration": 139,
+    "parse": 300,
+    "rows": 300,
+    "evidence": 6559,
+    "conflict": 60,
+    "internal_warning": 20,
+    "capability_boundary": 46
+  },
+  "failures_by_category": {},
+  "address_gap_cases": [
+    "SHP-00003",
+    "SHP-00013",
+    "SHP-00023",
+    "SHP-00033",
+    "SHP-00043",
+    "SHP-00053",
+    "SHP-00063",
+    "SHP-00073",
+    "SHP-00083",
+    "SHP-00093"
+  ],
+  "production_accessed": false,
+  "candidate_source_modified": false,
+  "limits": [
+    "synthetic single-template text benchmark",
+    "no browser acceptance",
+    "no production deployment/restart acceptance",
+    "no verified country-law or certificate-bodies acceptance"
+  ],
+  "packages": {
+    "fastapi": "0.143.0",
+    "pydantic": "2.14.1",
+    "httpx": "0.28.1",
+    "uvicorn": "0.54.0",
+    "pypdf": "6.20.0",
+    "pymupdf": "1.28.2"
+  }
+}

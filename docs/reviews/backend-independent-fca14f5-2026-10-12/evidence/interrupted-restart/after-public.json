@@ -1,0 +1,44 @@
+{
+  "task_id": "tsk_20261012_0001_c8ba27fccbbc",
+  "status": "FAILED",
+  "created_at": "2026-10-12T20:28:43+08:00",
+  "finished_at": "2026-10-12T20:37:49+08:00",
+  "input": {
+    "destination_country": "US",
+    "destination_country_name": "美国",
+    "trade_mode": null,
+    "declared_currency": null,
+    "notes": null
+  },
+  "documents": [
+    {
+      "file_id": "f1",
+      "file_name": "commercial_invoice.scan.png",
+      "file_type": "IMAGE",
+      "doc_type": null,
+      "process_status": "PARSING",
+      "page_count": null,
+      "error_message": null
+    }
+  ],
+  "extractions": [],
+  "items": [],
+  "comparisons": [],
+  "risks": [],
+  "summary": {
+    "document_count": 1,
+    "field_count": 0,
+    "conflict_count": 0,
+    "missing_count": 0,
+    "risk_count": 0,
+    "unrecognized_count": 0
+  },
+  "errors": [
+    {
+      "code": "TASK_INTERRUPTED",
+      "message": "服务重启中断了任务，请重新上传文件",
+      "level": "FATAL",
+      "file_ids": []
+    }
+  ]
+}

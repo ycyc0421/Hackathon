@@ -1,0 +1,65 @@
+{
+  "document_numbers": {
+    "checks": 300,
+    "failed": 0
+  },
+  "unit_associations": {
+    "checks": 3461,
+    "failed": 0
+  },
+  "description_raw_business_text": {
+    "checks": 753,
+    "failed": 0,
+    "convention": "case/space insensitive; explicitly labelled inline SKU suffix kept in evidence but omitted for business-description comparison"
+  },
+  "destination_country": {
+    "checks": 300,
+    "failed": 126,
+    "failed_groups": 42,
+    "failed_raw_values": {
+      "Melbourne, Australia": 36,
+      "Singapore, Singapore": 51,
+      "Sydney, Australia": 39
+    }
+  },
+  "four_row_empty_hs_originals": [
+    {
+      "case": "SHP-00007",
+      "rows": 4,
+      "missing_hs_rows": [
+        1
+      ],
+      "quantities": {
+        "1": 264,
+        "2": 408,
+        "3": 1000,
+        "4": 4800
+      },
+      "amounts": {
+        "1": 2061.84,
+        "2": 2415.36,
+        "3": 2520,
+        "4": 2544
+      }
+    },
+    {
+      "case": "SHP-00097",
+      "rows": 4,
+      "missing_hs_rows": [
+        1
+      ],
+      "quantities": {
+        "1": 7500,
+        "2": 312,
+        "3": 1040,
+        "4": 6000
+      },
+      "amounts": {
+        "1": 1500,
+        "2": 2221.44,
+        "3": 3712.8,
+        "4": 3420
+      }
+    }
+  ]
+}

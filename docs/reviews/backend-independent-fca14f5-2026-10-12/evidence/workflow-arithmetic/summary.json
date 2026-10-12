@@ -1,0 +1,80 @@
+{
+  "source_commit": "fca14f56910333c4bac8c72cfd6428ffe2fb6f2a",
+  "mode": "arithmetic",
+  "checks": 8,
+  "checks_failed": 0,
+  "detail": [
+    {
+      "check": "SHP-00015 original warning present",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "SHP-00015-arithmetic original unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "SHP-00015-arithmetic raw evidence unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "SHP-00015 resolved arithmetic warning removed",
+      "passed": true,
+      "actual": [
+        {
+          "code": "RULES_UNVERIFIED",
+          "message": "规则适用条件尚需核实，风险提示不代表合规结论",
+          "level": "WARNING",
+          "file_ids": []
+        },
+        {
+          "code": "HUMAN_CORRECTED",
+          "message": "有效抽取值经人工修正并重算；原始证据保留，操作者身份未认证",
+          "level": "WARNING",
+          "file_ids": [
+            "f1"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "SHP-00016 original warning present",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "SHP-00016-arithmetic original unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "SHP-00016-arithmetic raw evidence unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "SHP-00016 resolved arithmetic warning removed",
+      "passed": true,
+      "actual": [
+        {
+          "code": "RULES_UNVERIFIED",
+          "message": "规则适用条件尚需核实，风险提示不代表合规结论",
+          "level": "WARNING",
+          "file_ids": []
+        },
+        {
+          "code": "HUMAN_CORRECTED",
+          "message": "有效抽取值经人工修正并重算；原始证据保留，操作者身份未认证",
+          "level": "WARNING",
+          "file_ids": [
+            "f2"
+          ]
+        }
+      ]
+    }
+  ],
+  "evidence": "real HTTP correction of persisted results from original-file uploads in this run; no new inference in this stage",
+  "production_accessed": false
+}

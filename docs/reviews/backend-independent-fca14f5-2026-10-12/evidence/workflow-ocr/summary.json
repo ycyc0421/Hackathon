@@ -1,0 +1,243 @@
+{
+  "source_commit": "fca14f56910333c4bac8c72cfd6428ffe2fb6f2a",
+  "mode": "ocr",
+  "checks": 11,
+  "checks_failed": 0,
+  "detail": [
+    {
+      "check": "ocr-currency-1 original unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "ocr-currency-1 raw evidence unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "currency EUR does not clear pending OCR description",
+      "passed": true,
+      "actual": [
+        {
+          "comparison_id": "cmp_10",
+          "item_id": "item_1",
+          "field_key": "description",
+          "label": "货物描述",
+          "value_type": "STRING",
+          "unit": null,
+          "status": "NOT_CHECKED",
+          "canonical_value": null,
+          "severity": "WARNING",
+          "rule_id": null,
+          "note": "品名未取得同一货号区域的两路 OCR 一致核验；存在文字差异、区域未定位或仅单路恢复布局。保留识别原文与归一值，待人工复核。",
+          "values": [
+            {
+              "file_id": "f1",
+              "file_name": "exportdoc-commercial-invoice-sample.pdf",
+              "raw_value": "100% Cotton T-shirt, unisex, assorted colors",
+              "normalized_value": "100 棉 T 衬衫 UNISEX ASSORTED COLORS",
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            },
+            {
+              "file_id": "f2",
+              "file_name": "exportdoc-packing-list-sample.pdf",
+              "raw_value": "100% Cotton T-shirt, unisex, assorted colors",
+              "normalized_value": "100 棉 T 衬衫 UNISEX ASSORTED COLORS",
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            },
+            {
+              "file_id": "f3",
+              "file_name": "exportdoc-proforma-invoice-sample.pdf",
+              "raw_value": "100% Cotton T-shirt, unisex, assorted colors",
+              "normalized_value": "100 棉 T 衬衫 UNISEX ASSORTED COLORS",
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": "当前无法自动判断，请人工复核。"
+        }
+      ]
+    },
+    {
+      "check": "currency EUR updates all matching money units",
+      "passed": true,
+      "actual": [
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": "TOTAL AMOUNT (USD)\n$1,400.00",
+          "raw_value": "USD 1,400.00",
+          "normalized_value": 1400,
+          "unit": "EUR",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null,
+          "item_id": null
+        },
+        {
+          "field_key": "unit_price",
+          "label": "单价",
+          "raw_text": "1   CT-2408   100% Cotton T-shirt, unisex, assorted colors   6109.10   500 PCS   $2.80   $1,400.00",
+          "raw_value": "$2.80",
+          "normalized_value": 2.8,
+          "unit": "EUR",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null,
+          "item_id": "item_1",
+          "line_no": 1
+        },
+        {
+          "field_key": "amount",
+          "label": "行金额",
+          "raw_text": "1   CT-2408   100% Cotton T-shirt, unisex, assorted colors   6109.10   500 PCS   $2.80   $1,400.00",
+          "raw_value": "$1,400.00",
+          "normalized_value": 1400,
+          "unit": "EUR",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null,
+          "item_id": "item_1",
+          "line_no": 1
+        }
+      ]
+    },
+    {
+      "check": "ocr-currency-2 original unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "ocr-currency-2 raw evidence unchanged",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "currency GBP does not clear pending OCR description",
+      "passed": true,
+      "actual": [
+        {
+          "comparison_id": "cmp_10",
+          "item_id": "item_1",
+          "field_key": "description",
+          "label": "货物描述",
+          "value_type": "STRING",
+          "unit": null,
+          "status": "NOT_CHECKED",
+          "canonical_value": null,
+          "severity": "WARNING",
+          "rule_id": null,
+          "note": "品名未取得同一货号区域的两路 OCR 一致核验；存在文字差异、区域未定位或仅单路恢复布局。保留识别原文与归一值，待人工复核。",
+          "values": [
+            {
+              "file_id": "f1",
+              "file_name": "exportdoc-commercial-invoice-sample.pdf",
+              "raw_value": "100% Cotton T-shirt, unisex, assorted colors",
+              "normalized_value": "100 棉 T 衬衫 UNISEX ASSORTED COLORS",
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            },
+            {
+              "file_id": "f2",
+              "file_name": "exportdoc-packing-list-sample.pdf",
+              "raw_value": "100% Cotton T-shirt, unisex, assorted colors",
+              "normalized_value": "100 棉 T 衬衫 UNISEX ASSORTED COLORS",
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            },
+            {
+              "file_id": "f3",
+              "file_name": "exportdoc-proforma-invoice-sample.pdf",
+              "raw_value": "100% Cotton T-shirt, unisex, assorted colors",
+              "normalized_value": "100 棉 T 衬衫 UNISEX ASSORTED COLORS",
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": "当前无法自动判断，请人工复核。"
+        }
+      ]
+    },
+    {
+      "check": "currency GBP updates all matching money units",
+      "passed": true,
+      "actual": [
+        {
+          "field_key": "total_amount",
+          "label": "总金额",
+          "raw_text": "TOTAL AMOUNT (USD)\n$1,400.00",
+          "raw_value": "USD 1,400.00",
+          "normalized_value": 1400,
+          "unit": "GBP",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null,
+          "item_id": null
+        },
+        {
+          "field_key": "unit_price",
+          "label": "单价",
+          "raw_text": "1   CT-2408   100% Cotton T-shirt, unisex, assorted colors   6109.10   500 PCS   $2.80   $1,400.00",
+          "raw_value": "$2.80",
+          "normalized_value": 2.8,
+          "unit": "GBP",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null,
+          "item_id": "item_1",
+          "line_no": 1
+        },
+        {
+          "field_key": "amount",
+          "label": "行金额",
+          "raw_text": "1   CT-2408   100% Cotton T-shirt, unisex, assorted colors   6109.10   500 PCS   $2.80   $1,400.00",
+          "raw_value": "$1,400.00",
+          "normalized_value": 1400,
+          "unit": "GBP",
+          "confidence": null,
+          "status": "EXTRACTED",
+          "page": 1,
+          "bbox": null,
+          "bbox_unit": null,
+          "item_id": "item_1",
+          "line_no": 1
+        }
+      ]
+    },
+    {
+      "check": "exportdoc-commercial-invoice-sample.pdf multi-revision original download",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "exportdoc-packing-list-sample.pdf multi-revision original download",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "exportdoc-proforma-invoice-sample.pdf multi-revision original download",
+      "passed": true,
+      "actual": null
+    }
+  ],
+  "evidence": "real HTTP correction of persisted results from original-file uploads in this run; no new inference in this stage",
+  "production_accessed": false
+}

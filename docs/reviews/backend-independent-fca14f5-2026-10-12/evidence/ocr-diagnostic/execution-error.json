@@ -1,0 +1,8 @@
+{
+  "source_commit": "fca14f56910333c4bac8c72cfd6428ffe2fb6f2a",
+  "status": "INCOMPLETE",
+  "error_type": "httpx.RemoteProtocolError",
+  "message": "Server disconnected without sending a response during GET polling",
+  "server_exit_code_before_cleanup": "not recorded by first revision of harness",
+  "limits": "Do not count as parsed, failed parsing, or a proven native crash. Later restart results are recorded separately."
+}

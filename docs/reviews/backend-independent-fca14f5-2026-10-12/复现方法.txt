@@ -1,0 +1,17 @@
+固定检出仓库PR37提交 fca14f56910333c4bac8c72cfd6428ffe2fb6f2a，不要用漂移分支代替。
+安装该版本backend/requirements.txt。扫描新推理环境为Python3.12.13、paddlepaddle==3.2.0、paddleocr[doc-parser]==3.7.0、setuptools<82；完整版本锁见requirements-py312-ocr.lock.txt。
+按固定源码backend/README.md安装PaddleCPU依赖；从仓库根npm ci用于公开输出校验。
+
+在此证据包根目录执行（把<repo>换为固定源码路径）：
+python -X utf8 review_latest.py --repo <repo> --dataset inputs/dataset --edi inputs/edi --out rerun-digital
+python -X utf8 review_latest.py --repo <repo> --dataset inputs/dataset --edi inputs/edi --mode ocr --out rerun-ocr --ocr-cache <本机Paddle缓存目录>
+node <repo>/backend/tools/validate_outputs.mjs <rerun-digital/public绝对路径>
+node <repo>/backend/tools/validate_outputs.mjs <rerun-ocr/public绝对路径>
+
+驱动固定SHA，另启127.0.0.1服务和独立SQLite/上传路径，finally中停止服务。OCR仅在--mode ocr时开启，保存原始模型输出但不改预测。金标在预测结束后读取，不传入应用。
+返回码1可能表示保留下来的金标文本口径差异，不能只凭返回码判业务实错；核对summary/field-checks及复验记录。主驱动尚未纳入所有补充口径；补充对照脚本已随包保留。
+analyze_originals.py、restart_interrupted.py、review_stored_workflow.py、prepare_delivery.py的本轮路径仍在常量中；跨机复跑需按包根及固定源码/数据位置调整，不能修改业务源码或原件。
+中断恢复脚本需要新的实际中断任务数据库，不能以包内before/after保存结果替代新的重启操作。
+
+输入范围：300文本PDF、3扫描PNG、3T恤原始PDF、23EDI、2项目JSON，共331份不同原始文件；保留原数据全量金标/元数据。未打包其余模拟扫描变体；不是360份原件全量包。
+包内不含原运行SQLite、模型、缓存、环境凭据或生产日志。公开完整响应和报告见evidence，MANIFEST.sha256核对每个包内成员。
