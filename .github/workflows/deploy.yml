@@ -54,8 +54,7 @@ jobs:
       contents: read
       deployments: write
     env:
-      VITE_API_BASE: ${{ secrets.VITE_API_BASE }}
-      FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
+      SITE_ORIGIN: ${{ secrets.SITE_ORIGIN }}
       BACKEND_SSH_HOST: ${{ secrets.BACKEND_SSH_HOST }}
       BACKEND_SSH_USER: ${{ secrets.BACKEND_SSH_USER }}
       RELEASE_ID: ${{ needs.revision.outputs.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -90,11 +89,11 @@ jobs:
           import os, re
           from deploy.target import validate_target
 
-          required = ("VITE_API_BASE", "FRONTEND_ORIGIN", "BACKEND_SSH_HOST", "BACKEND_SSH_USER", "BACKEND_SSH_KEY", "BACKEND_SSH_KNOWN_HOSTS")
+          required = ("SITE_ORIGIN", "BACKEND_SSH_HOST", "BACKEND_SSH_USER", "BACKEND_SSH_KEY", "BACKEND_SSH_KNOWN_HOSTS")
           for name in required:
               if not os.environ.get(name):
                   raise SystemExit(f"production 环境缺少配置：{name}")
-          validate_target(os.environ["VITE_API_BASE"], os.environ["FRONTEND_ORIGIN"])
+          validate_target(os.environ["SITE_ORIGIN"])
           if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9.-]*", os.environ["BACKEND_SSH_HOST"]):
               raise SystemExit("BACKEND_SSH_HOST 需为域名或 IPv4 地址")
           user = os.environ["BACKEND_SSH_USER"]
@@ -139,7 +138,7 @@ jobs:
           target="$BACKEND_SSH_USER@$BACKEND_SSH_HOST"
           python3 - <<'PY' | ssh "${ssh_options[@]}" "$target" "cd app/releases/$RELEASE_ID && .venv/bin/python deploy/smoke.py smoke-output"
           import json, os
-          print(json.dumps({name: os.environ[name] for name in ("VITE_API_BASE", "FRONTEND_ORIGIN")}))
+          print(json.dumps({"SITE_ORIGIN": os.environ["SITE_ORIGIN"]}))
           PY
           mkdir -p "$SMOKE_OUTPUT_DIR"
           scp "${ssh_options[@]}" "$target:app/releases/$RELEASE_ID/smoke-output/*.json" "$SMOKE_OUTPUT_DIR/"

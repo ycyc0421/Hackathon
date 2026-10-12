@@ -6,7 +6,7 @@
 
 本项目读取一票货物的多份单证，抽取关键字段，**交叉比对文件之间的一致性**，并依据目的国规则提示证书缺失或归类风险。系统不替人下结论——它只定位矛盾、给出可追溯的依据，把最终判断留给负责合规的人。
 
-**在线 Demo**：https://hackathon-demo.ychome.net
+**在线 Demo**：https://hackathon.ychome.net
 
 线上默认使用内置示例数据；真实后端需单独运行，并配置 API 连接。
 
@@ -58,7 +58,7 @@ VITE_API_BASE=http://127.0.0.1:8000/api/v1 npm --prefix web run dev
 
 在前端顶栏切换数据源，或通过 URL 参数 `?mock=0` 使用真实后端、`?mock=1` 使用示例数据。切换数据源无需修改代码；`VITE_API_BASE` 在前端启动或构建时读取，未设置时请求同源 `/api/v1`。
 
-当前 [部署工作流](.github/workflows/deploy.yml) 会在 main 的 CI 成功后，先部署独立 FastAPI 后端并验证公网接口，再发布前端与 JS Worker。线上前端通过构建时的 `VITE_API_BASE` 直连 HTTPS 后端。API 地址填写位置、部署密钥和服务器初始化方式见 [CI/CD 配置说明](.github/workflows/README.md)。
+当前 [部署工作流](.github/workflows/deploy.yml) 在 main 的 CI 成功后，将前端与 FastAPI 后端作为同一版本发布和回退。线上统一使用上述域名，前端请求同源 `/api/v1`，不需要单独配置后端 URL。production Secrets 只配置一个 `SITE_ORIGIN` 供公网验证使用；部署密钥和服务器初始化方式见 [CI/CD 配置说明](.github/workflows/README.md)。
 
 在 GitHub Actions 中，`CI` 仅负责测试和构建；发布结果请查看 `Deploy frontend and backend` 工作流里的「部署后端与公网验证」和「部署前端到 Cloudflare」两个 job。
 

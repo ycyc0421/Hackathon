@@ -118,5 +118,6 @@ if __name__ == '__main__':
     # 配置通过标准输入传递，避免把地址插入远端 shell 命令。
     config = json.load(sys.stdin)
     settings = deployment_settings(Path.home() / 'app')
-    run(config['VITE_API_BASE'], config['FRONTEND_ORIGIN'].rstrip('/'), Path(sys.argv[1]),
+    origin = config['SITE_ORIGIN'].rstrip('/')
+    run(origin + '/api/v1', origin, Path(sys.argv[1]),
         ocr_enabled=settings['PADDLE_OCR_ENABLED'] == '1')
