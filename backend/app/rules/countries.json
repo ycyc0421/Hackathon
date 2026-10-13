@@ -1,11 +1,11 @@
 {
-  "version": "static-source-candidates-v3",
-  "updated_at": "2026-10-12",
+  "version": "static-source-candidates-v4",
+  "updated_at": "2026-10-13",
   "verified": false,
   "verified_by": null,
   "verified_at": null,
   "_readme": [
-    "Official source retrieval does not verify applicability or legal compliance. HS prefixes select review candidates only. No unconditional missing-certificate conclusion. Archived demo rules are not executed."
+    "Official source retrieval does not verify applicability or legal compliance. HS prefixes select review candidates only. Certificate/supporting-document prompts are conditional review prompts, not unconditional missing-certificate conclusions. Archived broad demo rules are not executed."
   ],
   "countries": {
     "DE": {
@@ -45,6 +45,64 @@
           "severity": "WARNING",
           "title": "陶瓷食品接触用途及规则适用条件待核对",
           "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "DE-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "?????????/?????? ?????????",
+          "detail": "????{country}????? {hs} ?????????????????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "?????????/??????",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "DE-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "?????????/?????? ?????????",
+          "detail": "????{country}????? {hs} ?????????????????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "?????????/??????",
           "source_ids": [
             "EU-FCM-LEGISLATION",
             "EU-CERAMICS-84-500"
@@ -126,6 +184,64 @@
             "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
           }
         }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "NL-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "?????????/?????? ?????????",
+          "detail": "????{country}????? {hs} ?????????????????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "?????????/??????",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "NL-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "?????????/?????? ?????????",
+          "detail": "????{country}????? {hs} ?????????????????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "?????????/??????",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        }
       ]
     },
     "FR": {
@@ -165,6 +281,64 @@
           "severity": "WARNING",
           "title": "陶瓷食品接触用途及规则适用条件待核对",
           "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "FR-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "?????????/?????? ?????????",
+          "detail": "????{country}????? {hs} ?????????????????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "?????????/??????",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "FR-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "?????????/?????? ?????????",
+          "detail": "????{country}????? {hs} ?????????????????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "?????????/??????",
           "source_ids": [
             "EU-FCM-LEGISLATION",
             "EU-CERAMICS-84-500"
@@ -240,6 +414,58 @@
             "national_implementation_review_required": true
           }
         }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "GB-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "?????????/?????? ?????????",
+          "detail": "????{country}????? {hs} ?????????????????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "?????????/??????",
+          "source_ids": [
+            "GB-FOOD-PACKAGING"
+          ],
+          "source_urls": [
+            "https://www.gov.uk/food-labelling-and-packaging/overview"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "GB-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "?????????/?????? ?????????",
+          "detail": "????{country}????? {hs} ?????????????????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "?????????/??????",
+          "source_ids": [
+            "GB-FOOD-PACKAGING"
+          ],
+          "source_urls": [
+            "https://www.gov.uk/food-labelling-and-packaging/overview"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true
+          }
+        }
       ]
     },
     "US": {
@@ -276,6 +502,58 @@
           "severity": "WARNING",
           "title": "陶瓷食品接触用途及规则适用条件待核对",
           "detail": "如属于陶瓷食品器皿，请核对 FDA 关于铅析出污染的执法指引及检测资料；该指引不等于所有陶瓷均需食品事先通知。缺少用途和检测信息，无法作合规判断。",
+          "source_ids": [
+            "FDA-CPG-545450"
+          ],
+          "source_urls": [
+            "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true
+          }
+        }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "US-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "???????????/???? ?????????",
+          "detail": "????{country}????? {hs} ??????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "???????????/????",
+          "source_ids": [
+            "FDA-CPG-545450"
+          ],
+          "source_urls": [
+            "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "US-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "???????????/???? ?????????",
+          "detail": "????{country}????? {hs} ??????????????????????????????????????????????????????????????????????? {where}?",
+          "document_name": "???????????/????",
           "source_ids": [
             "FDA-CPG-545450"
           ],

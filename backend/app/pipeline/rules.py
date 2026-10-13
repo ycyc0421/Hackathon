@@ -91,7 +91,7 @@ def country_rules(code: str | None) -> dict | None:
 
 
 def match_hs_rule(code: str | None, hs_code: str | None) -> dict | None:
-    """按 HS 章号（前两位）匹配归类规则；匹配不到返回 None。"""
+    """按 HS 前缀匹配归类规则；匹配不到返回 None。"""
     rules = country_rules(code)
     if not rules or not hs_code:
         return None
@@ -104,6 +104,29 @@ def match_hs_rule(code: str | None, hs_code: str | None) -> dict | None:
             if best is None or len(prefix) > len(str(best.get("chapter_prefix", ""))):
                 best = rule
     return best
+
+
+def match_certificate_rules(code: str | None, hs_code: str | None) -> list[dict]:
+    """按目的国和 HS 前缀匹配需人工核对的支持文件/证书规则。"""
+    rules = country_rules(code)
+    if not rules or not hs_code:
+        return []
+    hs = str(hs_code)
+    matched: list[tuple[int, dict]] = []
+    for rule in rules.get("certificate_rules", []):
+        prefixes = rule.get("hs_prefixes") or [rule.get("chapter_prefix", "")]
+        best_len = max((len(str(prefix)) for prefix in prefixes if prefix and hs.startswith(str(prefix))), default=0)
+        if best_len:
+            matched.append((best_len, rule))
+    matched.sort(key=lambda item: item[0], reverse=True)
+    return [rule for _, rule in matched]
+
+
+def _source_text_for(rule: dict) -> str:
+    urls = rule.get("source_urls", [])
+    if urls:
+        return "；".join(urls) + "（官方来源候选；适用条件未经人工核实）"
+    return rule_source_text()
 
 
 def hs_covered(code: str | None, hs_code: str | None) -> bool:
@@ -206,6 +229,52 @@ def evaluate_risks(
         for m in i["members"]:
             item_of_row[(m["file_id"], m["item_no"])] = i["item_id"]
 
+    seen_cert: set[tuple[str, str, str | None]] = set()
+
+    def certificate_risk(hs: str, file_id: str, item_id: str | None, where: str) -> None:
+        suffix = f"（品名：{item_labels.get(item_id, '')}）" if item_id else ""
+        related = [item_id] if item_id else []
+        for rule in match_certificate_rules(code, hs):
+            satisfied_by = set(rule.get("satisfied_by_doc_types", []))
+            if satisfied_by and doc_types.intersection(satisfied_by):
+                continue
+            dedupe = (str(rule.get("rule_id")), hs, item_id)
+            if dedupe in seen_cert:
+                continue
+            seen_cert.add(dedupe)
+            if unparsed:
+                unparsed_names = "、".join(d["file_name"] for d in unparsed)
+                add(
+                    type="OTHER",
+                    severity="WARNING",
+                    title=_mark(f"有 {len(unparsed)} 份文件未能解析，无法确认支持文件是否齐全{suffix}"),
+                    detail=_with_disclaimer(
+                        f"本票编码 {hs} 命中 {country_name} 的 {rule.get('document_name', '支持文件')} 复核规则，"
+                        f"但有 {len(unparsed)} 份文件未能解析（{unparsed_names}），可能包含相关支持文件，"
+                        "因此不作缺失结论。请先修复解析或人工核对原件。"
+                    ),
+                    related_field_keys=["hs_code", "destination_country"],
+                    related_item_ids=related,
+                    related_file_ids=[file_id, *[d["file_id"] for d in unparsed]],
+                    destination_country=code,
+                    rule_id=None,
+                )
+                continue
+            add(
+                type="MISSING_CERTIFICATE",
+                severity=rule.get("severity", "WARNING"),
+                title=_mark(f"{rule['title']}{suffix}"),
+                detail=_with_disclaimer(
+                    rule["detail"].format(country=country_name, hs=hs, where=where, doc_count=doc_count)
+                ),
+                related_field_keys=["hs_code", "destination_country"],
+                related_item_ids=related,
+                related_file_ids=[file_id],
+                destination_country=code,
+                rule_id=rule.get("rule_id"),
+                rule_source=_source_text_for(rule),
+            )
+
     def hs_risk(hs: str, file_id: str, item_id: str | None, where: str) -> None:
         rule = match_hs_rule(code, hs)
         suffix = f"（品名：{item_labels.get(item_id, '')}）" if item_id else ""
@@ -221,7 +290,7 @@ def evaluate_risks(
                 related_file_ids=[file_id],
                 destination_country=code,
                 rule_id=rule.get("rule_id"),
-                rule_source="；".join(rule.get("source_urls", [])) + "（官方来源候选；适用条件未经人工核实）" if rule.get("source_urls") else rule_source_text(),
+                rule_source=_source_text_for(rule),
             )
         else:
             add(
@@ -253,7 +322,9 @@ def evaluate_risks(
             if not hs or str(hs) in seen_doc:
                 continue
             seen_doc.add(str(hs))
-            hs_risk(str(hs), ext["file_id"], None, doc_names.get(ext["file_id"], ext["file_id"]))
+            where = doc_names.get(ext["file_id"], ext["file_id"])
+            certificate_risk(str(hs), ext["file_id"], None, where)
+            hs_risk(str(hs), ext["file_id"], None, where)
 
         # 品名级编码（多品名票）
         for li in ext.get("line_items") or []:
@@ -273,6 +344,7 @@ def evaluate_risks(
                 # where 带上文件名：两份文件对同一品名给了不同编码时，
                 # 两条风险的标题会完全一样，只有 detail 里的出处能区分开
                 where = f"{doc_names.get(ext['file_id'], ext['file_id'])} 第 {li['item_no']} 行"
+                certificate_risk(str(hs), ext["file_id"], item_id, where)
                 hs_risk(str(hs), ext["file_id"], item_id, where)
 
     return risks
