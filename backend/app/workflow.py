@@ -1,7 +1,6 @@
 """Human revisions preserve source evidence; reports never imply compliance approval."""
 import copy
 import hashlib
-import html
 import json
 import math
 import re
@@ -158,40 +157,20 @@ def correct(store, task_id, request):
     store.persist(task['task_id'])
     return task
 
-def report(store, task_id):
+def report(store, task_id, *, view='content'):
+    from .report_content import content
     task = store.get(task_id)
     if task is None:
-        raise WorkflowError(404,'TASK_NOT_FOUND','任务不存在')
-    if task['status'] in {'PENDING','PROCESSING'}:
-        raise WorkflowError(409,'TASK_NOT_FINISHED','任务尚未结束')
+        raise WorkflowError(404, 'TASK_NOT_FOUND', '任务不存在')
+    if task['status'] in {'PENDING', 'PROCESSING'}:
+        raise WorkflowError(409, 'TASK_NOT_FINISHED', '任务尚未结束')
     task = dump(CheckTask.model_validate(task))
     corrections = store.correction_history(task_id)
-    rule_dir = Path(__file__).resolve().parent / 'rules'
-    catalog_path = rule_dir / 'source_catalog.json'
-    metadata = {'source_catalog': json.loads(catalog_path.read_text(encoding='utf-8')) if catalog_path.is_file() else None,
-                'fetch_manifest': None}
-    def metadata_only(value):
-        if isinstance(value,list):
-            return [metadata_only(v) for v in value]
-        if isinstance(value,dict):
-            return {k:(copy.deepcopy(v) if k=='applicability' else metadata_only(v)) for k,v in value.items() if k in {'countries','rules','hs_rules','certificate_rules','required_certificates','version','code','name','id','rule_id','source_urls','source_ids','review_status','applicability'} or isinstance(v,(dict,list))}
-        return value
-    metadata['rule_metadata'] = metadata_only(rules.load_rules())
-    metadata['notice'] = '导出时当前来源目录与运行时监测状态，仅用于追溯来源和适用条件；不代表原任务运行时版本，也不代表法律适用已经核实。'
-    metadata['monitor_status'] = rule_sources.status()
-    return {'report_version':'1','generated_at':now_iso(),'result_hash':payload_hash(task),'rule_version':corrections[-1]['rule_version'] if corrections else None,'rule_version_note':'原任务未记录历史规则版本时为 null；修正任务使用重算审计中的版本。','current_catalog':metadata,'notice':'处理完成不代表合规通过；单一来源、未检查和失败必须分别核对。原始值是来源证据，有效归一值可能经人工修改。','task':task,'corrections':corrections}
-
-def report_html(envelope):
-    def table(headers, rows):
-        def cell(value):
-            return html.escape(str(value if value is not None else '—'))
-        return '<table><thead><tr>'+''.join('<th>'+cell(h)+'</th>' for h in headers)+'</tr></thead><tbody>'+''.join('<tr>'+''.join('<td>'+cell(v)+'</td>' for v in row)+'</tr>' for row in rows)+'</tbody></table>'
-    readable = '<h2>文件处理情况</h2>'+table(['文件','类型','处理状态','错误'],[[d['file_name'],d['doc_type'],d['process_status'],d.get('error_message')] for d in envelope['task']['documents']])
-    readable += '<h2>逐项检查</h2>'+table(['范围/品名','字段','结论','各文件有效值','说明'],[[c.get('item_id') or '整票',c['label'],c['status'],'；'.join(str(v.get('file_name',v['file_id']))+': '+str(v.get('normalized_value')) for v in c['values']),c.get('note')] for c in envelope['task']['comparisons']])
-    readable += '<h2>风险提示（非合规结论）</h2>'+table(['级别','提示','适用条件与说明','来源'],[[r['severity'],r['title'],r['detail'],r.get('rule_source')] for r in envelope['task']['risks']])
-    sections = [('任务与输入',{k:v for k,v in envelope['task'].items() if k in {'task_id','status','created_at','finished_at','input','summary'}})]
-    sections += [(title,envelope['task'][key]) for title,key in [('文件清单与失败','documents'),('原始证据与有效抽取值','extractions'),('多品名行组','items'),('逐字段比对及未检查项','comparisons'),('规则风险及来源','risks'),('错误与警告','errors')]]
-    sections.append(('人工修正审计',envelope['corrections']))
-    body = ''.join('<section><h2>'+html.escape(title)+'</h2><pre>'+html.escape(json.dumps(value,ensure_ascii=False,indent=2))+'</pre></section>' for title,value in sections)
-    meta = {k:v for k,v in envelope.items() if k not in {'task','corrections'}}
-    return '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>单证检查报告</title><style>body{font-family:system-ui;margin:32px;line-height:1.5}pre,td{white-space:pre-wrap;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:8px;text-align:left}section{border-top:1px solid #ccc}@media print{body{margin:0}}</style><h1>单证检查报告</h1><p>'+html.escape(envelope['notice'])+'</p>'+readable+'<h2>版本与来源记录</h2><pre>'+html.escape(json.dumps(meta,ensure_ascii=False,indent=2))+'</pre>'+body+'</html>'
+    original_hash = payload_hash(task)
+    from .public_errors import task_for_public_report
+    task = task_for_public_report(task)
+    envelope = {'report_version': '2', 'view': view, 'generated_at': now_iso(),
+                'result_hash': original_hash}
+    if view == 'archive':
+        return {**envelope, 'task': task, 'corrections': corrections}
+    return {**envelope, **content(task, corrections)}
