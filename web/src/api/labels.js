@@ -5,6 +5,8 @@
  * 但状态枚举是前端自己渲染的，必须有一份统一对照表，否则三个页面各写一套。
  *
  * 取值集合来自 docs/schema/check-task.schema.json，改动要同步。
+ * 报告契约 v2 独有的枚举（核实状态、局限说明等）来自
+ * docs/schema/report-content.schema.json，单独成组放在文件末尾。
  * 注意：后端已确认任务进行中状态为 PROCESSING（issue #4），schema 的旧写法 RUNNING 已随契约修订更正。
  */
 
@@ -35,6 +37,42 @@ export const PROCESS_STATUS = {
   EXTRACTED: { text: '已抽取', tone: 'ok' },
   FAILED: { text: '处理失败', tone: 'bad' },
   UNSUPPORTED: { text: '格式不支持', tone: 'warn' },
+}
+
+/**
+ * 单证类型。此前报告页直接输出 COMMERCIAL_INVOICE 这类契约枚举当展示文案
+ * （issue #51 第 3 点），导出件又把它原样带进用户报告，所以在这里补一张表。
+ * 查不到时 lookup 兜底为「未知」，不把英文枚举甩给用户。
+ */
+export const DOC_TYPE = {
+  COMMERCIAL_INVOICE: { text: '商业发票', tone: 'muted' },
+  PACKING_LIST: { text: '装箱单', tone: 'muted' },
+  BILL_OF_LADING: { text: '提单', tone: 'muted' },
+  CUSTOMS_DECLARATION: { text: '报关单', tone: 'muted' },
+  CERTIFICATE_OF_ORIGIN: { text: '原产地证', tone: 'muted' },
+  INSURANCE_POLICY: { text: '保险单', tone: 'muted' },
+  OTHER: { text: '其他单证', tone: 'muted' },
+}
+
+/**
+ * 行组对齐状态（report v2 的 items[].alignment_status）。
+ * PARTIAL / UNALIGNED 表示商品行没能完整对上，比对覆盖不完整，
+ * 不能读成"没问题"，所以带 hint 说明。
+ */
+export const ALIGNMENT_STATUS = {
+  ALIGNED: { text: '已对齐', tone: 'ok' },
+  PARTIAL: { text: '部分对齐', tone: 'warn', hint: '该行组只在部分文件中找到对应行，比对覆盖不完整' },
+  UNALIGNED: { text: '未对齐', tone: 'warn', hint: '该行组未能在其他文件中找到对应行，仅作为单文件证据' },
+}
+
+/**
+ * 行组对齐依据（items[].alignment_basis）。对齐依据是机器判断的线索，
+ * 只作说明用途，不代表比对结论。
+ */
+export const ALIGNMENT_BASIS = {
+  ITEM_CODE: '按货号对齐',
+  DESCRIPTION: '按品名描述对齐',
+  POSITION: '按行号位置对齐',
 }
 
 export const FIELD_STATUS = {
@@ -72,6 +110,64 @@ export const ERROR_LEVEL = {
   FATAL: { text: '严重', tone: 'bad' },
   ERROR: { text: '错误', tone: 'warn' },
   WARNING: { text: '警告', tone: 'muted' },
+}
+
+/* ---------- 报告契约 v2（docs/schema/report-content.schema.json）----------
+   以下枚举只出现在报告内容里，不在 CheckTask 契约中。取值同样来自
+   docs/schema/report-content.schema.json，改动要同步。 */
+
+/**
+ * 规则核实状态（risk.rule_context.verification_status 与
+ * provenance.rule_verification_status）。
+ *
+ * 三个取值**都不是 VERIFIED**：契约里根本没有"已核实"这一档。
+ * 所以文案不能写成"已核实"，也不能因为缺省而让读者以为默认通过——
+ * 未核实、未检查、未知都必须各自显示出来。
+ */
+export const VERIFICATION_STATUS = {
+  UNVERIFIED: { text: '未经人工核实', tone: 'warn', hint: '规则适用条件尚需人工核实，提示不代表合规结论' },
+  NOT_CHECKED: { text: '未校验', tone: 'warn', hint: '没有对应的规则编号，未做规则校验' },
+  UNKNOWN: { text: '核实状态未知', tone: 'muted', hint: '没有足够信息判断该规则是否经过核实' },
+}
+
+/** 历史规则版本的记录状态（provenance.execution_version_status） */
+export const EXECUTION_VERSION_STATUS = {
+  /** 原任务没有留下历史版本记录——必须如实说不知道，不能用当前版本顶替 */
+  UNKNOWN: '原任务未记录当时使用的规则版本',
+  RECORDED_IN_CORRECTION: '来自最近一次修正的审计记录',
+}
+
+/**
+ * 报告局限说明（limitations[]）。后端给的是固定语义代码，
+ * 由前端统一组织成中文，不逐条当正文堆叠（issue #51 第 6 点）。
+ */
+export const LIMITATION_TEXT = {
+  PROCESSING_IS_NOT_COMPLIANCE: '处理完成只表示流程走完，不代表合规通过。',
+  UNKNOWN_HISTORY_IS_NOT_CURRENT_VERSION: '历史规则版本缺失时按未知处理，不用当前版本回填。',
+  UNVERIFIED_RULES_REQUIRE_REVIEW: '规则适用条件未经人工核实，风险提示需要人工复核。',
+}
+
+/**
+ * 来源监测状态（provenance.sources[].status）。
+ *
+ * 注意 `NOT_CHECKED` 在这里的含义与比对状态、核实状态都不同：它说的是
+ * "这个来源的内容有没有去查过更新"，不是"这条规则校验过没有"。
+ * 所以文案要带上"来源"二字，避免读者把它和别处的"未校验"混为一谈。
+ */
+export const SOURCE_STATUS = {
+  NOT_CHECKED: { text: '来源更新未检查', tone: 'muted', hint: '未配置来源监测，仅展示目录，不代表没有变化' },
+  PENDING_REVIEW: { text: '来源有变更待复核', tone: 'warn', hint: '来源内容变化不等于法规修订，不会自动替换运行规则' },
+  UNCHANGED: { text: '来源未变化', tone: 'ok' },
+  CHANGED: { text: '来源内容已变化', tone: 'warn' },
+}
+
+/**
+ * 来源适用性复核状态（provenance.sources[].review_status）。
+ * 所有取值都表示"还没确认这条来源是否适用于本票"，没有"已适用"这一档。
+ */
+export const SOURCE_REVIEW_STATUS = {
+  APPLICABILITY_REVIEW_REQUIRED: { text: '适用性待复核', tone: 'warn', hint: '该来源是否适用于本票尚未确认' },
+  REVIEWED: { text: '适用性已复核', tone: 'ok' },
 }
 
 /**

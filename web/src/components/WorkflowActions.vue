@@ -2,9 +2,16 @@
 /**
  * 报告导出与人工修正。
  *
- * 网络行为全部收口在 api/index.js（getCorrections / createCorrection / exportReport），
- * 本组件只处理：字段选择、修正值与原因输入、busy、提示与文件下载交互——不直接
- * fetch、不 import request 层。
+ * 网络行为全部收口在 api/index.js（getCorrections / createCorrection /
+ * getReportContent / exportReportArchive），本组件只处理：字段选择、修正值与
+ * 原因输入、busy、提示与文件下载交互——不直接 fetch、不 import request 层。
+ *
+ * 导出有两条出口，对应报告契约 v2 的两种视图（issue #51）：
+ * - **HTML 报告**：拉 `view=content`，由 `src/report/document.js` 在前端排成
+ *   一份自包含的文档再下载。后端 `format=html` 已返回 410，排版是前端的职责。
+ * - **归档 JSON**：拉 `view=archive` 的原始文件，保留完整抽取结构与审计
+ *   before/after。默认报告正文不含这些内容，所以必须留一个能拿到它的出口，
+ *   否则完整证据就没有访问路径了。
  *
  * 关键语义（见交付说明 F2）：
  * - source_hash 来自 GET corrections 的 result_hash，不对公开 getCheck JSON 自算；
@@ -15,7 +22,8 @@
  * - 处理中切换任务时，过期的响应不覆盖新任务。
  */
 import { computed, inject, onBeforeUnmount, ref, watch } from 'vue'
-import { isMock, getCorrections, createCorrection, exportReport } from '../api/index.js'
+import { isMock, getCorrections, createCorrection, getReportContent, exportReportArchive } from '../api/index.js'
+import { buildReportHtml, reportFileName } from '../report/document.js'
 
 const task = inject('task')
 const taskError = inject('taskError', null)
@@ -104,19 +112,50 @@ async function revise() {
   } finally { activeRequest = null; busy.value = false }
 }
 
-async function download(format) {
+/** 触发浏览器下载。Blob 用完即释放，避免长时间占着内存 */
+function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url; anchor.download = filename; anchor.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+/**
+ * 导出 HTML 报告。
+ *
+ * 两步：先取结构化内容，再在前端排成文档。**排版失败不下载半成品**——
+ * 宁可报错也不给一份内容不全的报告，那比没有报告更危险。
+ */
+async function downloadHtml() {
   if (!available.value || busy.value) return
-  busy.value = true; error.value = ''
+  busy.value = true; error.value = ''; message.value = ''
   const id = task.value.task_id
   const controller = new AbortController()
   activeRequest = controller
   try {
-    const blob = await exportReport(id, format, { signal: controller.signal })
+    const content = await getReportContent(id, { view: 'content', signal: controller.signal })
     if (controller.signal.aborted || task.value?.task_id !== id) return
-    const url = URL.createObjectURL(blob)
-    const anchor = document.createElement('a')
-    anchor.href = url; anchor.download = `report-${id}.${format}`; anchor.click()
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    const html = buildReportHtml(content)
+    saveBlob(new Blob([html], { type: 'text/html;charset=utf-8' }), reportFileName(content, 'html'))
+    message.value = '已导出 HTML 报告。可在浏览器中打开，或用「打印 → 另存为 PDF」留档。'
+  } catch (e) {
+    if (controller.signal.aborted || task.value?.task_id !== id) return
+    error.value = e?.message || '导出失败'
+  } finally { activeRequest = null; busy.value = false }
+}
+
+/** 导出归档 JSON（完整抽取结构与审计记录） */
+async function downloadArchive() {
+  if (!available.value || busy.value) return
+  busy.value = true; error.value = ''; message.value = ''
+  const id = task.value.task_id
+  const controller = new AbortController()
+  activeRequest = controller
+  try {
+    const blob = await exportReportArchive(id, { signal: controller.signal })
+    if (controller.signal.aborted || task.value?.task_id !== id) return
+    saveBlob(blob, `report-${id}-archive.json`)
+    message.value = '已导出归档 JSON，包含完整抽取结构与修正审计，供离线核对。'
   } catch (e) {
     if (controller.signal.aborted || task.value?.task_id !== id) return
     // 任何失败都不下载错误内容、不显示成功
@@ -130,11 +169,12 @@ async function download(format) {
     <h2 class="card-title">报告导出与人工修正</h2>
     <p v-if="isMock()">示例任务不支持服务端导出或修正。请切换真实后端并上传单证。</p>
     <template v-else>
-      <p>处理完成不代表合规通过。报告包含原始证据、警告、未检查项和修正记录。HTML 报告可在浏览器打印为 PDF。</p>
+      <p>处理完成不代表合规通过。报告包含原始证据、警告、未检查项和修正记录；HTML 报告可在浏览器打印为 PDF。</p>
       <div class="workflow-buttons">
-        <button :disabled="!available || busy" @click="download('json')">导出 JSON</button>
-        <button :disabled="!available || busy" @click="download('html')">导出 HTML</button>
+        <button :disabled="!available || busy" @click="downloadHtml">导出 HTML 报告</button>
+        <button :disabled="!available || busy" @click="downloadArchive">导出归档 JSON</button>
       </div>
+      <p class="workflow-hint">归档 JSON 保留完整抽取结构与修正审计，供离线核对；默认报告正文不含这些明细。</p>
       <form v-if="editable" @submit.prevent="revise">
         <p>修正有效抽取值后重新比对，不重跑 OCR。原始读数保持不变；当前署名为未认证操作者。</p>
         <label>选择已有字段
@@ -159,6 +199,8 @@ async function download(format) {
 <style scoped>
 .workflow-actions p { margin: 12px 0; line-height: 1.6; }
 .workflow-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+/* 两个出口的区别要说清楚，否则用户不知道该点哪个 */
+.workflow-hint { margin-top: 8px; color: var(--text-muted); font-size: var(--text-xs); }
 form { display: grid; gap: 12px; margin-top: 20px; }
 label { display: grid; gap: 6px; }
 input, select, textarea { font: inherit; width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #bbb; border-radius: 6px; background: var(--surface, white); color: inherit; }
