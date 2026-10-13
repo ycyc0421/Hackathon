@@ -87,6 +87,9 @@ class TableResult:
 # --------------------------------------------------------------------------
 def _looks_like_header(line: str) -> set[str]:
     """一行里命中 ≥3 个表头列名才算表头，避免把普通文本行认成表头。"""
+    # 合计行可能同时包含多个列名，但仍属于票级字段。
+    if TOTAL_LINE.match(line):
+        return set()
     hits: set[str] = set()
     for pattern, key in HEADER_MAP:
         if pattern.search(line):
