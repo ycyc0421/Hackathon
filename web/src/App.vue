@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getEvaluation, getCheck } from './api/index.js'
+import { isMock, getEvaluation, getCheck } from './api/index.js'
 import { needsReview } from './utils/needsReview.js'
 import {
   task, taskError, isRunning,
@@ -30,7 +30,42 @@ const active = computed(() => route.name)
  * 顶栏的数据源切换 UI 已移除（改用 ?mock=1 URL 参数），
  * 这里只保留恢复逻辑本身。
  */
+const mock = isMock()
 const restoreError = ref('')
+const terminalStatuses = new Set(['COMPLETED', 'PARTIAL', 'FAILED'])
+// URL 仅保存任务编号，刷新后重新读取后端结果。
+watch(() => [task.value?.task_id, task.value?.status], ([id]) => {
+  if (isMock()) return
+  if (id) restoreError.value = ''
+  const url = new URL(window.location.href)
+  if (id && terminalStatuses.has(task.value?.status)) url.searchParams.set('task', id)
+  else if (!id) url.searchParams.delete('task')
+  // 保留 Vue Router 的历史状态，避免破坏前进、后退和滚动恢复。
+  window.history.replaceState(window.history.state, '', url)
+})
+onMounted(async () => {
+  if (isMock()) return
+  const id = new URLSearchParams(window.location.search).get('task')
+  if (!id) return
+  if (!/^tsk_[A-Za-z0-9_-]{1,100}$/.test(id)) {
+    restoreError.value = '任务编号格式无效，请重新上传或检查链接。'
+    return
+  }
+  isRunning.value = true
+  try {
+    await router.isReady()
+    const restored = await getCheck(id)
+    if (!terminalStatuses.has(restored.status)) {
+      restoreError.value = '此任务尚未结束，请稍后刷新查看结果。'
+      return
+    }
+    task.value = restored
+    await router.replace({ name: 'report' })
+  } catch (error) {
+    restoreError.value = `无法恢复任务：${error.message || '请检查网络或任务链接'}`
+  } finally { isRunning.value = false }
+})
+
 /** 当前检查任务。由上传页写入，差异页和报告页读取（ref 本体在 state/session.js） */
 provide('task', task)
 provide('taskError', taskError)
@@ -313,6 +348,7 @@ watch(() => route.name, updateIndicator)
       </button>
 
     </header>
+    <p v-if="mock" class="mock-notice" role="status">示例数据模式：结果与处理过程均为模拟，不代表真实检查或评测。</p>
 
     <!-- 移动端主导航：≤640px 显示（顶栏页签隐藏），选中态用颜色/字重表达，不用滑动指示条 -->
     <nav v-if="active !== 'home'" class="bottom-tabs" aria-label="页面导航">

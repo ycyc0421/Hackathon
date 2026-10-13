@@ -34,7 +34,7 @@ function resolveInitial() {
     const fromUrl = readMockParam()
     if (fromUrl !== null) {
       const value = fromUrl === '1'
-      window.localStorage.setItem(STORAGE_KEY, value ? '1' : '0')
+      try { window.localStorage.setItem(STORAGE_KEY, value ? '1' : '0') } catch { /* URL 选择不依赖存储写入成功 */ }
       return value
     }
     const saved = window.localStorage.getItem(STORAGE_KEY)

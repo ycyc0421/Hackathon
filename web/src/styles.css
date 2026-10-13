@@ -3983,3 +3983,41 @@ textarea {
 :root[data-theme='dark'] .theme-toggle .theme-icon::after {
   background: var(--surface-blur);
 }
+
+/* PR #50 复审：示例来源在所有页面持续可辨，不依赖已移除的切换器。 */
+.mock-notice {
+  margin: 0;
+  padding: 8px 16px;
+  background: var(--warning-bg);
+  color: var(--text-body);
+  text-align: center;
+  font-size: var(--text-xs);
+}
+
+/* 暗色是屏幕偏好，打印仍使用浅色纸面和深色文字。 */
+@media print {
+  :root[data-theme='dark'] {
+    color-scheme: light;
+    --surface: #fff;
+    --surface-desk: #fff;
+    --surface-raised: #fff;
+    --surface-sunken: #f4f5f6;
+    --text-body: #17212b;
+    --text-muted: #4b5563;
+    --text-disabled: #6b7280;
+    --border: #d1d5db;
+    --border-strong: #9ca3af;
+    --color-primary: #235875;
+    --on-primary: #fff;
+    --success: #246a42;
+    --success-strong: #246a42;
+    --warning: #885012;
+    --warning-strong: #885012;
+    --danger: #a62d32;
+    --danger-strong: #a62d32;
+    --info: #225f7a;
+    --info-strong: #225f7a;
+  }
+  .app::before, .app::after, .desk-glow { display: none; }
+  .reveal--armed { opacity: 1; transform: none; }
+}

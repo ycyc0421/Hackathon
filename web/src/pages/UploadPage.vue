@@ -5,7 +5,7 @@
  * 目的国暂由用户选择。契约第四节第 3 项未定「由用户选还是从文件识别」，
  * 这里按用户选择实现——可控，演示时不依赖抽取准确率。
  */
-import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, inject, watch, onMounted, onBeforeUnmount } from 'vue'
 import { createCheck, pollCheck, validateFiles, splitByName, ApiError, UPLOAD_LIMITS, isMock, isEdiName } from '../api/index.js'
 import { backendErrorText } from '../api/errors.js'
 import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
@@ -453,6 +453,11 @@ const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).
 
 /** 任务已到终态（按钮可点）：COMPLETED 或 PARTIAL */
 const taskDone = computed(() => task.value?.status === 'COMPLETED' || task.value?.status === 'PARTIAL')
+const statusRow = ref(null)
+let guidedTaskId = null
+
+// 任务头通常在处理中就已进入页面，终态更新不会再次触发 after-enter。
+watch([taskDone, reviewCount], () => onStatusRowEnter(statusRow.value), { flush: 'post' })
 
 /**
  * 「查看比对结果」一次性描边引导的启动时机。
@@ -465,13 +470,15 @@ const taskDone = computed(() => task.value?.status === 'COMPLETED' || task.value
  * 描边 transitionend 后给按钮一次轻微脉冲（一次即停）。全程只播一次。
  */
 function onStatusRowEnter(el) {
-  const btn = el.querySelector?.('.cta-trace')
-  const rect = el.querySelector?.('.cta-trace-rect')
+  const btn = el?.querySelector('.cta-trace')
+  const rect = el?.querySelector('.cta-trace-rect')
   if (!btn || !rect) return
   // 只有任务完成且有待复核项时才播引导
   const taskDone = task.value?.status === 'COMPLETED' || task.value?.status === 'PARTIAL'
   if (!taskDone || reviewCount.value === 0) return
+  if (guidedTaskId === task.value.task_id) return
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  guidedTaskId = task.value.task_id
   rect.setAttribute('x', '1')
   rect.setAttribute('y', '1')
   rect.setAttribute('width', String(btn.offsetWidth - 2))
@@ -492,9 +499,6 @@ function onStatusRowEnter(el) {
     { once: true }
   )
 }
-
-/** 任务完成且可点（COMPLETED 或 PARTIAL）时触发描边引导 */
-function onNextActionsEnter() { /* 已迁移到 onStatusRowEnter，保留空函数避免 template 引用报错 */ }
 
 /**
  * 是否提示 EDI 能力说明：真实模式且已选含 EDI 文件时显示。
@@ -671,7 +675,7 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
             硬插入会把文件列表瞬间顶开，看起来像卡片尺寸异常抖动。
           -->
           <Transition :css="false" v-bind="collapseHooks" @after-enter="onStatusRowEnter">
-            <div v-if="task" class="status-row">
+            <div v-if="task" ref="statusRow" class="status-row">
               <StatusBadge :status="statusInfo" />
               <span class="status-meta">任务 {{ task.task_id }}</span>
               <Transition name="fade">

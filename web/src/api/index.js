@@ -1,3 +1,4 @@
+import { mockSnapshot, startMockTask } from './mockProgress.js'
 /**
  * 数据访问层。页面只调这里的函数，不直接 fetch。
  *
@@ -86,104 +87,6 @@ function nextMockSample() {
   return stripComment(JSON.parse(JSON.stringify(MOCK_SAMPLES[mockScenario])))
 }
 
-/* ── 示例数据下的处理过程模拟 ────────────────────────────────────────────
- *
- * 示例数据模式原先每次轮询都直接返回终态样例，于是"排队中 → 解析文件中 →
- * 交叉比对中 → 已生成结果"这条阶段条、以及逐份文件的「解析中 → 已抽取」
- * 全都看不到——而这些恰恰是上传页最值得看的部分。演示视频只能自己在脚本里
- * 编一套，和前端真实动画是两回事。
- *
- * 现在按"任务创建后经过的时长"给出中间态，用的是契约里本来就有的字段
- * （status: PROCESSING；Document.process_status: UPLOADED / PARSING），
- * 因此页面渲染路径与真实后端完全一致，没有任何为演示专设的分支。
- *
- * 这不是伪造结果：过程走完后给出的仍是该场景的样例，终态一个字段都没变；
- * 示例数据模式本身也已由横幅明确标注。时长取 9 秒，短到不拖沓，
- * 又足够看清三次阶段切换与逐份解析。
- */
-
-const MOCK_TASK_KEY = 'app.mockTaskStartedAt'
-const MOCK_RUN_MS = 9000
-/** 三份文件的解析起始点（占总时长的比例），错开才有"逐份推进"的观感 */
-const MOCK_PARSE_AT = [0.18, 0.42, 0.66]
-/** 阶段切换点：PENDING → PROCESSING → （全部抽取完）→ 终态 */
-const MOCK_PROCESSING_AT = 0.12
-
-function mockElapsedRatio(taskId) {
-  let startedAt = 0
-  try {
-    const raw = window.sessionStorage.getItem(`${MOCK_TASK_KEY}:${taskId}`)
-    if (raw) startedAt = Number(raw) || 0
-    if (!startedAt) {
-      startedAt = Date.now()
-      window.sessionStorage.setItem(`${MOCK_TASK_KEY}:${taskId}`, String(startedAt))
-    }
-  } catch {
-    // sessionStorage 不可用（隐私模式等）：按"刚创建"处理，过程照常走一遍
-    startedAt = startedAt || Date.now()
-  }
-  return Math.min(1, (Date.now() - startedAt) / MOCK_RUN_MS)
-}
-
-/**
- * 把终态样例降级成"进行中"的样子。只改状态与逐文件进度，
- * 不动任何结果数据（comparisons / risks / summary 原样保留），
- * 因为进行中的任务本来就不该让用户看到结论。
- */
-function toProcessing(sample, ratio) {
-  const docs = sample.documents ?? []
-  const parsedCount = MOCK_PARSE_AT.filter((t) => ratio >= t).length
-
-  sample.status = 'PROCESSING'
-  sample.finished_at = null
-  sample.documents = docs.map((doc, i) => {
-    const status =
-      i < parsedCount ? 'EXTRACTED' : i === parsedCount ? 'PARSING' : 'UPLOADED'
-    return {
-      ...doc,
-      process_status: status,
-      // 还没解析完的份数不该有页码，留 null 比填一个假数字诚实
-      page_count: status === 'EXTRACTED' ? doc.page_count : null,
-    }
-  })
-  // 进行中：结果区尚无内容
-  sample.extractions = []
-  sample.comparisons = []
-  sample.risks = []
-  sample.items = []
-  sample.errors = []
-  sample.summary = {
-    document_count: docs.length,
-    field_count: 0,
-    conflict_count: 0,
-    missing_count: 0,
-    risk_count: 0,
-    unrecognized_count: 0,
-  }
-  return sample
-}
-
-/**
- * 示例数据下的任务快照：按创建后经过的时长给出中间态或终态。
- * 终态直接返回样例原样，不做任何加工。
- */
-function mockSnapshot(taskId) {
-  const sample = nextMockSample()
-  sample.task_id = taskId
-  const ratio = mockElapsedRatio(taskId)
-  if (ratio < MOCK_PROCESSING_AT) {
-    sample.status = 'PENDING'
-    sample.finished_at = null
-    sample.documents = (sample.documents ?? []).map((doc) => ({
-      ...doc,
-      process_status: 'UPLOADED',
-      page_count: null,
-    }))
-    return toProcessing(sample, 0)
-  }
-  return ratio >= 1 ? sample : toProcessing(sample, ratio)
-}
-
 // —— 真实实现 ——
 
 /**
@@ -214,7 +117,7 @@ export async function createCheck(
       onUploadProgress?.(Math.round((loaded / total) * 100))
     }
     return {
-      task_id: `mock_${Date.now()}`,
+      task_id: startMockTask(),
       status: 'PENDING',
       created_at: new Date().toISOString(),
     }
@@ -246,7 +149,7 @@ export async function createCheck(
 export async function getCheck(taskId, { onRetry, signal } = {}) {
   if (isMock()) {
     await sleep(200)
-    return mockSnapshot(taskId)
+    return mockSnapshot(taskId, nextMockSample())
   }
   return request(
     `/checks/${encodeURIComponent(taskId)}`,
