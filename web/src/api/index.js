@@ -20,6 +20,7 @@ import {
 import {
   ApiError,
   request,
+  requestBlob,
   requestWithUploadProgress,
   pollTask,
 } from './request.js'
@@ -161,7 +162,7 @@ export async function getCheck(taskId, { onRetry, signal } = {}) {
 /**
  * 轮询直到任务结束。
  *
- * 终止条件：拿到终态、达到轮询上限（硬截止 90 秒）、调用方通过 signal 取消。
+ * 终止条件：拿到终态、达到轮询上限（30 分钟）、调用方通过 signal 取消。
  * 超过 SLOW_POLL_MS（软提示线，30 秒，先于硬截止触发）未结束时通过 onSlow
  * 提示"处理时间较长"，但继续等待——不把它当失败，让后端有机会跑完大文件。
  * 超时和失败都抛 ApiError，由页面决定怎么显示——绝不返回一个空结果，
@@ -228,6 +229,79 @@ export async function getEvaluation(options = {}) {
     }
     throw e
   }
+}
+
+/**
+ * 读取人工修正上下文。
+ *
+ * 返回 { task_id, result_hash, corrections }。result_hash 由后端按其内部存储
+ * 结果计算，提交修正时原样回传作 source_hash——前端不对 getCheck 的公开扁平
+ * JSON 自算 hash。mock 下没有真实后端存储，明确抛出不支持。
+ *
+ * @returns {Promise<{ task_id: string, result_hash: string, corrections: Array }>}
+ */
+export async function getCorrections(taskId, { signal } = {}) {
+  if (isMock()) {
+    throw new ApiError('示例任务不支持读取修正上下文，请切换真实后端', { kind: 'SERVER', code: 'MOCK_UNSUPPORTED' })
+  }
+  return request(
+    `/checks/${encodeURIComponent(taskId)}/corrections`,
+    {},
+    { base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS, retries: RETRY_MAX_ATTEMPTS, baseDelayMs: RETRY_BASE_DELAY_MS, signal }
+  )
+}
+
+/**
+ * 提交人工修正并返回重算后的子任务（CheckTask）。
+ *
+ * payload 为 { request_id, source_hash, reason, changes }：
+ * - source_hash 必须来自 getCorrections 的 result_hash；
+ * - 同一次修正的网络重试复用相同 request_id 与载荷（幂等），修改选择/值/原因
+ *   或源任务后才由调用方生成新标识；
+ * - 成功返回子任务，原任务与原始证据保留，前端不自行改 comparisons/summary。
+ *
+ * 失败按真实返回呈现：404（任务不存在）、409（source_hash 冲突，应重新读取
+ * 上下文）、422（修正值非法）等，不显示保存成功。
+ *
+ * @returns {Promise<object>} 子任务 CheckTask
+ */
+export async function createCorrection(taskId, payload, { signal } = {}) {
+  if (isMock()) {
+    throw new ApiError('示例任务不支持人工修正，请切换真实后端', { kind: 'SERVER', code: 'MOCK_UNSUPPORTED' })
+  }
+  // 修正是写操作，重试语义由调用方凭 request_id 幂等保证，这里不做网络层自动重试，
+  // 避免同一 payload 被自动重发时与手动重试叠加出意料外的请求
+  return request(
+    `/checks/${encodeURIComponent(taskId)}/corrections`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    },
+    { base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS, retries: 1, signal }
+  )
+}
+
+/**
+ * 导出报告文件（JSON 或 HTML）。返回 Blob，文件名由组件生成。
+ *
+ * HTML 报告可在浏览器打印为 PDF，当前不是服务端 PDF 导出。mock、任务未结束
+ * 不发真实请求；FAILED 终态可导出失败明细。失败（404/409/超时/网络错误）按
+ * 真实返回抛错，绝不把错误 JSON 当作报告文件返回给下载逻辑。
+ *
+ * @param {'json'|'html'} format
+ * @returns {Promise<Blob>}
+ */
+export async function exportReport(taskId, format, { signal } = {}) {
+  if (isMock()) {
+    throw new ApiError('示例任务不支持服务端导出，请切换真实后端', { kind: 'SERVER', code: 'MOCK_UNSUPPORTED' })
+  }
+  const fmt = format === 'html' ? 'html' : 'json'
+  return requestBlob(
+    `/checks/${encodeURIComponent(taskId)}/report?format=${fmt}`,
+    {},
+    { base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS, signal }
+  )
 }
 
 export { isMock }

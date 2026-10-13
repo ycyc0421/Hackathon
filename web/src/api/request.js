@@ -33,7 +33,7 @@ export const REQUEST_TIMEOUT_MS = 30_000
  * 两者都会让 fetch / res.json() 在读体阶段也中断；
  * 主动取消归 CANCELED，本地截止归 TIMEOUT，互不混淆。
  */
-export async function requestOnce(path, options = {}, { base = '', timeoutMs = REQUEST_TIMEOUT_MS, signal } = {}) {
+export async function requestOnce(path, options = {}, { base = '', timeoutMs = REQUEST_TIMEOUT_MS, signal, responseType = 'json' } = {}) {
   if (signal?.aborted) throw new ApiError('已取消', { kind: 'CANCELED' })
 
   const ctrl = new AbortController()
@@ -89,15 +89,20 @@ export async function requestOnce(path, options = {}, { base = '', timeoutMs = R
     }
 
     try {
-      return await res.json()
+      return await (responseType === 'blob' ? res.blob() : res.json())
     } catch {
       if (ctrl.signal.aborted) throw abortError()
-      throw new ApiError('后端返回的内容不是合法 JSON', { kind: 'PARSE', status: res.status })
+      throw new ApiError(responseType === 'blob' ? '读取报告文件失败' : '后端返回的内容不是合法 JSON', { kind: 'PARSE', status: res.status })
     }
   } finally {
     clearTimeout(timer)
     signal?.removeEventListener('abort', onExternalAbort)
   }
+}
+
+/** 报告下载复用同一套截止、取消和错误处理，仅成功响应按 Blob 读取。 */
+export function requestBlob(path, options = {}, config = {}) {
+  return requestOnce(path, options, { ...config, responseType: 'blob' })
 }
 
 /**
@@ -236,7 +241,7 @@ export function requestWithUploadProgress(
  * 否则页面会把它渲染成"检查完成，没有问题"。
  *
  * fetchTask 由调用方提供（ mock / 真实请求的差异在 index.js 里收口）；
- * sleep / now 可注入，便于用虚拟时钟测试，不等真实的 90 秒。
+ * sleep / now 可注入，便于用虚拟时钟测试。
  */
 export async function pollTask(
   fetchTask,
