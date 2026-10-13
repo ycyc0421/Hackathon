@@ -4,28 +4,45 @@
  * mock / 真实后端在运行时切换，不用改代码、不用重新构建：
  *   1. URL 参数 ?mock=1 / ?mock=0（优先级最高，并写入 localStorage 记住选择）
  *   2. localStorage 里已记住的选择
- *   3. 默认 true（mock）
- * 顶栏的数据源切换器走同一套（见 App.vue），切换后整页刷新让所有状态归零。
+ *   3. 默认真实后端
+ *
+ * 注意参数位置：路由是 hash 模式，查询串必须写在 hash **之前**
+ * （`/?mock=1#/upload`）。写成 `/#/upload?mock=1` 时 query 落在 hash 内部，
+ * location.search 为空，参数读不到——旧文档与演示脚本都踩过这个坑。
  */
 
 const STORAGE_KEY = 'app.useMock'
 
-/** 模块初始化时解析一次：URL 参数 > localStorage > 默认 mock */
+/**
+ * 读取数据源参数：优先 location.search，其次 hash 内 query。
+ * hash 内分支是对旧链接（`#/?mock=1`）的兼容，同时兜住「用户把参数
+ * 写在 hash 里」的直觉写法——静默失效比报错更难排查。
+ */
+function readMockParam() {
+  const fromSearch = new URLSearchParams(window.location.search).get('mock')
+  if (fromSearch === '0' || fromSearch === '1') return fromSearch
+  const hash = window.location.hash
+  const q = hash.indexOf('?')
+  if (q === -1) return null
+  const fromHash = new URLSearchParams(hash.slice(q + 1)).get('mock')
+  return fromHash === '0' || fromHash === '1' ? fromHash : null
+}
+
+/** 模块初始化时解析一次：URL 参数 > localStorage > 默认真实后端 */
 function resolveInitial() {
   try {
-    const params = new URLSearchParams(window.location.search)
-    const fromUrl = params.get('mock')
-    if (fromUrl === '0' || fromUrl === '1') {
+    const fromUrl = readMockParam()
+    if (fromUrl !== null) {
       const value = fromUrl === '1'
-      window.localStorage.setItem(STORAGE_KEY, value ? '1' : '0')
+      try { window.localStorage.setItem(STORAGE_KEY, value ? '1' : '0') } catch { /* URL 选择不依赖存储写入成功 */ }
       return value
     }
     const saved = window.localStorage.getItem(STORAGE_KEY)
     if (saved === '0' || saved === '1') return saved === '1'
   } catch {
-    // localStorage 不可用（隐私模式等）时静默落到默认 mock
+    // localStorage 不可用（隐私模式等）时静默落到默认真实后端
   }
-  return true
+  return false
 }
 
 let useMock = resolveInitial()

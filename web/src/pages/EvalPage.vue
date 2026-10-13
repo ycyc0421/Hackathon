@@ -80,6 +80,11 @@ const errorBreakdown = computed(() => {
   if (!b) return []
   return Object.entries(b).map(([k, v]) => ({ label: k, count: v }))
 })
+
+/** 错误分类条形图的归一基准：取最大计数。全为 0 时退回 1，避免除零产生 NaN 宽度 */
+const maxErrCount = computed(() =>
+  Math.max(1, ...errorBreakdown.value.map((e) => e.count ?? 0)),
+)
 </script>
 
 <template>
@@ -153,33 +158,45 @@ const errorBreakdown = computed(() => {
           </dl>
 
           <h3 class="card-title eval-section-title">指标</h3>
-          <table class="metric-table">
-            <thead>
-              <tr>
-                <th>项目</th>
-                <th class="num">精确率</th>
-                <th class="num">召回率</th>
-                <th class="num">F1</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in metricRows" :key="row.label">
-                <td>{{ row.label }}</td>
-                <td class="num">{{ pct(row.precision) }}</td>
-                <td class="num">{{ pct(row.recall) }}</td>
-                <td class="num">{{ pct(row.f1) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- 每个指标一组：三项各自一条比例条 + 数值。
+               条形只表示 0–100% 的比例，不画"达标线"——本页不设阈值。 -->
+          <div class="metric-cards">
+            <article v-for="row in metricRows" :key="row.label" class="metric-card">
+              <h4 class="metric-card-title">{{ row.label }}</h4>
+              <div
+                v-for="m in [
+                  { key: 'precision', label: '精确率', value: row.precision, tone: 'p' },
+                  { key: 'recall', label: '召回率', value: row.recall, tone: 'r' },
+                  { key: 'f1', label: 'F1', value: row.f1, tone: 'f' },
+                ]"
+                :key="m.key"
+                class="metric-row"
+                :class="`metric-row--${m.tone}`"
+              >
+                <span class="metric-label">{{ m.label }}</span>
+                <span class="metric-track" aria-hidden="true">
+                  <span
+                    class="metric-fill"
+                    :style="`width:${m.value == null ? 0 : Math.max(0, Math.min(1, m.value)) * 100}%`"
+                  />
+                </span>
+                <span class="metric-value">{{ pct(m.value) }}</span>
+              </div>
+            </article>
+          </div>
           <p class="foot-note">
             指标口径（采用哪几项、如何计算）需与提供评测结果的一方确认，本页不设达标阈值。
           </p>
 
           <template v-if="errorBreakdown.length">
             <h3 class="card-title eval-section-title">错误分类</h3>
+            <!-- 横向条形：按最大计数归一，让各条之间的相对量级可读 -->
             <ul class="err-breakdown">
               <li v-for="e in errorBreakdown" :key="e.label">
                 <span class="eb-label">{{ e.label }}</span>
+                <span class="eb-track" aria-hidden="true">
+                  <span class="eb-fill" :style="`width:${(e.count / maxErrCount) * 100}%`" />
+                </span>
                 <span class="eb-count">{{ e.count }}</span>
               </li>
             </ul>

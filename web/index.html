@@ -4,6 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>跨境单证合规校验</title>
+    <!-- 主题防闪烁：必须在样式表之前、同步执行。
+         否则浏览器会先按默认浅色画一帧，再被 JS 改成暗色——夜间模式下
+         每次刷新都会闪一下白光。逻辑与 src/state/theme.js 保持一致
+         （localStorage 优先，其次跟随系统），那里是兜底。 -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('app.theme')
+          var dark =
+            saved === 'dark' ||
+            (saved !== 'light' &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          var t = dark ? 'dark' : 'light'
+          document.documentElement.dataset.theme = t
+          document.documentElement.style.colorScheme = t
+        } catch (e) {
+          /* localStorage 不可用（隐私模式等）：交给 main.js 的 initTheme */
+        }
+      })()
+    </script>
     <!-- 内联 SVG 图标：没有 public/favicon 时浏览器会请求 /favicon.ico 并 404 -->
     <link
       rel="icon"

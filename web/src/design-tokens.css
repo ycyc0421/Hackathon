@@ -1,4 +1,10 @@
-/* 设计 Token - 色彩、间距、字体统一定义 */
+/* 设计 Token - 色彩、间距、字体统一定义
+ *
+ * 视觉语言：**纸感工作台**。整个产品的内核是单证与比对，界面因此按
+ * 「桌面 → 纸 → 浮起」三层表面组织，而不是靠 1px 边框区分每一块。
+ * 桌面是页面底（--surface-desk），纸是内容卡（--surface-raised），
+ * 卡内子块再用 --surface-sunken 下沉。层级靠圆角梯度 + 极轻投影 + 边框
+ * 减淡建立，边框只作最后一道保底，不承担主要层次职责。 */
 
 :root {
   /* ========== 中性灰阶（冷灰，微带蓝调）========== */
@@ -25,32 +31,97 @@
   --blue-800: oklch(30% 0.11 240);
   --blue-900: oklch(22% 0.08 240);
 
-  /* ========== 语义色 ========== */
-  --success: oklch(58% 0.13 145);
+  /* ========== 品牌强调色（柠檬黄绿 / chartreuse）==========
+     取自 velopay 的荧光绿（#c6f24e ≈ 色相 120°、亮度约 90%、彩度约 0.19）。
+     家族名沿用 teal（改名的收益抵不上改动面），但色相已是黄绿。
+
+     浅色主题下必须压亮度、降彩度：velopay 那档亮度在近黑底上是"电光"，
+     放到近白底上就是一片荧光黄，读不清也刺眼。所以浅色取 500–700 档
+     作为可用的深色，900 档才是"接近 velopay"的原味（只用于暗色）。 */
+  --teal-50: oklch(97% 0.045 120);
+  --teal-100: oklch(94% 0.08 120);
+  --teal-200: oklch(90% 0.12 120);
+  --teal-300: oklch(85% 0.155 120);
+  --teal-400: oklch(79% 0.175 120);
+  --teal-500: oklch(72% 0.175 120);
+  --teal-600: oklch(62% 0.16 120);
+  --teal-700: oklch(52% 0.135 120);
+  --teal-800: oklch(42% 0.11 120);
+  --teal-900: oklch(33% 0.085 120);
+
+  /* ========== 语义色 ==========
+     饱和度比初版提一档：状态色是界面最需要"一眼分开"的信息，
+     偏灰的语义色在纸感浅底上会被中性灰吃掉。 */
+  --success: oklch(56% 0.15 148);
   --success-bg: oklch(from var(--success) l c h / 0.1);
+  --success-strong: oklch(44% 0.14 148);
 
-  --warning: oklch(68% 0.15 65);
-  --warning-bg: oklch(from var(--warning) l c h / 0.1);
+  --warning: oklch(66% 0.16 62);
+  --warning-bg: oklch(from var(--warning) l c h / 0.12);
+  --warning-strong: oklch(50% 0.14 55);
 
-  --danger: oklch(58% 0.16 25);
+  --danger: oklch(56% 0.19 25);
   --danger-bg: oklch(from var(--danger) l c h / 0.1);
+  --danger-strong: oklch(45% 0.18 25);
 
-  --info: oklch(62% 0.10 230);
+  --info: oklch(60% 0.12 230);
   --info-bg: oklch(from var(--info) l c h / 0.1);
+  --info-strong: oklch(46% 0.11 230);
 
   /* ========== 功能色（语义映射）========== */
   --color-primary: var(--blue-500);
   --color-primary-hover: var(--blue-600);
   --color-primary-active: var(--blue-700);
+  /* 品牌点缀色：不做操作色，只用于装饰与数据可视化。
+     浅色下取**冷青绿**——它是蓝主色的搭档，两者组成的渐变干净；
+     注意不能用 --teal-*（那是柠檬黄绿族），浅色下当背景会糊成脏黄 */
+  --color-accent: oklch(58% 0.115 195);
+  --accent-tint: oklch(58% 0.115 195 / 0.12);
+  --accent-text: oklch(44% 0.10 195);
 
-  --surface: var(--gray-50);
-  --surface-raised: #fff;
-  --border: var(--gray-200);
+  /* 三层表面：桌面 → 纸 → 下沉。层级靠表面亮度差与投影建立 */
+  --surface-desk: oklch(96.6% 0.005 250); /* 页面底，比纸暗，纸才浮得起来 */
+  --surface: var(--surface-desk);         /* 兼容既有引用 */
+  --surface-raised: #fff;                 /* 纸：内容卡 */
+  --surface-sunken: oklch(97.2% 0.004 250); /* 卡内子块，比纸略沉 */
+  --border: oklch(92% 0.006 250);         /* 边框减淡：层次已由表面承担 */
+  --border-strong: oklch(86% 0.008 250);  /* 需要明确边界处（拖拽区、表头） */
   --border-hover: var(--gray-300);
 
   --text-body: var(--gray-900);
   --text-muted: var(--gray-600);
   --text-disabled: var(--gray-400);
+
+  /* 半透明表面：顶栏毛玻璃、拖放区悬停遮罩。
+     必须显式定，不能写 oklch(100% 0 0 / .82)——暗色下会变成一块白玻璃 */
+  --surface-blur: oklch(100% 0 0 / 0.82);
+  --surface-veil: oklch(100% 0 0 / 0.72);
+  /* 主色实底上的文字/图标颜色 */
+  --on-primary: #fff;
+  /* 桌面点阵纹理的圆点色 */
+  --desk-dot: oklch(45% 0.02 250 / 0.042);
+  /* 桌面环境光：左上主光 + 右下补光。
+     浅色下是两团冷色光晕；暗色下主光转成中性白（velopay 的做法——
+     暗底上的高级感来自白色柔光，不是彩色光） */
+  --desk-glow-a: var(--blue-200);
+  --desk-glow-b: var(--teal-200);
+  --desk-glow-a-opacity: 0.28;
+  --desk-glow-b-opacity: 0.26;
+  /* ===== 品牌色族：所有"品牌感"的装饰都走这几个 token =====
+     浅色主题下品牌色是蓝（主色），暗色主题下是柠檬黄绿（主色+强调色）。
+     装饰处如果直接写 var(--blue-*) ，暗色下会留下一片蓝，
+     读起来像"一个变暗的蓝色应用"——首页尤其明显。
+     集中成 token 后，换主题只改这里一处。 */
+  --brand-from: var(--blue-600);       /* 品牌章渐变起 */
+  --brand-to: var(--blue-800);         /* 品牌章渐变止 */
+  --brand-tint-bg: var(--blue-50);     /* 淡底：标签、悬停填充 */
+  --brand-tint-border: var(--blue-100);/* 淡底描边 */
+  --brand-tint-text: var(--blue-700);  /* 淡底上的文字 */
+  --brand-glow: var(--blue-100);       /* 大团柔光 */
+  --brand-glow-2: var(--blue-100);     /* 第二团柔光 */
+  --brand-glow-opacity: 0.5;
+  --brand-halo: var(--blue-50);        /* 元素周围的光晕环 */
+  --brand-ring: oklch(from var(--blue-500) l c h / 0.08);
 
   /* ========== 间距（4px 基数）========== */
   --space-1: 4px;
@@ -64,16 +135,28 @@
   --space-12: 48px;
   --space-16: 64px;
 
-  /* ========== 圆角 ========== */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* ========== 圆角 ==========
+     克制档位：企业工具不需要大圆角，越大越显得轻浮。
+     只保留"层级越高、圆角略大"的微弱梯度，不做夸张的胶囊化。 */
+  --radius-sm: 5px;   /* 按钮、输入框、徽章 */
+  --radius-md: 7px;   /* 卡内子块、卡片 */
+  --radius-lg: 9px;   /* 纸：内容卡 */
+  --radius-xl: 12px;  /* 首页大块容器 */
+  --radius-pill: 999px; /* 仅用于胶囊标签（chips / 徽章） */
 
-  /* ========== 阴影 ========== */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.10), 0 8px 24px rgba(0, 0, 0, 0.08);
+  /* ========== 阴影 ==========
+     纸感靠"极轻而多层"的投影，不靠深投影。纸的投影带一点冷色
+     （蓝调黑而非纯黑），与冷灰表面同源，白纸上不会显脏。 */
+  --shadow-xs: 0 1px 2px oklch(30% 0.02 250 / 0.05);
+  --shadow-sm: 0 1px 2px oklch(30% 0.02 250 / 0.04),
+               0 2px 6px oklch(30% 0.02 250 / 0.05);
+  --shadow-md: 0 2px 4px oklch(30% 0.02 250 / 0.04),
+               0 8px 20px oklch(30% 0.02 250 / 0.07);
+  --shadow-lg: 0 4px 8px oklch(30% 0.02 250 / 0.05),
+               0 16px 40px oklch(30% 0.02 250 / 0.09);
+  /* 纸的落定投影：纸浮在桌面上，投影要向下、略散 */
+  --shadow-paper: 0 1px 1px oklch(30% 0.02 250 / 0.03),
+                  0 12px 32px -8px oklch(30% 0.02 250 / 0.10);
 
   /* ========== 字体 ========== */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -123,6 +206,160 @@
   --row-height: 48px;
   --font-body: var(--text-base);
   --space-card: var(--space-6);
+}
+
+/* ==========================================================================
+   暗色主题
+   --------------------------------------------------------------------------
+   结构照搬 velopay 的骨架：近黑底、发丝级半透明描边、顶部环境光、
+   电光青绿高亮。**不是把浅色反相**——暗色下"表面越高越亮"，
+   浅色下是"越高越白"，两者的层级方向一致，但取值必须重新定，
+   直接反转会把所有对比度压到不可读。
+
+   三件在暗色下必须显式重定的事：
+   1. **投影**：近黑底上看不见黑投影，纸的层次改由边框承担，
+      投影只留一点点当作"落定感"。
+   2. **文字对比**：`--text-muted` 用浅色的 gray-600 会直接沉进背景，
+      必须提到 gray-300 一档。
+   3. **语义色**：浅底上的语义色是"深色文字 + 浅色底"，
+      暗色下要反过来——主色提亮，底色改为低透明度叠加。
+   ========================================================================== */
+
+:root[data-theme='dark'] {
+  /* 中性灰阶：只反转到"中灰"为止，不反相成浅色阶。
+     600 以上（深档）在暗色下仍然更深，直接用于文字会不可读，
+     所以文字类 token 一律显式指定，不依赖灰阶。 */
+  --gray-50: oklch(21% 0.004 120);
+  --gray-100: oklch(25% 0.005 120);
+  --gray-200: oklch(30% 0.005 120);
+  --gray-300: oklch(43% 0.006 120);
+  --gray-400: oklch(53% 0.006 120);
+  --gray-500: oklch(63% 0.006 120);
+  --gray-600: oklch(73% 0.006 120);
+  --gray-700: oklch(81% 0.005 120);
+  --gray-800: oklch(89% 0.004 120);
+  --gray-900: oklch(96% 0.002 120);
+
+  /* 主色：整体提亮。蓝 500 在近黑底上偏闷，操作色要够亮才像"可点" */
+  --blue-50: oklch(26% 0.045 240);
+  --blue-100: oklch(32% 0.065 240);
+  --blue-200: oklch(40% 0.095 240);
+  --blue-300: oklch(50% 0.12 240);
+  --blue-400: oklch(62% 0.145 240);
+  --blue-500: oklch(70% 0.15 240);
+  --blue-600: oklch(77% 0.13 240);
+  --blue-700: oklch(84% 0.10 240);
+  --blue-800: oklch(89% 0.07 240);
+  --blue-900: oklch(93% 0.05 240);
+
+  /* 强调色：暗色下就是 velopay 原味那一档——高亮 + 高彩度，
+     而且它**兼作主操作色**（主按钮 = 强调色实底 + 深色文字）。
+     这是 velopay 最关键的一条：强调色不做点缀，它承担操作。 */
+  --teal-50: oklch(26% 0.06 120);
+  --teal-100: oklch(32% 0.09 120);
+  --teal-200: oklch(40% 0.12 120);
+  --teal-300: oklch(55% 0.16 120);
+  --teal-400: oklch(72% 0.185 120);
+  --teal-500: oklch(88% 0.19 120);   /* ≈ velopay 的 #c6f24e */
+  --teal-600: oklch(92% 0.175 120);
+  --teal-700: oklch(95% 0.13 120);
+  --teal-800: oklch(96% 0.09 120);
+  --teal-900: oklch(97% 0.06 120);
+
+  /* 语义色：提亮 + 底色改低透明度叠加。
+     注意 --success 与 --teal 在暗色下会更接近（都偏亮偏绿），
+     因此成功色刻意保留更黄的绿相（148 vs 150 但彩度更高），
+     并且成功态永远带文字与图标，不靠颜色单独表意。 */
+  /* 强调色是黄绿(120)、成功色是绿(152)：两者在暗色下都亮，必须靠色相拉开。
+     成功色刻意压到更蓝的绿并降低彩度，让"通过"与"品牌强调"不会看混。 */
+  --success: oklch(74% 0.13 158);
+  --success-bg: oklch(74% 0.13 158 / 0.14);
+  --success-strong: oklch(85% 0.11 158);
+
+  --warning: oklch(78% 0.15 68);
+  --warning-bg: oklch(78% 0.15 68 / 0.14);
+  --warning-strong: oklch(87% 0.12 70);
+
+  --danger: oklch(68% 0.17 22);
+  --danger-bg: oklch(68% 0.17 22 / 0.15);
+  --danger-strong: oklch(80% 0.13 22);
+
+  --info: oklch(72% 0.12 230);
+  --info-bg: oklch(72% 0.12 230 / 0.14);
+  --info-strong: oklch(84% 0.10 230);
+
+  /* 暗色下主操作色 = 强调色（velopay 的结构：唯一饱和色即操作色）。
+     蓝色退居"信息/中性强调"，不再出现在主按钮上。 */
+  --color-primary: var(--teal-500);
+  --color-primary-hover: var(--teal-400);
+  --color-primary-active: var(--teal-600);
+  /* 暗色下强调色就是柠檬黄绿本身 */
+  --color-accent: var(--teal-500);
+  --accent-tint: oklch(from var(--teal-500) l c h / 0.14);
+  --accent-text: var(--teal-600);
+
+  /* 三层表面：越高越亮。桌面最深，纸比桌面亮一档，子块夹在中间——
+     与浅色同向（越高越亮），但绝对值全部重新定过。
+
+     色相从中性出发（彩度 0.002–0.004）：velopay 的近黑是不偏色的，
+     偏蓝的暗底会让柠檬绿强调色显脏，也会读成"变暗的蓝色应用"。
+     浅色主题仍保留冷灰（250），因为白纸上的冷灰是中性观感。 */
+  --surface-desk: oklch(13.5% 0.003 120);
+  --surface: var(--surface-desk);
+  --surface-raised: oklch(18% 0.004 120);
+  --surface-sunken: oklch(15.5% 0.003 120);
+
+  /* 边框：暗色下纸的层次主要靠它，所以比浅色档略亮一点。
+     白字 96% / 深档 17.5% 的对比足够，边界读得出来又不刺眼 */
+  --border: oklch(27% 0.005 120);
+  --border-strong: oklch(35% 0.006 120);
+  --border-hover: oklch(41% 0.007 120);
+
+  --text-body: oklch(96% 0.002 120);
+  --text-muted: oklch(73% 0.006 120);
+  --text-disabled: oklch(53% 0.006 120);
+
+  /* 暗色下的顶栏：深色半透明玻璃，不是白色玻璃 */
+  --surface-blur: oklch(15.5% 0.003 120 / 0.78);
+  --surface-veil: oklch(15.5% 0.003 120 / 0.72);
+  /* 主色变成亮柠檬绿后，实底上必须是近黑文字：
+     白字在 88% 亮度的黄绿上完全不可读。这一条也是 velopay 的做法
+     （Sign up free / Send Money Now 都是深色字压在荧光绿上） */
+  --on-primary: oklch(17% 0.012 120);
+  /* 点阵在暗底上要反过来：亮点而不是暗点 */
+  --desk-dot: oklch(85% 0.02 120 / 0.045);
+  /* 主光改成中性白、面积更大更柔——暗底上这团白光是"高级感"的主要来源；
+     右下补光保留一点强调色，让两团光有冷暖对比而不喧哗 */
+  --desk-glow-a: oklch(96% 0.01 120);
+  --desk-glow-b: var(--teal-500);
+  --desk-glow-a-opacity: 0.11;
+  --desk-glow-b-opacity: 0.07;
+  /* 暗色下主色就是强调色，品牌色族随之整体换成柠檬黄绿。
+     淡底用强调色的低透明度叠加，不用实色——实色块在近黑底上太重 */
+  --brand-from: var(--teal-400);
+  --brand-to: var(--teal-700);
+  --brand-tint-bg: oklch(from var(--teal-500) l c h / 0.10);
+  --brand-tint-border: oklch(from var(--teal-500) l c h / 0.24);
+  --brand-tint-text: var(--teal-600);
+  --brand-glow: var(--teal-500);
+  /* 第二团光晕在暗色下用中性白：两团都是绿会腻，
+     而且 velopay 的暗色高级感本来就来自白色柔光 */
+  --brand-glow-2: oklch(96% 0.01 120);
+  --brand-glow-opacity: 0.10;
+  --brand-halo: oklch(from var(--teal-500) l c h / 0.16);
+  --brand-ring: oklch(from var(--teal-500) l c h / 0.16);
+
+  /* 投影：近黑底上黑投影几乎不可见，只留一点点落定感。
+     真正的层次交给边框与表面亮度差。 */
+  --shadow-xs: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4),
+               0 2px 6px oklch(0% 0 0 / 0.3);
+  --shadow-md: 0 2px 4px oklch(0% 0 0 / 0.4),
+               0 8px 20px oklch(0% 0 0 / 0.45);
+  --shadow-lg: 0 4px 8px oklch(0% 0 0 / 0.45),
+               0 16px 40px oklch(0% 0 0 / 0.5);
+  --shadow-paper: 0 1px 1px oklch(0% 0 0 / 0.35),
+                  0 12px 32px -8px oklch(0% 0 0 / 0.55);
 }
 
 /* ========== 紧凑模式 ========== */

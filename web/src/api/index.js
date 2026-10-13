@@ -1,3 +1,4 @@
+import { mockSnapshot, startMockTask } from './mockProgress.js'
 /**
  * 数据访问层。页面只调这里的函数，不直接 fetch。
  *
@@ -116,7 +117,7 @@ export async function createCheck(
       onUploadProgress?.(Math.round((loaded / total) * 100))
     }
     return {
-      task_id: `mock_${Date.now()}`,
+      task_id: startMockTask(),
       status: 'PENDING',
       created_at: new Date().toISOString(),
     }
@@ -147,10 +148,8 @@ export async function createCheck(
  */
 export async function getCheck(taskId, { onRetry, signal } = {}) {
   if (isMock()) {
-    await sleep(500)
-    const sample = nextMockSample()
-    sample.task_id = taskId
-    return sample
+    await sleep(200)
+    return mockSnapshot(taskId, nextMockSample())
   }
   return request(
     `/checks/${encodeURIComponent(taskId)}`,
