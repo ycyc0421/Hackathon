@@ -81,8 +81,14 @@ jobs:
           npm i --no-save playwright-core
           npx --no-install playwright-core install --with-deps chromium
 
-      - name: 确认 ffmpeg 可用
-        run: ffmpeg -hide_banner -version | head -1
+      # ubuntu-latest 的 runner 上没有预装 ffmpeg（实测确认），必须自己装。
+      # 用 apt 装系统包：它比 ffmpeg-static 的 npm 包稳定，也不会往
+      # web/package.json 里加依赖（AGENTS.md 规定 web 只允许四个包）。
+      - name: 安装 ffmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -hide_banner -version | head -1
 
       # 构建产物既是 vite preview 的输入，也顺带验证了"前端能构建"。
       - name: 构建前端
