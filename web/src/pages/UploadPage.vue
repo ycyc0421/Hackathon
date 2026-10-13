@@ -5,13 +5,14 @@
  * 目的国暂由用户选择。契约第四节第 3 项未定「由用户选还是从文件识别」，
  * 这里按用户选择实现——可控，演示时不依赖抽取准确率。
  */
-import { ref, computed, inject, onBeforeUnmount } from 'vue'
+import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue'
 import { createCheck, pollCheck, validateFiles, splitByName, ApiError, UPLOAD_LIMITS, isMock, isEdiName } from '../api/index.js'
 import { backendErrorText } from '../api/errors.js'
 import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
 import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING, EDI_CAPABILITY } from '../api/labels.js'
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
 import { needsReview } from '../utils/needsReview.js'
+import { autoSubmitMock } from '../state/session.js'
 import { heightListItemHooks, collapseHooks } from '../utils/animateHeight.js'
 import { isMobile } from '../utils/isMobile.js'
 import StatusBadge from '../components/StatusBadge.vue'
@@ -230,6 +231,19 @@ function stopClock() {
 
 onBeforeUnmount(stopClock)
 
+/**
+ * 首页演示场景卡的自动提交：autoSubmitMock 非空说明用户刚在首页点了场景。
+ * 一次性信号，先清掉再判断，避免之后手动进上传页时意外触发。
+ * 只有 mock 模式才自动提交（真实模式没有可预演的合成结果，
+ * 场景数据对真实后端无意义）；提交后留在本页展示进度，
+ * 不再自动跳页——进度过程本身就是演示的一部分。
+ */
+onMounted(() => {
+  if (!autoSubmitMock.value) return
+  autoSubmitMock.value = null
+  if (isMock()) submit({ skipFileValidation: true })
+})
+
 /** 已等待时长文案。只展示真实流逝的时间，不做任何预计（后端没有给 ETA 数据） */
 const elapsedText = computed(() => {
   if (!startedAt.value) return ''
@@ -264,9 +278,12 @@ const stageIndex = computed(() => {
 /** 骨架屏行数与已选文件数一致，占位形状贴近真实列表 */
 const skeletonRows = computed(() => Math.max(files.value.length, 2))
 
-async function submit() {
-  // 直接调用 submit 也不能绕过校验：以当前文件集合实时复验为准
-  const problems = validateFiles(files.value)
+async function submit({ skipFileValidation = false } = {}) {
+  // 直接调用 submit 也不能绕过校验：以当前文件集合实时复验为准。
+  // 唯一例外是首页演示场景触发的自动提交（skipFileValidation）：
+  // mock 的 createCheck 不读取真实文件字节，「必须选文件」的校验对它无意义，
+  // 强制要求选文件会让演示流程断在上传页。
+  const problems = skipFileValidation ? [] : validateFiles(files.value)
   if (isRunning.value) return
   if (problems.length) {
     localErrors.value = problems
@@ -435,6 +452,51 @@ const extractProgress = computed(() => {
 const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).length ?? 0)
 
 /**
+ * 「查看比对结果」一次性描边引导的启动时机。
+ *
+ * 必须在 collapseHooks 的高度展开动画【结束之后】启动（@after-enter），
+ * 不能与高度展开同帧：展开期间 .next-actions 的 height/overflow 是内联受控的，
+ * 按钮还在被「长高」的过程中，此时播描边会一半被 overflow 裁掉、
+ * 且两条动画抢同一注意力，引导反而看不清。
+ *
+ * 描边 transitionend 后再给按钮加一次轻微脉冲（一次即停）。全程只播一次；
+ * 组件因 key 变化或切页返回重挂载即视为新语境，允许重播（after-enter 只会
+ * 在本次挂载的入场完成后触发一次，天然不会循环）。
+ */
+function onNextActionsEnter(el) {
+  const rect = el.querySelector?.('.cta-trace-rect')
+  const btn = el.querySelector?.('.cta-trace')
+  if (!rect || !btn) return
+  // prefers-reduced-motion：全局规则只把过渡时长压到 0.01ms，transition 照样
+  // 走到终态——加了 .playing 会瞬间呈现完整描边环且不再消失。干脆不启动。
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  // rect 几何按按钮实测像素写死：viewBox 拉伸只保描边宽不保几何，
+  // 宽按钮上圆角会被拉成椭圆角、四边内缩不均（x 与 y 缩放比不同）
+  rect.setAttribute('x', '1')
+  rect.setAttribute('y', '1')
+  rect.setAttribute('width', String(btn.offsetWidth - 2))
+  rect.setAttribute('height', String(btn.offsetHeight - 2))
+  rect.classList.add('playing')
+  rect.addEventListener(
+    'transitionend',
+    () => {
+      // 描边完成后淡出再清类：引导只播一次，播完界面回归克制基线，
+      // 不允许留一个永久的描边环
+      rect.classList.add('done')
+      rect.addEventListener(
+        'transitionend',
+        () => rect.classList.remove('playing', 'done'),
+        { once: true }
+      )
+      btn.classList.add('cta-pulse')
+      // 脉冲结束后清类，避免内联态残留；动画只播一次，无需循环
+      btn.addEventListener('animationend', () => btn.classList.remove('cta-pulse'), { once: true })
+    },
+    { once: true }
+  )
+}
+
+/**
  * 是否提示 EDI 能力说明：真实模式且已选含 EDI 文件时显示。
  * 接受 .edi 只表示允许提交原件，不代表后端已解析（#40）；示例数据模式不提示
  * （示例返回的是合成解析结果，不需要能力声明）。
@@ -463,6 +525,9 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
         @keydown.space.prevent="fileInput?.click()"
       >
         <!-- 手机没有拖放，窄屏只提示点击选择 -->
+        <svg class="dropzone-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+        </svg>
         <div class="dropzone-main">{{ isMobile ? '点击选择文件' : '把文件拖到这里，或点击选择' }}</div>
         <div class="dropzone-hint">
           支持 {{ UPLOAD_LIMITS.accept.split(',').join(' / ') }}，单个不超过
@@ -731,15 +796,23 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
           </ul>
 
           <!-- 完成态主路径：收合动画入场，直接给去差异页的按钮 -->
-          <Transition :css="false" v-bind="collapseHooks">
+          <Transition :css="false" v-bind="collapseHooks" @after-enter="onNextActionsEnter">
             <div
               v-if="task && (task.status === 'COMPLETED' || task.status === 'PARTIAL')"
               class="next-actions"
             >
-              <button class="btn primary" @click="navigate.go('diff')">
+              <button class="btn primary cta-trace" @click="navigate.go('diff')">
                 {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
+                <svg class="cta-trace-svg" aria-hidden="true">
+                  <rect
+                    class="cta-trace-rect"
+                    rx="4"
+                    fill="none"
+                    pathLength="100"
+                  />
+                </svg>
               </button>
-              <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
+
             </div>
           </Transition>
         </div>

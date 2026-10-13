@@ -1,23 +1,31 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { isMock, listMockScenarios, setMockScenario, getEvaluation } from './api/index.js'
 import { setMock } from './api/config.js'
 import { needsReview } from './utils/needsReview.js'
+import { SCENARIO_NAMES } from './state/scenarios.js'
+import {
+  task, taskError, isRunning,
+  uploadFiles, uploadCountry, uploadNotes, uploadScanWarnings,
+  diffFilter, diffViews,
+  evaluation, evaluationLoaded,
+  pendingAnchor,
+} from './state/session.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import AppSelect from './components/AppSelect.vue'
-import UploadPage from './pages/UploadPage.vue'
-import DiffPage from './pages/DiffPage.vue'
-import ReportPage from './pages/ReportPage.vue'
-import EvalPage from './pages/EvalPage.vue'
 
+/* label 从路由 meta 取，这里只存页序 key 列表，避免两处维护同一份文案 */
 const PAGES = [
-  { key: 'upload', label: '上传', component: UploadPage },
-  { key: 'diff', label: '差异', component: DiffPage },
-  { key: 'report', label: '报告', component: ReportPage },
-  { key: 'eval', label: '评测', component: EvalPage },
+  { key: 'upload', label: '上传' },
+  { key: 'diff', label: '差异' },
+  { key: 'report', label: '报告' },
+  { key: 'eval', label: '评测' },
 ]
 
-const active = ref('upload')
+const route = useRoute()
+const router = useRouter()
+const active = computed(() => route.name)
 
 /**
  * 数据源：mock 示例数据 / 真实后端。初始值在 config.js 里按
@@ -38,19 +46,7 @@ function onSourceChange(value) {
   window.location.reload()
 }
 
-/** mock 场景选择。key → 中文名只用于展示，场景数据以 api 层注册表为准 */
-const SCENARIO_NAMES = {
-  'single-item': '单品名 · 有冲突',
-  'partial-fail': '单品名 · 部分失败',
-  'multi-item': '双品名 · 分组',
-  clean: '全部一致',
-  'edi-only': 'EDI · 单份报文',
-  'edi-mixed': 'EDI · 与 PDF/图片混合',
-  'edi-multi-item': 'EDI · 双商品',
-  'edi-partial': 'EDI · 部分解析失败',
-  'edi-unsupported': 'EDI · 后端不支持',
-  'edi-failed': 'EDI · 解析失败',
-}
+/** mock 场景选择。中文名在 state/scenarios.js 共享（首页演示区复用），场景数据以 api 层注册表为准 */
 const mockScenario = ref('single-item')
 const scenarioOptions = listMockScenarios().map((key) => ({
   value: key,
@@ -80,25 +76,15 @@ function onDocumentClick(e) {
   mockPanelOpen.value = false
 }
 
-/** 当前检查任务。由上传页写入，差异页和报告页读取 */
-const task = ref(null)
-const taskError = ref(null)
-const isRunning = ref(false)
-
+/** 当前检查任务。由上传页写入，差异页和报告页读取（ref 本体在 state/session.js） */
 provide('task', task)
 provide('taskError', taskError)
 provide('isRunning', isRunning)
 
 /**
- * 上传页表单状态提升到 App 层：文件列表/目的国/备注在切页返回时保留，
- * 与任务状态（task）的生命周期一致——任务还在、输入却丢了，层级不一致。
- * scanWarnings 由文件内容异步检测得出，一并在 App 层持有，
- * 否则返回上传页时文件还在、扫描件警告却丢了。
+ * 上传页表单状态提升到会话层（state/session.js）：文件列表/目的国/备注在
+ * 切页返回时保留，与任务状态（task）的生命周期一致。
  */
-const uploadFiles = ref([])
-const uploadCountry = ref('DE')
-const uploadNotes = ref('')
-const uploadScanWarnings = ref(new Set())
 provide('uploadFiles', uploadFiles)
 provide('uploadCountry', uploadCountry)
 provide('uploadNotes', uploadNotes)
@@ -107,27 +93,21 @@ provide('uploadScanWarnings', uploadScanWarnings)
 /**
  * 跨页导航：报告页的条目可以直接跳到差异页对应位置。
  * anchor 经 pendingAnchor 传给目标页（页面随切页重挂载，挂载时消费并清空）。
+ * go 的签名不变，页面零改动；内部从改 active ref 换成 router.push。
  */
-const pendingAnchor = ref(null)
 /** 本次切页是否锚点跳转：是则滚动交给目标页挂载时的锚点定位，进场钩子不碰滚动 */
 let anchorJump = false
 
 function go(page, anchor) {
   pendingAnchor.value = anchor ?? null
   anchorJump = !!anchor
-  active.value = page
+  router.push({ name: page })
 }
 
 provide('pendingAnchor', pendingAnchor)
 provide('navigate', { go })
 
-/**
- * 差异页跨页状态提升到 App 层：筛选与每张卡片的 表格/对照 选择
- * 在切页返回时保留——页面内容（task）还在，查看进度却丢了，层级不一致。
- * 与 uploadFiles 同一模式；views 保持 new Map 整体赋值的响应式写法。
- */
-const diffFilter = ref('problems')
-const diffViews = ref(new Map())
+/** 差异页筛选与每张卡片的 表格/对照 选择（ref 本体在 state/session.js） */
 provide('diffFilter', diffFilter)
 provide('diffViews', diffViews)
 
@@ -137,10 +117,28 @@ provide('diffViews', diffViews)
  * 对应卡片）时不恢复，锚点滚动优先。
  */
 const scrollMemo = new Map()
-/** 切页过渡结束后待恢复的滚动位置（out-in：新页挂载晚于 active 变化一个离场过渡） */
+/**
+ * 切页过渡的滚动恢复目标（纸张层叠：enter 钩子里同步 scrollTo，见下）。
+ * enter 时新页已插入、旧页已 fixed 脱流不撑高，文档高度即新页内容高度，
+ * 此时 scrollTo 不会被钳位。注意不能放在 before-enter：那时新页尚未插入，
+ * 旧页又已脱流，文档只剩顶栏+页脚，maxScroll≈0，scrollTo 会被立即钳到 0。
+ */
 let pendingScrollRestore = null
 
-watch(active, (to, from) => {
+/**
+ * 纸张层叠方向：按路由 meta.order 比较 from/to 得出前进/后退，
+ * 动态切换两套过渡类。首页 order 最小（-1），去向任何页都是前进；
+ * 锚点跳转（报告页 → 差异页条目，order 2 → 1）按同一规则算为后退。
+ */
+const pageTransition = ref('page-stack-forward')
+/** 层叠进行中：.content 显出底下的「桌面」暗层，两张纸的边缘和缩小后的留白才看得见 */
+const stacking = ref(false)
+const orderOf = (name) =>
+  router.getRoutes().find((r) => r.name === name)?.meta?.order ?? 0
+
+watch(() => route.name, (to, from) => {
+  pageTransition.value =
+    orderOf(to) >= orderOf(from) ? 'page-stack-forward' : 'page-stack-backward'
   scrollMemo.set(from, window.scrollY)
   pendingScrollRestore = null
   if (pendingAnchor.value) return // 锚点跳转由 DiffPage 挂载时滚动，不恢复
@@ -148,26 +146,79 @@ watch(active, (to, from) => {
   if (y != null) pendingScrollRestore = y
 })
 
+/** 首次挂载不做焦点迁移（见 onPageEnter） */
+let firstPageEnter = true
+
 /**
- * 滚动恢复必须在新页淡入第一帧之前完成，用 enter 钩子（元素插入后、
- * 过渡开始前同步触发）；after-enter 才 scrollTo 会让新页先从头淡入
- * 约 200ms 再硬跳，肉眼可见。
- * out-in 下旧页已离场，新页内容在插入时即完成渲染，文档高度就是新页
- * 高度，此时 scrollTo 不会被钳位。
- * 没有记忆位置的页面，同一时刻归零，不残留上一页的滚动。
- * 锚点跳转（报告条目 → 差异页卡片）不在这里滚动，由 DiffPage 挂载时定位。
+ * 滚动恢复新时序（并行过渡，不再是 out-in）：
+ * enter 在新页插入后、过渡开始前同步触发，此刻旧页已 fixed 脱流、
+ * 文档高度即新页高度，立即 scrollTo 不会钳位，也赶得上进场第一帧。
+ * 有记忆位置恢复记忆，否则归零；锚点跳转不在这里滚动，
+ * DiffPage 挂载时的锚点定位优先于滚动记忆。
+ *
+ * 焦点迁移：页内按钮触发跳页后旧页卸载，焦点会回落到 body，
+ * 键盘/读屏用户位置丢失。切页后把焦点移到新页第一个标题
+ * （tabindex=-1 只收程序焦点，不进 Tab 序），preventScroll 不与
+ * 滚动恢复打架。首次挂载不动焦点（浏览器原生恢复行为优先）。
  */
-function onPageEnter() {
+function onPageEnter(el) {
   if (anchorJump) {
     anchorJump = false
-    return
-  }
-  if (pendingScrollRestore != null) {
-    window.scrollTo(0, pendingScrollRestore)
+  } else {
+    const y = pendingScrollRestore
     pendingScrollRestore = null
+    window.scrollTo(0, y ?? 0)
+  }
+  /* 后退时新纸从「被压低」状态放大回来：缩放原点对准视口中心而不是纸张
+     中心（长页面的纸张中心可能远在视口外，缩放会带着可见区域大幅漂移）。
+     用未受 transform 影响的 offsetTop 推算纸张在视口中的位置 */
+  /* 后退进场：压缩状态回弹放大。版心内容列居中，以自身中点为原点即可 */
+  el.style.transformOrigin = '50% 50%'  
+  if (firstPageEnter) {
+    firstPageEnter = false
     return
   }
-  window.scrollTo(0, 0)
+  const heading = el.querySelector?.('h1, h2')
+  if (!heading) return
+  heading.tabIndex = -1
+  heading.focus({ preventScroll: true })
+}
+
+/**
+ * 旧页脱流：量出视口位置后用 fixed 锁定（top 已是视口坐标，天然补偿了
+ * scrollY，before-enter 的 scrollTo 不会带它走），旧页在视觉原位缩小/
+ * 滑出，不随新页滚动位置跳。宽度锁为实测宽，防止脱流后宽度塌陷。
+ */
+function onPageBeforeLeave(el) {
+  const rect = el.getBoundingClientRect()
+  el.style.position = 'fixed'
+  el.style.top = `${rect.top}px`
+  el.style.left = `${rect.left}px`
+  el.style.width = `${rect.width}px`
+  el.style.margin = '0'
+  /* 缩放原点对齐视口中心（版心内容列，不是整屏），长页面滚动后不会漂移 */
+  el.style.transformOrigin = `50% ${window.innerHeight / 2 - rect.top}px`
+  stacking.value = true
+}
+
+/**
+ * 清理脱流内联样式。元素本身会被 Vue 移除，这里是防御性清理：
+ * 离场被取消（leave-cancelled）时元素会留在 DOM，样式必须还原；
+ * prefers-reduced-motion 下过渡近瞬切，同样不能残留 fixed。
+ */
+function onPageLeaveDone(el) {
+  el.style.position = ''
+  el.style.top = ''
+  el.style.left = ''
+  el.style.width = ''
+  el.style.margin = ''
+  el.style.transformOrigin = ''
+  stacking.value = false
+}
+
+/** 进场结束（或被打断）清掉缩放原点，静止态不留内联样式 */
+function onPageAfterEnter(el) {
+  el.style.transformOrigin = ''
 }
 
 /**
@@ -188,13 +239,7 @@ provide('sourceFiles', {
   clear: () => sourceFiles.clear(),
 })
 
-/**
- * 评测数据缓存提升到 App 层：
- * 切页时 EvalPage 会卸载重挂载，缓存留在 provide 里，
- * 重挂载时直接复用，不再每次切页都重新请求一次。
- */
-const evaluation = ref(null)
-const evaluationLoaded = ref(false)
+/** 评测数据缓存提升到会话层（state/session.js），重挂载时直接复用 */
 provide('evaluation', evaluation)
 provide('evaluationLoaded', evaluationLoaded)
 
@@ -218,10 +263,11 @@ const problemCount = computed(() => {
   return task.value.comparisons?.filter(needsReview).length ?? 0
 })
 
-const current = computed(() => PAGES.find((p) => p.key === active.value)?.component)
+const current = computed(() => route.matched.at(-1)?.components?.default)
 
-/** 没有任务时，差异页和报告页没有内容可显示 */
+/** 没有任务时，差异页和报告页没有内容可显示；首页是入口，恒不锁定 */
 function isLocked(key) {
+  if (key === 'home') return false
   return (key === 'diff' || key === 'report') && !task.value
 }
 
@@ -264,19 +310,21 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', onDocumentClick)
 })
 
-watch(active, updateIndicator)
+watch(() => route.name, updateIndicator)
 </script>
 
 <template>
   <ErrorBoundary>
     <div class="app">
       <header class="topbar">
-      <div class="brand">
+      <!-- 品牌区做成可点按钮：任何页面都可回首页，入口语义一致 -->
+      <button type="button" class="brand" @click="router.push({ name: 'home' })">
         <span class="brand-mark">单证校验</span>
         <span class="brand-sub">跨境物流 · 交叉比对与合规提示</span>
-      </div>
+      </button>
 
-      <nav ref="tabsRef" class="tabs">
+      <!-- 首页是入口页，不渲染顶栏页签（含指示条），减少干扰 -->
+      <nav v-if="active !== 'home'" ref="tabsRef" class="tabs">
         <button
           v-for="p in PAGES"
           :key="p.key"
@@ -284,7 +332,7 @@ watch(active, updateIndicator)
           :class="{ active: active === p.key, locked: isLocked(p.key) }"
           :disabled="isLocked(p.key)"
           :title="isLocked(p.key) ? '先在上传页创建一次检查' : ''"
-          @click="active = p.key"
+          @click="router.push({ name: p.key })"
         >
           {{ p.label }}
           <span v-if="p.key === 'diff' && problemCount" class="tab-badge">{{ problemCount }}</span>
@@ -326,7 +374,7 @@ watch(active, updateIndicator)
     </header>
 
     <!-- 移动端主导航：≤640px 显示（顶栏页签隐藏），选中态用颜色/字重表达，不用滑动指示条 -->
-    <nav class="bottom-tabs" aria-label="页面导航">
+    <nav v-if="active !== 'home'" class="bottom-tabs" aria-label="页面导航">
       <button
         v-for="p in PAGES"
         :key="p.key"
@@ -334,23 +382,33 @@ watch(active, updateIndicator)
         :class="{ active: active === p.key, locked: isLocked(p.key) }"
         :disabled="isLocked(p.key)"
         :title="isLocked(p.key) ? '先在上传页创建一次检查' : ''"
-        @click="active = p.key"
+        @click="router.push({ name: p.key })"
       >
         {{ p.label }}
         <span v-if="p.key === 'diff' && problemCount" class="tab-badge">{{ problemCount }}</span>
       </button>
     </nav>
 
-    <main class="content">
-      <Transition name="fade" mode="out-in" @enter="onPageEnter">
-        <component :is="current" :key="active" />
+    <main class="content" :class="{ stacking }">
+      <!-- 纸张层叠：无 mode 并行渲染，新旧页同时在 DOM。每页包一张通栏不透明
+           的 .page-inner 作为纸面（版心限宽卡片容器），层叠时两张纸
+           互不透字；旧纸在 before-leave 里 fixed 脱流锁定视觉原位 -->
+      <Transition
+        :name="pageTransition"
+        @enter="onPageEnter"
+        @after-enter="onPageAfterEnter"
+        @enter-cancelled="onPageAfterEnter"
+        @before-leave="onPageBeforeLeave"
+        @after-leave="onPageLeaveDone"
+        @leave-cancelled="onPageLeaveDone"
+      >
+        <div :key="route.name" class="page-inner">
+          <component :is="current" />
+        </div>
       </Transition>
     </main>
 
-      <footer class="footer">
-        <span>契约草案 v0.1 · 未冻结</span>
-        <span v-if="task" class="task-ref">任务 {{ task.task_id }}</span>
-      </footer>
+
     </div>
   </ErrorBoundary>
 </template>
