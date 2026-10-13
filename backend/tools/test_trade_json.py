@@ -63,6 +63,15 @@ class TradeJsonTests(unittest.TestCase):
                     CheckTask.model_validate(task)
                     self.assertEqual(task['extractions'][0]['parse_method'],'EDI_PARSE')
                     self.assertEqual(len(task['extractions'][0]['line_items']),1)
+                    duplicate = self.sample()
+                    duplicate['line_items'] *= 2
+                    failed = client.post('/api/v1/checks', data={'destination_country': 'DE'},
+                        files=[('files', ('duplicate.json', json.dumps(duplicate).encode(), 'application/json'))]).json()
+                    self.assertEqual(failed['status'], 'FAILED')
+                    reason = '商品行号必须为不重复的正整数'
+                    self.assertIn(reason, failed['documents'][0]['error_message'])
+                    exported = client.get(f"/api/v1/checks/{failed['task_id']}/report").json()
+                    self.assertIn(reason, exported['documents'][0]['error_message'])
 
 
 if __name__ == '__main__':

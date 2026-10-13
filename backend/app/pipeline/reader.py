@@ -84,7 +84,7 @@ def read_document(filename: str, data: bytes) -> ReadResult:
             return ReadResult(parse_method=ParseMethod.EDI_PARSE, structured=parse_trade_json(data))
         except (ValueError, TypeError, KeyError, RecursionError) as exc:
             log.exception("Trade JSON parsing failed")
-            return ReadResult(failed=True, error_message=f"项目交换 JSON 无效。请确认文件完整后重试。")
+            return ReadResult(failed=True, error_message=f"项目交换 JSON 无效：{exc}")
     if file_type is FileType.PDF:
         return _read_pdf(data)
     if file_type is FileType.IMAGE:

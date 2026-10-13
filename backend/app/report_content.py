@@ -33,10 +33,18 @@ def content(task, corrections):
             'definition_scope': 'CURRENT_AT_EXPORT' if entry else 'UNKNOWN',
         }
     documents = copy.deepcopy(task['documents'])
+    # 仅补齐未在票级比对中出现的字段，避免把完整抽取结果重复导出。
+    compared = {(value['file_id'], comparison['field_key'])
+                for comparison in task['comparisons'] if comparison.get('scope', 'DOCUMENT') == 'DOCUMENT'
+                for value in comparison['values']}
     for document in documents:
         extraction = unique(task['extractions'], 'file_id', document['file_id'])
         document['identifiers'] = [copy.deepcopy(f) for f in extraction.get('fields', [])
                                    if f['field_key'] in {'document_no', 'invoice_no'}]
+        document['fields'] = [copy.deepcopy(f) for f in extraction.get('fields', [])
+                              if f['status'] != 'NOT_IN_DOC'
+                              and f['field_key'] not in {'document_no', 'invoice_no'}
+                              and (document['file_id'], f['field_key']) not in compared]
         document['original_url'] = f"/api/v1/checks/{task['task_id']}/files/{document['file_id']}"
     comparisons = copy.deepcopy(task['comparisons'])
     for comparison in comparisons:

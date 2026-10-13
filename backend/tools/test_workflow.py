@@ -127,6 +127,66 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(envelope['task']['input']['notes'], '<script>alert(1)</script>')
         self.assertNotIn('extractions', envelope['task'])
         self.assertIn('extractions', report(self.store, self.id, view='archive')['task'])
+
+    def test_report_keeps_business_fields_without_duplicating_comparisons(self):
+        from app.pipeline.compare import build_comparisons
+        from app.pipeline.trade_json import parse_trade_json, FORMAT
+        fields = {'document_no': 'INV-1', 'invoice_no': 'INV-1',
+                  'shipper': 'EXPORTER LTD', 'consignee': 'BUYER LTD',
+                  'contract_no': 'CONTRACT-1', 'container_no': 'CONT-1',
+                  'port_of_loading': 'NINGBO', 'port_of_discharge': 'HAMBURG',
+                  'packages': '120 CARTONS'}
+        for count in (1, 2):
+            with self.subTest(document_count=count):
+                task = copy.deepcopy(self.task)
+                task['documents'] = task['documents'][:count]
+                task['extractions'] = task['extractions'][:count]
+                for index, extraction in enumerate(task['extractions']):
+                    values = fields if index == 0 else {'packages': '120 CARTONS', 'shipper': 'EXPORTER LTD'}
+                    parsed = parse_trade_json(json.dumps({'format': FORMAT,
+                        'doc_type': task['documents'][index]['doc_type'], 'fields': values}).encode())
+                    extraction.update(parsed)
+                task['comparisons'] = build_comparisons(task['documents'], task['extractions'], lambda *_: False)
+                task['summary'].update(document_count=count, field_count=sum(len(e['fields']) for e in task['extractions']))
+                self.store.update(self.id, task)
+                result = report(self.store, self.id)
+                document = result['documents'][0]
+                remaining = {f['field_key']: f for f in document['fields']}
+                expected = set(fields) - {'document_no', 'invoice_no', 'packages'}
+                if count == 2:
+                    expected.remove('shipper')
+                    self.assertTrue(any(c['field_key'] == 'shipper' for c in result['comparisons']))
+                self.assertEqual(set(remaining), expected)
+                for field in task['extractions'][0]['fields']:
+                    if field['field_key'] in expected:
+                        self.assertEqual(remaining[field['field_key']], field)
+                self.assertEqual(self.store.get(self.id), task)
+
+    def test_report_keeps_controlled_failure_reason(self):
+        from app.pipeline.reader import ReadResult
+        from app.public_errors import parse_failure
+        message = '未检测到文本层（疑似扫描件），且未配置识别服务'
+        parsed = ReadResult(failed=True, error_message=message)
+        self.assertIn('提供带文本层的 PDF', parsed.error_message)
+        self.assertEqual(parse_failure(parsed.error_message), parsed.error_message)
+        task = copy.deepcopy(self.task)
+        task['documents'][0].update(process_status='FAILED', error_message=parsed.error_message)
+        task['errors'] = [{'code': 'DOC_PARSE_FAILED', 'level': 'ERROR',
+                           'message': 'scan.pdf 解析失败：' + parsed.error_message, 'file_ids': ['f1']}]
+        self.store.update(self.id, task)
+        for view in ('content', 'archive'):
+            result = report(self.store, self.id, view=view)
+            projected = result['task'] if view == 'archive' else result
+            self.assertEqual(projected['documents'][0]['error_message'], parsed.error_message)
+            self.assertEqual(projected['errors'][0]['message'], parsed.error_message)
+
+    def test_image_unavailable_reason_survives_read_result(self):
+        from app.pipeline import reader
+        with patch.object(reader, 'PADDLE_OCR_ENABLED', False), patch.object(reader, 'llm_enabled', return_value=False):
+            result = reader._read_image(b'synthetic image')
+        self.assertTrue(result.failed)
+        self.assertIn('提供带文本层的 PDF', result.error_message)
+
     def test_running_not_editable_or_exportable(self):
         self.store.update(self.id,{'status':'PROCESSING'})
         with self.assertRaises(WorkflowError): report(self.store,self.id)

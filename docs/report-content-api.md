@@ -19,6 +19,7 @@
 | report_version / view / generated_at / result_hash | 契约版本、投影视图、导出时间、原结果标识 |
 | task | task_id/status/时间/input/summary；不嵌套重复的全部结果 |
 | documents | 原文件清单与逐文件状态；identifiers 保留 document_no/invoice_no 各自证据；original_url 为同源下载路径 |
+| documents[].fields | 可选补充字段：未被 identifiers 或票级 comparisons 覆盖、且状态不是 NOT_IN_DOC 的业务字段，保留 label、原始证据、有效值及单位；缺省按空数组处理 |
 | items | 原 item_id、label、alignment_status/basis/note 和成员 file_id/item_no；以 label 展示，不把 ID 当品名 |
 | comparisons | 原 comparison_id、scope/item_id、field_key/label、status/severity/note/unit/values；枚举不变，D 统一翻译 |
 | comparisons[].values[].evidence | 唯一同文件、同字段、同商品成员的 raw_text、bbox_unit、line_no；无法唯一定位 status=UNAVAILABLE，值为 null，不猜首条或跨行取证；原值/页/bbox 仍在 value 中 |
@@ -32,6 +33,8 @@
 file_id、item_id、comparison_id、risk_id 和原枚举保持稳定。`SINGLE_SOURCE`、`NOT_CHECKED`、失败、未核实仍必须独立显示；`COMPLETED` 仅表示处理终态。各 summary 检查计数和比较/风险结论来自原任务，不因报告投影而重算。
 
 ## 历史与来源语义
+
+单份文件独有的收发货人、合同号、集装箱号和港口等信息通过 `documents[].fields` 保留，不因缺少交叉比对而消失。新增此可选字段不改变 CheckTask 契约或原有比较结论。解析错误文案经过受控转换后再次导出保持一致；项目 JSON 的输入校验原因保留，底层异常仍仅写日志。
 
 - `execution_rule_version=null` / `execution_version_status=UNKNOWN`：原任务没有历史版本记录，不用当前版本补齐。
 - 派生任务使用最后修订审计中的 `rule_version`，状态 RECORDED_IN_CORRECTION；审计链保留各次版本。

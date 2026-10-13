@@ -507,6 +507,13 @@
             "$ref": "#/$defs/ExtractedField"
           }
         },
+        "fields": {
+          "description": "未被 identifiers 或票级 comparisons 覆盖的适用业务字段，保留原始证据和有效值。",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExtractedField"
+          }
+        },
         "original_url": {
           "type": "string"
         }
