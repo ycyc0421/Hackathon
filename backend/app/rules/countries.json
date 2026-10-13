@@ -1,11 +1,11 @@
 {
-  "version": "static-source-candidates-v3",
-  "updated_at": "2026-10-12",
+  "version": "static-source-candidates-v4",
+  "updated_at": "2026-10-14",
   "verified": false,
   "verified_by": null,
   "verified_at": null,
   "_readme": [
-    "Official source retrieval does not verify applicability or legal compliance. HS prefixes select review candidates only. No unconditional missing-certificate conclusion. Archived demo rules are not executed."
+    "Official source retrieval does not verify applicability or legal compliance. HS prefixes select review candidates only. Supporting-document candidates produce manual-review prompts only; neither absence nor applicability is inferred from HS prefixes. Archived broad demo rules are not executed."
   ],
   "countries": {
     "DE": {
@@ -16,8 +16,8 @@
           "chapter_prefix": "6911",
           "rule_id": "DE-CERAMICS-6911",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "title": "瓷制餐厨用品食品接触用途及欧盟/成员国适用条件待核对",
+          "detail": "HS 6911 仅能提示该商品可能属于瓷制餐厨用品，不能证明食品接触用途。若实际用于接触食品，应核对欧盟食品接触材料要求、陶瓷指令及目的国实施要求；当前尚未核实用途、材质、测试证据和销售阶段信息，系统不判定合规或缺证。",
           "source_ids": [
             "EU-FCM-LEGISLATION",
             "EU-CERAMICS-84-500"
@@ -43,8 +43,66 @@
           "chapter_prefix": "6912",
           "rule_id": "DE-CERAMICS-6912",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "title": "其他陶瓷餐厨用品食品接触用途及欧盟/成员国适用条件待核对",
+          "detail": "HS 6912 仅能提示该商品可能属于其他陶瓷餐厨用品，不能证明食品接触用途。若实际用于接触食品，应核对欧盟食品接触材料要求、陶瓷指令及目的国实施要求；当前尚未核实用途、材质、测试证据和销售阶段信息，系统不判定合规或缺证。",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "DE-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "瓷制餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中瓷制餐厨用品候选规则。系统尚不支持自动确认符合性声明或测试报告的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "符合性声明或测试报告",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "DE-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "其他陶瓷餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中其他陶瓷餐厨用品候选规则。系统尚不支持自动确认符合性声明或测试报告的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "符合性声明或测试报告",
           "source_ids": [
             "EU-FCM-LEGISLATION",
             "EU-CERAMICS-84-500"
@@ -76,8 +134,8 @@
           "chapter_prefix": "6911",
           "rule_id": "NL-CERAMICS-6911",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "title": "瓷制餐厨用品食品接触用途及欧盟/成员国适用条件待核对",
+          "detail": "HS 6911 仅能提示该商品可能属于瓷制餐厨用品，不能证明食品接触用途。若实际用于接触食品，应核对欧盟食品接触材料要求、陶瓷指令及目的国实施要求；当前尚未核实用途、材质、测试证据和销售阶段信息，系统不判定合规或缺证。",
           "source_ids": [
             "EU-FCM-LEGISLATION",
             "EU-CERAMICS-84-500"
@@ -103,8 +161,66 @@
           "chapter_prefix": "6912",
           "rule_id": "NL-CERAMICS-6912",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "title": "其他陶瓷餐厨用品食品接触用途及欧盟/成员国适用条件待核对",
+          "detail": "HS 6912 仅能提示该商品可能属于其他陶瓷餐厨用品，不能证明食品接触用途。若实际用于接触食品，应核对欧盟食品接触材料要求、陶瓷指令及目的国实施要求；当前尚未核实用途、材质、测试证据和销售阶段信息，系统不判定合规或缺证。",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "NL-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "瓷制餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中瓷制餐厨用品候选规则。系统尚不支持自动确认符合性声明或测试报告的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "符合性声明或测试报告",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "NL-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "其他陶瓷餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中其他陶瓷餐厨用品候选规则。系统尚不支持自动确认符合性声明或测试报告的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "符合性声明或测试报告",
           "source_ids": [
             "EU-FCM-LEGISLATION",
             "EU-CERAMICS-84-500"
@@ -136,8 +252,8 @@
           "chapter_prefix": "6911",
           "rule_id": "FR-CERAMICS-6911",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "title": "瓷制餐厨用品食品接触用途及欧盟/成员国适用条件待核对",
+          "detail": "HS 6911 仅能提示该商品可能属于瓷制餐厨用品，不能证明食品接触用途。若实际用于接触食品，应核对欧盟食品接触材料要求、陶瓷指令及目的国实施要求；当前尚未核实用途、材质、测试证据和销售阶段信息，系统不判定合规或缺证。",
           "source_ids": [
             "EU-FCM-LEGISLATION",
             "EU-CERAMICS-84-500"
@@ -163,8 +279,66 @@
           "chapter_prefix": "6912",
           "rule_id": "FR-CERAMICS-6912",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "title": "其他陶瓷餐厨用品食品接触用途及欧盟/成员国适用条件待核对",
+          "detail": "HS 6912 仅能提示该商品可能属于其他陶瓷餐厨用品，不能证明食品接触用途。若实际用于接触食品，应核对欧盟食品接触材料要求、陶瓷指令及目的国实施要求；当前尚未核实用途、材质、测试证据和销售阶段信息，系统不判定合规或缺证。",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "FR-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "瓷制餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中瓷制餐厨用品候选规则。系统尚不支持自动确认符合性声明或测试报告的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "符合性声明或测试报告",
+          "source_ids": [
+            "EU-FCM-LEGISLATION",
+            "EU-CERAMICS-84-500"
+          ],
+          "source_urls": [
+            "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+            "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true,
+            "document_version": "84/500/EEC consolidated 2005-05-20; later amendments and national implementation need review"
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "FR-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "其他陶瓷餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中其他陶瓷餐厨用品候选规则。系统尚不支持自动确认符合性声明或测试报告的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "符合性声明或测试报告",
           "source_ids": [
             "EU-FCM-LEGISLATION",
             "EU-CERAMICS-84-500"
@@ -196,8 +370,8 @@
           "chapter_prefix": "6911",
           "rule_id": "GB-CERAMICS-6911",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "title": "瓷制餐厨用品食品接触用途及英国食品包装规则适用条件待核对",
+          "detail": "HS 6911 仅能提示该商品可能属于瓷制餐厨用品，不能证明食品接触用途。若实际用于接触食品，应核对英国食品包装/食品接触材料要求、测试资料和销售阶段；当前信息不足，系统不判定合规或缺证。",
           "source_ids": [
             "GB-FOOD-PACKAGING"
           ],
@@ -220,8 +394,60 @@
           "chapter_prefix": "6912",
           "rule_id": "GB-CERAMICS-6912",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如商品用于接触食品，应进一步核对食品接触材料的适用要求及支持文件。当前未取得用途、测试报告、销售阶段等条件，不能判定合规或缺证。",
+          "title": "其他陶瓷餐厨用品食品接触用途及英国食品包装规则适用条件待核对",
+          "detail": "HS 6912 仅能提示该商品可能属于其他陶瓷餐厨用品，不能证明食品接触用途。若实际用于接触食品，应核对英国食品包装/食品接触材料要求、测试资料和销售阶段；当前信息不足，系统不判定合规或缺证。",
+          "source_ids": [
+            "GB-FOOD-PACKAGING"
+          ],
+          "source_urls": [
+            "https://www.gov.uk/food-labelling-and-packaging/overview"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true
+          }
+        }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "GB-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "瓷制餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中瓷制餐厨用品候选规则。系统尚不支持自动确认食品接触材料声明或测试报告的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "食品接触材料声明或测试报告",
+          "source_ids": [
+            "GB-FOOD-PACKAGING"
+          ],
+          "source_urls": [
+            "https://www.gov.uk/food-labelling-and-packaging/overview"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "GB-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "其他陶瓷餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中其他陶瓷餐厨用品候选规则。系统尚不支持自动确认食品接触材料声明或测试报告的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "食品接触材料声明或测试报告",
           "source_ids": [
             "GB-FOOD-PACKAGING"
           ],
@@ -250,8 +476,8 @@
           "chapter_prefix": "6911",
           "rule_id": "US-CERAMICS-6911",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如属于陶瓷食品器皿，请核对 FDA 关于铅析出污染的执法指引及检测资料；该指引不等于所有陶瓷均需食品事先通知。缺少用途和检测信息，无法作合规判断。",
+          "title": "瓷制餐厨用品食品接触用途及 FDA 适用条件待核对",
+          "detail": "HS 6911 仅能提示该商品可能属于瓷制餐厨用品，不能证明食品接触用途。若实际为陶瓷食品器皿，请核对 FDA 关于铅析出污染的执法指引及检测资料；缺少用途、材质和检测信息时，系统不判定合规或缺证。",
           "source_ids": [
             "FDA-CPG-545450"
           ],
@@ -274,8 +500,60 @@
           "chapter_prefix": "6912",
           "rule_id": "US-CERAMICS-6912",
           "severity": "WARNING",
-          "title": "陶瓷食品接触用途及规则适用条件待核对",
-          "detail": "如属于陶瓷食品器皿，请核对 FDA 关于铅析出污染的执法指引及检测资料；该指引不等于所有陶瓷均需食品事先通知。缺少用途和检测信息，无法作合规判断。",
+          "title": "其他陶瓷餐厨用品食品接触用途及 FDA 适用条件待核对",
+          "detail": "HS 6912 仅能提示该商品可能属于其他陶瓷餐厨用品，不能证明食品接触用途。若实际为陶瓷食品器皿，请核对 FDA 关于铅析出污染的执法指引及检测资料；缺少用途、材质和检测信息时，系统不判定合规或缺证。",
+          "source_ids": [
+            "FDA-CPG-545450"
+          ],
+          "source_urls": [
+            "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true
+          }
+        }
+      ],
+      "certificate_rules": [
+        {
+          "chapter_prefix": "6911",
+          "rule_id": "US-CERAMICS-6911-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "瓷制餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中瓷制餐厨用品候选规则。系统尚不支持自动确认铅析出测试报告或合规支持资料的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "铅析出测试报告或合规支持资料",
+          "source_ids": [
+            "FDA-CPG-545450"
+          ],
+          "source_urls": [
+            "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination"
+          ],
+          "review_status": "APPLICABILITY_REVIEW_REQUIRED",
+          "applicability": {
+            "hs_prefix_is_candidate_only": true,
+            "required_facts": [
+              "food_contact_use",
+              "product_category",
+              "test_evidence",
+              "market_stage"
+            ],
+            "national_implementation_review_required": true
+          }
+        },
+        {
+          "chapter_prefix": "6912",
+          "rule_id": "US-CERAMICS-6912-SUPPORT-DOCS",
+          "severity": "WARNING",
+          "title": "其他陶瓷餐厨用品支持资料待人工核对",
+          "detail": "本票目的国为 {country}，HS 编码 {hs} 命中其他陶瓷餐厨用品候选规则。系统尚不支持自动确认铅析出测试报告或合规支持资料的适用性、随附情况及与本商品的对应关系，请人工核对用途及原件；不作缺失或合规结论。编码来源：{where}。",
+          "document_name": "铅析出测试报告或合规支持资料",
           "source_ids": [
             "FDA-CPG-545450"
           ],

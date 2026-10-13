@@ -46,7 +46,16 @@ export function buildConclusion({ status, documentCount, fieldCount, riskCount, 
   }
 
   // 无问题条目：未校验或结果不完整都不能算"通过"，橙色提醒
-  const fallbackTone = counts.unchecked > 0 || status === 'PARTIAL' ? 'warn' : 'neutral'
+  const fallbackTone = counts.unchecked > 0 || riskCount > 0 || status === 'PARTIAL' ? 'warn' : 'neutral'
+
+  // 数值一致不能消除抽取可信度问题，概要与人工复核列表使用同一口径。
+  if (counts.lowConfidence > 0) {
+    const unchecked = counts.unchecked > 0 ? '，另有 ' + counts.unchecked + ' 项未校验' : ''
+    return {
+      text: prefix + counts.lowConfidence + ' 个比对条目的取值可信度较低' + unchecked + '，需要人工复核' + riskTail + '。',
+      tone: 'warn',
+    }
+  }
 
   // 以下为"没有问题条目"的分支，逐一区分能不能说"一致"
   if (counts.total === 0) {
@@ -76,7 +85,7 @@ export function buildConclusion({ status, documentCount, fieldCount, riskCount, 
     // 全部比对条目一致且任务完整完成，是唯一可以给出绿色正向结论的形态
     return {
       text: `${prefix}${documentCount} 份文件、${counts.match} 个比对条目全部一致${riskTail}。`,
-      tone: status === 'COMPLETED' ? 'ok' : 'warn',
+      tone: status === 'COMPLETED' && riskCount === 0 ? 'ok' : 'warn',
     }
   }
 
@@ -85,4 +94,35 @@ export function buildConclusion({ status, documentCount, fieldCount, riskCount, 
     text: `${prefix}共 ${counts.single} 个字段，均仅有一份文件提供，无法交叉比对${riskTail}。`,
     tone: fallbackTone,
   }
+}
+
+/**
+ * 按 comparisons 的实际状态统计各档条数，供 buildConclusion 与报告导出共用。
+ *
+ * 单独抽出来是因为报告页与导出的 HTML 报告是同一份结论的两种呈现，
+ * 两处各写一份统计迟早会漂移——导出的 PDF 说"3 处不一致"、页面说"2 处"
+ * 是最难解释的一类缺陷。
+ *
+ * 口径：只认 comparisons[].status，不用 summary 里的问题计数反推，
+ * 因为 summary 是后端统计的原始任务计数，与比对条目数不是一回事。
+ *
+ * @param {Array} comparisons task.comparisons
+ * @returns {{total:number,match:number,single:number,unchecked:number,conflict:number,missing:number,unrecognized:number}}
+ */
+export function comparisonCounts(comparisons) {
+  const list = comparisons ?? []
+  const counts = { total: list.length, match: 0, single: 0, unchecked: 0, conflict: 0, missing: 0, unrecognized: 0, lowConfidence: 0 }
+  for (const item of list) {
+    if (item?.values?.some((value) => value.field_status === 'LOW_CONFIDENCE')) counts.lowConfidence += 1
+    switch (item?.status) {
+      case 'MATCH': counts.match += 1; break
+      case 'SINGLE_SOURCE': counts.single += 1; break
+      case 'NOT_CHECKED': counts.unchecked += 1; break
+      case 'CONFLICT': counts.conflict += 1; break
+      case 'MISSING_IN_SOME': counts.missing += 1; break
+      case 'UNRECOGNIZED': counts.unrecognized += 1; break
+      default: break
+    }
+  }
+  return counts
 }

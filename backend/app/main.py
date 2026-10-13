@@ -24,7 +24,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -328,15 +328,16 @@ def create_correction(task_id: str, request: workflow.CorrectionRequest):
     return to_frontend_task(workflow.correct(store,task_id,request))
 
 @app.get('/api/v1/checks/{task_id}/report')
-def export_report(task_id: str, format: str = 'json'):
-    if format not in {'json','html'}:
-        raise ApiError(400,'INVALID_REPORT_FORMAT','报告支持 json 或 html')
-    envelope = workflow.report(store,task_id)
-    safe_id = re.sub(r'[^A-Za-z0-9_-]','_',task_id)
-    headers = {'Content-Disposition':f'attachment; filename="{safe_id}.{format}"','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; sandbox"}
+def export_report(task_id: str, format: str = 'json', view: str = 'content'):
     if format == 'html':
-        return HTMLResponse(workflow.report_html(envelope),headers=headers)
-    return JSONResponse(envelope,headers=headers)
+        raise ApiError(410, 'REPORT_PRESENTATION_MOVED', '请在报告页面使用前端打印或导出；后端提供结构化 JSON 内容')
+    if format != 'json' or view not in {'content', 'archive'}:
+        raise ApiError(400, 'INVALID_REPORT_FORMAT', '报告支持 format=json，view=content 或 archive')
+    envelope = workflow.report(store, task_id, view=view)
+    safe_id = re.sub(r'[^A-Za-z0-9_-]', '_', task_id)
+    headers = {'Content-Disposition': f'attachment; filename="{safe_id}-{view}.json"',
+               'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store'}
+    return JSONResponse(envelope, headers=headers)
 
 
 @app.get('/api/v1/rules/sources')

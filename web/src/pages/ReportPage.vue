@@ -7,7 +7,7 @@
  */
 import { computed, inject } from 'vue'
 import { formatTime, formatDuration, riskType, severity, processStatus, taskStatus } from '../api/formatters.js'
-import { buildConclusion } from '../utils/reportConclusion.js'
+import { buildConclusion, comparisonCounts } from '../utils/reportConclusion.js'
 import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
@@ -106,19 +106,7 @@ const duration = computed(() =>
 )
 
 /** comparisons 各状态条数，结论与概要都以它为准（不信 summary 的问题计数反推一致） */
-const counts = computed(() => {
-  const list = task.value?.comparisons ?? []
-  const c = { total: list.length, match: 0, single: 0, unchecked: 0, conflict: 0, missing: 0, unrecognized: 0 }
-  for (const item of list) {
-    if (item.status === 'MATCH') c.match += 1
-    else if (item.status === 'SINGLE_SOURCE') c.single += 1
-    else if (item.status === 'NOT_CHECKED') c.unchecked += 1
-    else if (item.status === 'CONFLICT') c.conflict += 1
-    else if (item.status === 'MISSING_IN_SOME') c.missing += 1
-    else if (item.status === 'UNRECOGNIZED') c.unrecognized += 1
-  }
-  return c
-})
+const counts = computed(() => comparisonCounts(task.value?.comparisons))
 
 /**
  * 检查概要的开头结论：把统计数字串成一句话，让读者先知道"要不要处理"。

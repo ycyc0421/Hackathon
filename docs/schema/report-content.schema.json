@@ -1,0 +1,1252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ycyc0421/Hackathon/schema/report-content.schema.json",
+  "title": "Report content v2",
+  "type": "object",
+  "required": [
+    "report_version",
+    "view",
+    "generated_at",
+    "result_hash",
+    "task",
+    "documents",
+    "items",
+    "comparisons",
+    "risks",
+    "errors",
+    "unaligned_evidence",
+    "corrections",
+    "provenance",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "report_version": {
+      "const": "2"
+    },
+    "view": {
+      "const": "content"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "result_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "task": {
+      "$ref": "#/$defs/ReportTask"
+    },
+    "documents": {
+      "items": {
+        "$ref": "#/$defs/Document"
+      },
+      "title": "Documents",
+      "type": "array"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/ItemGroup"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "comparisons": {
+      "items": {
+        "$ref": "#/$defs/Comparison"
+      },
+      "title": "Comparisons",
+      "type": "array"
+    },
+    "risks": {
+      "items": {
+        "$ref": "#/$defs/Risk"
+      },
+      "title": "Risks",
+      "type": "array"
+    },
+    "errors": {
+      "items": {
+        "$ref": "#/$defs/TaskError"
+      },
+      "title": "Errors",
+      "type": "array"
+    },
+    "unaligned_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "file_id",
+          "item_no",
+          "fields"
+        ]
+      }
+    },
+    "corrections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source_task_id",
+          "derived_task_id",
+          "actor_verified",
+          "changes"
+        ]
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "execution_rule_version",
+        "execution_version_status",
+        "rule_verification_status",
+        "source_metadata_scope",
+        "sources",
+        "pending_updates"
+      ],
+      "properties": {
+        "execution_rule_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "execution_version_status": {
+          "enum": [
+            "UNKNOWN",
+            "RECORDED_IN_CORRECTION"
+          ]
+        },
+        "rule_verification_status": {
+          "enum": [
+            "UNVERIFIED",
+            "UNKNOWN"
+          ]
+        },
+        "source_metadata_scope": {
+          "const": "CURRENT_AT_EXPORT"
+        },
+        "sources": {
+          "type": "array"
+        },
+        "pending_updates": {
+          "type": "array"
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "AlignmentBasis": {
+      "description": "对应关系的依据。给不出依据时给 None，不要假装是位置对齐。",
+      "enum": [
+        "ITEM_CODE",
+        "DESCRIPTION",
+        "POSITION"
+      ],
+      "title": "AlignmentBasis",
+      "type": "string"
+    },
+    "AlignmentStatus": {
+      "description": "行组的对齐状态。\n\nALIGNED   = 至少两份文件的行已对应上，品名级比对有意义\nPARTIAL   = 只有一份文件有该行，无法比对，但不代表异常（如提单只有汇总）\nUNALIGNED = 多份文件都有疑似行但无法确定对应关系，**不得据此给出比对结论**",
+      "enum": [
+        "ALIGNED",
+        "PARTIAL",
+        "UNALIGNED"
+      ],
+      "title": "AlignmentStatus",
+      "type": "string"
+    },
+    "BBoxUnit": {
+      "enum": [
+        "PX",
+        "RELATIVE"
+      ],
+      "title": "BBoxUnit",
+      "type": "string"
+    },
+    "Comparison": {
+      "additionalProperties": false,
+      "properties": {
+        "comparison_id": {
+          "title": "Comparison Id",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/ComparisonScope",
+          "default": "DOCUMENT"
+        },
+        "item_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item Id"
+        },
+        "field_key": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Field Key",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "value_type": {
+          "$ref": "#/$defs/ValueType"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "status": {
+          "$ref": "#/$defs/ComparisonStatus"
+        },
+        "canonical_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Canonical Value"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "rule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rule Id"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/ComparisonValue"
+          },
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "comparison_id",
+        "field_key",
+        "label",
+        "value_type",
+        "status",
+        "severity"
+      ],
+      "title": "Comparison",
+      "type": "object"
+    },
+    "ComparisonScope": {
+      "description": "DOCUMENT = 票级（沿用 v0.1 语义）；ITEM = 品名级（同一行组内互比）。",
+      "enum": [
+        "DOCUMENT",
+        "ITEM"
+      ],
+      "title": "ComparisonScope",
+      "type": "string"
+    },
+    "ComparisonStatus": {
+      "description": "跨文件比对结论。NOT_CHECKED 必须返回：省略它等于让用户以为检查过了。",
+      "enum": [
+        "MATCH",
+        "CONFLICT",
+        "MISSING_IN_SOME",
+        "NOT_CHECKED",
+        "UNRECOGNIZED",
+        "SINGLE_SOURCE"
+      ],
+      "title": "ComparisonStatus",
+      "type": "string"
+    },
+    "ComparisonValue": {
+      "additionalProperties": false,
+      "properties": {
+        "file_id": {
+          "title": "File Id",
+          "type": "string"
+        },
+        "file_name": {
+          "title": "File Name",
+          "type": "string"
+        },
+        "raw_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Value"
+        },
+        "normalized_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalized Value"
+        },
+        "field_status": {
+          "$ref": "#/$defs/FieldStatus"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page"
+        },
+        "bbox": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bbox"
+        },
+        "evidence": {
+          "type": "object",
+          "required": [
+            "raw_text",
+            "bbox_unit",
+            "line_no",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "raw_text": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "bbox_unit": {
+              "enum": [
+                "PX",
+                "PT",
+                "NORMALIZED",
+                null
+              ]
+            },
+            "line_no": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "status": {
+              "enum": [
+                "LOCATED",
+                "UNAVAILABLE"
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "file_id",
+        "file_name",
+        "field_status",
+        "evidence"
+      ],
+      "title": "ComparisonValue",
+      "type": "object"
+    },
+    "DocType": {
+      "description": "判不出来给 None。",
+      "enum": [
+        "COMMERCIAL_INVOICE",
+        "PACKING_LIST",
+        "BILL_OF_LADING",
+        "CUSTOMS_DECLARATION",
+        "CERTIFICATE_OF_ORIGIN",
+        "INSURANCE_POLICY",
+        "OTHER"
+      ],
+      "title": "DocType",
+      "type": "string"
+    },
+    "Document": {
+      "additionalProperties": false,
+      "properties": {
+        "file_id": {
+          "title": "File Id",
+          "type": "string"
+        },
+        "file_name": {
+          "title": "File Name",
+          "type": "string"
+        },
+        "file_type": {
+          "$ref": "#/$defs/FileType"
+        },
+        "doc_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DocType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "process_status": {
+          "$ref": "#/$defs/ProcessStatus"
+        },
+        "page_count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Count"
+        },
+        "error_message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Message"
+        },
+        "identifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExtractedField"
+          }
+        },
+        "fields": {
+          "description": "未被 identifiers 或票级 comparisons 覆盖的适用业务字段，保留原始证据和有效值。",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExtractedField"
+          }
+        },
+        "original_url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "file_id",
+        "file_name",
+        "file_type",
+        "process_status",
+        "identifiers",
+        "original_url"
+      ],
+      "title": "Document",
+      "type": "object"
+    },
+    "ErrorLevel": {
+      "enum": [
+        "FATAL",
+        "ERROR",
+        "WARNING"
+      ],
+      "title": "ErrorLevel",
+      "type": "string"
+    },
+    "ExtractedField": {
+      "additionalProperties": false,
+      "description": "契约里的 `Field`。名字加 Extracted 前缀避免与 pydantic.Field 混淆。\n\nv0.2 起：同一个 field_key 可以在同一份文件里出现多次 —— 票级一次\n（放在 Extraction.fields），各品名行各一次（放在 LineItem.fields）。\n其身份由**所在位置**决定，不再由 field_key 唯一决定。",
+      "properties": {
+        "field_key": {
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Field Key",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "raw_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Text"
+        },
+        "raw_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Value"
+        },
+        "normalized_value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalized Value"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "status": {
+          "$ref": "#/$defs/FieldStatus"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page"
+        },
+        "bbox": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bbox"
+        },
+        "bbox_unit": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BBoxUnit"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "field_key",
+        "label",
+        "status"
+      ],
+      "title": "ExtractedField",
+      "type": "object"
+    },
+    "Extraction": {
+      "additionalProperties": false,
+      "properties": {
+        "file_id": {
+          "title": "File Id",
+          "type": "string"
+        },
+        "doc_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DocType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "parse_method": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParseMethod"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/ExtractedField"
+          },
+          "title": "Fields",
+          "type": "array"
+        },
+        "line_items": {
+          "items": {
+            "$ref": "#/$defs/LineItem"
+          },
+          "title": "Line Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "file_id"
+      ],
+      "title": "Extraction",
+      "type": "object"
+    },
+    "FieldStatus": {
+      "description": "该字段在某一份文件里的状态。NOT_IN_DOC 与 MISSING_IN_DOC 必须分开。",
+      "enum": [
+        "EXTRACTED",
+        "LOW_CONFIDENCE",
+        "NOT_IN_DOC",
+        "MISSING_IN_DOC",
+        "UNRECOGNIZED",
+        "NORMALIZE_FAILED"
+      ],
+      "title": "FieldStatus",
+      "type": "string"
+    },
+    "FileType": {
+      "enum": [
+        "PDF",
+        "IMAGE",
+        "EDI",
+        "OTHER"
+      ],
+      "title": "FileType",
+      "type": "string"
+    },
+    "ItemGroup": {
+      "additionalProperties": false,
+      "description": "对齐后的一组相互对应的「行」，品名级比对的最小单位。",
+      "properties": {
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "alignment_status": {
+          "$ref": "#/$defs/AlignmentStatus"
+        },
+        "alignment_basis": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AlignmentBasis"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "alignment_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignment Note"
+        },
+        "members": {
+          "items": {
+            "$ref": "#/$defs/ItemMember"
+          },
+          "title": "Members",
+          "type": "array"
+        }
+      },
+      "required": [
+        "item_id",
+        "label",
+        "alignment_status"
+      ],
+      "title": "ItemGroup",
+      "type": "object"
+    },
+    "ItemMember": {
+      "additionalProperties": false,
+      "description": "该行组在某一份文件里对应的那一行。",
+      "properties": {
+        "file_id": {
+          "title": "File Id",
+          "type": "string"
+        },
+        "item_no": {
+          "minimum": 1,
+          "title": "Item No",
+          "type": "integer"
+        },
+        "match_score": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Match Score"
+        }
+      },
+      "required": [
+        "file_id",
+        "item_no"
+      ],
+      "title": "ItemMember",
+      "type": "object"
+    },
+    "LineItem": {
+      "additionalProperties": false,
+      "description": "一份文件里的一个品名行（v0.2 新增）。\n\n只放**属于该行**的字段；整票唯一的字段（发票号、港口、收发货人）和\n整票汇总值（各行之和的合计）仍放在 Extraction.fields，不要塞进来。",
+      "properties": {
+        "item_no": {
+          "minimum": 1,
+          "title": "Item No",
+          "type": "integer"
+        },
+        "raw_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Text"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/ExtractedField"
+          },
+          "title": "Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "item_no"
+      ],
+      "title": "LineItem",
+      "type": "object"
+    },
+    "ParseMethod": {
+      "enum": [
+        "TEXT_LAYER",
+        "OCR",
+        "EDI_PARSE"
+      ],
+      "title": "ParseMethod",
+      "type": "string"
+    },
+    "ProcessStatus": {
+      "enum": [
+        "UPLOADED",
+        "PARSING",
+        "EXTRACTED",
+        "FAILED",
+        "UNSUPPORTED"
+      ],
+      "title": "ProcessStatus",
+      "type": "string"
+    },
+    "Risk": {
+      "additionalProperties": false,
+      "properties": {
+        "risk_id": {
+          "title": "Risk Id",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/RiskType"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        },
+        "related_field_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Field Keys",
+          "type": "array"
+        },
+        "related_item_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Item Ids",
+          "type": "array"
+        },
+        "related_file_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related File Ids",
+          "type": "array"
+        },
+        "destination_country": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Destination Country"
+        },
+        "rule_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rule Id"
+        },
+        "rule_source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rule Source"
+        },
+        "rule_context": {
+          "type": "object",
+          "required": [
+            "verification_status",
+            "source_ids",
+            "applicability",
+            "definition_scope"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "verification_status": {
+              "enum": [
+                "UNVERIFIED",
+                "NOT_CHECKED",
+                "UNKNOWN"
+              ]
+            },
+            "source_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "applicability": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "definition_scope": {
+              "enum": [
+                "CURRENT_AT_EXPORT",
+                "UNKNOWN"
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "risk_id",
+        "type",
+        "severity",
+        "title",
+        "detail",
+        "rule_context"
+      ],
+      "title": "Risk",
+      "type": "object"
+    },
+    "RiskType": {
+      "enum": [
+        "MISSING_CERTIFICATE",
+        "HS_CLASSIFICATION",
+        "RULE_UNCOVERED",
+        "OTHER"
+      ],
+      "title": "RiskType",
+      "type": "string"
+    },
+    "Severity": {
+      "enum": [
+        "INFO",
+        "WARNING",
+        "ERROR"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "Summary": {
+      "additionalProperties": false,
+      "properties": {
+        "document_count": {
+          "minimum": 0,
+          "title": "Document Count",
+          "type": "integer"
+        },
+        "field_count": {
+          "minimum": 0,
+          "title": "Field Count",
+          "type": "integer"
+        },
+        "item_count": {
+          "minimum": 0,
+          "title": "Item Count",
+          "type": "integer"
+        },
+        "conflict_count": {
+          "minimum": 0,
+          "title": "Conflict Count",
+          "type": "integer"
+        },
+        "missing_count": {
+          "minimum": 0,
+          "title": "Missing Count",
+          "type": "integer"
+        },
+        "risk_count": {
+          "minimum": 0,
+          "title": "Risk Count",
+          "type": "integer"
+        },
+        "unrecognized_count": {
+          "minimum": 0,
+          "title": "Unrecognized Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "document_count",
+        "field_count",
+        "item_count",
+        "conflict_count",
+        "missing_count",
+        "risk_count",
+        "unrecognized_count"
+      ],
+      "title": "Summary",
+      "type": "object"
+    },
+    "TaskError": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "level": {
+          "$ref": "#/$defs/ErrorLevel"
+        },
+        "file_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "File Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "level"
+      ],
+      "title": "TaskError",
+      "type": "object"
+    },
+    "TaskInput": {
+      "additionalProperties": false,
+      "properties": {
+        "destination_country": {
+          "pattern": "^[A-Z]{2}$",
+          "title": "Destination Country",
+          "type": "string"
+        },
+        "destination_country_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Destination Country Name"
+        },
+        "trade_mode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trade Mode"
+        },
+        "declared_currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Declared Currency"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        }
+      },
+      "required": [
+        "destination_country"
+      ],
+      "title": "TaskInput",
+      "type": "object"
+    },
+    "TaskStatus": {
+      "description": "COMPLETED 与 PARTIAL 必须分开：前者全部分析完成，后者有文件失败但其余出了结果。",
+      "enum": [
+        "PENDING",
+        "PROCESSING",
+        "COMPLETED",
+        "PARTIAL",
+        "FAILED"
+      ],
+      "title": "TaskStatus",
+      "type": "string"
+    },
+    "ValueType": {
+      "enum": [
+        "NUMBER",
+        "MONEY",
+        "CODE",
+        "STRING",
+        "DATE"
+      ],
+      "title": "ValueType",
+      "type": "string"
+    },
+    "ReportTask": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "status",
+        "created_at",
+        "finished_at",
+        "input",
+        "summary"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/TaskStatus"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finished At"
+        },
+        "input": {
+          "$ref": "#/$defs/TaskInput"
+        },
+        "summary": {
+          "$ref": "#/$defs/Summary"
+        }
+      }
+    }
+  }
+}

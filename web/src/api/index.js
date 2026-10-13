@@ -379,22 +379,48 @@ export async function createCorrection(taskId, payload, { signal } = {}) {
 }
 
 /**
- * 导出报告文件（JSON 或 HTML）。返回 Blob，文件名由组件生成。
+ * 读取报告内容（报告契约 v2）。
  *
- * HTML 报告可在浏览器打印为 PDF，当前不是服务端 PDF 导出。mock、任务未结束
- * 不发真实请求；FAILED 终态可导出失败明细。失败（404/409/超时/网络错误）按
- * 真实返回抛错，绝不把错误 JSON 当作报告文件返回给下载逻辑。
+ * `GET /checks/{id}/report?format=json&view=content` 是默认视图：后端给出
+ * 结构化内容，前端负责排版与呈现（issue #51）。`view='archive'` 返回完整的
+ * 内部抽取结构与审计 before/after，用于归档留底，不进报告正文。
  *
- * @param {'json'|'html'} format
- * @returns {Promise<Blob>}
+ * 适用于 COMPLETED / PARTIAL / FAILED；处理中返回 409/TASK_NOT_FINISHED，
+ * 不存在返回 404/TASK_NOT_FOUND，均按真实返回抛错。
+ *
+ * 注意：后端的 `format=html` 已返回 410/REPORT_PRESENTATION_MOVED，
+ * 导出的 HTML 由前端 `src/report/document.js` 依据这里的内容生成。
+ *
+ * @param {'content'|'archive'} [view]
+ * @returns {Promise<object>} report_version=2 的报告内容
  */
-export async function exportReport(taskId, format, { signal } = {}) {
+export async function getReportContent(taskId, { view = 'content', signal } = {}) {
   if (isMock()) {
     throw new ApiError('示例任务不支持服务端导出，请切换真实后端', { kind: 'SERVER', code: 'MOCK_UNSUPPORTED' })
   }
-  const fmt = format === 'html' ? 'html' : 'json'
+  const v = view === 'archive' ? 'archive' : 'content'
+  return request(
+    `/checks/${encodeURIComponent(taskId)}/report?format=json&view=${v}`,
+    {},
+    { base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS, retries: RETRY_MAX_ATTEMPTS, baseDelayMs: RETRY_BASE_DELAY_MS, signal }
+  )
+}
+
+/**
+ * 导出报告为 JSON 文件（归档视图）。
+ *
+ * 这是**归档**出口：完整抽取结构、原始字段值与审计 before/after 都在里面，
+ * 供留底与离线核对。默认报告正文不含这些内容，所以要有一个地方能拿到。
+ * 返回 Blob，文件名由组件生成；失败按真实返回抛错，绝不把错误响应当文件下载。
+ *
+ * @returns {Promise<Blob>}
+ */
+export async function exportReportArchive(taskId, { signal } = {}) {
+  if (isMock()) {
+    throw new ApiError('示例任务不支持服务端导出，请切换真实后端', { kind: 'SERVER', code: 'MOCK_UNSUPPORTED' })
+  }
   return requestBlob(
-    `/checks/${encodeURIComponent(taskId)}/report?format=${fmt}`,
+    `/checks/${encodeURIComponent(taskId)}/report?format=json&view=archive`,
     {},
     { base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS, signal }
   )

@@ -75,7 +75,9 @@ jobs:
         run: npm ci
 
       - name: 契约校验
-        run: npm run validate
+        run: |
+          npm run validate
+          node backend/tools/validate_reports.mjs
 
   build-frontend:
     name: 构建前端
