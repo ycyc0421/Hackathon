@@ -1,0 +1,261 @@
+/* 第二套独立视觉方案：深海蓝 + 电光蓝。绿色版文件保持原样。 */
+:root {
+  --gray-50: #111a2b;
+  --gray-100: #1b2940;
+  --gray-200: #293c58;
+  --gray-300: #405977;
+  --gray-400: #6f86a0;
+  --gray-500: #8da2b9;
+  --gray-600: #a9bdd3;
+  --gray-700: #c9d8e9;
+  --gray-800: #e2ecf8;
+  --gray-900: #f4f8ff;
+  --blue-50: #152540;
+  --blue-100: #1b3155;
+  --blue-200: #285187;
+  --blue-300: #4683d7;
+  --blue-400: #5c9df1;
+  --blue-500: #67a9ff;
+  --blue-600: #5298f5;
+  --blue-700: #3c7fd9;
+  --blue-800: #2c5eaa;
+  --blue-900: #1c3b73;
+  --color-primary: #70afff;
+  --color-primary-hover: #95c7ff;
+  --color-primary-active: #4d93ef;
+  --success: #87d6b0;
+  --success-bg: #19352f;
+  --warning: #f5c371;
+  --warning-bg: #3a3025;
+  --danger: #ff8889;
+  --danger-bg: #3b2634;
+  --info: #87c7ff;
+  --info-bg: #1a314e;
+  --surface: #070d1b;
+  --surface-raised: #111b2d;
+  --border: #283850;
+  --border-hover: #4c6e95;
+  --text-body: #f1f6ff;
+  --text-muted: #a9bbd3;
+  --text-disabled: #72849e;
+}
+
+body {
+  background: radial-gradient(circle at 87% 2%, rgba(32, 86, 182, .25), transparent 500px),
+              radial-gradient(circle at 3% 68%, rgba(13, 54, 143, .18), transparent 520px),
+              #070d1b;
+}
+.topbar { background: rgba(7, 13, 27, .95); border-bottom-color: #263854; }
+.brand-symbol {
+  background: linear-gradient(145deg, #bce7ff, #65aaff);
+  color: #0a1d3a;
+  box-shadow: 0 0 24px rgba(84, 152, 255, .34);
+}
+.brand-mark { color: #f3f8ff; }
+.brand-sub { color: #8fa6c1; }
+.tab { color: #a2b4ca; }
+.tab:not(.active):not(:disabled):hover { color: #f3f8ff; background: #182841; }
+.tab.active { color: #8cc0ff; }
+.tab-indicator { background: #70afff; box-shadow: 0 0 15px #3f8dff; }
+.tab.locked { color: #657992; }
+.mock-flag { background: #312b25; border-color: #8d6945; color: #f5c582; }
+.backend-flag { background: #1b3740; border-color: #4e8e9f; color: #9cdbeb; }
+
+.workspace-intro {
+  border-color: #2c4773;
+  background: radial-gradient(circle at 80% 110%, rgba(49, 118, 226, .22), transparent 38%),
+              linear-gradient(115deg, #14243f, #0a1427 72%, #102347);
+  box-shadow: inset 0 1px 0 rgba(197, 225, 255, .1), 0 20px 48px rgba(0, 0, 0, .2);
+}
+.workspace-intro::before { background-image: radial-gradient(#9ecbff 1px, transparent 1px); }
+.workspace-eyebrow { color: #8fc6ff; }
+.workspace-intro h1 { color: #f8fbff; }
+.workspace-description { color: #bdcde2; }
+.workspace-step { border-color: #4b70a3; background: rgba(19, 47, 84, .72); color: #b4d9ff; }
+.workspace-intro--upload {
+  border-color: #325a99;
+  background-image:
+    linear-gradient(90deg, rgba(4, 10, 24, .97) 0%, rgba(4, 10, 24, .91) 24%, rgba(4, 10, 24, .57) 52%, rgba(4, 10, 24, .06) 78%),
+    linear-gradient(0deg, rgba(5, 13, 30, .38), transparent 35%),
+    url('/images/logistics-earth-blue.png');
+  background-color: #071124;
+  box-shadow: inset 0 1px 0 rgba(205, 232, 255, .16), 0 24px 65px rgba(0, 0, 0, .28);
+}
+.workspace-intro--upload .workspace-eyebrow { color: #b7dcff; }
+.workspace-intro--upload .workspace-description { color: #e3edfb; }
+
+.page-title, .card-title { color: #f5f9ff; }
+.page-sub, .card-sub { color: #aabdd4; }
+.card {
+  border-color: #2b3b56;
+  background: linear-gradient(155deg, #17243a, #101b2e 88%);
+  box-shadow: inset 0 1px 0 rgba(230, 243, 255, .035), 0 12px 30px rgba(0, 0, 0, .15);
+}
+.dropzone {
+  border-color: #4a73aa;
+  background: radial-gradient(circle at center, #203b69 0, #182d50 55%, #16253f 100%);
+}
+.dropzone:hover, .dropzone.active { border-color: #87bcff; background: #234777; }
+.dropzone-symbol {
+  border-color: #648dc4;
+  background: #254779;
+  color: #b9dcff;
+  box-shadow: 0 0 22px rgba(88, 158, 255, .18);
+}
+.dropzone-main { color: #f1f7ff; }
+.dropzone-hint { color: #aabdd3; }
+.file-list, .doc-list { border-color: #344962; }
+.file-item, .doc-item { border-color: #2c3e56; }
+.file-item:hover { background: #1e3352; }
+.field-label { color: #b6c7dd; }
+.input, textarea, .app-select-trigger, .app-select.block .app-select-trigger {
+  border-color: #405a7c;
+  background: #101b2d;
+  color: #eef5ff;
+}
+.input::placeholder, textarea::placeholder { color: #7e96b0; }
+.input:hover, textarea:hover, .app-select-trigger:hover { border-color: #628dc0; }
+.input:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(105, 169, 255, .16); }
+.app-select-list { background: #1a2a44; border-color: #506c91; }
+.app-select-option.active { background: #2d476d; }
+.app-select-option.selected { color: #9ccaff; }
+.btn { border-color: #455f80; background: #223854; color: #eaf3ff; }
+.btn:hover:not(:disabled) { background: #2e4a6f; border-color: #6b94c6; }
+.btn.primary { background: #73b0ff; border-color: #73b0ff; color: #0b1b35; box-shadow: 0 4px 21px rgba(74, 151, 255, .22); }
+.btn.primary:hover:not(:disabled) { background: #9acaff; border-color: #9acaff; }
+.btn.primary:active:not(:disabled) { background: #4f96f0; border-color: #4f96f0; }
+.link-btn { color: #93c6ff; }
+.footer { background: #0a1324; border-color: #263851; color: #8ea3bd; }
+
+.metric-table, table, .cmp-table { background: #15223a; color: #eaf2ff; }
+th, .metric-table th, .cmp-table th { background: #1d3152; color: #dcecff; }
+td, .metric-table td, .cmp-table td { border-color: #30445f; }
+.metric-table tbody tr:nth-child(odd), .cmp-table tbody tr:nth-child(odd) { background: #1b2b47; }
+.metric-table tbody tr:hover, .cmp-table tbody tr:hover { background: #28436a; }
+.empty-state { color: #c4d4e8; }
+.empty-state-title { color: #f3f8ff; }
+.empty-state-detail { color: #a9bed6; }
+
+.preview-guide { border-color: #293f62; background: rgba(15, 28, 53, .72); }
+.preview-guide-kicker { color: #8fc1ff; }
+.preview-guide-head > p:last-child { color: #aebfda; }
+.preview-guide-grid > div { border-color: #344f78; background: linear-gradient(145deg, #1d3255, #132541); }
+.preview-guide-grid span { color: #90c3ff; }
+.preview-guide-grid p { color: #a8bdd6; }
+
+@media (max-width: 640px) {
+  .topbar, .bottom-tabs { background: #0a1426; border-color: #2b3e5d; }
+  .bottom-tab.active { color: #8bbfff; }
+  .bottom-tab.locked { color: #6f819b; }
+  .workspace-intro--upload {
+    background-image:
+      linear-gradient(90deg, rgba(4, 10, 24, .95), rgba(4, 10, 24, .59) 74%, rgba(4, 10, 24, .42)),
+      linear-gradient(0deg, rgba(5, 13, 30, .42), transparent 50%),
+      url('/images/logistics-earth-blue.png');
+  }
+}
+
+/* V2：居中的半球与网格。标题占据暗色星空，地球从下半部升起。 */
+.workspace-intro--upload {
+  min-height: 510px;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 48px 5% 30px;
+  text-align: center;
+  background-image:
+    linear-gradient(180deg, rgba(3, 10, 28, .48) 0%, rgba(3, 10, 28, .22) 37%, rgba(3, 10, 28, 0) 76%),
+    url('/images/logistics-earth-blue-stylized.png');
+  background-color: #04112d;
+  background-position: center top;
+  background-size: cover;
+}
+.workspace-intro--upload > div:first-child { max-width: 750px; }
+.workspace-intro--upload h1 {
+  font-size: clamp(48px, 5.2vw, 64px);
+  line-height: 1.12;
+  text-shadow: 0 3px 20px rgba(0, 4, 20, .82);
+}
+.workspace-intro--upload .hero-type-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin: 14px 0 0;
+  line-height: 1;
+}
+.hero-type-main {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  padding: 2px 22px 6px;
+  color: #fff;
+  font-family: "Microsoft YaHei", "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: clamp(52px, 6.1vw, 76px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -.055em;
+  transform: skewX(-9deg);
+  text-shadow: 0 6px 0 rgba(1, 14, 44, .75), 0 12px 30px rgba(0, 3, 20, .75);
+}
+.hero-type-ghost {
+  position: absolute;
+  z-index: -1;
+  left: 34px;
+  top: -14px;
+  width: 100%;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(185, 218, 255, .42);
+  text-shadow: none;
+  pointer-events: none;
+}
+.hero-type-sub {
+  position: relative;
+  display: block;
+  margin-top: 4px;
+  padding-left: .22em;
+  color: #eaf5ff;
+  font-family: "Microsoft YaHei", "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: clamp(29px, 3.5vw, 43px);
+  font-weight: 300;
+  letter-spacing: .22em;
+  text-shadow: 0 3px 20px rgba(0, 3, 20, .85);
+}
+.hero-type-sub::after {
+  content: '';
+  display: block;
+  width: 76px;
+  height: 2px;
+  margin: 8px auto 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #86d8ff, transparent);
+  box-shadow: 0 0 14px #3fa8ff;
+}
+.workspace-intro--upload .workspace-description {
+  max-width: 580px;
+  margin: 4px auto 0;
+  color: #e3efff;
+  text-shadow: 0 2px 15px rgba(0, 5, 24, .85);
+}
+
+@media (max-width: 900px) {
+  .workspace-intro--upload { min-height: 470px; background-position: center top; }
+}
+
+@media (max-width: 640px) {
+  .workspace-intro--upload {
+    min-height: 420px;
+    padding: 48px 18px 24px;
+    background-image:
+      linear-gradient(180deg, rgba(3, 10, 28, .8) 0%, rgba(3, 10, 28, .48) 52%, rgba(3, 10, 28, .02) 100%),
+      url('/images/logistics-earth-blue-stylized.png');
+    background-size: auto 100%;
+    background-position: center bottom;
+  }
+  .workspace-intro--upload h1 { font-size: clamp(37px, 10vw, 48px); }
+  .hero-type-main { font-size: clamp(39px, 10vw, 52px); padding-inline: 4px; }
+  .hero-type-ghost { left: 9px; top: -8px; }
+  .hero-type-sub { font-size: clamp(26px, 6.6vw, 34px); }
+  .hero-type-sub::after { margin-top: 10px; }
+  .workspace-intro--upload .workspace-description { font-size: 13px; }
+}

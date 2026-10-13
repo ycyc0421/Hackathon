@@ -1,0 +1,208 @@
+/* 独立视觉试验。此文件只存在于 ui-design-preview，不影响原前端。 */
+:root {
+  --gray-50: #f7f9fb;
+  --gray-100: #eef3f5;
+  --gray-200: #e0e8eb;
+  --gray-300: #cad5d9;
+  --gray-400: #91a0a7;
+  --gray-500: #72828a;
+  --gray-600: #52626c;
+  --gray-700: #34434e;
+  --gray-800: #20313c;
+  --gray-900: #102734;
+  --blue-50: #eff9f9;
+  --blue-100: #d9eeee;
+  --blue-200: #b9dedd;
+  --blue-300: #8cc7c5;
+  --blue-400: #4aa5a4;
+  --blue-500: #087d82;
+  --blue-600: #086d72;
+  --blue-700: #07585d;
+  --blue-800: #0b4248;
+  --blue-900: #102f38;
+  --success: #21845d;
+  --success-bg: #eaf7ef;
+  --warning: #b8731c;
+  --warning-bg: #fff4e4;
+  --danger: #c64c48;
+  --danger-bg: #fff0ee;
+  --info: #247f93;
+  --info-bg: #eaf6f8;
+  --surface: #f3f6f6;
+  --surface-raised: #fff;
+  --border: #e1e9ea;
+  --border-hover: #b7cbcd;
+  --text-body: #102734;
+  --text-muted: #647580;
+  --text-disabled: #9caaaf;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 4px 16px rgba(19, 56, 64, .04);
+}
+
+body {
+  background: radial-gradient(circle at 82% 2%, #e8f4f2 0, transparent 360px), var(--surface);
+}
+
+.topbar {
+  height: 74px;
+  padding: 0 clamp(20px, 4vw, 64px);
+  gap: 52px;
+  box-shadow: 0 1px 0 rgba(16, 39, 52, .03);
+}
+
+.brand {
+  position: relative;
+  min-width: 222px;
+  padding-left: 44px;
+}
+
+.brand-symbol {
+  position: absolute;
+  left: 0;
+  top: 1px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: #0d5961;
+  color: white;
+  font-size: 21px;
+  line-height: 1;
+}
+
+.brand-mark { font-size: 16px; font-weight: 700; letter-spacing: .035em; }
+.brand-sub { margin-top: 3px; font-size: 11px; }
+.tabs { gap: 8px; }
+.tab { padding: 0 18px; font-size: 14px; font-weight: 550; }
+.tab.active { color: #086d72; }
+.tab-indicator { height: 3px; border-radius: 3px 3px 0 0; }
+.tab-badge { background: #d95650; }
+.mock-flag, .backend-flag { border-radius: 20px; font-weight: 600; }
+
+.content {
+  max-width: 1220px;
+  padding: 42px 28px 68px;
+}
+
+.workspace-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.workspace-eyebrow {
+  margin: 0 0 8px;
+  color: #087d82;
+  font: 700 11px/1.4 var(--font-sans);
+  letter-spacing: .16em;
+}
+
+.workspace-intro h1 {
+  margin: 0;
+  font-size: clamp(28px, 3vw, 36px);
+  line-height: 1.22;
+  letter-spacing: -.035em;
+}
+
+.workspace-description {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.workspace-step {
+  flex: none;
+  margin-top: 8px;
+  padding: 7px 12px;
+  border: 1px solid #cfe4e2;
+  border-radius: 100px;
+  color: #0a6d71;
+  background: #eef8f6;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.page { gap: 20px; }
+.page-head { margin-bottom: 4px; }
+.page-title { font-size: 21px; font-weight: 700; }
+.card {
+  border-color: #e5ebed;
+  border-radius: 16px;
+  padding: 26px 30px;
+  box-shadow: 0 8px 30px rgba(24, 57, 64, .035);
+}
+.card-title { font-weight: 700; letter-spacing: -.02em; }
+.card-sub { color: var(--text-muted); }
+
+.upload-card { padding: 30px 34px; }
+.upload-card > .card-title { font-size: 20px; }
+.upload-card > .card-sub { max-width: 760px; margin-bottom: 24px; }
+.dropzone {
+  min-height: 206px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1.5px dashed #9fc8c8;
+  border-radius: 14px;
+  background: #f5fbfa;
+  transition: border-color var(--duration-fast) var(--ease), background var(--duration-fast) var(--ease);
+}
+.dropzone:hover, .dropzone.active { border-color: #087d82; background: #eaf7f5; }
+.dropzone-symbol {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 14px;
+  border: 1px solid #c6e1df;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(13, 89, 97, .07);
+  color: #087d82;
+  font-size: 27px;
+  font-weight: 300;
+}
+.dropzone-main { font-size: 15px; font-weight: 650; }
+.dropzone-hint { font-size: 12px; margin-top: 8px; }
+.file-list { border-radius: 12px; margin-top: 18px; overflow: hidden; }
+.file-item { min-height: 48px; padding: 10px 16px; font-size: 13px; }
+.file-item:hover { background: #f8fbfb; }
+.field-row { gap: 18px; margin-top: 24px; }
+.field-label { font-size: 12px; font-weight: 550; }
+.input, textarea { border-radius: 9px; min-height: 44px; }
+.actions { margin-top: 26px; }
+.btn { min-height: 42px; padding: 9px 18px; border-radius: 9px; font-weight: 650; }
+.btn.primary { box-shadow: 0 5px 14px rgba(8, 125, 130, .16); }
+.btn.small { min-height: 30px; }
+
+.filter-row, .stat-row { gap: 10px; }
+.cmp-card, .issue-card, .risk-card { border-radius: 12px; }
+.report-conclusion { border-radius: 11px; }
+.metric-table { border-radius: 10px; overflow: hidden; }
+.footer { background: #fff; }
+
+@media (max-width: 900px) {
+  .topbar { gap: 20px; padding: 0 20px; }
+  .brand { min-width: 190px; }
+  .tab { padding: 0 10px; }
+  .content { padding: 30px 20px 50px; }
+}
+
+@media (max-width: 640px) {
+  .topbar { height: 58px; }
+  .brand { min-width: 0; }
+  .brand-sub { display: none; }
+  .content { padding: 24px 14px 90px; }
+  .workspace-intro { margin-bottom: 18px; }
+  .workspace-intro h1 { font-size: 26px; }
+  .workspace-description { line-height: 1.55; }
+  .workspace-step { display: none; }
+  .card, .upload-card { padding: 20px 18px; border-radius: 14px; }
+  .dropzone { min-height: 170px; padding: 22px 14px; }
+}

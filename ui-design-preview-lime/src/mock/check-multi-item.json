@@ -1,0 +1,306 @@
+{
+  "_comment": "示例：一票双品名（陶瓷马克杯 + 玻璃水杯），比对按商品分组。覆盖 item_001 数量冲突、item_002 数量一致、毛重仅装箱单承担（发票侧 NOT_IN_DOC，属正常不适用而非缺失）、整票字段一致与一项未校验。演示差异页的商品分组与 NOT_IN_DOC / MISSING_IN_DOC 的区分。",
+
+  "task_id": "tsk_20261013_0001",
+  "status": "COMPLETED",
+  "created_at": "2026-10-13T10:20:00+08:00",
+  "finished_at": "2026-10-13T10:20:24+08:00",
+
+  "input": {
+    "destination_country": "DE",
+    "destination_country_name": "德国"
+  },
+
+  "documents": [
+    {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "file_type": "PDF", "doc_type": "COMMERCIAL_INVOICE", "process_status": "EXTRACTED", "page_count": 1, "error_message": null},
+    {"file_id": "f2", "file_name": "装箱单-PL20261013.pdf", "file_type": "PDF", "doc_type": "PACKING_LIST", "process_status": "EXTRACTED", "page_count": 1, "error_message": null},
+    {"file_id": "f3", "file_name": "提单-BL20261013.pdf", "file_type": "PDF", "doc_type": "BILL_OF_LADING", "process_status": "EXTRACTED", "page_count": 2, "error_message": null}
+  ],
+
+  "items": [
+    {"item_id": "item_001", "display_name": "陶瓷马克杯", "description": "陶瓷马克杯 350ml 白釉（CERAMIC MUG 350ML WHITE）", "line_no": 1},
+    {"item_id": "item_002", "display_name": "玻璃水杯", "description": "玻璃水杯 300ml 透明（GLASS CUP 300ML CLEAR）", "line_no": 2}
+  ],
+
+  "extractions": [
+    {
+      "file_id": "f1",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "parse_method": "OCR",
+      "fields": [
+        {"field_key": "invoice_no", "label": "发票号", "raw_text": "INVOICE NO. INV-2026-1013", "raw_value": "INV-2026-1013", "normalized_value": "INV-2026-1013", "unit": null, "confidence": 0.98, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [420, 180, 260, 22], "bbox_unit": "PX"},
+        {"field_key": "currency", "label": "币种", "raw_text": "USD", "raw_value": "USD", "normalized_value": "USD", "unit": null, "confidence": 0.97, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [80, 520, 60, 22], "bbox_unit": "PX"},
+        {"field_key": "total_amount", "label": "总金额", "raw_text": "TOTAL: USD 15,700.00", "raw_value": "USD 15,700.00", "normalized_value": 15700.0, "unit": "USD", "confidence": 0.95, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [80, 520, 240, 22], "bbox_unit": "PX"},
+        {"field_key": "description", "label": "货物描述", "raw_text": "CERAMIC MUG 350ML WHITE", "raw_value": "CERAMIC MUG 350ML WHITE", "normalized_value": "陶瓷马克杯 350ml 白釉", "unit": null, "confidence": 0.93, "status": "EXTRACTED", "item_id": "item_001", "line_no": 1, "page": 1, "bbox": [80, 300, 300, 22], "bbox_unit": "PX"},
+        {"field_key": "hs_code", "label": "HS 编码", "raw_text": "HS CODE: 6911.10.00", "raw_value": "6911.10.00", "normalized_value": "6911100000", "unit": null, "confidence": 0.89, "status": "EXTRACTED", "item_id": "item_001", "line_no": 1, "page": 1, "bbox": [80, 326, 200, 22], "bbox_unit": "PX"},
+        {"field_key": "quantity", "label": "数量", "raw_text": "QTY: 2400 PCS", "raw_value": "2400 PCS", "normalized_value": 2400, "unit": "PCS", "confidence": 0.88, "status": "EXTRACTED", "item_id": "item_001", "line_no": 1, "page": 1, "bbox": [80, 352, 200, 22], "bbox_unit": "PX"},
+        {"field_key": "unit_price", "label": "单价", "raw_text": "UNIT PRICE: USD 5.00", "raw_value": "USD 5.00", "normalized_value": 5.0, "unit": "USD", "confidence": 0.94, "status": "EXTRACTED", "item_id": "item_001", "line_no": 1, "page": 1, "bbox": [320, 352, 180, 22], "bbox_unit": "PX"},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": null, "raw_value": null, "normalized_value": null, "unit": null, "confidence": null, "status": "NOT_IN_DOC", "item_id": "item_001", "line_no": 1, "page": null, "bbox": null, "bbox_unit": null},
+        {"field_key": "description", "label": "货物描述", "raw_text": "GLASS CUP 300ML CLEAR", "raw_value": "GLASS CUP 300ML CLEAR", "normalized_value": "玻璃水杯 300ml 透明", "unit": null, "confidence": 0.92, "status": "EXTRACTED", "item_id": "item_002", "line_no": 2, "page": 1, "bbox": [80, 404, 300, 22], "bbox_unit": "PX"},
+        {"field_key": "hs_code", "label": "HS 编码", "raw_text": "HS CODE: 7013.49.00", "raw_value": "7013.49.00", "normalized_value": "7013490000", "unit": null, "confidence": 0.9, "status": "EXTRACTED", "item_id": "item_002", "line_no": 2, "page": 1, "bbox": [80, 430, 200, 22], "bbox_unit": "PX"},
+        {"field_key": "quantity", "label": "数量", "raw_text": "QTY: 800 PCS", "raw_value": "800 PCS", "normalized_value": 800, "unit": "PCS", "confidence": 0.91, "status": "EXTRACTED", "item_id": "item_002", "line_no": 2, "page": 1, "bbox": [80, 456, 200, 22], "bbox_unit": "PX"},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": null, "raw_value": null, "normalized_value": null, "unit": null, "confidence": null, "status": "NOT_IN_DOC", "item_id": "item_002", "line_no": 2, "page": null, "bbox": null, "bbox_unit": null}
+      ]
+    },
+    {
+      "file_id": "f2",
+      "doc_type": "PACKING_LIST",
+      "parse_method": "TEXT_LAYER",
+      "fields": [
+        {"field_key": "description", "label": "货物描述", "raw_text": "CERAMIC MUG, 350ML, WHITE GLAZE", "raw_value": "CERAMIC MUG, 350ML, WHITE GLAZE", "normalized_value": "陶瓷马克杯 350ml 白釉", "unit": null, "confidence": 0.66, "status": "LOW_CONFIDENCE", "item_id": "item_001", "line_no": 1, "page": 1, "bbox": [180, 300, 320, 24], "bbox_unit": "PX"},
+        {"field_key": "quantity", "label": "数量", "raw_text": "QTY: 2,500 PCS", "raw_value": "2,500 PCS", "normalized_value": 2500, "unit": "PCS", "confidence": 0.95, "status": "EXTRACTED", "item_id": "item_001", "line_no": 1, "page": 1, "bbox": [180, 352, 200, 24], "bbox_unit": "PX"},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "G.W.: 1,900.00 KGS", "raw_value": "1,900.00 KGS", "normalized_value": 1900.0, "unit": "KGS", "confidence": 0.94, "status": "EXTRACTED", "item_id": "item_001", "line_no": 1, "page": 1, "bbox": [180, 378, 200, 24], "bbox_unit": "PX"},
+        {"field_key": "description", "label": "货物描述", "raw_text": "GLASS CUP 300ML CLEAR", "raw_value": "GLASS CUP 300ML CLEAR", "normalized_value": "玻璃水杯 300ml 透明", "unit": null, "confidence": 0.91, "status": "EXTRACTED", "item_id": "item_002", "line_no": 2, "page": 1, "bbox": [180, 430, 300, 24], "bbox_unit": "PX"},
+        {"field_key": "quantity", "label": "数量", "raw_text": "QTY: 800 PCS", "raw_value": "800 PCS", "normalized_value": 800, "unit": "PCS", "confidence": 0.96, "status": "EXTRACTED", "item_id": "item_002", "line_no": 2, "page": 1, "bbox": [180, 456, 200, 24], "bbox_unit": "PX"},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "G.W.: 520.00 KGS", "raw_value": "520.00 KGS", "normalized_value": 520.0, "unit": "KGS", "confidence": 0.95, "status": "EXTRACTED", "item_id": "item_002", "line_no": 2, "page": 1, "bbox": [180, 482, 200, 24], "bbox_unit": "PX"}
+      ]
+    },
+    {
+      "file_id": "f3",
+      "doc_type": "BILL_OF_LADING",
+      "parse_method": "OCR",
+      "fields": [
+        {"field_key": "bill_of_lading_no", "label": "提单号", "raw_text": "B/L NO. MAEU2610137777", "raw_value": "MAEU2610137777", "normalized_value": "MAEU2610137777", "unit": null, "confidence": 0.96, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [60, 150, 280, 22], "bbox_unit": "PX"},
+        {"field_key": "shipper", "label": "发货人", "raw_text": "SHIPPER: NINGBO YUANHANG TRADING CO., LTD.", "raw_value": "NINGBO YUANHANG TRADING CO., LTD.", "normalized_value": "NINGBO YUANHANG TRADING CO., LTD.", "unit": null, "confidence": 0.93, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [60, 180, 360, 22], "bbox_unit": "PX"},
+        {"field_key": "consignee", "label": "收货人", "raw_text": "CONSIGNEE: HAMBURG IMPORT GMBH", "raw_value": "HAMBURG IMPORT GMBH", "normalized_value": "HAMBURG IMPORT GMBH", "unit": null, "confidence": 0.94, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [60, 206, 320, 22], "bbox_unit": "PX"},
+        {"field_key": "port_of_loading", "label": "起运港", "raw_text": "SHANGHAI, CHINA", "raw_value": "SHANGHAI, CHINA", "normalized_value": "上海", "unit": null, "confidence": 0.95, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [60, 250, 240, 22], "bbox_unit": "PX"},
+        {"field_key": "port_of_discharge", "label": "目的港", "raw_text": "HAMBURG, GERMANY", "raw_value": "HAMBURG, GERMANY", "normalized_value": "汉堡", "unit": null, "confidence": 0.95, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [60, 276, 240, 22], "bbox_unit": "PX"},
+        {"field_key": "shipment_date", "label": "装运日期", "raw_text": "SHIPPED ON BOARD 11 OCT 2026", "raw_value": "11 OCT 2026", "normalized_value": "2026-10-11", "unit": null, "confidence": 0.94, "status": "EXTRACTED", "item_id": null, "line_no": null, "page": 1, "bbox": [60, 330, 260, 22], "bbox_unit": "PX"},
+        {"field_key": "quantity", "label": "数量", "raw_text": "2500 PCS CERAMIC MUGS", "raw_value": "2500 PCS", "normalized_value": 2500, "unit": "PCS", "confidence": 0.9, "status": "EXTRACTED", "item_id": "item_001", "line_no": null, "page": 2, "bbox": [60, 300, 260, 22], "bbox_unit": "PX"},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "1900.00 KGS (MUGS)", "raw_value": "1900.00 KGS", "normalized_value": 1900.0, "unit": "KGS", "confidence": 0.91, "status": "EXTRACTED", "item_id": "item_001", "line_no": null, "page": 2, "bbox": [60, 326, 220, 22], "bbox_unit": "PX"},
+        {"field_key": "quantity", "label": "数量", "raw_text": "800 PCS GLASS CUPS", "raw_value": "800 PCS", "normalized_value": 800, "unit": "PCS", "confidence": 0.92, "status": "EXTRACTED", "item_id": "item_002", "line_no": null, "page": 2, "bbox": [60, 352, 240, 22], "bbox_unit": "PX"},
+        {"field_key": "gross_weight", "label": "毛重", "raw_text": "520.00 KGS (CUPS)", "raw_value": "520.00 KGS", "normalized_value": 520.0, "unit": "KGS", "confidence": 0.92, "status": "EXTRACTED", "item_id": "item_002", "line_no": null, "page": 2, "bbox": [60, 378, 220, 22], "bbox_unit": "PX"}
+      ]
+    }
+  ],
+
+  "comparisons": [
+    {
+      "comparison_id": "cmp_1",
+      "field_key": "quantity",
+      "item_id": "item_001",
+      "label": "数量",
+      "value_type": "NUMBER",
+      "unit": "PCS",
+      "status": "CONFLICT",
+      "canonical_value": null,
+      "severity": "ERROR",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": "item_001", "raw_value": "2400 PCS", "normalized_value": 2400, "field_status": "EXTRACTED", "page": 1, "bbox": [80, 352, 200, 22]},
+        {"file_id": "f2", "file_name": "装箱单-PL20261013.pdf", "item_id": "item_001", "raw_value": "2,500 PCS", "normalized_value": 2500, "field_status": "EXTRACTED", "page": 1, "bbox": [180, 352, 200, 24]},
+        {"file_id": "f3", "file_name": "提单-BL20261013.pdf", "item_id": "item_001", "raw_value": "2500 PCS", "normalized_value": 2500, "field_status": "EXTRACTED", "page": 2, "bbox": [60, 300, 260, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_2",
+      "field_key": "description",
+      "item_id": "item_001",
+      "label": "货物描述",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "归一后一致，但原始写法不同，装箱单的抽取可信度偏低。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": "item_001", "raw_value": "CERAMIC MUG 350ML WHITE", "normalized_value": "陶瓷马克杯 350ml 白釉", "field_status": "EXTRACTED", "page": 1, "bbox": [80, 300, 300, 22]},
+        {"file_id": "f2", "file_name": "装箱单-PL20261013.pdf", "item_id": "item_001", "raw_value": "CERAMIC MUG, 350ML, WHITE GLAZE", "normalized_value": "陶瓷马克杯 350ml 白釉", "field_status": "LOW_CONFIDENCE", "page": 1, "bbox": [180, 300, 320, 24]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_3",
+      "field_key": "gross_weight",
+      "item_id": "item_001",
+      "label": "毛重",
+      "value_type": "NUMBER",
+      "unit": "KGS",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {"file_id": "f2", "file_name": "装箱单-PL20261013.pdf", "item_id": "item_001", "raw_value": "1,900.00 KGS", "normalized_value": 1900.0, "field_status": "EXTRACTED", "page": 1, "bbox": [180, 378, 200, 24]},
+        {"file_id": "f3", "file_name": "提单-BL20261013.pdf", "item_id": "item_001", "raw_value": "1900.00 KGS", "normalized_value": 1900.0, "field_status": "EXTRACTED", "page": 2, "bbox": [60, 326, 220, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_4",
+      "field_key": "hs_code",
+      "item_id": "item_001",
+      "label": "HS 编码",
+      "value_type": "CODE",
+      "unit": null,
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有商业发票提供该字段，无法交叉比对。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": "item_001", "raw_value": "6911.10.00", "normalized_value": "6911100000", "field_status": "EXTRACTED", "page": 1, "bbox": [80, 326, 200, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_5",
+      "field_key": "quantity",
+      "item_id": "item_002",
+      "label": "数量",
+      "value_type": "NUMBER",
+      "unit": "PCS",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": "item_002", "raw_value": "800 PCS", "normalized_value": 800, "field_status": "EXTRACTED", "page": 1, "bbox": [80, 456, 200, 22]},
+        {"file_id": "f2", "file_name": "装箱单-PL20261013.pdf", "item_id": "item_002", "raw_value": "800 PCS", "normalized_value": 800, "field_status": "EXTRACTED", "page": 1, "bbox": [180, 456, 200, 24]},
+        {"file_id": "f3", "file_name": "提单-BL20261013.pdf", "item_id": "item_002", "raw_value": "800 PCS", "normalized_value": 800, "field_status": "EXTRACTED", "page": 2, "bbox": [60, 352, 240, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_6",
+      "field_key": "gross_weight",
+      "item_id": "item_002",
+      "label": "毛重",
+      "value_type": "NUMBER",
+      "unit": "KGS",
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": "CROSS_CHECK_001",
+      "note": "按单证类型规则表，商业发票不承担毛重字段，标记为不适用而非缺失。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": "item_002", "raw_value": null, "normalized_value": null, "field_status": "NOT_IN_DOC", "page": null, "bbox": null},
+        {"file_id": "f2", "file_name": "装箱单-PL20261013.pdf", "item_id": "item_002", "raw_value": "520.00 KGS", "normalized_value": 520.0, "field_status": "EXTRACTED", "page": 1, "bbox": [180, 482, 200, 24]},
+        {"file_id": "f3", "file_name": "提单-BL20261013.pdf", "item_id": "item_002", "raw_value": "520.00 KGS", "normalized_value": 520.0, "field_status": "EXTRACTED", "page": 2, "bbox": [60, 378, 220, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_7",
+      "field_key": "hs_code",
+      "item_id": "item_002",
+      "label": "HS 编码",
+      "value_type": "CODE",
+      "unit": null,
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有商业发票提供该字段，无法交叉比对。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": "item_002", "raw_value": "7013.49.00", "normalized_value": "7013490000", "field_status": "EXTRACTED", "page": 1, "bbox": [80, 430, 200, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_8",
+      "field_key": "description",
+      "item_id": "item_002",
+      "label": "货物描述",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "MATCH",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": null,
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": "item_002", "raw_value": "GLASS CUP 300ML CLEAR", "normalized_value": "玻璃水杯 300ml 透明", "field_status": "EXTRACTED", "page": 1, "bbox": [80, 404, 300, 22]},
+        {"file_id": "f2", "file_name": "装箱单-PL20261013.pdf", "item_id": "item_002", "raw_value": "GLASS CUP 300ML CLEAR", "normalized_value": "玻璃水杯 300ml 透明", "field_status": "EXTRACTED", "page": 1, "bbox": [180, 430, 300, 24]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_9",
+      "field_key": "invoice_no",
+      "item_id": null,
+      "label": "发票号",
+      "value_type": "CODE",
+      "unit": null,
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有商业发票提供该字段，无法交叉比对。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": null, "raw_value": "INV-2026-1013", "normalized_value": "INV-2026-1013", "field_status": "EXTRACTED", "page": 1, "bbox": [420, 180, 260, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_10",
+      "field_key": "total_amount",
+      "item_id": null,
+      "label": "总金额",
+      "value_type": "MONEY",
+      "unit": "USD",
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有商业发票提供该字段，无法交叉比对。",
+      "values": [
+        {"file_id": "f1", "file_name": "商业发票-INV20261013.pdf", "item_id": null, "raw_value": "USD 15,700.00", "normalized_value": 15700.0, "field_status": "EXTRACTED", "page": 1, "bbox": [80, 520, 240, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_11",
+      "field_key": "port_of_loading",
+      "item_id": null,
+      "label": "起运港",
+      "value_type": "STRING",
+      "unit": null,
+      "status": "SINGLE_SOURCE",
+      "canonical_value": null,
+      "severity": "INFO",
+      "rule_id": null,
+      "note": "只有提单提供该字段，无法交叉比对。",
+      "values": [
+        {"file_id": "f3", "file_name": "提单-BL20261013.pdf", "item_id": null, "raw_value": "SHANGHAI, CHINA", "normalized_value": "上海", "field_status": "EXTRACTED", "page": 1, "bbox": [60, 250, 240, 22]}
+      ]
+    },
+    {
+      "comparison_id": "cmp_12",
+      "field_key": "shipment_date",
+      "item_id": null,
+      "label": "装运日期",
+      "value_type": "DATE",
+      "unit": null,
+      "status": "NOT_CHECKED",
+      "canonical_value": null,
+      "severity": "WARNING",
+      "rule_id": null,
+      "note": "仅提单提供装运日期，发票与装箱单未给出可比对的第二来源，该日期未经交叉校验。",
+      "values": [
+        {"file_id": "f3", "file_name": "提单-BL20261013.pdf", "item_id": null, "raw_value": "11 OCT 2026", "normalized_value": "2026-10-11", "field_status": "EXTRACTED", "page": 1, "bbox": [60, 330, 260, 22]}
+      ]
+    }
+  ],
+
+  "risks": [
+    {
+      "risk_id": "rsk_1",
+      "type": "MISSING_CERTIFICATE",
+      "severity": "WARNING",
+      "title": "目的国为德国，未在本票文件中找到原产地证明",
+      "detail": "依据规则 DE-IMP-004：申报目的地为德国的货物，随附单证中应包含原产地证明。本票 3 份文件均未识别到该单证。涉及商品：陶瓷马克杯（HS 6911100000）、玻璃水杯（HS 7013490000）。",
+      "related_field_keys": ["hs_code"],
+      "related_file_ids": [],
+      "destination_country": "DE",
+      "rule_id": "DE-IMP-004",
+      "rule_source": "团队配置的目的国规则集 v1"
+    }
+  ],
+
+  "summary": {
+    "document_count": 3,
+    "field_count": 28,
+    "conflict_count": 1,
+    "missing_count": 0,
+    "risk_count": 1,
+    "unrecognized_count": 0
+  },
+
+  "errors": []
+}

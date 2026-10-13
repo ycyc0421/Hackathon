@@ -1,0 +1,296 @@
+/* 物流竞赛视觉试验：深色控制台 + 荧光青柠；只作用于独立预览副本。 */
+:root {
+  color-scheme: dark;
+  --gray-50: #111b1b;
+  --gray-100: #1c2928;
+  --gray-200: #2a3936;
+  --gray-300: #40504a;
+  --gray-400: #718079;
+  --gray-500: #91a19a;
+  --gray-600: #a5b3ac;
+  --gray-700: #c5d0c8;
+  --gray-800: #e2e9e1;
+  --gray-900: #f3f7ef;
+  --blue-50: #1a2b25;
+  --blue-100: #263b29;
+  --blue-200: #3e6335;
+  --blue-300: #74a849;
+  --blue-400: #a2d660;
+  --blue-500: #c3f469;
+  --blue-600: #aee35a;
+  --blue-700: #8fca43;
+  --blue-800: #608c39;
+  --blue-900: #31502a;
+  --color-primary: #c3f469;
+  --color-primary-hover: #d6ff86;
+  --color-primary-active: #a8db59;
+  --success: #a8e57a;
+  --success-bg: #1d3324;
+  --warning: #f2c470;
+  --warning-bg: #3a3020;
+  --danger: #ff817f;
+  --danger-bg: #3b2527;
+  --info: #8cd7ce;
+  --info-bg: #203834;
+  --surface: #08100f;
+  --surface-raised: #131d1b;
+  --border: #2a3833;
+  --border-hover: #536b59;
+  --text-body: #f3f7ef;
+  --text-muted: #abb8af;
+  --text-disabled: #738078;
+  --shadow-sm: 0 10px 28px rgba(0, 0, 0, .16);
+  --shadow-md: 0 20px 48px rgba(0, 0, 0, .22);
+}
+
+body {
+  background: radial-gradient(circle at 88% 5%, #193b24 0, transparent 460px),
+              radial-gradient(circle at 8% 65%, #112b1e 0, transparent 480px),
+              #08100f;
+}
+
+.topbar {
+  height: 76px;
+  background: rgba(9, 18, 16, .94);
+  border-bottom: 1px solid #26372d;
+  backdrop-filter: blur(18px);
+  box-shadow: none;
+}
+.brand-symbol {
+  background: linear-gradient(145deg, #d5ff82, #80c94b);
+  color: #102216;
+  box-shadow: 0 0 22px rgba(185, 244, 97, .28);
+}
+.brand-mark { color: #f6faef; }
+.brand-sub { color: #8fa398; }
+.tab { color: #a0afa5; border-radius: 10px 10px 0 0; }
+.tab:not(.active):not(:disabled):hover { color: #f2f6ed; background: #1a2a20; }
+.tab.active { color: #c3f469; }
+.tab-indicator { background: #c3f469; box-shadow: 0 0 14px #a3eb5c; }
+.tab.locked { color: #64716b; }
+.tab-badge { background: #ed7069; }
+.mock-flag { background: #312c1e; border-color: #826b39; color: #f2cb80; }
+.backend-flag { background: #1c3526; border-color: #598a5e; color: #b1ed8d; }
+
+.content { max-width: 1240px; padding-top: 28px; }
+.workspace-intro {
+  position: relative;
+  overflow: hidden;
+  min-height: 194px;
+  margin-bottom: 22px;
+  padding: 32px 36px;
+  border: 1px solid #2a4030;
+  border-radius: 20px;
+  background: radial-gradient(circle at 80% 110%, rgba(147, 234, 74, .22), transparent 36%),
+              radial-gradient(circle at 94% 16%, rgba(86, 171, 78, .13), transparent 28%),
+              linear-gradient(115deg, #14221b 0%, #0c1714 68%, #102219 100%);
+  box-shadow: inset 0 1px 0 rgba(217, 255, 177, .08), 0 18px 48px rgba(0, 0, 0, .13);
+}
+.workspace-intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: .14;
+  background-image: radial-gradient(#d3ff9b 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: linear-gradient(90deg, transparent 45%, black 100%);
+  pointer-events: none;
+}
+.workspace-intro > div:first-child { position: relative; z-index: 2; max-width: 630px; }
+.workspace-eyebrow { color: #bbef73; font-size: 11px; }
+.workspace-intro h1 { color: #f7fbf3; font-size: clamp(30px, 3.6vw, 44px); }
+.workspace-description { max-width: 520px; color: #b3c2b6; font-size: 14px; }
+.workspace-step {
+  position: relative;
+  z-index: 2;
+  margin-top: 0;
+  border-color: #44633e;
+  background: rgba(27, 50, 30, .74);
+  color: #c3f469;
+}
+.hero-globe {
+  position: absolute;
+  z-index: 1;
+  right: 3%;
+  bottom: -132px;
+  width: 410px;
+  height: 310px;
+  pointer-events: none;
+}
+.hero-globe-core {
+  position: absolute;
+  left: 50%;
+  top: 25px;
+  width: 280px;
+  height: 280px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(180, 244, 103, .38);
+  border-radius: 50%;
+  background: radial-gradient(circle at 37% 20%, rgba(192, 255, 112, .42), transparent 24%),
+              radial-gradient(circle at 60% 45%, rgba(112, 200, 79, .18), transparent 42%),
+              repeating-linear-gradient(0deg, transparent 0 33px, rgba(179, 242, 111, .11) 34px 35px),
+              repeating-linear-gradient(90deg, transparent 0 39px, rgba(179, 242, 111, .09) 40px 41px),
+              radial-gradient(circle, #183c28 10%, #0e2018 70%);
+  box-shadow: 0 0 62px rgba(162, 239, 83, .19), inset -20px -26px 32px rgba(3, 12, 8, .66), inset 0 0 25px rgba(187, 249, 110, .14);
+}
+.hero-globe-core::before, .hero-globe-core::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(180, 244, 103, .22);
+  border-radius: 50%;
+  transform: scaleX(.46);
+}
+.hero-globe-core::after { transform: scaleX(.78); }
+.hero-globe-orbit {
+  position: absolute;
+  left: 7%;
+  top: 103px;
+  width: 86%;
+  height: 95px;
+  transform: rotate(-17deg);
+  border: 1px solid rgba(176, 246, 98, .34);
+  border-radius: 50%;
+  box-shadow: 0 0 19px rgba(154, 225, 80, .1);
+}
+.hero-globe-orbit--two { transform: rotate(28deg); opacity: .65; }
+.hero-node { position: absolute; z-index: 2; width: 7px; height: 7px; border-radius: 50%; background: #d8ff91; box-shadow: 0 0 0 5px rgba(182, 250, 94, .13), 0 0 20px #c9fc6e; }
+.hero-node--one { top: 87px; left: 75px; }
+.hero-node--two { top: 41px; right: 132px; }
+.hero-node--three { top: 174px; right: 33px; }
+
+/* 首屏专用背景：左侧深色遮罩保护文字，地球保留在右侧与下方。 */
+.workspace-intro--upload {
+  min-height: 420px;
+  align-items: center;
+  padding: 54px 6%;
+  border-color: #355037;
+  background-image:
+    linear-gradient(90deg, rgba(5, 14, 12, .97) 0%, rgba(5, 14, 12, .91) 25%, rgba(5, 14, 12, .55) 52%, rgba(5, 14, 12, .06) 78%),
+    linear-gradient(0deg, rgba(6, 15, 12, .42), transparent 32%),
+    url('/images/logistics-earth-hero.png');
+  background-color: #07120d;
+  background-size: cover;
+  background-position: center, center, center 39%;
+  box-shadow: inset 0 1px 0 rgba(223, 255, 187, .13), 0 24px 65px rgba(0, 0, 0, .24);
+}
+.workspace-intro--upload::before { opacity: .08; }
+.workspace-intro--upload > div:first-child { max-width: 570px; }
+.workspace-intro--upload .workspace-eyebrow { color: #d3ff90; text-shadow: 0 1px 12px rgba(0,0,0,.65); }
+.workspace-intro--upload h1 {
+  white-space: pre-line;
+  font-size: clamp(48px, 5.5vw, 70px);
+  line-height: 1.13;
+  letter-spacing: -.055em;
+  text-shadow: 0 3px 22px rgba(0, 0, 0, .5);
+}
+.workspace-intro--upload .workspace-description {
+  max-width: 475px;
+  margin-top: 22px;
+  color: #e5eee1;
+  font-size: 15px;
+  line-height: 1.75;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .65);
+}
+.workspace-intro--upload .workspace-step { position: absolute; right: 28px; top: 26px; }
+
+.page-title { color: #f4f8f1; }
+.page-sub { color: #aab9ad; }
+.card {
+  border-color: #2b3932;
+  background: linear-gradient(160deg, #17221e, #121c19 85%);
+  box-shadow: inset 0 1px 0 rgba(242, 255, 222, .035), 0 10px 28px rgba(0, 0, 0, .12);
+}
+.card-title { color: #f6faef; }
+.card-sub { color: #aebdb0; }
+.dropzone {
+  border-color: #577b48;
+  background: radial-gradient(circle at center, #203b29 0, #18271e 64%, #15231b 100%);
+}
+.dropzone:hover, .dropzone.active { border-color: #c3f469; background: #243e2a; }
+.dropzone-symbol { border-color: #617d4f; background: #2b472c; color: #d1fb82; box-shadow: 0 0 22px rgba(178, 240, 85, .13); }
+.dropzone-main { color: #eff8e5; }
+.dropzone-hint { color: #a3b2a5; }
+.file-list, .doc-list { border-color: #334339; }
+.file-item, .doc-item { border-color: #2b3931; }
+.file-item:hover { background: #203029; }
+.field-label { color: #b3c1b5; }
+.input, textarea, .app-select-trigger {
+  border-color: #405146;
+  background: #111b18;
+  color: #edf4e9;
+}
+.input::placeholder, textarea::placeholder { color: #7b8d81; }
+.input:hover, textarea:hover, .app-select-trigger:hover { border-color: #6a865b; }
+.app-select.block .app-select-trigger { background: #111b18; color: #edf4e9; }
+.app-select-list { background: #1b2921; border-color: #4a5d49; }
+.app-select-option.active { background: #2f4431; }
+.app-select-option.selected { color: #c3f469; }
+.input:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(195, 244, 105, .13); }
+.btn { border-color: #3f5345; background: #203027; color: #eaf3e2; }
+.btn:hover:not(:disabled) { background: #2d4031; border-color: #6a8a57; }
+.btn.primary { background: #c3f469; border-color: #c3f469; color: #14240f; box-shadow: 0 4px 20px rgba(184, 246, 99, .15); }
+.btn.primary:hover:not(:disabled) { background: #d6ff86; border-color: #d6ff86; }
+.btn.primary:active:not(:disabled) { background: #a8db59; border-color: #a8db59; }
+.link-btn { color: #c3f469; }
+.footer { border-color: #27372d; background: #0a1310; color: #8c9c90; }
+
+/* 表格、状态与空态保持深色底，状态文案继续由原组件控制。 */
+.metric-table, table, .cmp-table { background: #16211d; color: #e8f1e7; }
+th, .metric-table th, .cmp-table th { background: #1e2d24; color: #dbe9d2; }
+td, .metric-table td, .cmp-table td { border-color: #2b3a30; }
+.metric-table tbody tr:nth-child(odd), .cmp-table tbody tr:nth-child(odd) { background: #1a2720; }
+.metric-table tbody tr:hover, .cmp-table tbody tr:hover { background: #27372a; }
+.empty-state { color: #c2d0c2; }
+.empty-state-title { color: #eef5e9; }
+.empty-state-detail { color: #a7b7a8; }
+
+.preview-guide {
+  display: grid;
+  grid-template-columns: minmax(225px, 290px) 1fr;
+  gap: 28px;
+  align-items: center;
+  padding: 26px 32px;
+  border: 1px solid #25392b;
+  border-radius: 17px;
+  background: rgba(17, 31, 22, .68);
+}
+.preview-guide-kicker { margin: 0 0 8px; color: #bcf471; font-size: 10px; font-weight: 750; letter-spacing: .18em; }
+.preview-guide-head h2 { margin: 0 0 8px; font-size: 19px; line-height: 1.35; }
+.preview-guide-head > p:last-child { margin: 0; color: #aabaae; font-size: 12px; line-height: 1.6; }
+.preview-guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.preview-guide-grid > div { min-height: 126px; padding: 17px; border: 1px solid #304437; border-radius: 12px; background: linear-gradient(145deg, #1c2d21, #14221b); }
+.preview-guide-grid span { display: block; margin-bottom: 12px; color: #bdf168; font: 700 12px/1 var(--font-mono); }
+.preview-guide-grid strong { font-size: 13px; }
+.preview-guide-grid p { margin: 8px 0 0; color: #a7b9a9; font-size: 11px; line-height: 1.5; }
+
+@media (max-width: 900px) {
+  .preview-guide { grid-template-columns: 1fr; }
+  .workspace-intro--upload { min-height: 370px; background-position: center, center, 60% 40%; }
+}
+
+@media (max-width: 640px) {
+  .topbar { background: #0d1713; }
+  .workspace-intro { min-height: 194px; padding: 24px 22px; }
+  .workspace-intro h1 { font-size: 30px; }
+  .workspace-intro > div:first-child { max-width: 76%; }
+  .hero-globe { right: -150px; bottom: -155px; opacity: .6; }
+  .bottom-tabs { background: #0d1713; border-color: #2a3930; }
+  .bottom-tab.active { color: #c3f469; }
+  .bottom-tab.locked { color: #65736a; }
+  .workspace-intro--upload {
+    min-height: 345px;
+    padding: 34px 24px;
+    background-image:
+      linear-gradient(90deg, rgba(5, 14, 12, .94), rgba(5, 14, 12, .55) 72%, rgba(5, 14, 12, .38)),
+      linear-gradient(0deg, rgba(5, 14, 12, .45), transparent 50%),
+      url('/images/logistics-earth-hero.png');
+    background-position: center, center, 61% center;
+  }
+  .workspace-intro--upload > div:first-child { max-width: 100%; }
+  .workspace-intro--upload h1 { font-size: clamp(37px, 10vw, 48px); }
+  .workspace-intro--upload .workspace-description { font-size: 13px; line-height: 1.6; }
+  .preview-guide { grid-template-columns: 1fr; padding: 22px; gap: 20px; }
+  .preview-guide-grid { grid-template-columns: 1fr; }
+  .preview-guide-grid > div { min-height: 0; }
+}
