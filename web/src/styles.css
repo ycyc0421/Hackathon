@@ -60,6 +60,13 @@ body {
   color: inherit;
   text-align: left;
   cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+/* 可点品牌区（回首页）是键盘可达的导航控件，焦点样式与其他按钮同一规格 */
+.brand:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .brand-mark {
@@ -2391,7 +2398,7 @@ textarea {
 .home-scenario {
   display: block;
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--border, #e2e2e2);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-raised);
   font: inherit;
@@ -2517,8 +2524,9 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  /* 初始不可见：prefers-reduced-motion 下 transition 被全局压零，
-     .playing 的过渡不会播放，描边因此始终 opacity 0，优雅降级为无引导 */
+  /* 初始不可见；prefers-reduced-motion 下 JS 不启动（onNextActionsEnter
+     直接 return），描边始终不出现——全局规则只压时长不压状态，
+     靠它降级会留下瞬间到终态的描边环 */
   opacity: 0;
   pointer-events: none;
 }
@@ -2535,7 +2543,14 @@ body {
 .cta-trace-rect.playing {
   opacity: 1;
   stroke-dashoffset: 0;
-  transition: stroke-dashoffset 600ms var(--ease);
+  transition: stroke-dashoffset var(--duration-slower) var(--ease);
+}
+
+/* 描边完成后的淡出（JS 加 .done，transitionend 后两类一起移除）：
+   引导只播一次，播完不留永久描边环 */
+.cta-trace-rect.playing.done {
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease);
 }
 
 /* SVG 自身可见性跟随 rect（壳不参与过渡，仅 rect 的 .playing 生效） */

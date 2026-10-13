@@ -119,9 +119,10 @@ provide('diffViews', diffViews)
  */
 const scrollMemo = new Map()
 /**
- * 切页过渡的滚动恢复目标（纸张层叠：before-enter 里同步 scrollTo，见下）。
- * 旧页在 before-leave 已 fixed 脱流不再撑高，文档高度由新页内容决定，
- * 进场前滚动不会被钳位，是安全的。
+ * 切页过渡的滚动恢复目标（纸张层叠：enter 钩子里同步 scrollTo，见下）。
+ * enter 时新页已插入、旧页已 fixed 脱流不撑高，文档高度即新页内容高度，
+ * 此时 scrollTo 不会被钳位。注意不能放在 before-enter：那时新页尚未插入，
+ * 旧页又已脱流，文档只剩顶栏+页脚，maxScroll≈0，scrollTo 会被立即钳到 0。
  */
 let pendingScrollRestore = null
 
@@ -144,21 +145,37 @@ watch(() => route.name, (to, from) => {
   if (y != null) pendingScrollRestore = y
 })
 
+/** 首次挂载不做焦点迁移（见 onPageEnter） */
+let firstPageEnter = true
+
 /**
  * 滚动恢复新时序（并行过渡，不再是 out-in）：
- * before-enter 在新页插入前同步触发，此刻旧页已 fixed 脱流、文档高度
- * 由新页内容决定，立即 scrollTo 既不会钳位也不会被后续布局推走。
+ * enter 在新页插入后、过渡开始前同步触发，此刻旧页已 fixed 脱流、
+ * 文档高度即新页高度，立即 scrollTo 不会钳位，也赶得上进场第一帧。
  * 有记忆位置恢复记忆，否则归零；锚点跳转不在这里滚动，
  * DiffPage 挂载时的锚点定位优先于滚动记忆。
+ *
+ * 焦点迁移：页内按钮触发跳页后旧页卸载，焦点会回落到 body，
+ * 键盘/读屏用户位置丢失。切页后把焦点移到新页第一个标题
+ * （tabindex=-1 只收程序焦点，不进 Tab 序），preventScroll 不与
+ * 滚动恢复打架。首次挂载不动焦点（浏览器原生恢复行为优先）。
  */
-function onPageBeforeEnter() {
+function onPageEnter(el) {
   if (anchorJump) {
     anchorJump = false
+  } else {
+    const y = pendingScrollRestore
+    pendingScrollRestore = null
+    window.scrollTo(0, y ?? 0)
+  }
+  if (firstPageEnter) {
+    firstPageEnter = false
     return
   }
-  const y = pendingScrollRestore
-  pendingScrollRestore = null
-  window.scrollTo(0, y ?? 0)
+  const heading = el.querySelector?.('h1, h2')
+  if (!heading) return
+  heading.tabIndex = -1
+  heading.focus({ preventScroll: true })
 }
 
 /**
@@ -361,7 +378,7 @@ watch(() => route.name, updateIndicator)
            旧页在 before-leave 里 fixed 脱流锁定视觉原位，新页在文档流撑高 -->
       <Transition
         :name="pageTransition"
-        @before-enter="onPageBeforeEnter"
+        @enter="onPageEnter"
         @before-leave="onPageBeforeLeave"
         @after-leave="onPageLeaveDone"
         @leave-cancelled="onPageLeaveDone"

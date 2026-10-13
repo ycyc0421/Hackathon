@@ -467,10 +467,27 @@ function onNextActionsEnter(el) {
   const rect = el.querySelector?.('.cta-trace-rect')
   const btn = el.querySelector?.('.cta-trace')
   if (!rect || !btn) return
+  // prefers-reduced-motion：全局规则只把过渡时长压到 0.01ms，transition 照样
+  // 走到终态——加了 .playing 会瞬间呈现完整描边环且不再消失。干脆不启动。
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  // rect 几何按按钮实测像素写死：viewBox 拉伸只保描边宽不保几何，
+  // 宽按钮上圆角会被拉成椭圆角、四边内缩不均（x 与 y 缩放比不同）
+  rect.setAttribute('x', '1')
+  rect.setAttribute('y', '1')
+  rect.setAttribute('width', String(btn.offsetWidth - 2))
+  rect.setAttribute('height', String(btn.offsetHeight - 2))
   rect.classList.add('playing')
   rect.addEventListener(
     'transitionend',
     () => {
+      // 描边完成后淡出再清类：引导只播一次，播完界面回归克制基线，
+      // 不允许留一个永久的描边环
+      rect.classList.add('done')
+      rect.addEventListener(
+        'transitionend',
+        () => rect.classList.remove('playing', 'done'),
+        { once: true }
+      )
       btn.classList.add('cta-pulse')
       // 脉冲结束后清类，避免内联态残留；动画只播一次，无需循环
       btn.addEventListener('animationend', () => btn.classList.remove('cta-pulse'), { once: true })
@@ -783,17 +800,16 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
             >
               <button class="btn primary cta-trace" @click="navigate.go('diff')">
                 {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
-                <!-- 一次性描边引导：rect 与按钮同尺寸，dashoffset 100→0 描一圈。
-                     初始 opacity 0，仅 .playing 时可见——prefers-reduced-motion
-                     全局压零 transition 时动画不播放，描边也就始终不可见，优雅降级 -->
-                <svg class="cta-trace-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <!-- 一次性描边引导：rect 几何由 JS 按按钮实测像素写入
+                     （onNextActionsEnter），dashoffset 100→0 描一圈后淡出清除。
+                     初始 opacity 0，仅 .playing 时可见；prefers-reduced-motion
+                     下 JS 直接不启动，描边始终不出现 -->
+                <svg class="cta-trace-svg" aria-hidden="true">
                   <rect
                     class="cta-trace-rect"
-                    x="1" y="1" width="98" height="98"
                     rx="4"
                     fill="none"
                     pathLength="100"
-                    vector-effect="non-scaling-stroke"
                   />
                 </svg>
               </button>
