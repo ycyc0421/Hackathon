@@ -29,13 +29,6 @@ function continueTask() {
   router.push(reviewCount.value > 0 ? '/diff' : '/report')
 }
 
-/* 首页统计数字（演示数据，标注说明） */
-const STATS = [
-  { num: '10 种', label: '支持场景' },
-  { num: '3+', label: '单票同时比对' },
-  { num: '秒级', label: '出结果' },
-]
-
 /* 特性卡片 */
 const FEATURES = [
   {
@@ -177,14 +170,6 @@ function runScenario(key) {
         <span v-if="reviewCount" class="home-task-review">{{ reviewCount }} 项待复核</span>
       </div>
       <button class="btn primary" @click="continueTask">继续查看</button>
-    </section>
-
-    <!-- 统计数字：演示数据，三列展示核心指标 -->
-    <section class="home-stats" aria-label="产品概览（演示数据）">
-      <div v-for="s in STATS" :key="s.num" class="home-stat">
-        <span class="home-stat-num">{{ s.num }}</span>
-        <span class="home-stat-label">{{ s.label }}</span>
-      </div>
     </section>
 
     <!-- 特性卡片区：四个核心能力 -->

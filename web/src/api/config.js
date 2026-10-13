@@ -25,7 +25,7 @@ function resolveInitial() {
   } catch {
     // localStorage 不可用（隐私模式等）时静默落到默认 mock
   }
-  return true
+  return false
 }
 
 let useMock = resolveInitial()
