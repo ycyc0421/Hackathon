@@ -86,3 +86,33 @@ export function buildConclusion({ status, documentCount, fieldCount, riskCount, 
     tone: fallbackTone,
   }
 }
+
+/**
+ * 按 comparisons 的实际状态统计各档条数，供 buildConclusion 与报告导出共用。
+ *
+ * 单独抽出来是因为报告页与导出的 HTML 报告是同一份结论的两种呈现，
+ * 两处各写一份统计迟早会漂移——导出的 PDF 说"3 处不一致"、页面说"2 处"
+ * 是最难解释的一类缺陷。
+ *
+ * 口径：只认 comparisons[].status，不用 summary 里的问题计数反推，
+ * 因为 summary 是后端统计的原始任务计数，与比对条目数不是一回事。
+ *
+ * @param {Array} comparisons task.comparisons
+ * @returns {{total:number,match:number,single:number,unchecked:number,conflict:number,missing:number,unrecognized:number}}
+ */
+export function comparisonCounts(comparisons) {
+  const list = comparisons ?? []
+  const counts = { total: list.length, match: 0, single: 0, unchecked: 0, conflict: 0, missing: 0, unrecognized: 0 }
+  for (const item of list) {
+    switch (item?.status) {
+      case 'MATCH': counts.match += 1; break
+      case 'SINGLE_SOURCE': counts.single += 1; break
+      case 'NOT_CHECKED': counts.unchecked += 1; break
+      case 'CONFLICT': counts.conflict += 1; break
+      case 'MISSING_IN_SOME': counts.missing += 1; break
+      case 'UNRECOGNIZED': counts.unrecognized += 1; break
+      default: break
+    }
+  }
+  return counts
+}

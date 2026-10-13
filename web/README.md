@@ -51,6 +51,7 @@ npm --prefix web run build
 | `src/pages/` | 上传、差异、报告、评测 |
 | `src/components/` | 共享交互组件 |
 | `src/utils/needsReview.js` | 人工复核条目口径 |
+| `src/report/` | 导出 HTML 报告的排版与打印样式 |
 | `src/design-tokens.css`、`src/styles.css` | 设计变量与全站样式 |
 
 - 上传到终态共用一个任务视图；阶段条、文件列表与等待时间持续可见，完成后就地更新。上传 100% 只代表字节发完，创建任务仍可能等待。
@@ -58,7 +59,7 @@ npm --prefix web run build
 - 多品名依赖后端商品目录与 item_id；字段中文名直接使用 label。
 - MATCH 表示参与值一致，含 LOW_CONFIDENCE 时仍需人工复核；不能据此宣布整票合规。
 - 缺置信度、页码或坐标时降级显示；未评测显示“尚未评测”，不能填假数字。
-- 报告页展示结果，尚无报告文件导出或人工修正接口。
+- 报告页展示结果；报告导出与人工修正见 `src/components/WorkflowActions.vue`。导出的 HTML 报告由 `src/report/` 在前端排版生成（后端 `format=html` 已返回 410），另提供归档 JSON 出口保留完整抽取结构与修正审计。
 - 当前轮询 1.5 秒一次、最多 60 次，耗时 OCR 可能超出窗口；停止轮询不等于取消任务。
 - 上传页扫描件提示仍有“后端仅支持文本 PDF”的旧文案，和已启用 OCR 的生产环境不一致，后续应用改动需修正。
 
