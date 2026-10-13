@@ -1404,16 +1404,18 @@ textarea {
 .stat {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   min-width: 96px;
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  background: var(--surface-raised);
 }
 
 .stat-num {
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
   font-variant-numeric: tabular-nums;
 }
 
@@ -1428,7 +1430,11 @@ textarea {
 }
 
 .stat.zero .stat-num {
-  color: var(--text-muted);
+  color: var(--text-disabled);
+}
+
+.stat.zero {
+  border-style: dashed;
 }
 
 .stat.alert {
@@ -1461,10 +1467,25 @@ textarea {
 }
 
 .issue-item {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--danger);
-  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--danger);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  transition: box-shadow var(--duration-fast) var(--ease), border-color var(--duration-fast) var(--ease);
+}
+
+.issue-item:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+/* 左色条按严重度：问题红 / 注意橙 / 提示灰，与徽章同一口径 */
+.issue-item.sev-warn {
+  border-left-color: var(--warning);
+}
+
+.issue-item.sev-muted {
+  border-left-color: var(--gray-400);
 }
 
 /* 头部：字段名 + 商品归属 + 徽章，归属 pill 弱化、字段名最重 */
@@ -1476,6 +1497,7 @@ textarea {
 }
 
 .issue-label {
+  font-size: var(--text-base);
   font-weight: var(--weight-semibold);
 }
 
@@ -1505,13 +1527,15 @@ textarea {
 }
 
 .risk-item {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--warning);
+  border-radius: var(--radius-md);
 }
 
 .risk-item.suggested {
   border-style: dashed;
+  border-left: 4px solid var(--gray-300);
   background: var(--gray-50);
 }
 
@@ -1571,16 +1595,46 @@ textarea {
  * 左边带 + 底色卡片承载，一眼可见；颜色跟随结论语气（tone），
  * 与文案同源推导，不出现"坏消息配蓝色"的错位。
  */
+/* 报告头：顶部一条状态色带 + 标题行（标题 + 任务状态徽章），结论是全页最大的一句话 */
+.report-head {
+  position: relative;
+  overflow: hidden;
+  padding-top: calc(var(--space-6) + 4px);
+}
+
+.report-head::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--gray-300);
+}
+
+.report-head.tone-bad::before { background: var(--danger); }
+.report-head.tone-warn::before { background: var(--warning); }
+.report-head.tone-ok::before { background: var(--success); }
+
+.report-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.report-kicker .card-title {
+  margin: 0;
+}
+
 .report-conclusion {
-  margin: var(--space-2) 0 var(--space-4);
-  padding: var(--space-3) var(--space-4);
+  margin: var(--space-4) 0 var(--space-5);
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--gray-400);
-  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--gray-400);
+  border-radius: var(--radius-md);
   background: var(--gray-50);
-  font-size: var(--text-base);
-  font-weight: var(--weight-medium);
-  line-height: var(--leading-relaxed);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-normal);
 }
 
 .report-conclusion.tone-bad {
@@ -1674,7 +1728,7 @@ textarea {
 }
 
 .issue-foot {
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 /* 报告页跳到差异页后的定位反馈：高亮背景淡去，约 1.6s 后由 JS 移除 class */

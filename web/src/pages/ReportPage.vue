@@ -6,7 +6,7 @@
  * 导出功能未实现：契约第四节第 9 项未定导出由哪个接口提供。
  */
 import { computed, inject } from 'vue'
-import { formatTime, formatDuration, riskType, severity, processStatus } from '../api/formatters.js'
+import { formatTime, formatDuration, riskType, severity, processStatus, taskStatus } from '../api/formatters.js'
 import { buildConclusion } from '../utils/reportConclusion.js'
 import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
@@ -194,8 +194,11 @@ const severityOf = severity
         :detail="`${failedDocs.length} 份文件未能处理成功，其数据未参与比对。`"
       />
 
-      <section class="card">
-        <h2 class="card-title">检查概要</h2>
+      <section class="card report-head" :class="conclusion ? `tone-${conclusion.tone}` : ''">
+        <div class="report-kicker">
+          <h2 class="card-title">检查概要</h2>
+          <StatusBadge :status="taskStatus(task.status)" />
+        </div>
 
         <!-- 结论先行：一段话回答"这次检查要不要处理"。summary 缺失时不显示，不替后端下结论。
              tone 与文案同源推导（utils/reportConclusion.js），结论条按 tone 上色 -->
@@ -220,7 +223,7 @@ const severityOf = severity
           <div class="stat" :class="summary.unrecognized_count > 0 ? 'warn' : 'zero'">
             <span class="stat-num">{{ summary.unrecognized_count }}</span><span class="stat-label">无法比对</span>
           </div>
-          <div class="stat"><span class="stat-num">{{ summary.risk_count }}</span><span class="stat-label">风险提示</span></div>
+          <div class="stat" :class="summary.risk_count > 0 ? '' : 'zero'"><span class="stat-num">{{ summary.risk_count }}</span><span class="stat-label">风险提示</span></div>
         </div>
       </section>
 
@@ -243,7 +246,7 @@ const severityOf = severity
         <h2 class="card-title">需要处理的条目 <span class="title-num">{{ issues.length }}</span></h2>
 
         <ul v-if="issues.length" class="issue-list">
-          <li v-for="c in issues" :key="c.comparison_id" class="issue-item">
+          <li v-for="c in issues" :key="c.comparison_id" class="issue-item" :class="`sev-${severityOf(c.severity).tone}`">
             <div class="issue-head">
               <span class="issue-label">{{ c.label }}</span>
               <!-- 商品归属：多品名时问题条目必须能区分属于哪个商品；查不到目录时不猜 -->
