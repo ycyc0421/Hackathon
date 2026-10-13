@@ -50,7 +50,7 @@ export function evidenceRawText(index, comparison, value) {
       : candidates.filter((f) => (f.item_id ?? null) === itemId)
 
   const field =
-    exact[0] ??
+    (exact.length === 1 ? exact[0] : null) ??
     (candidates.length === 1 &&
     (candidates[0].item_id ?? null) === null &&
     (candidates[0].line_no ?? null) === null
