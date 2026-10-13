@@ -3,7 +3,7 @@
  * 报告页：本次检查的汇总与待处理问题。
  *
  * 与差异页结果同源（都读同一个 task），因此不会出现两边数字不一致。
- * 导出功能未实现：契约第四节第 9 项未定导出由哪个接口提供。
+ * 真实任务可导出报告并创建人工修正版本。
  */
 import { computed, inject } from 'vue'
 import { formatTime, formatDuration, riskType, severity, processStatus, taskStatus } from '../api/formatters.js'
@@ -12,6 +12,8 @@ import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
+import WorkflowActions from '../components/WorkflowActions.vue'
+import DocumentNumbers from '../components/DocumentNumbers.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
@@ -63,13 +65,40 @@ const showNoRisk = computed(
     (task.value.risks ?? []).length === 0
 )
 
-/** 「没有需要人工处理的条目」成功式空状态：仅终态成功且无请求错误时出现 */
+/**
+ * 文件自身编号（document_no）的待核对状态。
+ *
+ * document_no 没有对应的比较项，但 LOW_CONFIDENCE / UNRECOGNIZED /
+ * NORMALIZE_FAILED / MISSING_IN_DOC 仍需在文件清单提示；存在这些提示时，
+ * 报告不能笼统写"没有需要人工处理的条目"。比较计数保持原样，不为此伪造
+ * comparisons。NOT_IN_DOC 与缺少整个可选字段不算异常，不计入。
+ */
+const DOCNO_ATTENTION = ['LOW_CONFIDENCE', 'UNRECOGNIZED', 'NORMALIZE_FAILED', 'MISSING_IN_DOC']
+const docNoAttentionCount = computed(() => {
+  const exts = task.value?.extractions ?? []
+  let n = 0
+  for (const e of exts) {
+    for (const f of e?.fields ?? []) {
+      if (
+        f?.field_key === 'document_no' &&
+        (f.item_id ?? null) === null &&
+        (f.line_no ?? null) === null &&
+        DOCNO_ATTENTION.includes(f.status)
+      )
+        n += 1
+    }
+  }
+  return n
+})
+
+/** 「没有需要人工处理的条目」成功式空状态：仅终态成功、无请求错误且无编号待核对提示时出现 */
 const showNoIssues = computed(
   () =>
     isTerminal.value &&
     !taskError?.value &&
     task.value.status !== 'FAILED' &&
-    issues.value.length === 0
+    issues.value.length === 0 &&
+    docNoAttentionCount.value === 0
 )
 
 const duration = computed(() =>
@@ -170,8 +199,8 @@ const severityOf = severity
       <NoticeBar
         v-if="task.status === 'FAILED'"
         tone="bad"
-        title="检查失败，无报告可出"
-        detail="未产生任何比对结果。"
+        title="检查失败；可导出失败明细"
+        detail="未产生任何比对结果，但可导出失败报告留档。"
       />
       <!-- 轮询中断但缓存还是中间状态：明确尚未取得最终结果，不把缓存当完成报告 -->
       <NoticeBar
@@ -236,6 +265,8 @@ const severityOf = severity
               <span class="doc-chip-name">{{ d.file_name }}</span>
               <span class="doc-chip-type">{{ d.doc_type || '类型未识别' }}</span>
             </span>
+            <!-- 该文件自身的单据编号（document_no）：按 file_id 关联抽取层，无编号时整行隐藏 -->
+            <DocumentNumbers :document="d" :extractions="task.extractions" />
             <!-- 失败原因必须能看到，不能随压缩丢失 -->
             <span v-if="d.error_message" class="doc-chip-error">{{ d.error_message }}</span>
           </li>
@@ -244,6 +275,15 @@ const severityOf = severity
 
       <section class="card">
         <h2 class="card-title">需要处理的条目 <span class="title-num">{{ issues.length }}</span></h2>
+
+        <!-- 编号待核对不计入上方比较条目数（document_no 无比较项，不伪造 comparisons），
+             单独一行提示；此时不再显示"没有需要人工处理的条目" -->
+        <NoticeBar
+          v-if="issues.length === 0 && docNoAttentionCount > 0"
+          tone="warn"
+          :title="`有 ${docNoAttentionCount} 份文件的自身编号需要人工核对`"
+          detail="编号问题已在上方文件清单中标注；比对条目计数不受影响。"
+        />
 
         <ul v-if="issues.length" class="issue-list">
           <li v-for="c in issues" :key="c.comparison_id" class="issue-item" :class="`sev-${severityOf(c.severity).tone}`">
@@ -324,11 +364,7 @@ const severityOf = severity
         </ul>
       </section>
 
-      <NoticeBar
-        tone="info"
-        title="报告导出尚未实现"
-        detail="导出由哪个接口提供、采用何种格式尚未确认，因此本页暂不提供导出按钮。"
-      />
+      <WorkflowActions />
     </template>
   </div>
 </template>

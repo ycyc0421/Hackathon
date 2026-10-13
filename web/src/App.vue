@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { isMock, getEvaluation } from './api/index.js'
+import { getEvaluation, getCheck } from './api/index.js'
 import { needsReview } from './utils/needsReview.js'
 import {
   task, taskError, isRunning,
@@ -25,12 +25,11 @@ const router = useRouter()
 const active = computed(() => route.name)
 
 /**
- * 数据源：mock 示例数据 / 真实后端。初始值在 config.js 里按
- * URL 参数 ?mock= → localStorage → 默认 mock 的顺序解析。
- * 顶栏切换后整页刷新：任务、缓存、错误提示都属于旧数据源，不值得就地迁移。
+ * 任务恢复（main 引入）：URL 只保存任务编号，刷新后重新读取后端结果。
+ * 顶栏的数据源切换 UI 已移除（改用 ?mock=1 URL 参数），
+ * 这里只保留恢复逻辑本身。
  */
-const mock = ref(isMock())
-
+const restoreError = ref('')
 /** 当前检查任务。由上传页写入，差异页和报告页读取（ref 本体在 state/session.js） */
 provide('task', task)
 provide('taskError', taskError)
@@ -312,6 +311,7 @@ watch(() => route.name, updateIndicator)
     </nav>
 
     <main class="content" :class="{ stacking }">
+      <p v-if="restoreError" role="alert">{{ restoreError }}</p>
       <!-- 纸张层叠：无 mode 并行渲染，新旧页同时在 DOM。每页包一张通栏不透明
            的 .page-inner 作为纸面（版心限宽卡片容器），层叠时两张纸
            互不透字；旧纸在 before-leave 里 fixed 脱流锁定视觉原位 -->

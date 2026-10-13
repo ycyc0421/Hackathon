@@ -55,12 +55,11 @@ export const API_BASE = import.meta.env.VITE_API_BASE || '/api/v1'
 
 /** 轮询参数。取自 docs/数据契约.md 第四节第 1 项的当前处理方式 */
 export const POLL_INTERVAL_MS = 1500
-export const POLL_MAX_ATTEMPTS = 60 // 90 秒硬截止
+export const POLL_MAX_ATTEMPTS = 1200 // 最多等待 30 分钟，包含 CPU 模型冷启动和排队
 
 /**
  * 软提示线：轮询超过这个时长仍未结束时，提示"处理时间较长"，但不放弃等待。
- * 必须明显小于硬截止（90 秒），否则提示永远轮不到展示；
- * 取 30 秒，给提示留出一分钟的可见窗口。
+ * 30 秒后展示提示；任务仍在运行时继续查询，取消操作仍立即生效。
  */
 export const SLOW_POLL_MS = 30_000
 
