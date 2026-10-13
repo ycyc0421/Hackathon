@@ -2501,3 +2501,56 @@ body {
 .page-stack-backward-leave-to {
   transform: translateX(24%);
 }
+
+/* ========== 上传完成引导 ========== */
+/* 任务达终态后，「查看比对结果」按钮的一次性描边引导 + 轻微脉冲。
+   启动时机在 UploadPage.onNextActionsEnter：collapseHooks 高度展开结束后
+   才加 .playing，避免与高度动画同帧被 overflow 裁切。 */
+
+/* 按钮作为 SVG 的定位壳；不改按钮原有盒模型 */
+.cta-trace {
+  position: relative;
+}
+
+.cta-trace-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* 初始不可见：prefers-reduced-motion 下 transition 被全局压零，
+     .playing 的过渡不会播放，描边因此始终 opacity 0，优雅降级为无引导 */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cta-trace-rect {
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+/* .playing 由 JS 在高度展开结束后加上：opacity 立刻置 1（无过渡，防闪现），
+   dashoffset 从 100 过渡到 0，描边沿按钮描一圈 */
+.cta-trace-rect.playing {
+  opacity: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 600ms var(--ease);
+}
+
+/* SVG 自身可见性跟随 rect（壳不参与过渡，仅 rect 的 .playing 生效） */
+.cta-trace-svg:has(.cta-trace-rect.playing) {
+  opacity: 1;
+}
+
+/* 描边结束后的一次性脉冲：1 → 1.03 → 1，一次即停。
+   时长取 --duration-base 的 2 倍（400ms）：比一次交互动效稍长，又不至于拖沓 */
+@keyframes cta-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.cta-pulse {
+  animation: cta-pulse calc(var(--duration-base) * 2) var(--ease) 1;
+}

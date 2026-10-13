@@ -452,6 +452,34 @@ const extractProgress = computed(() => {
 const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).length ?? 0)
 
 /**
+ * 「查看比对结果」一次性描边引导的启动时机。
+ *
+ * 必须在 collapseHooks 的高度展开动画【结束之后】启动（@after-enter），
+ * 不能与高度展开同帧：展开期间 .next-actions 的 height/overflow 是内联受控的，
+ * 按钮还在被「长高」的过程中，此时播描边会一半被 overflow 裁掉、
+ * 且两条动画抢同一注意力，引导反而看不清。
+ *
+ * 描边 transitionend 后再给按钮加一次轻微脉冲（一次即停）。全程只播一次；
+ * 组件因 key 变化或切页返回重挂载即视为新语境，允许重播（after-enter 只会
+ * 在本次挂载的入场完成后触发一次，天然不会循环）。
+ */
+function onNextActionsEnter(el) {
+  const rect = el.querySelector?.('.cta-trace-rect')
+  const btn = el.querySelector?.('.cta-trace')
+  if (!rect || !btn) return
+  rect.classList.add('playing')
+  rect.addEventListener(
+    'transitionend',
+    () => {
+      btn.classList.add('cta-pulse')
+      // 脉冲结束后清类，避免内联态残留；动画只播一次，无需循环
+      btn.addEventListener('animationend', () => btn.classList.remove('cta-pulse'), { once: true })
+    },
+    { once: true }
+  )
+}
+
+/**
  * 是否提示 EDI 能力说明：真实模式且已选含 EDI 文件时显示。
  * 接受 .edi 只表示允许提交原件，不代表后端已解析（#40）；示例数据模式不提示
  * （示例返回的是合成解析结果，不需要能力声明）。
@@ -748,13 +776,26 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
           </ul>
 
           <!-- 完成态主路径：收合动画入场，直接给去差异页的按钮 -->
-          <Transition :css="false" v-bind="collapseHooks">
+          <Transition :css="false" v-bind="collapseHooks" @after-enter="onNextActionsEnter">
             <div
               v-if="task && (task.status === 'COMPLETED' || task.status === 'PARTIAL')"
               class="next-actions"
             >
-              <button class="btn primary" @click="navigate.go('diff')">
+              <button class="btn primary cta-trace" @click="navigate.go('diff')">
                 {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
+                <!-- 一次性描边引导：rect 与按钮同尺寸，dashoffset 100→0 描一圈。
+                     初始 opacity 0，仅 .playing 时可见——prefers-reduced-motion
+                     全局压零 transition 时动画不播放，描边也就始终不可见，优雅降级 -->
+                <svg class="cta-trace-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <rect
+                    class="cta-trace-rect"
+                    x="1" y="1" width="98" height="98"
+                    rx="4"
+                    fill="none"
+                    pathLength="100"
+                    vector-effect="non-scaling-stroke"
+                  />
+                </svg>
               </button>
               <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
             </div>
