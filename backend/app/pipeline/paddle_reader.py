@@ -465,6 +465,6 @@ def _recognize_image(data: bytes) -> ReadResult:
             raise ValueError("OCR 返回文字过少")
         return ReadResult(text=text, page_count=1, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain, ocr_corrections=corrections)
     except Exception as exc:  # noqa: BLE001
-        from ..public_errors import log
+        from ..public_errors import log, parse_failure
         log.exception("Document parsing failed")
-        return ReadResult(error_message="识别服务未能完成此文件的解析，请稍后重试", page_count=1, failed=True)
+        return ReadResult(error_message=parse_failure(str(exc)), page_count=1, failed=True)

@@ -13,6 +13,10 @@ def parse_failure(message):
         return prefix + '文件已加密，无法读取。请提供未加密的原件。'
     if '暂不支持' in text:
         return prefix + '暂不支持此文件格式。请使用支持的原始单证格式。'
+    if '货号' in text:
+        return prefix + '商品明细缺少可核验的货号或品名，相关商品尚未检查。请核对原件中的商品标识。'
+    if '唯一' in text:
+        return prefix + '未能识别唯一的商品明细表，相关商品尚未检查。请核对表格范围或提供更清晰的原件。'
     if '网格' in text or '表格' in text:
         return prefix + '无法可靠读取商品表格，未完成此文件的检查。请核对原件版式或提供更清晰的文件。'
     if '未配置' in text or '缺少' in text or '尚未启用' in text:
