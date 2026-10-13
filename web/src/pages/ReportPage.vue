@@ -150,14 +150,20 @@ const severityOf = severity
       tone="bad"
       title="尚未取得检查结果"
       :detail="taskError.message"
-    />
+    >
+      <!-- 失败提示不能只给原因不给出口：直接引导回上传页重新检查 -->
+      <button class="btn primary" @click="navigate.go('upload')">去上传页重新检查</button>
+    </NoticeBar>
 
     <NoticeBar
       v-else-if="!task"
       tone="info"
       title="尚无检查结果"
       detail="请先在「上传」页创建一次检查。"
-    />
+    >
+      <!-- 空状态给出明确的下一步操作，而不是只提示一句说明 -->
+      <button class="btn primary" @click="navigate.go('upload')">去上传页创建检查</button>
+    </NoticeBar>
 
     <template v-else>
       <!-- 未完成 / 失败的检查不得呈现为"通过" -->

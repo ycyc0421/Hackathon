@@ -318,6 +318,11 @@ body {
   color: var(--success);
 }
 
+/* NoticeBar 默认 slot 放操作按钮时，与正文之间留出节奏间距 */
+.notice .btn {
+  margin-top: var(--space-2);
+}
+
 /* ---------- 状态标签 ---------- */
 
 .badge {
@@ -529,7 +534,8 @@ textarea {
   color: var(--text-body);
   font-family: inherit;
   font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
+  /* 全站强调元素（标题、选中态）统一 600；按钮是最主要操作，字重不应比它们更轻 */
+  font-weight: var(--weight-semibold);
   line-height: var(--leading-tight);
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease),
@@ -579,6 +585,8 @@ textarea {
   min-height: 28px;
 }
 
+/* 文字按钮。已登记的变体：.compare-foot .link-btn（对照面板脚注，xs 无下划线），
+   只有那里允许局部覆盖，其它场景不得再开新变体 */
 .link-btn {
   border: none;
   background: none;
@@ -597,6 +605,18 @@ textarea {
 
 .link-btn:active:not(:disabled) {
   color: var(--color-primary-active);
+}
+
+/* 键盘焦点可见性与 .btn 对齐：文字按钮同样是可聚焦控件 */
+.link-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.link-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ---------- 任务状态 ---------- */

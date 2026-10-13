@@ -127,20 +127,29 @@
 
 ### 按钮
 
-```css
-.btn-primary {
-  background: var(--blue-500);
-  color: white;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-sm);
-  min-height: 36px;
-}
-```
+实现集中在 `styles.css` 按钮区，类名均为 `.btn` 复合类（不是连字符类名）：
 
-- hover：背景变深
-- active：再深 + `scale(0.98)`
-- focus-visible：蓝色外圈 2px
-- disabled：透明度 0.5
+- `.btn`：基类，即次按钮——白底灰边，36px 高，`--text-sm` 字号
+- `.btn.primary`：主按钮——实色填充（`--color-primary`），一页一个主操作
+- `.btn.small`：小按钮——28px 高，`--text-xs` 字号，用于卡片内联操作（如重试）
+- `.link-btn`：文字按钮——无边框无背景、主色带下划线，用于低强调操作
+  （如「在差异页查看」「移除」）
+- `.chip`：筛选胶囊——视图/筛选项切换，非操作按钮
+
+**字重统一 600**（`--weight-semibold`）：全站强调元素（标题、选中态）都是 600，
+按钮是最主要的操作，不例外。
+
+通用状态（`.btn` / `.link-btn` 一致）：
+
+- hover：背景或颜色加深（`.btn` 白底变 `--gray-50`，`.link-btn` 主色变深）
+- active：`.btn` 再深 + `scale(0.98)`；`.link-btn` 颜色到 active 档
+- focus-visible：`outline: 2px solid var(--color-primary)`，offset 2px；
+  `.link-btn` 额外带 `--radius-sm` 圆角，避免外圈切角
+- disabled：`opacity: 0.5` + `cursor: not-allowed`
+
+**已登记的变体**：`.compare-foot .link-btn`（对照面板脚注，`--text-xs`、
+无下划线）。这是唯一允许局部覆盖 `.link-btn` 的场景，其它场景需要新外观时
+先改基类或登记新变体，不就地覆盖。
 
 ### 表格
 
