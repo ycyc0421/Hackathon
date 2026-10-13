@@ -85,7 +85,10 @@ def run(base, origin, output, ocr_enabled=False):
                     break
                 assert time.monotonic() < deadline, '任务轮询超时'
                 time.sleep(1)
-            assert task['status'] == 'COMPLETED', f'{name}：任务未完成'
+            assert task['status'] == 'COMPLETED', (
+                f'{name}：任务未完成；任务 {created["task_id"]} 状态为 {task["status"]}，'
+                f'错误码：{", ".join(error["code"] for error in task.get("errors", []))}'
+            )
             if name == '01_us_consistent':
                 assert task['summary']['conflict_count'] == 0
             if name == '02_de_conflict':
