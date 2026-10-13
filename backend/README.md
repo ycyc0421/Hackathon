@@ -174,4 +174,6 @@ PDF 验证见 [工作流说明](../.github/workflows/README.md#服务器首次�
 
 ## 候选工作流功能
 
-本分支增加人工修正与审计重算、JSON/HTML 报告导出、项目结构化 JSON 输入及官方来源动态监测。标准 EDIFACT/X12 尚未支持；新功能仍待合并及生产验收。详见 [工作流说明](../docs/workflow-and-rules.md)。
+本分支增加人工修正与审计重算、结构化 JSON 报告与显式归档导出（HTML/打印由前端负责）、项目结构化 JSON 输入及官方来源动态监测。标准 EDIFACT/X12 尚未支持；新功能仍待合并及生产验收。详见 [工作流说明](../docs/workflow-and-rules.md)。
+
+报告 v2 的字段、关联、历史版本和 HTML 迁移见 [接口说明](../docs/report-content-api.md)。

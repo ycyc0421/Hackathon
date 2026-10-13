@@ -145,7 +145,7 @@ def adapt_output(output: dict) -> ReadResult:
         parser = _TableParser()
         parser.feed('\n'.join(html))
         if any(any(_looks_like_header('   '.join(row)) for row in table[:3]) for table in parser.tables):
-            return ReadResult(failed=True, page_count=1, error_message=f'VL 商品网格无法可靠映射：{exc}',
+            return ReadResult(failed=True, page_count=1, error_message='无法可靠读取商品表格，请核对原件版式或提供更清晰的文件',
                               model_outputs=[output], source_blocks=source)
         table_rows = None
     lines = _structured_parties(ordinary, '\n'.join(html)) if html else ordinary
@@ -179,7 +179,7 @@ def recognize_image(data: bytes) -> ReadResult:
             if payload.get('pipeline_version') != config.PADDLE_VL_VERSION:
                 raise ValueError('VL 服务版本与后端配置不一致')
             if payload.get('failed'):
-                return ReadResult(failed=True, page_count=1, error_message=payload.get('error_message') or 'VL 服务识别失败',
+                return ReadResult(failed=True, page_count=1, error_message='识别服务未能完成此文件的解析，请稍后重试',
                                   model_outputs=payload.get('outputs', []))
             outputs = payload.get('outputs')
             if not isinstance(outputs, list) or len(outputs) != 1:
@@ -195,7 +195,9 @@ def recognize_image(data: bytes) -> ReadResult:
             raise ValueError('VL 未返回唯一单页结果')
         return adapt_output(results[0].json)
     except Exception as exc:
-        return ReadResult(failed=True, page_count=1, error_message=f'PaddleOCR-VL 识别失败：{exc}')
+        from ..public_errors import log
+        log.exception("VL document recognition failed")
+        return ReadResult(failed=True, page_count=1, error_message='识别服务未能完成此文件的解析，请稍后重试')
 
 
 def locate_fields(fields: list[dict], rows: list[dict], blocks: list[dict]):

@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from app.sqlite_store import TaskStore
-from app.workflow import CorrectionRequest, WorkflowError, correct, payload_hash, report, report_html
+from app.workflow import CorrectionRequest, WorkflowError, correct, payload_hash, report
 from app.models import CheckTask
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -120,18 +120,141 @@ class WorkflowTests(unittest.TestCase):
         with self.assertRaises(WorkflowError): correct(self.store,self.id,CorrectionRequest(**req))
         req['changes'] = [dict(file_id='f1',field_key='status',value='MATCH')]
         with self.assertRaises(WorkflowError): correct(self.store,self.id,CorrectionRequest(**req))
-    def test_report_escapes_and_retains_failure(self):
+    def test_report_preserves_literal_content_and_failure(self):
         self.store.update(self.id,{'status':'PARTIAL','input':{**self.task['input'],'notes':'<script>alert(1)</script>'}})
         envelope = report(self.store,self.id)
         self.assertEqual(envelope['task']['status'],'PARTIAL')
-        rendered = report_html(envelope)
-        self.assertNotIn('<script>',rendered)
-        self.assertIn('&lt;script&gt;',rendered)
+        self.assertEqual(envelope['task']['input']['notes'], '<script>alert(1)</script>')
+        self.assertNotIn('extractions', envelope['task'])
+        self.assertIn('extractions', report(self.store, self.id, view='archive')['task'])
+
+    def test_report_keeps_business_fields_without_duplicating_comparisons(self):
+        from app.pipeline.compare import build_comparisons
+        from app.pipeline.trade_json import parse_trade_json, FORMAT
+        fields = {'document_no': 'INV-1', 'invoice_no': 'INV-1',
+                  'shipper': 'EXPORTER LTD', 'consignee': 'BUYER LTD',
+                  'contract_no': 'CONTRACT-1', 'container_no': 'CONT-1',
+                  'port_of_loading': 'NINGBO', 'port_of_discharge': 'HAMBURG',
+                  'packages': '120 CARTONS'}
+        for count in (1, 2):
+            with self.subTest(document_count=count):
+                task = copy.deepcopy(self.task)
+                task['documents'] = task['documents'][:count]
+                task['extractions'] = task['extractions'][:count]
+                for index, extraction in enumerate(task['extractions']):
+                    values = fields if index == 0 else {'packages': '120 CARTONS', 'shipper': 'EXPORTER LTD'}
+                    parsed = parse_trade_json(json.dumps({'format': FORMAT,
+                        'doc_type': task['documents'][index]['doc_type'], 'fields': values}).encode())
+                    extraction.update(parsed)
+                task['comparisons'] = build_comparisons(task['documents'], task['extractions'], lambda *_: False)
+                task['summary'].update(document_count=count, field_count=sum(len(e['fields']) for e in task['extractions']))
+                self.store.update(self.id, task)
+                result = report(self.store, self.id)
+                document = result['documents'][0]
+                remaining = {f['field_key']: f for f in document['fields']}
+                expected = set(fields) - {'document_no', 'invoice_no', 'packages'}
+                if count == 2:
+                    expected.remove('shipper')
+                    self.assertTrue(any(c['field_key'] == 'shipper' for c in result['comparisons']))
+                self.assertEqual(set(remaining), expected)
+                for field in task['extractions'][0]['fields']:
+                    if field['field_key'] in expected:
+                        self.assertEqual(remaining[field['field_key']], field)
+                self.assertEqual(self.store.get(self.id), task)
+
+    def test_report_keeps_controlled_failure_reason(self):
+        from app.pipeline.reader import ReadResult
+        from app.public_errors import parse_failure
+        message = '未检测到文本层（疑似扫描件），且未配置识别服务'
+        parsed = ReadResult(failed=True, error_message=message)
+        self.assertIn('提供带文本层的 PDF', parsed.error_message)
+        self.assertEqual(parse_failure(parsed.error_message), parsed.error_message)
+        task = copy.deepcopy(self.task)
+        task['documents'][0].update(process_status='FAILED', error_message=parsed.error_message)
+        task['errors'] = [{'code': 'DOC_PARSE_FAILED', 'level': 'ERROR',
+                           'message': 'scan.pdf 解析失败：' + parsed.error_message, 'file_ids': ['f1']}]
+        self.store.update(self.id, task)
+        for view in ('content', 'archive'):
+            result = report(self.store, self.id, view=view)
+            projected = result['task'] if view == 'archive' else result
+            self.assertEqual(projected['documents'][0]['error_message'], parsed.error_message)
+            self.assertEqual(projected['errors'][0]['message'], parsed.error_message)
+
+    def test_image_unavailable_reason_survives_read_result(self):
+        from app.pipeline import reader
+        with patch.object(reader, 'PADDLE_OCR_ENABLED', False), patch.object(reader, 'llm_enabled', return_value=False):
+            result = reader._read_image(b'synthetic image')
+        self.assertTrue(result.failed)
+        self.assertIn('提供带文本层的 PDF', result.error_message)
+
     def test_running_not_editable_or_exportable(self):
         self.store.update(self.id,{'status':'PROCESSING'})
         with self.assertRaises(WorkflowError): report(self.store,self.id)
         fresh = self.store.get(self.id)
         with self.assertRaises(WorkflowError): correct(self.store,self.id,self.request(source_hash=payload_hash(fresh)))
+
+    def test_report_relevant_sources_and_unknown_history(self):
+        task = copy.deepcopy(self.task)
+        task['risks'] = [{'risk_id':'r1','type':'HS_CLASSIFICATION','severity':'WARNING',
+                         'title':'【演示规则·未经核实】用途待核对','detail':'未取得食品用途',
+                         'related_field_keys':['hs_code'],'related_file_ids':[], 'related_item_ids':[],
+                         'destination_country':'DE','rule_id':'DE-CERAMICS-6911','rule_source':None}]
+        task['errors'] = [{'code':'RULES_UNVERIFIED','level':'WARNING','message':'规则未核实','file_ids':[]}]
+        self.store.update(self.id,task)
+        result = report(self.store,self.id)
+        self.assertIsNone(result['provenance']['execution_rule_version'])
+        self.assertEqual(result['provenance']['execution_version_status'],'UNKNOWN')
+        self.assertEqual({s['source_id'] for s in result['provenance']['sources']}, {'EU-FCM-LEGISLATION','EU-CERAMICS-84-500'})
+        self.assertEqual(result['risks'][0]['rule_context']['verification_status'],'UNVERIFIED')
+        self.assertEqual(result['risks'][0]['title'],'用途待核对')
+        self.assertEqual(result['provenance']['rule_verification_status'],'UNVERIFIED')
+        self.assertEqual(result['errors'],[])
+        self.assertEqual(report(self.store,self.id,view='archive')['task']['risks'],task['risks'])
+        self.assertEqual(result['result_hash'],payload_hash(self.store.get(self.id)))
+
+    def test_diagnostics_stay_out_of_public_reports(self):
+        from app.pipeline.reader import ReadResult
+        diagnostic='PDF 第 2 页：backend exploded /private/path?token=secret .env LLM_API_KEY'
+        parsed=ReadResult(failed=True,error_message=diagnostic)
+        self.assertIn('第 2 页',parsed.error_message)
+        self.assertNotIn('secret',parsed.error_message)
+        task=copy.deepcopy(self.task)
+        task['documents'][0].update(process_status='FAILED',error_message=diagnostic)
+        task['errors']=[{'code':'DOC_PARSE_FAILED','message':diagnostic,'level':'ERROR','file_ids':['f1']}]
+        self.store.update(self.id,task)
+        for view in ('content','archive'):
+            result=report(self.store,self.id,view=view)
+            self.assertNotIn('secret',json.dumps(result))
+        self.assertEqual(self.store.get(self.id)['documents'][0]['error_message'],diagnostic)
+
+    def test_source_projection_excludes_operations(self):
+        from app import rule_sources
+        root=Path(self.tmp.name)
+        (root/'manifest.json').write_text(json.dumps({'sources':[{'source_id':'S1','status':'FETCH_FAILED',
+            'url':'https://example.test/reference','error':'token=secret','snapshot':'/private/path',
+            'attempts':[{'url':'private'}],'etag':'private'}]}))
+        (root/'pending_review.json').write_text(json.dumps({'updates':[{'source_id':'S1','status':'PENDING_REVIEW',
+            'old_snapshot':'private','error':'secret','checked_at':'2026-10-13'}]}))
+        with patch.dict(os.environ,{'RULE_SOURCE_DIR':str(root)}):
+            result=rule_sources.status()
+            self.assertEqual(result['sources'][0]['status'],'FETCH_FAILED')
+            self.assertEqual(result['pending_updates'][0]['source_id'],'S1')
+            self.assertNotIn('private',json.dumps(result))
+            self.assertNotIn('secret',json.dumps(result))
+
+    def test_report_preserves_conclusions_without_guessing_evidence(self):
+        child = correct(self.store,self.id,self.request())
+        extraction = child['extractions'][0]
+        extraction['fields'].append(copy.deepcopy(extraction['fields'][0]))
+        self.store.update(child['task_id'],child)
+        result = report(self.store,child['task_id'])
+        self.assertEqual([(c['status'],c['note']) for c in result['comparisons']],
+                         [(c['status'],c['note']) for c in child['comparisons']])
+        self.assertEqual(result['task']['summary'],child['summary'])
+        value = next(v for c in result['comparisons'] if c['field_key']=='packages'
+                     for v in c['values'] if v['file_id']==extraction['file_id'])
+        self.assertEqual(value['evidence']['status'],'UNAVAILABLE')
+        self.assertIsNone(value['evidence']['raw_text'])
 
     def test_item_revision_real_conflict_and_audit_chain(self):
         from app.pipeline.rows import _field
@@ -160,6 +283,8 @@ class WorkflowTests(unittest.TestCase):
             result = client.post(f'/api/v1/checks/{self.id}/corrections',json=self.request().model_dump())
             self.assertEqual(result.status_code,200)
             result = client.get(f'/api/v1/checks/{self.id}/report?format=html')
+            self.assertEqual(result.status_code,410)
+            result = client.get(f'/api/v1/checks/{self.id}/report?view=archive')
             self.assertEqual(result.status_code,200)
             self.assertIn('attachment;',result.headers['content-disposition'])
             self.assertEqual(client.get(f'/api/v1/checks/{self.id}/report?format=pdf').status_code,400)

@@ -10,7 +10,7 @@
 
 ## 报告
 
-`GET /api/v1/checks/{id}/report?format=json|html`。JSON 包含完整结果与审计链；HTML 可在浏览器打印为 PDF。终态失败和部分完成也可导出，处理中返回 409。结果、失败范围、未检查项、OCR 校正、人工修正和规则来源均保留；COMPLETED 不等于合规通过。
+`GET /api/v1/checks/{id}/report?format=json&view=content` 提供结构化报告；`view=archive` 显式下载完整抽取及审计归档。后端 HTML 已移至前端呈现，旧 format=html 返回 410/REPORT_PRESENTATION_MOVED。详见 [报告 v2 契约与迁移](report-content-api.md)。终态失败和部分完成也可导出，处理中返回 409。结果、失败范围、未检查项、OCR 校正、人工修正和规则来源均保留；COMPLETED 不等于合规通过。
 
 ## 项目交换输入
 

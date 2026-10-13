@@ -1,0 +1,201 @@
+{
+  "report_version": "2",
+  "view": "content",
+  "generated_at": "2026-10-13T19:42:26+08:00",
+  "result_hash": "5b8e6d24e6cfbcec10f8a4d9cd8e716d20ddf7d635555fd204b8ba2b725434c1",
+  "task": {
+    "task_id": "tsk_20261013_0001_aac452cc061e",
+    "status": "COMPLETED",
+    "created_at": "2026-10-13T19:42:26+08:00",
+    "finished_at": "2026-10-13T19:42:26+08:00",
+    "input": {
+      "destination_country": "DE",
+      "destination_country_name": "德国",
+      "trade_mode": null,
+      "declared_currency": null,
+      "notes": null
+    },
+    "summary": {
+      "document_count": 3,
+      "field_count": 3,
+      "item_count": 0,
+      "conflict_count": 1,
+      "missing_count": 0,
+      "risk_count": 0,
+      "unrecognized_count": 0
+    }
+  },
+  "documents": [
+    {
+      "file_id": "f1",
+      "file_name": "商业发票-INV20261012.pdf",
+      "file_type": "PDF",
+      "doc_type": "COMMERCIAL_INVOICE",
+      "process_status": "EXTRACTED",
+      "page_count": 1,
+      "error_message": null,
+      "identifiers": [],
+      "original_url": "/api/v1/checks/tsk_20261013_0001_aac452cc061e/files/f1"
+    },
+    {
+      "file_id": "f2",
+      "file_name": "装箱单-PL20261012.pdf",
+      "file_type": "PDF",
+      "doc_type": "PACKING_LIST",
+      "process_status": "EXTRACTED",
+      "page_count": 1,
+      "error_message": null,
+      "identifiers": [],
+      "original_url": "/api/v1/checks/tsk_20261013_0001_aac452cc061e/files/f2"
+    },
+    {
+      "file_id": "f3",
+      "file_name": "提单-BL20261012.pdf",
+      "file_type": "PDF",
+      "doc_type": "BILL_OF_LADING",
+      "process_status": "EXTRACTED",
+      "page_count": 2,
+      "error_message": null,
+      "identifiers": [],
+      "original_url": "/api/v1/checks/tsk_20261013_0001_aac452cc061e/files/f3"
+    }
+  ],
+  "items": [],
+  "comparisons": [
+    {
+      "comparison_id": "cmp_1",
+      "scope": "DOCUMENT",
+      "item_id": null,
+      "field_key": "packages",
+      "label": "件数",
+      "value_type": "NUMBER",
+      "unit": "CARTON",
+      "status": "CONFLICT",
+      "canonical_value": null,
+      "severity": "ERROR",
+      "rule_id": "CROSS_CHECK_001",
+      "note": null,
+      "values": [
+        {
+          "file_id": "f1",
+          "file_name": "商业发票-INV20261012.pdf",
+          "raw_value": "100 CARTONS",
+          "normalized_value": 121,
+          "field_status": "LOW_CONFIDENCE",
+          "page": 1,
+          "bbox": [
+            80.0,
+            506.0,
+            260.0,
+            22.0
+          ],
+          "evidence": {
+            "raw_text": "SAY ONE HUNDRED (100) CARTONS",
+            "bbox_unit": "PX",
+            "line_no": null,
+            "status": "LOCATED"
+          }
+        },
+        {
+          "file_id": "f2",
+          "file_name": "装箱单-PL20261012.pdf",
+          "raw_value": "120 CARTONS",
+          "normalized_value": 120,
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": [
+            180.0,
+            420.0,
+            240.0,
+            24.0
+          ],
+          "evidence": {
+            "raw_text": "TOTAL: SAY ONE HUNDRED AND TWENTY (120) CARTONS ONLY",
+            "bbox_unit": "PX",
+            "line_no": null,
+            "status": "LOCATED"
+          }
+        },
+        {
+          "file_id": "f3",
+          "file_name": "提单-BL20261012.pdf",
+          "raw_value": "120 CARTONS",
+          "normalized_value": 120,
+          "field_status": "EXTRACTED",
+          "page": 1,
+          "bbox": [
+            60.0,
+            400.0,
+            200.0,
+            22.0
+          ],
+          "evidence": {
+            "raw_text": "120 CARTONS",
+            "bbox_unit": "PX",
+            "line_no": null,
+            "status": "LOCATED"
+          }
+        }
+      ]
+    }
+  ],
+  "risks": [],
+  "errors": [
+    {
+      "code": "HUMAN_CORRECTED",
+      "message": "有效抽取值经人工修正并重算；原始证据保留，操作者身份未认证",
+      "level": "WARNING",
+      "file_ids": [
+        "f1"
+      ]
+    }
+  ],
+  "unaligned_evidence": [],
+  "corrections": [
+    {
+      "source_task_id": "tsk_20261012_0001",
+      "derived_task_id": "tsk_20261013_0001_aac452cc061e",
+      "source_hash": "8773a4a8374534e99a8bb1845828c91ec349435a6820623f629116ef93c47e07",
+      "request_id": "edit1",
+      "reason": "核对原件",
+      "actor": "anonymous",
+      "actor_verified": false,
+      "created_at": "2026-10-13T19:42:26+08:00",
+      "rule_version": "static-source-candidates-v3",
+      "changes": [
+        {
+          "file_id": "f1",
+          "item_no": null,
+          "field_key": "packages",
+          "value": "121 CARTONS",
+          "before": {
+            "normalized_value": 100,
+            "unit": "CARTON",
+            "status": "LOW_CONFIDENCE"
+          },
+          "after": {
+            "normalized_value": 121,
+            "unit": "CARTON",
+            "status": "LOW_CONFIDENCE"
+          }
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "execution_rule_version": "static-source-candidates-v3",
+    "execution_version_status": "RECORDED_IN_CORRECTION",
+    "rule_verification_status": "UNKNOWN",
+    "source_metadata_scope": "CURRENT_AT_EXPORT",
+    "current_definition_version": "static-source-candidates-v3",
+    "monitor_mode": "bundled_static",
+    "monitor_checked_at": null,
+    "sources": [],
+    "pending_updates": []
+  },
+  "limitations": [
+    "PROCESSING_IS_NOT_COMPLIANCE",
+    "UNKNOWN_HISTORY_IS_NOT_CURRENT_VERSION",
+    "UNVERIFIED_RULES_REQUIRE_REVIEW"
+  ]
+}

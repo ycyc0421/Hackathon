@@ -28,6 +28,7 @@ from ..config import (
     llm_enabled,
 )
 from ..models import FileType, ParseMethod
+from ..public_errors import parse_failure, log
 
 # 保真转写，不做抽取、不翻译、不总结 —— 抽取统一交给 extract.py 的正则，
 # 保证「文本层」与「OCR」两条通道走的是同一套抽取逻辑。
@@ -54,6 +55,10 @@ class ReadResult:
     model_outputs: list[dict] = field(default_factory=list)
     source_blocks: list[dict] = field(default_factory=list)
 
+    def __post_init__(self):
+        if self.failed and self.error_message:
+            self.error_message = parse_failure(self.error_message)
+
     @property
     def ok(self) -> bool:
         return not self.failed
@@ -78,6 +83,7 @@ def read_document(filename: str, data: bytes) -> ReadResult:
         try:
             return ReadResult(parse_method=ParseMethod.EDI_PARSE, structured=parse_trade_json(data))
         except (ValueError, TypeError, KeyError, RecursionError) as exc:
+            log.exception("Trade JSON parsing failed")
             return ReadResult(failed=True, error_message=f"项目交换 JSON 无效：{exc}")
     if file_type is FileType.PDF:
         return _read_pdf(data)
@@ -196,13 +202,15 @@ def _read_pdf(data: bytes) -> ReadResult:
                 chunks.append("")
         text = "\n".join(chunks).strip()
     except Exception as exc:  # noqa: BLE001
-        return ReadResult(error_message=f"PDF 解析失败：{exc}", failed=True)
+        from ..public_errors import log
+        log.exception("Document parsing failed")
+        return ReadResult(error_message=f"PDF 解析失败。请确认文件完整后重试。", failed=True)
 
     if unreadable_pages:
         if PADDLE_OCR_ENABLED:
             images = _pdf_pages_to_images(data, page_numbers=unreadable_pages, lazy=True)
             if images is None:
-                return ReadResult(page_count=page_count, error_message="PaddleOCR 处理扫描页需要 pymupdf", failed=True)
+                return ReadResult(page_count=page_count, error_message="当前无法读取扫描页，请稍后重试", failed=True)
             from .paddle_reader import read_image as paddle_read_image
             uncertain_codes: list[str] = []
             corrections: list[dict[str, str]] = []
@@ -234,7 +242,7 @@ def _read_pdf(data: bytes) -> ReadResult:
     if PADDLE_OCR_ENABLED:
         images = _pdf_pages_to_images(data, lazy=True)
         if images is None:
-            return ReadResult(page_count=page_count, error_message="PaddleOCR 处理扫描 PDF 需要 pymupdf", failed=True)
+            return ReadResult(page_count=page_count, error_message="当前无法读取扫描页，请稍后重试", failed=True)
         from .paddle_reader import read_image as paddle_read_image
         chunks = []
         uncertain_codes: list[str] = []
@@ -256,7 +264,7 @@ def _read_pdf(data: bytes) -> ReadResult:
             page_count=page_count,
             error_message=(
                 "未检测到文本层（疑似扫描件），且未配置多模态大模型兜底。"
-                "请在 .env 中配置 LLM_BASE_URL / LLM_API_KEY / LLM_MODEL。"
+                "请稍后重试，或提供带文本层的 PDF。"
             ),
             failed=True,
         )
@@ -266,7 +274,7 @@ def _read_pdf(data: bytes) -> ReadResult:
         return ReadResult(
             page_count=page_count,
             error_message=(
-                "未检测到文本层，且缺少 PDF 转图片能力（pip install pymupdf）"
+                "当前无法读取扫描页，请稍后重试或提供带文本层的 PDF。"
             ),
             failed=True,
         )
@@ -305,8 +313,7 @@ def _read_image(data: bytes) -> ReadResult:
             hint = f"（图像分辨率 {size[0]}×{size[1]}）"
         return ReadResult(
             error_message=(
-                f"图片单证需要 OCR 或多模态大模型兜底{hint}，当前未配置 LLM_BASE_URL / "
-                "LLM_API_KEY / LLM_MODEL，无法识别版式"
+                f"当前无法识别此图片{hint}，请稍后重试或提供带文本层的 PDF。"
             ),
             failed=True,
         )
@@ -368,7 +375,7 @@ def _transcribe_with_llm(
     try:
         import httpx
     except ImportError:
-        return ReadResult(error_message="缺少 httpx 依赖，无法调用多模态接口", failed=True)
+        return ReadResult(error_message="识别服务暂时不可用，请稍后重试", failed=True)
 
     content: list[dict] = [{"type": "text", "text": TRANSCRIBE_PROMPT}]
     for mime, blob in images:
@@ -396,9 +403,11 @@ def _transcribe_with_llm(
         body = resp.json()
         text = (body["choices"][0]["message"]["content"] or "").strip()
     except Exception as exc:  # noqa: BLE001
+        from ..public_errors import log
+        log.exception("Document parsing failed")
         return ReadResult(
             page_count=page_count,
-            error_message=f"多模态识别失败：{exc}",
+            error_message=f"多模态识别失败。请确认文件完整后重试。",
             failed=True,
         )
 

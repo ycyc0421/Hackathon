@@ -68,9 +68,9 @@ def run(output):
                 envelope = exported.json()
                 verify('json_report_and_audit', exported.status_code == 200 and envelope['task']['task_id'] == child_id and len(store.correction_history(child_id)) == 1)
                 rendered = client.get(f'/api/v1/checks/{child_id}/report?format=html')
-                verify('html_report_download', rendered.status_code == 200 and 'attachment;' in rendered.headers.get('content-disposition', ''))
+                verify('html_presentation_moved', rendered.status_code == 410 and rendered.json()['error']['code'] == 'REPORT_PRESENTATION_MOVED')
                 (output / 'report.json').write_text(json.dumps(envelope, ensure_ascii=False, indent=2), encoding='utf-8')
-                (output / 'report.html').write_bytes(rendered.content)
+                (output / 'html-migration.json').write_bytes(rendered.content)
                 verify('unknown_task_404', client.get('/api/v1/checks/accept-missing').status_code == 404)
                 reopened = TaskStore(root / 'tasks.db', root / 'legacy')
                 with patch.object(main, 'store', reopened):
