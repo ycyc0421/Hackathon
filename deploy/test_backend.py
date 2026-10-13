@@ -1,13 +1,79 @@
 """验证发布与回退不会覆盖运行配置、任务数据或旧版本依赖。"""
 
+from io import BytesIO
+import json
 from pathlib import Path
 import subprocess
 import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
+from urllib.error import HTTPError, URLError
 
 import backend
+
+
+class ModelReadinessTests(unittest.TestCase):
+    def setUp(self):
+        self.elapsed = 0
+        clock = patch("backend.time.monotonic", side_effect=lambda: self.elapsed)
+        sleep = patch("backend.time.sleep", side_effect=self.advance)
+        clock.start()
+        sleep.start()
+        self.addCleanup(clock.stop)
+        self.addCleanup(sleep.stop)
+        self.worker = {"status": "ok", "pipeline_version": "v1.6",
+                       "rec_backend": "llama-cpp-server", "busy": False}
+
+    def advance(self, seconds):
+        self.elapsed += seconds
+
+    @patch("backend.urlopen")
+    def test_ready_worker_waits_for_recognition_model_loading(self, urlopen):
+        attempts = []
+        def respond(url, **kwargs):
+            if url == "http://127.0.0.1:18082/health":
+                return BytesIO(json.dumps(self.worker).encode())
+            self.assertEqual(url, "http://127.0.0.1:18083/health")
+            attempts.append(self.elapsed)
+            if len(attempts) == 1:
+                raise HTTPError(url, 503, "Loading model", {}, None)
+            return BytesIO(b'{"status":"ok"}')
+        urlopen.side_effect = respond
+        backend.wait_model_healthy()
+        self.assertEqual(attempts, [0, 1])
+
+    @patch("backend.urlopen")
+    def test_unavailable_recognition_model_times_out(self, urlopen):
+        for unavailable in (URLError("connection refused"),
+                            HTTPError("http://127.0.0.1:18083/health", 503, "Loading model", {}, None),
+                            b'{"status":"loading"}'):
+            with self.subTest(unavailable=unavailable):
+                self.elapsed = 0
+                def respond(url, **kwargs):
+                    if url == "http://127.0.0.1:18082/health":
+                        return BytesIO(json.dumps(self.worker).encode())
+                    self.assertEqual(url, "http://127.0.0.1:18083/health")
+                    if isinstance(unavailable, Exception):
+                        raise unavailable
+                    return BytesIO(unavailable)
+                urlopen.side_effect = respond
+                with self.assertRaisesRegex(RuntimeError, "120 秒"):
+                    backend.wait_model_healthy()
+                self.assertEqual(self.elapsed, 120)
+
+    @patch("backend.urlopen")
+    def test_ready_recognition_model_does_not_override_worker_checks(self, urlopen):
+        for invalid in ({"pipeline_version": "v1.5"}, {"rec_backend": "native"},
+                        {"busy": True}, {"status": "starting"}):
+            with self.subTest(invalid=invalid):
+                self.elapsed = 0
+                def respond(url, **kwargs):
+                    payload = {**self.worker, **invalid} if "18082" in url else {"status": "ok"}
+                    return BytesIO(json.dumps(payload).encode())
+                urlopen.side_effect = respond
+                with self.assertRaisesRegex(RuntimeError, "120 秒"):
+                    backend.wait_model_healthy()
 
 
 class DeploymentTests(unittest.TestCase):
@@ -40,6 +106,36 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual((self.root / "shared/backend.env").read_text(), "服务配置")
         self.assertEqual((self.root / "shared/data/task.json").read_text(), "已有任务")
         self.assertEqual((self.old / ".venv/unchanged").read_text(), "旧依赖")
+
+    @patch("backend.time.sleep")
+    @patch("backend.urlopen")
+    @patch("backend.wait_healthy")
+    @patch("backend.run")
+    def test_vl_activation_waits_for_recognition_before_api_restart(self, run, api_health, urlopen, sleep):
+        (self.root / "shared/backend.env").write_text(
+            "PADDLE_OCR_ENABLED=1\nPADDLE_OCR_ENGINE=vl\nPADDLE_VL_SERVICE_URL=http://127.0.0.1:18082\n")
+        for name in backend.MODEL_SERVICES:
+            (self.new / "deploy" / name).write_text("新模型服务配置")
+        ready = False
+        attempts = 0
+        def respond(url, **kwargs):
+            nonlocal ready, attempts
+            if "18082" in url:
+                return BytesIO(b'{"status":"ok","pipeline_version":"v1.6","rec_backend":"llama-cpp-server","busy":false}')
+            attempts += 1
+            if attempts == 1:
+                raise HTTPError(url, 503, "Loading model", {}, None)
+            ready = True
+            return BytesIO(b'{"status":"ok"}')
+        def check_restart(*args, **kwargs):
+            if args == ("systemctl", "--user", "restart", backend.SERVICE):
+                self.assertTrue(ready, "底层模型未就绪时不得启动新 API")
+        urlopen.side_effect = respond
+        run.side_effect = check_restart
+        backend.activate(self.root, self.new)
+        self.assertEqual(attempts, 2)
+        self.assertEqual((self.root / "current").resolve(), self.new)
+        api_health.assert_called_once()
 
     @patch('backend.wait_healthy')
     @patch('backend.wait_model_healthy', side_effect=RuntimeError('model startup failed'))
@@ -216,6 +312,21 @@ class DeploymentTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "版本不符"):
             backend.deploy(self.root, release_id)
         activate.assert_not_called()
+
+    @patch("backend.wait_model_healthy", side_effect=RuntimeError("识别模型未就绪"))
+    @patch("backend.urlopen")
+    @patch("backend.activate")
+    @patch("backend.run")
+    def test_vl_preflight_requires_recognition_before_probe(self, run, activate, urlopen, readiness):
+        urlopen.return_value = BytesIO(b'{"status":"ok","pipeline_version":"v1.6","rec_backend":"llama-cpp-server","busy":false}')
+        release_id = self.prepare_archive(
+            "PADDLE_OCR_ENABLED=1\nPADDLE_OCR_ENGINE=vl\nPADDLE_VL_SERVICE_URL=http://127.0.0.1:18082\n")
+        with self.assertRaisesRegex(RuntimeError, "识别模型未就绪"):
+            backend.deploy(self.root, release_id)
+        readiness.assert_called_once()
+        activate.assert_not_called()
+        self.assertFalse(any("accept_paddle_vl.py" in str(call.args) for call in run.call_args_list))
+        self.assertEqual((self.root / "current").resolve(), self.old)
 
     @patch("backend.activate")
     @patch("backend.run")
