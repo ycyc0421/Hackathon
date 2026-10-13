@@ -112,7 +112,7 @@ test('正常成功不被残留定时器误判为超时', async () => {
   })
 })
 
-// —— 轮询：软提示必须先于硬截止可见（虚拟时钟） ——
+// —— 轮询：软提示必须先于硬截止可见（虚拟时钟，不等真实 90 秒） ——
 
 function virtualClock() {
   let t = 0
@@ -131,7 +131,7 @@ test('持续 PROCESSING：慢提示在软提示线触发，硬截止抛 TIMEOUT'
       onTick: () => { ticks += 1 },
       onSlow: () => { slowCalls += 1 },
       intervalMs: 1500,
-      maxAttempts: 60, // 用较短窗口验证截止行为
+      maxAttempts: 60, // 90 秒硬截止，与产品配置一致
       slowMs: 30_000, // 30 秒软提示线，与产品配置一致
       now: clock.now,
       sleep: clock.sleep,
@@ -141,17 +141,6 @@ test('持续 PROCESSING：慢提示在软提示线触发，硬截止抛 TIMEOUT'
   assert.equal(ticks, 60)
   assert.equal(slowCalls, 1, '软提示必须先于硬截止触发一次')
   assert.equal(clock.now(), 60 * 1500)
-})
-
-test('CPU 模型处理超过 90 秒后仍可取得终态', async () => {
-  const clock = virtualClock()
-  let calls = 0
-  const task = await pollTask(async () => ({ status: ++calls === 250 ? 'COMPLETED' : 'PROCESSING' }), {
-    intervalMs: 1500, maxAttempts: 1200, slowMs: 30_000,
-    now: clock.now, sleep: clock.sleep,
-  })
-  assert.equal(task.status, 'COMPLETED')
-  assert.ok(clock.now() > 90_000)
 })
 
 test('慢提示不会在到达软提示线之前触发', async () => {

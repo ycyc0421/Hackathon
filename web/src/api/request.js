@@ -236,7 +236,7 @@ export function requestWithUploadProgress(
  * 否则页面会把它渲染成"检查完成，没有问题"。
  *
  * fetchTask 由调用方提供（ mock / 真实请求的差异在 index.js 里收口）；
- * sleep / now 可注入，便于用虚拟时钟测试。
+ * sleep / now 可注入，便于用虚拟时钟测试，不等真实的 90 秒。
  */
 export async function pollTask(
   fetchTask,

@@ -15,7 +15,7 @@
 export const UPLOAD_LIMITS = {
   maxFiles: 10,
   maxFileSizeMB: 20,
-  accept: '.pdf,.png,.jpg,.jpeg,.webp,.json,.edi',
+  accept: '.pdf,.png,.jpg,.jpeg,.webp,.edi',
 }
 
 /**
