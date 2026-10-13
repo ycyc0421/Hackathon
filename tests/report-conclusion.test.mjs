@@ -94,3 +94,16 @@ test('PARTIAL 且有问题条目：红色优先', () => {
 test('counts 缺失：不下结论', () => {
   assert.equal(buildConclusion({ ...base, counts: null }), null)
 })
+
+test('一致条目仍有低可信度取值时提示人工复核', () => {
+  const { text, tone } = buildConclusion({ ...base, counts: mkCounts({ total: 2, match: 2, lowConfidence: 1 }) })
+  assert.ok(text.includes('可信度较低'))
+  assert.ok(text.includes('需要人工复核'))
+  assert.equal(tone, 'warn')
+})
+
+test('取值一致但有风险提示时不使用绿色结论', () => {
+  const { text, tone } = buildConclusion({ ...base, riskCount: 1, counts: mkCounts({ total: 2, match: 2 }) })
+  assert.ok(text.includes('1 条风险提示'))
+  assert.equal(tone, 'warn')
+})

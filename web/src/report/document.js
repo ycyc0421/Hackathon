@@ -298,6 +298,7 @@ ${badge(lookup(COMPARISON_STATUS, c.status))}
 ${values}
 </div>
 ${c.note ? `<p class="item-note">${escapeHtml(c.note)}</p>` : ''}
+${c.suggested_action ? `<p class="item-note">建议：${escapeHtml(c.suggested_action)}</p>` : ''}
 ${c.rule_id ? `<div class="item-foot">规则 ${escapeHtml(c.rule_id)}</div>` : ''}
 </li>`
 }
@@ -344,6 +345,9 @@ function issuesSection(content) {
           ? '但本报告基于不完整结果，未成功处理的文件没有参与比对，不能据此认为整票无问题。'
           : '但本次检查失败，该列表不构成通过结论。'
       ))
+    }
+    if (content.risks?.length) {
+      return card('需要人工处理的条目', notice('warn', '比对条目中没有待处理项', '下方风险提示仍需人工查看，不能据此认为整票无问题。'))
     }
     return card('需要人工处理的条目', notice('ok', '没有需要人工处理的条目'))
   }
@@ -475,6 +479,7 @@ ${verification ? badge(verification) : ''}
 </div>
 <div class="risk-title">${escapeHtml(r.title)}</div>
 <p class="risk-detail">${escapeHtml(r.detail)}</p>
+${r.suggested_action ? `<p class="item-note">建议：${escapeHtml(r.suggested_action)}</p>` : ''}
 ${applicabilityNote(ctx.applicability)}
 ${sourceIds.length ? `<p class="item-note">关联来源：${escapeHtml(sourceIds.map((id) => sourceLabel(id, sourceNames)).join('、'))}</p>` : ''}
 ${foot.length ? `<div class="risk-foot">${foot.map(escapeHtml).join(' · ')}</div>` : ''}
@@ -604,6 +609,22 @@ function correctionsSection(content) {
   const corrections = content.corrections ?? []
   if (!corrections.length) return ''
 
+  // 修正可能导致重新归组，按文件内原始行号查找当前证据，不复用历史商品编号。
+  const changeContext = (change) => {
+    const document = content.documents?.find((d) => d.file_id === change.file_id)
+    const item = change.item_no == null ? null : content.items?.find((it) =>
+      it.members.some((m) => m.file_id === change.file_id && m.item_no === change.item_no))
+    const fields = change.item_no == null
+      ? [...(document?.identifiers ?? []), ...(document?.fields ?? [])]
+      : content.unaligned_evidence?.find((row) => row.file_id === change.file_id && row.item_no === change.item_no)?.fields ?? []
+    const comparison = content.comparisons?.find((c) => c.field_key === change.field_key &&
+      c.values.some((v) => v.file_id === change.file_id) &&
+      (change.item_no == null ? c.scope !== 'ITEM' : item && c.item_id === item.item_id))
+    const label = fields.find((f) => f.field_key === change.field_key)?.label ?? comparison?.label ?? '字段名称未提供'
+    const scope = change.item_no == null ? '整票字段' : '第 ' + change.item_no + ' 行'
+    return [document?.file_name ?? '文件名称未提供', scope, label].join(' · ')
+  }
+
   const list = corrections.map((c) => {
     const changes = (c.changes ?? []).map((ch) => {
       const before = ch.before ?? {}
@@ -611,10 +632,12 @@ function correctionsSection(content) {
       const b = formatValue(before.normalized_value, typeof before.normalized_value === 'number' ? 'NUMBER' : 'STRING', before.unit)
       const a = formatValue(after.normalized_value, typeof after.normalized_value === 'number' ? 'NUMBER' : 'STRING', after.unit)
       return `<div class="change-row">
-<span class="mono">${escapeHtml(ch.field_key)}</span>
+<span>${escapeHtml(changeContext(ch))}</span>
 <span class="value-main">${escapeHtml(b.main)}${before.unit ? ` ${escapeHtml(before.unit)}` : ''}</span>
+${fieldStatusBadge(before.status)}
 <span class="change-arrow">→</span>
 <span class="value-main">${escapeHtml(a.main)}${after.unit ? ` ${escapeHtml(after.unit)}` : ''}</span>
+${fieldStatusBadge(after.status)}
 </div>`
     }).join('\n')
 
@@ -671,7 +694,10 @@ function provenanceSection(content) {
     const status = s.status ? lookup(SOURCE_STATUS, s.status) : null
     const review = s.review_status ? lookup(SOURCE_REVIEW_STATUS, s.review_status) : null
     const name = s.authority ?? s.source_id ?? '来源'
-    const label = s.url
+    // HTML 转义不限制链接协议；离线报告仅保留网页来源链接。
+    let webUrl = false
+    try { webUrl = ['https:', 'http:'].includes(new URL(s.url).protocol) } catch { /* 无有效网页地址时仅显示名称 */ }
+    const label = webUrl
       ? `<a href="${escapeHtml(s.url)}" rel="noreferrer noopener">${escapeHtml(name)}</a>`
       : escapeHtml(name)
     const tags = [status?.text, review?.text].filter(Boolean)

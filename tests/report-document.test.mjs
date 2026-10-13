@@ -211,10 +211,10 @@ test('comparisonCounts 只认状态，缺省与未知状态不误计', () => {
     { status: 'SOMETHING_NEW' }, {},
   ])
   assert.deepEqual(counts, {
-    total: 8, match: 1, conflict: 1, missing: 1, unchecked: 1, unrecognized: 1, single: 1,
+    total: 8, match: 1, conflict: 1, missing: 1, unchecked: 1, unrecognized: 1, single: 1, lowConfidence: 0,
   })
   assert.deepEqual(comparisonCounts(undefined), {
-    total: 0, match: 0, conflict: 0, missing: 0, unchecked: 0, unrecognized: 0, single: 0,
+    total: 0, match: 0, conflict: 0, missing: 0, unchecked: 0, unrecognized: 0, single: 0, lowConfidence: 0,
   })
 })
 
@@ -246,4 +246,55 @@ test('长串（64 位结果指纹）不撑出横向滚动', () => {
 test('非对象入参直接报错，不产出半份报告', () => {
   assert.throws(() => buildReportHtml(null), TypeError)
   assert.throws(() => buildReportHtml('x'), TypeError)
+})
+
+test('取值一致但可信度低时，概要仍提醒复核，不显示绿色结论', () => {
+  const content = structuredClone(samples['check-completed'])
+  const comparison = content.comparisons.find((c) => c.status === 'MATCH')
+  comparison.values[0].field_status = 'LOW_CONFIDENCE'
+  content.comparisons = [comparison]
+  content.risks = []
+  content.task.summary.risk_count = 0
+  const html = buildReportHtml(content)
+  const heading = html.slice(html.indexOf('<header'), html.indexOf('</header>'))
+  assert.ok(bodyText(html).includes('可信度较低'))
+  assert.ok(heading.includes('需要人工复核'))
+  assert.equal(heading.includes('report-head tone-ok'), false)
+})
+
+test('修正记录保留文件、原始行号、后端字段名称和状态', () => {
+  const content = JSON.parse(readFileSync(new URL('../docs/fixtures/report/content.json', import.meta.url), 'utf8'))
+  const change = content.corrections[0].changes[0]
+  const field = { field_key: change.field_key, label: '行级件数', status: 'LOW_CONFIDENCE' }
+  content.unaligned_evidence = [{ file_id: change.file_id, item_no: 7, fields: [field] }]
+  content.corrections[0].changes.push({ ...structuredClone(change), item_no: 7 })
+  const html = buildReportHtml(content)
+  const section = html.slice(html.indexOf('<h2 class="card-title">人工修正记录'))
+  const file = content.documents.find((d) => d.file_id === change.file_id)
+  assert.ok(section.includes(file.file_name))
+  assert.ok(section.includes('整票字段'))
+  assert.ok(section.includes('第 7 行'))
+  assert.ok(section.includes('行级件数'))
+  assert.ok(section.includes('请核对'))
+  assert.equal(section.includes('>packages<'), false)
+})
+
+test('来源只把 HTTP(S) 地址生成可点击链接', () => {
+  const content = structuredClone(samples['check-completed'])
+  content.provenance.sources = [{ source_id: 'source', authority: '来源名称', url: 'file:///source.html' }]
+  const html = buildReportHtml(content)
+  assert.ok(html.includes('来源名称'))
+  assert.equal(html.includes('href="file:'), false)
+})
+
+test('报告保留后端的问题处理建议，风险未处理时不显示绿色确认', () => {
+  const content = structuredClone(samples['check-completed'])
+  const issue = content.comparisons.find((c) => c.status === 'CONFLICT')
+  issue.suggested_action = '核对原件中的件数后再修正。'
+  content.risks[0].suggested_action = '请人工确认适用条件。'
+  const html = buildReportHtml(content)
+  assert.ok(html.includes(issue.suggested_action))
+  assert.ok(html.includes(content.risks[0].suggested_action))
+  content.comparisons = content.comparisons.filter((c) => c.status === 'MATCH')
+  assert.equal(buildReportHtml(content).includes('notice tone-ok'), false)
 })

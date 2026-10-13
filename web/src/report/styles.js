@@ -510,7 +510,7 @@ body::before {
 
 .risk-title { font-weight: 600; margin-top: var(--space-2); }
 .risk-detail { margin: var(--space-1) 0 0; font-size: var(--text-13); }
-.risk-foot { margin-top: var(--space-2); color: var(--text-muted); font-size: var(--text-xs); }
+.risk-foot { margin-top: var(--space-2); color: var(--text-muted); font-size: var(--text-xs); overflow-wrap: anywhere; }
 
 .err-item {
   display: flex;
