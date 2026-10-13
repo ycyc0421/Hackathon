@@ -121,6 +121,23 @@ const PREVIEW_DOCS = [
 const DEMO_SRC = './demo.mp4'
 const DEMO_POSTER = './demo-poster.jpg'
 
+/**
+ * 是否渲染"看一次完整的使用"这一块。两条独立的回退路径：
+ *
+ * 1. **构建期开关**：`VITE_HOME_DEMO=0 npm run build` 直接不渲染。
+ *    用于"这一版就是不要视频"的场景。
+ * 2. **运行期自动回退**：视频文件加载失败（还没出片、被清理、网络失败）
+ *    时自动收起整块。`public/` 不参与打包，构建期无法可靠探测文件是否存在，
+ *    所以这件事只能在运行期做——而它也正是最需要的那条路径：视频 PR 与
+ *    UI PR 是分开交付的，UI 先发时 mp4 还没落地，页面必须自己回退。
+ *
+ * 两条路径都让整块**连同标题一起**消失，首页回到没有视频时的样子；
+ * 它上下两块各自带 64px 留白，少一段不会塌陷错位。
+ */
+const demoEnabled = import.meta.env.VITE_HOME_DEMO !== '0'
+const demoFailed = ref(false)
+const showDemo = computed(() => demoEnabled && !demoFailed)
+
 /** 演示区只在示例数据模式下出现：真实后端模式没有可预演的合成结果 */
 const mock = isMock()
 const scenarios = listMockScenarios().map((key) => ({
@@ -273,10 +290,14 @@ onBeforeUnmount(() => observer?.disconnect())
     <div class="home-below">
 
     <!-- 真实使用演示：完整走一遍上传 → 比对 → 报告。
-         视频由 scripts/record-demo.mjs 自动录制到 public/demo.mp4，
-         录好即生效，不需要改这里的代码。缺文件时由 poster 与说明兜底，
-         不显示坏掉的播放器。 -->
-    <section class="home-demo-video reveal" aria-label="使用演示">
+         视频由 scripts/record-demo.mjs 录到 public/demo.mp4，录好即生效。
+
+         开关的意义：演示视频的产出在另一条线上（录制需要浏览器与 ffmpeg，
+         在 CI 里是独立的一环），随时可能还没生成或需要回退。所以这里
+         用一个显式开关而不是"文件在不在"来决定要不要渲染这一整块——
+         回退时整段连同标题一起消失，首页回到没有视频时的样子；
+         它上下两块各自有 64px 的留白，不会因为少了一段而塌陷错位。 -->
+    <section v-if="showDemo" class="home-demo-video reveal" aria-label="使用演示">
       <div class="home-section-head">
         <h2 class="home-section-title">看一次完整的使用</h2>
         <p class="home-section-sub">上传三份单证、跑完比对、在报告里看到冲突与风险提示。</p>
@@ -294,6 +315,7 @@ onBeforeUnmount(() => observer?.disconnect())
           loop
           playsinline
           preload="metadata"
+          @error="demoFailed = true"
         />
         <figcaption class="demo-caption">
           演示使用内置示例数据，不包含任何真实单证内容。
