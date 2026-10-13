@@ -5,13 +5,14 @@
  * 目的国暂由用户选择。契约第四节第 3 项未定「由用户选还是从文件识别」，
  * 这里按用户选择实现——可控，演示时不依赖抽取准确率。
  */
-import { ref, computed, inject, onBeforeUnmount } from 'vue'
+import { ref, computed, inject, onMounted, onBeforeUnmount } from 'vue'
 import { createCheck, pollCheck, validateFiles, splitByName, ApiError, UPLOAD_LIMITS, isMock, isEdiName } from '../api/index.js'
 import { backendErrorText } from '../api/errors.js'
 import { taskStatus, processStatus, formatTime, formatDuration } from '../api/formatters.js'
 import { API_ERROR_KIND, UPLOAD_ERROR_TEXT, TASK_STAGES, SCAN_WARNING, EDI_CAPABILITY } from '../api/labels.js'
 import { detectPdfTextLayer } from '../pdfTextLayer.js'
 import { needsReview } from '../utils/needsReview.js'
+import { autoSubmitMock } from '../state/session.js'
 import { heightListItemHooks, collapseHooks } from '../utils/animateHeight.js'
 import { isMobile } from '../utils/isMobile.js'
 import StatusBadge from '../components/StatusBadge.vue'
@@ -230,6 +231,19 @@ function stopClock() {
 
 onBeforeUnmount(stopClock)
 
+/**
+ * 首页演示场景卡的自动提交：autoSubmitMock 非空说明用户刚在首页点了场景。
+ * 一次性信号，先清掉再判断，避免之后手动进上传页时意外触发。
+ * 只有 mock 模式才自动提交（真实模式没有可预演的合成结果，
+ * 场景数据对真实后端无意义）；提交后留在本页展示进度，
+ * 不再自动跳页——进度过程本身就是演示的一部分。
+ */
+onMounted(() => {
+  if (!autoSubmitMock.value) return
+  autoSubmitMock.value = null
+  if (isMock()) submit({ skipFileValidation: true })
+})
+
 /** 已等待时长文案。只展示真实流逝的时间，不做任何预计（后端没有给 ETA 数据） */
 const elapsedText = computed(() => {
   if (!startedAt.value) return ''
@@ -264,9 +278,12 @@ const stageIndex = computed(() => {
 /** 骨架屏行数与已选文件数一致，占位形状贴近真实列表 */
 const skeletonRows = computed(() => Math.max(files.value.length, 2))
 
-async function submit() {
-  // 直接调用 submit 也不能绕过校验：以当前文件集合实时复验为准
-  const problems = validateFiles(files.value)
+async function submit({ skipFileValidation = false } = {}) {
+  // 直接调用 submit 也不能绕过校验：以当前文件集合实时复验为准。
+  // 唯一例外是首页演示场景触发的自动提交（skipFileValidation）：
+  // mock 的 createCheck 不读取真实文件字节，「必须选文件」的校验对它无意义，
+  // 强制要求选文件会让演示流程断在上传页。
+  const problems = skipFileValidation ? [] : validateFiles(files.value)
   if (isRunning.value) return
   if (problems.length) {
     localErrors.value = problems

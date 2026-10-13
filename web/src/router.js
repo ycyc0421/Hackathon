@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import HomePage from './pages/HomePage.vue'
 import UploadPage from './pages/UploadPage.vue'
 import DiffPage from './pages/DiffPage.vue'
 import ReportPage from './pages/ReportPage.vue'
@@ -11,7 +12,7 @@ import { task } from './state/session.js'
  * meta.order 承载页序（底部标签/顶栏页签的排列依据），meta.label 承载文案。
  */
 const routes = [
-  { path: '/', redirect: '/upload' },
+  { path: '/', name: 'home', component: HomePage, meta: { order: -1, label: '首页' } },
   {
     path: '/upload',
     name: 'upload',

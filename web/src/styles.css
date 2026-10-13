@@ -52,6 +52,14 @@ body {
   display: flex;
   flex-direction: column;
   line-height: var(--leading-tight);
+  /* 品牌区现在是可点按钮（回首页）：重置 button 默认样式，视觉上保持原样 */
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .brand-mark {
@@ -2285,4 +2293,140 @@ textarea {
 
 .edi-source-error {
   color: var(--warn, #b45309);
+}
+
+/* ========== 首页 ========== */
+/* 入口页克制无装饰：不做入场动效，加载即所见；布局桌面优先，窄屏不破 */
+
+.home-hero {
+  padding: var(--space-8) 0 var(--space-6);
+}
+
+.home-hero-title {
+  margin: 0;
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.home-hero-sub {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-base);
+  color: var(--text-muted);
+}
+
+.home-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+/* 当前任务卡：状态徽章 + 任务号 + 待复核数 一行，按钮靠右 */
+.home-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.home-task-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.home-task-id {
+  font-size: var(--text-13);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-task-review {
+  font-size: var(--text-13);
+  color: var(--warning);
+}
+
+/* 三步流程：桌面三列，窄屏一列 */
+.home-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.home-step-num {
+  font-size: var(--text-13);
+  font-weight: var(--weight-semibold);
+  color: var(--text-muted);
+}
+
+.home-step-title {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.home-step-desc {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-13);
+  color: var(--text-muted);
+}
+
+/* 演示场景区：仅在示例数据模式下渲染 */
+.home-demo {
+  margin-top: var(--space-2);
+}
+
+.home-scenarios {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+/* 场景卡复用卡片观感但做成整卡可点按钮；
+   hover/active 与 .btn 同一节奏（token 化过渡），不另起动效 */
+.home-scenario {
+  display: block;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border, #e2e2e2);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  font: inherit;
+  font-size: var(--text-13);
+  color: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease),
+    background-color var(--duration-fast) var(--ease);
+}
+
+.home-scenario:hover {
+  border-color: var(--border-hover);
+  background: var(--surface);
+}
+
+.home-scenario:active {
+  background: var(--gray-100);
+}
+
+.home-scenario:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ≤640px：三列流程与双列场景卡各收成一列，任务卡纵排，不破布局 */
+@media (max-width: 640px) {
+  .home-steps,
+  .home-scenarios {
+    grid-template-columns: 1fr;
+  }
+
+  .home-task {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

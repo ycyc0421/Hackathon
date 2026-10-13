@@ -44,3 +44,11 @@ export const evaluationLoaded = ref(false)
  * anchor 经 pendingAnchor 传给目标页（页面随切页重挂载，挂载时消费并清空）。
  */
 export const pendingAnchor = ref(null)
+
+/**
+ * 首页演示场景卡 → 上传页自动提交的一次性信号。
+ * 非 null 表示「用户刚在首页点了某个 mock 场景」：上传页挂载时消费并清空，
+ * 随即走一次自动提交（mock 的 createCheck 不依赖真实文件字节）。
+ * 一次性消费，避免用户之后手动进上传页时意外触发提交。
+ */
+export const autoSubmitMock = ref(null)

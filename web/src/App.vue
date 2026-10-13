@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { isMock, listMockScenarios, setMockScenario, getEvaluation } from './api/index.js'
 import { setMock } from './api/config.js'
 import { needsReview } from './utils/needsReview.js'
+import { SCENARIO_NAMES } from './state/scenarios.js'
 import {
   task, taskError, isRunning,
   uploadFiles, uploadCountry, uploadNotes, uploadScanWarnings,
@@ -16,6 +17,7 @@ import AppSelect from './components/AppSelect.vue'
 
 /* label 从路由 meta 取，这里只存页序 key 列表，避免两处维护同一份文案 */
 const PAGES = [
+  { key: 'home', label: '首页' },
   { key: 'upload', label: '上传' },
   { key: 'diff', label: '差异' },
   { key: 'report', label: '报告' },
@@ -45,19 +47,7 @@ function onSourceChange(value) {
   window.location.reload()
 }
 
-/** mock 场景选择。key → 中文名只用于展示，场景数据以 api 层注册表为准 */
-const SCENARIO_NAMES = {
-  'single-item': '单品名 · 有冲突',
-  'partial-fail': '单品名 · 部分失败',
-  'multi-item': '双品名 · 分组',
-  clean: '全部一致',
-  'edi-only': 'EDI · 单份报文',
-  'edi-mixed': 'EDI · 与 PDF/图片混合',
-  'edi-multi-item': 'EDI · 双商品',
-  'edi-partial': 'EDI · 部分解析失败',
-  'edi-unsupported': 'EDI · 后端不支持',
-  'edi-failed': 'EDI · 解析失败',
-}
+/** mock 场景选择。中文名在 state/scenarios.js 共享（首页演示区复用），场景数据以 api 层注册表为准 */
 const mockScenario = ref('single-item')
 const scenarioOptions = listMockScenarios().map((key) => ({
   value: key,
@@ -205,8 +195,9 @@ const problemCount = computed(() => {
 
 const current = computed(() => route.matched.at(-1)?.components?.default)
 
-/** 没有任务时，差异页和报告页没有内容可显示 */
+/** 没有任务时，差异页和报告页没有内容可显示；首页是入口，恒不锁定 */
 function isLocked(key) {
+  if (key === 'home') return false
   return (key === 'diff' || key === 'report') && !task.value
 }
 
@@ -256,12 +247,14 @@ watch(() => route.name, updateIndicator)
   <ErrorBoundary>
     <div class="app">
       <header class="topbar">
-      <div class="brand">
+      <!-- 品牌区做成可点按钮：任何页面都可回首页，入口语义一致 -->
+      <button type="button" class="brand" @click="router.push({ name: 'home' })">
         <span class="brand-mark">单证校验</span>
         <span class="brand-sub">跨境物流 · 交叉比对与合规提示</span>
-      </div>
+      </button>
 
-      <nav ref="tabsRef" class="tabs">
+      <!-- 首页是入口页，不渲染顶栏页签（含指示条），减少干扰 -->
+      <nav v-if="active !== 'home'" ref="tabsRef" class="tabs">
         <button
           v-for="p in PAGES"
           :key="p.key"
@@ -311,7 +304,7 @@ watch(() => route.name, updateIndicator)
     </header>
 
     <!-- 移动端主导航：≤640px 显示（顶栏页签隐藏），选中态用颜色/字重表达，不用滑动指示条 -->
-    <nav class="bottom-tabs" aria-label="页面导航">
+    <nav v-if="active !== 'home'" class="bottom-tabs" aria-label="页面导航">
       <button
         v-for="p in PAGES"
         :key="p.key"
