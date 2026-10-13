@@ -41,9 +41,6 @@ DOC_TYPE_CN = {
     "OTHER": "其他单证",
 }
 
-# 无法解析的文件状态：这些文件的内容我们根本没看到
-_UNPARSED_STATUS = {"FAILED", "UNSUPPORTED"}
-
 
 @lru_cache(maxsize=1)
 def load_rules() -> dict:
@@ -91,7 +88,7 @@ def country_rules(code: str | None) -> dict | None:
 
 
 def match_hs_rule(code: str | None, hs_code: str | None) -> dict | None:
-    """按 HS 章号（前两位）匹配归类规则；匹配不到返回 None。"""
+    """按 HS 前缀匹配归类规则；匹配不到返回 None。"""
     rules = country_rules(code)
     if not rules or not hs_code:
         return None
@@ -104,6 +101,29 @@ def match_hs_rule(code: str | None, hs_code: str | None) -> dict | None:
             if best is None or len(prefix) > len(str(best.get("chapter_prefix", ""))):
                 best = rule
     return best
+
+
+def match_certificate_rules(code: str | None, hs_code: str | None) -> list[dict]:
+    """按目的国和 HS 前缀匹配需人工核对的支持文件/证书规则。"""
+    rules = country_rules(code)
+    if not rules or not hs_code:
+        return []
+    hs = str(hs_code)
+    matched: list[tuple[int, dict]] = []
+    for rule in rules.get("certificate_rules", []):
+        prefixes = rule.get("hs_prefixes") or [rule.get("chapter_prefix", "")]
+        best_len = max((len(str(prefix)) for prefix in prefixes if prefix and hs.startswith(str(prefix))), default=0)
+        if best_len:
+            matched.append((best_len, rule))
+    matched.sort(key=lambda item: item[0], reverse=True)
+    return [rule for _, rule in matched]
+
+
+def _source_text_for(rule: dict) -> str:
+    urls = rule.get("source_urls", [])
+    if urls:
+        return "；".join(urls) + "（官方来源候选；适用条件未经人工核实）"
+    return rule_source_text()
 
 
 def hs_covered(code: str | None, hs_code: str | None) -> bool:
@@ -126,7 +146,7 @@ def evaluate_risks(
     doc_count = len(documents)
 
     # 没解析出来的文件：内容没看到，任何「缺失」结论都要打折扣
-    unparsed = [d for d in documents if d.get("process_status") in _UNPARSED_STATUS]
+    unparsed = [d for d in documents if d.get("process_status") != "EXTRACTED"]
 
     risks: list[dict] = []
     seq = 0
@@ -206,6 +226,41 @@ def evaluate_risks(
         for m in i["members"]:
             item_of_row[(m["file_id"], m["item_no"])] = i["item_id"]
 
+    seen_cert: dict[tuple, dict] = {}
+
+    def certificate_risk(hs: str, file_id: str, item_id: str | None, where: str, item_no: int | None = None) -> None:
+        suffix = f"（品名：{item_labels.get(item_id, '')}）" if item_id else ""
+        # 未归组的行仍是独立证据，不能把同编码的不同商品行合成一条。
+        scope = ("ITEM", item_id) if item_id else (("ROW", file_id, item_no) if item_no is not None else ("DOCUMENT",))
+        for rule in match_certificate_rules(code, hs):
+            key = (rule["rule_id"], hs, scope)
+            related_files = list(dict.fromkeys([file_id, *[d["file_id"] for d in unparsed]]))
+            if key in seen_cert:
+                risk = seen_cert[key]
+                risk["related_file_ids"] = list(dict.fromkeys([*risk["related_file_ids"], *related_files]))
+                continue
+            title = rule["title"] + suffix
+            detail = rule["detail"].format(country=country_name, hs=hs, where=where, doc_count=doc_count)
+            if unparsed:
+                names = "、".join(d["file_name"] for d in unparsed)
+                title = f"有 {len(unparsed)} 份文件未成功解析，无法确认支持资料是否齐全{suffix}"
+                detail += f"另有文件未成功解析（{names}），可能包含相关资料，请先核对原件或修复解析。"
+            # 契约尚无支持资料的识别、适用性及商品关联结果，不能由 HS 命中反推缺失。
+            # 保留规则编号和来源，报告可追溯到候选规则；这仍是待人工复核的 OTHER 提示。
+            add(
+                type="OTHER",
+                severity=rule.get("severity", "WARNING"),
+                title=_mark(title),
+                detail=_with_disclaimer(detail),
+                related_field_keys=["hs_code", "destination_country"],
+                related_item_ids=[item_id] if item_id else [],
+                related_file_ids=related_files,
+                destination_country=code,
+                rule_id=rule["rule_id"],
+                rule_source=_source_text_for(rule),
+            )
+            seen_cert[key] = risks[-1]
+
     def hs_risk(hs: str, file_id: str, item_id: str | None, where: str) -> None:
         rule = match_hs_rule(code, hs)
         suffix = f"（品名：{item_labels.get(item_id, '')}）" if item_id else ""
@@ -221,7 +276,7 @@ def evaluate_risks(
                 related_file_ids=[file_id],
                 destination_country=code,
                 rule_id=rule.get("rule_id"),
-                rule_source="；".join(rule.get("source_urls", [])) + "（官方来源候选；适用条件未经人工核实）" if rule.get("source_urls") else rule_source_text(),
+                rule_source=_source_text_for(rule),
             )
         else:
             add(
@@ -243,6 +298,12 @@ def evaluate_risks(
     seen_item: set[tuple[str, str | None]] = set()
 
     for ext in extractions:
+        # 同一文件已给出商品行编码时，避免把页头的相同编码再提示一遍。
+        row_hs = {str(field["normalized_value"])
+                  for row in ext.get("line_items") or [] for field in row.get("fields", [])
+                  if field.get("field_key") == "hs_code"
+                  and field.get("status") in ("EXTRACTED", "LOW_CONFIDENCE")
+                  and field.get("normalized_value")}
         # 票级编码（整票只有一个编码的单品名票）
         for f in ext.get("fields", []):
             if f.get("field_key") != "hs_code":
@@ -250,10 +311,15 @@ def evaluate_risks(
             if f.get("status") not in ("EXTRACTED", "LOW_CONFIDENCE"):
                 continue
             hs = f.get("normalized_value")
-            if not hs or str(hs) in seen_doc:
+            if not hs:
+                continue
+            where = doc_names.get(ext["file_id"], ext["file_id"])
+            if str(hs) not in row_hs:
+                certificate_risk(str(hs), ext["file_id"], None, where)
+            if str(hs) in seen_doc:
                 continue
             seen_doc.add(str(hs))
-            hs_risk(str(hs), ext["file_id"], None, doc_names.get(ext["file_id"], ext["file_id"]))
+            hs_risk(str(hs), ext["file_id"], None, where)
 
         # 品名级编码（多品名票）
         for li in ext.get("line_items") or []:
@@ -266,13 +332,14 @@ def evaluate_risks(
                 hs = f.get("normalized_value")
                 if not hs:
                     continue
+                where = f"{doc_names.get(ext['file_id'], ext['file_id'])} 第 {li['item_no']} 行"
+                certificate_risk(str(hs), ext["file_id"], item_id, where, li["item_no"])
                 dedupe = (str(hs), item_id)
                 if dedupe in seen_item:
                     continue
                 seen_item.add(dedupe)
                 # where 带上文件名：两份文件对同一品名给了不同编码时，
                 # 两条风险的标题会完全一样，只有 detail 里的出处能区分开
-                where = f"{doc_names.get(ext['file_id'], ext['file_id'])} 第 {li['item_no']} 行"
                 hs_risk(str(hs), ext["file_id"], item_id, where)
 
     return risks
