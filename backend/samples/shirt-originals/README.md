@@ -34,4 +34,4 @@
 
 ## 校验与下载
 
-PDF 原始 SHA-256、大小、页数见 [source-manifest.json](source-manifest.json)，本包成员校验值见 [MANIFEST.sha256](MANIFEST.sha256)。三个 PDF 可分别下载，也可下载 `shirt-originals-evidence.zip` 一次取得全部原件、金标和说明。
+PDF 原始 SHA-256、大小、页数统一记录在 [golden-fields.json](golden-fields.json) 的 documents 中。三个 PDF 可通过上表分别下载；本目录不提供额外压缩包或重复校验清单。

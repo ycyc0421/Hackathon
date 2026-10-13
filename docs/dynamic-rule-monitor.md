@@ -37,7 +37,9 @@ systemctl --user start hackathon-rule-monitor.service
 
 ## 后端接入（本分支，尚未部署到业务服务）
 
-`GET /api/v1/rules/sources` 返回来源状态、最后检查时间和待复核变更；报告也携带当前监测状态。部署本分支时设置 `RULE_SOURCE_DIR=/home/deploy-user/app/shared/rule-sources`；未设置时返回仓库静态快照，并明确 `mode=bundled_static`。接口只展示来源元数据，不把来源变化当作规则核实通过。
+`GET /api/v1/rules/sources` 返回来源状态、最后检查时间和待复核变更；报告也携带当前监测状态。部署时将 `RULE_SOURCE_DIR` 设置为监测程序的实际输出目录；开发环境默认输出到 `backend/.out/rule-sources/`。清单、快照、复核记录和检查历史仅保存在运行目录，不提交源码。
+
+未设置 `RULE_SOURCE_DIR` 时，`mode=bundled_static` 仅表示内置来源目录：各来源为 `NOT_CHECKED`，检查时间为空，空待复核列表不代表没有变更。接口不把来源变化或抓取成功当作法规适用核实通过。
 
 ## 官方接口说明
 

@@ -6,7 +6,7 @@
 
 正式 API 已切换至 `831e90f5b7c98f7f39ba86e52161fd75cc8564e2`，合并了 main `d223d7cfe94acccc60b96656f2f93f866b63e087`。`GET /health` 返回 `release_revision`；后续证据和文档提交不改变本次被测运行代码。PR #37 是交付分支，生产候选与 PR 最终文档提交分别记录。
 
-主模型为 PaddleOCR-VL-1.6，CPU 使用官方 GGUF 与 llama.cpp b11429；不是额外通用 LLM。布局模型 PP-DocLayoutV3。下载版本和每个文件 SHA-256 固定于 [prepare_vl_cpu.py](../deploy/prepare_vl_cpu.py)，最终运行清单包含在证据包 `runtime.json`。
+主模型为 PaddleOCR-VL-1.6，CPU 使用官方 GGUF 与 llama.cpp b11429；不是额外通用 LLM。布局模型 PP-DocLayoutV3。下载版本和每个文件 SHA-256 固定于 [prepare_vl_cpu.py](../deploy/prepare_vl_cpu.py)，具体运行版本以部署环境的清单和 `/health` 为准。
 
 - GGUF 固定 revision：`511b09642bb324401f15f97cc23bc67e8f0a291d`。
 - 布局固定 revision：`241f8bdfc77a7c7bee915a5057aaee58c235a8d3`。
@@ -24,11 +24,11 @@
 - `packages` 表示原文包装件数；裸数、PKGS、PACKAGES 没有包装种类证据时 unit=null；明确 CTNS/CARTON/箱才归一为 CARTON。单位未知的比较保留 NOT_CHECKED 原因。
 - 空 HS 保留其他有效行字段；主体按标签、表格关系和区域定位；自身 document_no 与 CI 引用分开；行字段保留页码；品名不能由 TOTAL 行补成 MATCH。
 - 多商品关联与数据回填同步 #39；保留修订审计。内部 quantity×unit_price、gross<net 警告及修订重算保持有效。
-- 前端最长轮询 30 分钟，30 秒提示等待；取消及单请求超时保持有效。公网 OCR 探针等待上限同样调整为 30 分钟。
+- 公网 OCR 探针等待上限调整为 30 分钟；前端轮询、报告和修正入口随独立 PR #43 集成。
 
 ## 实际验收与证据
 
-固定证据及各检查范围见 [服务器验收记录](reviews/paddle-vl-server-2026-10-12/README.md)。
+以下为 2026-10-12 至 2026-10-13 原候选版本的历史验收摘要，不代表后续提交已经完成服务器或浏览器验收。完整运行输出和回放包保留在私有归档，不随源码分发。可重复的接口检查见 [工作流验收](workflow-acceptance.md)，模型部署预检使用 [accept_paddle_vl.py](../backend/tools/accept_paddle_vl.py) 和仓库内的三份原始 PDF。
 
 | 验证 | 实际结果与范围 |
 |---|---|

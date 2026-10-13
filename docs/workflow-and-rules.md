@@ -2,7 +2,7 @@
 
 ## 人工修正
 
-报告页真实后端模式提供修正入口。仅修改已抽取文件中已有的票级/商品行字段，禁止增删商品行、改判定、改原始证据。原因必填，操作者记录为 anonymous（当前无身份认证）。修正生成新任务，重新运行对齐、比对和规则；原任务及 raw_text/raw_value/坐标完整保留。不重新执行 OCR。
+后端提供人工修正接口，报告页入口由独立前端 PR #43 接入。仅修改已抽取文件中已有的票级/商品行字段，禁止增删商品行、改判定、改原始证据。原因必填，操作者记录为 anonymous（当前无身份认证）。修正生成新任务，重新运行对齐、比对和规则；原任务及 raw_text/raw_value/坐标完整保留。不重新执行 OCR。
 
 - `GET /api/v1/checks/{id}/corrections` 返回结果哈希和审计。
 - `POST /api/v1/checks/{id}/corrections` 接受 `request_id`、`source_hash`、`reason`、`changes`；每项 `file_id`、可选 `item_no`、`field_key`、字符串 `value`。
@@ -35,11 +35,11 @@
 
 ## 静态规则来源
 
-`backend/app/rules/source_catalog.json` 是官方来源清单；`sources/manifest.json` 保存抓取时间、SHA-256、ETag/Last-Modified、成功/失败和快照路径。运行 `python backend/tools/crawl_rule_sources.py` 重新抓取；仅访问官方 HTTPS 白名单，限定体积/超时，不绕过站点挑战、不自动发布规则。新服务器现已启用每小时来源监测，详见 [动态监测说明](dynamic-rule-monitor.md)。
+`backend/app/rules/source_catalog.json` 是官方来源清单。运行 `python backend/tools/crawl_rule_sources.py`，抓取清单、正文快照与复核记录默认写入忽略提交的 `backend/.out/rule-sources/`；部署时通过 `--output` 指定运行目录，并将后端 `RULE_SOURCE_DIR` 设为同一目录。仅访问官方 HTTPS 白名单，限定体积/超时，不绕过站点挑战、不自动发布规则，详见 [动态监测说明](dynamic-rule-monitor.md)。未配置监测时仅返回来源目录，状态为 `NOT_CHECKED`，不提供历史抓取成功记录。
 
 首批来源：欧盟委员会食品接触材料法规概览、EUR-Lex 陶瓷指令、FDA 陶瓷铅污染执法指引、GOV.UK 食品包装概览。正文抓取失败会留痕，不冒充成功。
 
-旧演示规则归档到 `countries-demo-archive.json`，不再运行其中无条件原产地证明、全 HS69 食品接触、全 HS85 CE/FCC、陶瓷一律 FDA 事先通知等判断。新规则仅对 6911/6912 提示用途及适用条件待核对；HS 编码不能证明食品用途，未获得测试报告/销售阶段/地区实施信息时不作合规或缺证结论。国家税则、贸易方式、优惠原产地、其他商品尚未覆盖。
+旧演示规则可从 Git 历史追溯，不再额外保留副本，也不再运行其中无条件原产地证明、全 HS69 食品接触、全 HS85 CE/FCC、陶瓷一律 FDA 事先通知等判断。新规则仅对 6911/6912 提示用途及适用条件待核对；HS 编码不能证明食品用途，未获得测试报告/销售阶段/地区实施信息时不作合规或缺证结论。国家税则、贸易方式、优惠原产地、其他商品尚未覆盖。
 
 **抓取成功不等于法规适用核实。** 当前 verified=false，仍显示“演示规则·未经核实”。核实人员、日期与有效条款须由团队逐条复核后再确认；不会用爬虫或 AI 自动把 verified 改成 true。
 

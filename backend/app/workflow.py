@@ -167,9 +167,9 @@ def report(store, task_id):
     task = dump(CheckTask.model_validate(task))
     corrections = store.correction_history(task_id)
     rule_dir = Path(__file__).resolve().parent / 'rules'
-    metadata = {}
-    for key, path in [('source_catalog',rule_dir/'source_catalog.json'),('fetch_manifest',rule_dir/'sources/manifest.json')]:
-        metadata[key] = json.loads(path.read_text(encoding='utf-8')) if path.is_file() else None
+    catalog_path = rule_dir / 'source_catalog.json'
+    metadata = {'source_catalog': json.loads(catalog_path.read_text(encoding='utf-8')) if catalog_path.is_file() else None,
+                'fetch_manifest': None}
     def metadata_only(value):
         if isinstance(value,list):
             return [metadata_only(v) for v in value]
@@ -177,7 +177,7 @@ def report(store, task_id):
             return {k:(copy.deepcopy(v) if k=='applicability' else metadata_only(v)) for k,v in value.items() if k in {'countries','rules','hs_rules','certificate_rules','required_certificates','version','code','name','id','rule_id','source_urls','source_ids','review_status','applicability'} or isinstance(v,(dict,list))}
         return value
     metadata['rule_metadata'] = metadata_only(rules.load_rules())
-    metadata['notice'] = '导出时当前静态来源目录与抓取记录，仅用于追溯来源和适用条件；不代表原任务运行时版本，也不代表法律适用已经核实。'
+    metadata['notice'] = '导出时当前来源目录与运行时监测状态，仅用于追溯来源和适用条件；不代表原任务运行时版本，也不代表法律适用已经核实。'
     metadata['monitor_status'] = rule_sources.status()
     return {'report_version':'1','generated_at':now_iso(),'result_hash':payload_hash(task),'rule_version':corrections[-1]['rule_version'] if corrections else None,'rule_version_note':'原任务未记录历史规则版本时为 null；修正任务使用重算审计中的版本。','current_catalog':metadata,'notice':'处理完成不代表合规通过；单一来源、未检查和失败必须分别核对。原始值是来源证据，有效归一值可能经人工修改。','task':task,'corrections':corrections}
 

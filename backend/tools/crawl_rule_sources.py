@@ -165,7 +165,7 @@ def check_sources(catalog, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "sources")
+    parser.add_argument("--output", type=Path, default=ROOT.parent.parent / ".out/rule-sources")
     parser.add_argument("--catalog", type=Path, default=ROOT / "source_catalog.json")
     args = parser.parse_args()
     records = check_sources(json.loads(args.catalog.read_text(encoding="utf-8")), args.output)

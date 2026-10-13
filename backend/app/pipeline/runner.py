@@ -321,7 +321,7 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
             {
                 "code": "RULES_UNVERIFIED",
                 "message": (
-                    "本票使用静态规则候选；来源与抓取记录可追溯，但商品用途、适用条件与法律版本尚需人工核实，"
+                    "本票使用未经核实的规则候选；公开来源目录仅供人工核对，商品用途、适用条件与法律版本尚需核实，"
                     "不得作为合规结论。"
                 ),
                 "level": "WARNING",

@@ -10,5 +10,4 @@ __pycache__/
 
 .wrangler/
 .private/
-backend/app/rules/sources/.check.lock
-backend/app/rules/sources/*.tmp
+backend/app/rules/sources/
