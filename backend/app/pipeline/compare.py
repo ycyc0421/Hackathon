@@ -36,7 +36,7 @@ from ..schema_fields import (
 )
 
 # 核心字段之外，标识类字段只在「至少两份文件都涉及」时才出比对行，避免噪音
-_IDENTIFIER_KEYS = {s.key for s in IDENTIFIERS}
+_IDENTIFIER_KEYS = {s.key for s in IDENTIFIERS if s.key != "document_no"}
 CORE_KEYS = [s.key for s in CORE_COMPARABLE]
 # 品名行级字段的比对顺序
 ITEM_KEYS = [s.key for s in ITEM_LEVEL]
@@ -206,6 +206,8 @@ def build_comparisons(
         if not ext:
             continue
         for f in ext["fields"]:
+            if f["field_key"] == "document_no":
+                continue
             collected.setdefault(f["field_key"], []).append((doc, f))
 
     comparisons: list[dict] = []
@@ -229,6 +231,9 @@ def build_comparisons(
         spec = BY_KEY[key]
         value_type = spec.value_type
         unit = spec.unit
+        if key == 'packages':
+            package_units = {field.get('unit') for _, field in usable}
+            unit = next(iter(package_units)) if len(package_units) == 1 else None
         values_out = [_comparison_value(d, f) for d, f in applicable]
 
         status = "SINGLE_SOURCE"
@@ -292,6 +297,9 @@ def build_comparisons(
 
         if failed_note:
             note = f"{note} {failed_note}".strip() if note else failed_note
+        if key == 'packages' and status == 'MATCH' and unit is None:
+            status, severity, rule_id = 'NOT_CHECKED', 'WARNING', None
+            note = '包装类型或单位未明确，不能确认跨文件一致；保留件数，待核对原件。'
 
         # 金额的单位是币种；多份文件币种不同时，无法用单一单位表述，留 null
         if key == "total_amount":
@@ -358,6 +366,7 @@ def build_item_comparisons(
     destination_country: str | None = None,
     destination_country_name: str | None = None,
     start_index: int = 0,
+    unchecked_descriptions: set[tuple[str, int]] | None = None,
 ) -> list[dict]:
     """按行组逐组比对，产出 scope=ITEM 的比对条目。
 
@@ -399,7 +408,13 @@ def build_item_comparisons(
             if doc is None or row is None:
                 continue
             rows_seen += 1
-            for f in row.get("fields", []):
+            from ..doc_profile import profile_of
+            from .extract import _field
+            row_fields = list(row.get("fields", []))
+            present = {f['field_key'] for f in row_fields}
+            for key in (profile_of(doc.get('doc_type')) or set()) & set(ITEM_KEYS) - present:
+                row_fields.append(_field(BY_KEY[key], 'MISSING_IN_DOC', page=None))
+            for f in row_fields:
                 if f["status"] == "NOT_IN_DOC":
                     continue
                 collected.setdefault(f["field_key"], []).append((doc, f))
@@ -418,6 +433,9 @@ def build_item_comparisons(
             value_type = spec.value_type if spec else "STRING"
             label = spec.label if spec else key
             unit = spec.unit if spec else None
+            if key == 'packages':
+                package_units = {field.get('unit') for _, field in usable}
+                unit = next(iter(package_units)) if len(package_units) == 1 else None
             values_out = [_comparison_value(d, f) for d, f in rows]
 
             status = "SINGLE_SOURCE"
@@ -431,6 +449,13 @@ def build_item_comparisons(
                 note = "本组各文件的行无法确定一一对应关系，未做比对。" + (
                     item.get("alignment_note") or ""
                 )
+            elif key == 'description' and any(
+                (member['file_id'], member['item_no']) in (unchecked_descriptions or set())
+                for member in members
+            ):
+                status = 'NOT_CHECKED'
+                severity = 'WARNING'
+                note = '品名未取得同一货号区域的两路 OCR 一致核验；存在文字差异、区域未定位或仅单路恢复布局。保留识别原文与归一值，待人工复核。'
             elif len(usable) < 2 and any(f["status"] == "NORMALIZE_FAILED" for _, f in rows):
                 status = "NOT_CHECKED"
                 severity = "WARNING"
@@ -494,6 +519,9 @@ def build_item_comparisons(
 
             if failed_note:
                 note = f"{note} {failed_note}".strip() if note else failed_note
+            if key == 'packages' and status == 'MATCH' and unit is None:
+                status, severity, rule_id = 'NOT_CHECKED', 'WARNING', None
+                note = '包装类型或单位未明确，不能确认跨文件一致；保留件数，待核对原件。'
             if status in ("SINGLE_SOURCE", "UNALIGNED") and item.get("alignment_note"):
                 note = note or item["alignment_note"]
 

@@ -60,7 +60,7 @@ def ruleset_verified() -> bool:
     data = load_rules()
     if not data.get("verified", False):
         return False
-    return bool(str(data.get("verified_by") or "").strip())
+    return bool(str(data.get("verified_by") or "").strip() and str(data.get("verified_at") or "").strip())
 
 
 def rule_version() -> str:
@@ -221,6 +221,7 @@ def evaluate_risks(
                 related_file_ids=[file_id],
                 destination_country=code,
                 rule_id=rule.get("rule_id"),
+                rule_source="；".join(rule.get("source_urls", [])) + "（官方来源候选；适用条件未经人工核实）" if rule.get("source_urls") else rule_source_text(),
             )
         else:
             add(

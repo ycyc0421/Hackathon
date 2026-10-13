@@ -1,0 +1,9 @@
+[Unit]
+Description=Hackathon API and document model total resource budget
+
+[Slice]
+MemoryAccounting=yes
+MemoryHigh=7G
+MemoryMax=8G
+CPUQuota=400%
+

@@ -158,7 +158,9 @@ def test_rules_unverified_guard() -> None:
         rules.load_rules = lambda: {"version": "x", "verified": True, "verified_by": None}
         check("只把 verified 改成 true、不填核实人 -> 仍算未核实", rules.ruleset_verified() is False)
         rules.load_rules = lambda: {"version": "x", "verified": True, "verified_by": "C-某人"}
-        check("verified=true 且填了核实人 -> 才算已核实", rules.ruleset_verified() is True)
+        check("核实日期缺失 -> 仍算未核实", rules.ruleset_verified() is False)
+        rules.load_rules = lambda: {"version": "x", "verified": True, "verified_by": "C-某人", "verified_at": "2026-10-12"}
+        check("verified=true 且核实人、日期完整 -> 才算已核实", rules.ruleset_verified() is True)
     finally:
         rules.load_rules = original
 

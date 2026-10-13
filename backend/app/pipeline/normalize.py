@@ -37,7 +37,9 @@ def to_measure(raw: str | None, field_key: str) -> tuple[int | float | None, str
         units = text[:match.start()] + " " + text[match.end():]
         units = re.sub(r"[()（）.:：,，]", " ", units).strip()
         if not units:
-            return number, default  # 确实没写单位时才沿用字段约定
+            return number, None if field_key == 'packages' else default
+        if field_key == 'packages' and re.fullmatch(r'(?:PACKAGES?|PKGS?)(?:\s+(?:PACKAGES?|PKGS?))*', units, re.I):
+            return number, None  # General packaging count does not identify cartons.
         if re.fullmatch(rf"(?:{aliases})(?:\s+(?:{aliases}))*", units, re.I):
             return number * factor, default
         if field_key in {"gross_weight", "net_weight"} and re.fullmatch(
@@ -287,6 +289,8 @@ COUNTRY_GLOSSARY = {
     "BELGIUM": "BE", "BE": "BE", "比利时": "BE",
     "VIETNAM": "VN", "VN": "VN", "越南": "VN",
     "KOREA": "KR", "SOUTH KOREA": "KR", "KR": "KR", "韩国": "KR",
+    "SINGAPORE": "SG", "SG": "SG", "新加坡": "SG",
+    "AUSTRALIA": "AU", "AU": "AU", "澳大利亚": "AU", "澳洲": "AU",
 }
 
 

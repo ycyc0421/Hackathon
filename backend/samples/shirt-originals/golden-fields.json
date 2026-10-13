@@ -1,0 +1,316 @@
+{
+  "case_id": "exportdoc-shirt-originals-20261012",
+  "gold_status": "MANUALLY_REVIEWED_DRAFT",
+  "verification_status": "NOT_RUN",
+  "source": "用户于 2026-10-12 补充的三份原始 PDF；逐页渲染人工核对。",
+  "relationship_to_previous_task": "用户指认为此前 T 恤样例的源文件；未取得旧任务上传哈希，不能证明与 tsk_20261012_0014_aa78b6cf5b63 的历史上传字节相同。",
+  "pdf_content": "三份各 1 页；可抽取文本均只有 1 / 1，业务正文嵌入单张图像。属于图片正文 PDF，需要 OCR 或文档视觉解析。",
+  "scope": "系统提取、状态、比较与来源正确性；不评价法规符合性。",
+  "documents": [
+    {
+      "file_name": "exportdoc-proforma-invoice-sample.pdf",
+      "sha256": "055691e630083ce406530b451c9b3d8378488856bc378237bc7897cf681c4ea5",
+      "size_bytes": 302366,
+      "page_count": 1,
+      "original_document_title": "PROFORMA INVOICE",
+      "fields": {
+        "seller": {
+          "value": "Ningbo Qihang Export Co., Ltd.",
+          "evidence": "SELLER / EXPORTER; Ningbo Qihang Export Co., Ltd.",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "buyer": {
+          "value": "Global Fashion Inc.",
+          "evidence": "BUYER / IMPORTER; Global Fashion Inc.",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "document_date": {
+          "value": "2026-08-30",
+          "evidence": "Date: 2026-08-30",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "sku": {
+          "value": "CT-2408",
+          "evidence": "CT-2408",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "description": {
+          "value": "100% Cotton T-shirt, unisex, assorted colors",
+          "evidence": "100% Cotton T-shirt, unisex, assorted colors",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "quantity": {
+          "value": 500,
+          "unit": "PCS",
+          "evidence": "500 PCS",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "document_no": {
+          "value": "PI-20260830-08300186",
+          "evidence": "Document No.: PI-20260830-08300186",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "hs_code": {
+          "value": "6109.10",
+          "evidence": "HS CODE: 6109.10",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "unit_price": {
+          "value": 2.8,
+          "currency": "USD",
+          "evidence": "UNIT PRICE: $2.80",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "total_amount": {
+          "value": 1400,
+          "currency": "USD",
+          "evidence": "TOTAL AMOUNT (USD): $1,400.00",
+          "source": {
+            "file_name": "exportdoc-proforma-invoice-sample.pdf",
+            "page": 1
+          }
+        }
+      }
+    },
+    {
+      "file_name": "exportdoc-packing-list-sample.pdf",
+      "sha256": "fc3cc01f3956b88f7cf7b855aeb11f27b16b50da45ebb9a4ed8afcd89ed8ba95",
+      "size_bytes": 282216,
+      "page_count": 1,
+      "original_document_title": "PACKING LIST",
+      "fields": {
+        "seller": {
+          "value": "Ningbo Qihang Export Co., Ltd.",
+          "evidence": "SELLER / EXPORTER; Ningbo Qihang Export Co., Ltd.",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "buyer": {
+          "value": "Global Fashion Inc.",
+          "evidence": "BUYER / IMPORTER; Global Fashion Inc.",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "document_date": {
+          "value": "2026-08-30",
+          "evidence": "Date: 2026-08-30",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "sku": {
+          "value": "CT-2408",
+          "evidence": "CT-2408",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "description": {
+          "value": "100% Cotton T-shirt, unisex, assorted colors",
+          "evidence": "100% Cotton T-shirt, unisex, assorted colors",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "quantity": {
+          "value": 500,
+          "unit": "PCS",
+          "evidence": "500 PCS",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "document_no": {
+          "value": "PL-20260830-08300186",
+          "evidence": "Document No.: PL-20260830-08300186",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "packages": {
+          "value": 20,
+          "unit": null,
+          "evidence": "PKGS: 20",
+          "note": "原文列名 PKGS，未印 CARTON 单位；此前问题报告称为 20 箱。行值和 TOTAL 是同一批包装，不能重复加总。",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "net_weight": {
+          "value": 150,
+          "unit": "KG",
+          "evidence": "NET KG: 150.00",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "gross_weight": {
+          "value": 170,
+          "unit": "KG",
+          "evidence": "GROSS KG: 170.00",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "volume": {
+          "value": 1.68,
+          "unit": "CBM",
+          "evidence": "CBM: 1.680",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "currency_label": {
+          "value": "USD",
+          "evidence": "CURRENCY: USD",
+          "note": "PL 头部实际印有币种，但没有金额列或总金额；币种不能据此生成金额。",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        },
+        "total_amount": {
+          "value": null,
+          "evidence": null,
+          "note": "原件未载明金额；不生成 USD 500，也不以 0 补齐。接口适用状态按装箱单金额规则返回。",
+          "source": {
+            "file_name": "exportdoc-packing-list-sample.pdf",
+            "page": 1
+          }
+        }
+      }
+    },
+    {
+      "file_name": "exportdoc-commercial-invoice-sample.pdf",
+      "sha256": "223542662fe4f4dd60d99edf373a37af892a4c725827f61bdc24d8e8ff6940ef",
+      "size_bytes": 281818,
+      "page_count": 1,
+      "original_document_title": "COMMERCIAL INVOICE",
+      "fields": {
+        "seller": {
+          "value": "Ningbo Qihang Export Co., Ltd.",
+          "evidence": "SELLER / EXPORTER; Ningbo Qihang Export Co., Ltd.",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "buyer": {
+          "value": "Global Fashion Inc.",
+          "evidence": "BUYER / IMPORTER; Global Fashion Inc.",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "document_date": {
+          "value": "2026-08-30",
+          "evidence": "Date: 2026-08-30",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "sku": {
+          "value": "CT-2408",
+          "evidence": "CT-2408",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "description": {
+          "value": "100% Cotton T-shirt, unisex, assorted colors",
+          "evidence": "100% Cotton T-shirt, unisex, assorted colors",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "quantity": {
+          "value": 500,
+          "unit": "PCS",
+          "evidence": "500 PCS",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "document_no": {
+          "value": "CI-20260830-08300186",
+          "evidence": "Document No.: CI-20260830-08300186",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "hs_code": {
+          "value": "6109.10",
+          "evidence": "HS CODE: 6109.10",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "unit_price": {
+          "value": 2.8,
+          "currency": "USD",
+          "evidence": "UNIT PRICE: $2.80",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        },
+        "total_amount": {
+          "value": 1400,
+          "currency": "USD",
+          "evidence": "TOTAL AMOUNT (USD): $1,400.00",
+          "source": {
+            "file_name": "exportdoc-commercial-invoice-sample.pdf",
+            "page": 1
+          }
+        }
+      }
+    }
+  ]
+}

@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
+Slice=hackathon.slice
 WorkingDirectory=%h/app/current/backend
 EnvironmentFile=%h/app/shared/backend.env
 Environment=PYTHONUNBUFFERED=1

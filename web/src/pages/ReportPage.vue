@@ -3,7 +3,7 @@
  * 报告页：本次检查的汇总与待处理问题。
  *
  * 与差异页结果同源（都读同一个 task），因此不会出现两边数字不一致。
- * 导出功能未实现：契约第四节第 9 项未定导出由哪个接口提供。
+ * 真实任务可导出报告并创建人工修正版本。
  */
 import { computed, inject } from 'vue'
 import { formatTime, formatDuration, riskType, severity, processStatus } from '../api/formatters.js'
@@ -12,6 +12,7 @@ import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
+import WorkflowActions from '../components/WorkflowActions.vue'
 
 const task = inject('task')
 const isRunning = inject('isRunning')
@@ -315,11 +316,7 @@ const severityOf = severity
         </ul>
       </section>
 
-      <NoticeBar
-        tone="info"
-        title="报告导出尚未实现"
-        detail="导出由哪个接口提供、采用何种格式尚未确认，因此本页暂不提供导出按钮。"
-      />
+      <WorkflowActions />
     </template>
   </div>
 </template>

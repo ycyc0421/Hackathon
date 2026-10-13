@@ -1,0 +1,2 @@
+# Official source snapshots must preserve exact response bytes and SHA-256.
+backend/app/rules/sources/snapshots/* -text -diff

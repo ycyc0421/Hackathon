@@ -5,6 +5,7 @@ pydantic>=2.9
 uvicorn[standard]>=0.30
 python-multipart>=0.0.9
 pypdf>=4.3
+pymupdf>=1.24,<2
 httpx>=0.27
 
 # 仅用于 tools/make_samples.py 生成示例单证，运行时用不到
@@ -12,5 +13,4 @@ fpdf2>=2.7
 # 仅用于 tools/make_challenge_samples.py 生成 PNG 挑战样例
 Pillow>=10.0
 
-# 可选：扫描版 PDF 需要先渲染成图片才能交给多模态兜底
-# pymupdf>=1.24
+# pymupdf 同时用于文本 PDF 的列坐标保留和扫描 PDF 渲染。

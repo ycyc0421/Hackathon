@@ -73,7 +73,7 @@ def test_package_units() -> None:
             assert field["status"] == "NORMALIZE_FAILED", field
             assert field["normalized_value"] is None and field["unit"] is None, field
         else:
-            assert field["normalized_value"] == 10 and field["unit"] == "CARTON", field
+            assert field["normalized_value"] == 10 and field["unit"] is None, field
     for text in ("SAY TEN (10) CARTONS ONLY", "PACKAGES: 10  CARTONS", "件数：10 箱（CARTONS）"):
         field = next(f for f in extract_fields(text, "PACKING_LIST") if f["field_key"] == "packages")
         assert field["normalized_value"] == 10 and field["unit"] == "CARTON", field

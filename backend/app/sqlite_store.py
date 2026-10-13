@@ -29,6 +29,41 @@ class TaskStore:
             conn.executescript((DATA_ROOT / 'schema.sql').read_text(encoding='utf-8'))
             importer.backfill_task_relations(conn)
             conn.execute('CREATE TABLE IF NOT EXISTS api_task_payloads (task_id TEXT PRIMARY KEY REFERENCES tasks(task_id) ON DELETE CASCADE, payload_json TEXT NOT NULL)')
+            conn.execute('CREATE TABLE IF NOT EXISTS correction_audits (source_id TEXT NOT NULL, request_id TEXT NOT NULL, derived_id TEXT NOT NULL UNIQUE REFERENCES tasks(task_id) DEFERRABLE INITIALLY DEFERRED, request_hash TEXT NOT NULL, audit_json TEXT NOT NULL, PRIMARY KEY(source_id,request_id))')
+
+    def correction_history(self, task_id):
+        with self._lock, self._connect() as conn:
+            result, seen = [], set()
+            current = task_id
+            while current not in seen:
+                seen.add(current)
+                row = conn.execute('SELECT audit_json,source_id FROM correction_audits WHERE derived_id=?', (current,)).fetchone()
+                if not row:
+                    break
+                result.append(json.loads(row[0]))
+                current = row[1]
+            return list(reversed(result))
+
+    def derive(self, source_id, source_hash, request_id, request_hash, build):
+        """Idempotency, source check, child payload and audit share one transaction."""
+        from .workflow import payload_hash, WorkflowError
+        with self._lock, self._connect() as conn:
+            conn.execute('BEGIN IMMEDIATE')
+            row = conn.execute('SELECT derived_id,request_hash FROM correction_audits WHERE source_id=? AND request_id=?', (source_id,request_id)).fetchone()
+            if row:
+                if row[1] != request_hash:
+                    raise WorkflowError(409, 'IDEMPOTENCY_CONFLICT', 'request_id 已用于不同修正')
+                return self._payload(conn, row[0])
+            source = self._payload(conn, source_id)
+            if source is None:
+                raise WorkflowError(404, 'TASK_NOT_FOUND', '源任务不存在')
+            if payload_hash(source) != source_hash:
+                raise WorkflowError(409, 'SOURCE_CHANGED', '源结果已变化，请重新读取')
+            task, audit = build(source)
+            conn.execute('INSERT INTO correction_audits VALUES (?,?,?,?,?)', (source_id,request_id,task['task_id'],request_hash,json.dumps(audit,ensure_ascii=False,allow_nan=False)))
+            # The importer commits its connection context, including the deferred audit.
+            self._write(conn, task)
+            return task
 
     def _connect(self):
         conn = sqlite3.connect(self.db_path, timeout=30)
@@ -126,7 +161,13 @@ class TaskStore:
         for task_id in ids:
             task = self.get(task_id)
             if task is not None:
-                self.update(task_id, {'status': 'FAILED', 'finished_at': now_iso(), 'errors': task.get('errors', []) + [
+                documents = task.get('documents', [])
+                for document in documents:
+                    if document.get('process_status') in {'UPLOADED', 'PARSING'}:
+                        document.update(process_status='FAILED', error_message='服务重启中断了处理，此文件未完成解析')
+                self.update(task_id, {'status': 'FAILED', 'documents': documents,
+                                     'summary': {**task['summary'], 'document_count': len(documents)},
+                                     'finished_at': now_iso(), 'errors': task.get('errors', []) + [
                     {'code': 'TASK_INTERRUPTED', 'message': '服务重启中断了任务，请重新上传文件', 'level': 'FATAL', 'file_ids': []}]})
                 self.persist(task_id)
         return len(ids)

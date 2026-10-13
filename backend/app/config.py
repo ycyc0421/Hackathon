@@ -30,6 +30,16 @@ MIN_TEXT_LAYER_CHARS = int(os.getenv("MIN_TEXT_LAYER_CHARS", "40"))
 
 # 本地 PaddleOCR 默认关闭；单独安装模型依赖并设置 1 后启用。
 PADDLE_OCR_ENABLED = os.getenv("PADDLE_OCR_ENABLED", "0") == "1"
+PADDLE_OCR_ENGINE = os.getenv("PADDLE_OCR_ENGINE", "legacy")
+PADDLE_VL_VERSION = os.getenv("PADDLE_VL_VERSION", "v1.6")
+PADDLE_VL_DEVICE = os.getenv("PADDLE_VL_DEVICE", "cpu")
+PADDLE_VL_CPU_THREADS = int(os.getenv("PADDLE_VL_CPU_THREADS", "4"))
+PADDLE_VL_REC_BACKEND = os.getenv("PADDLE_VL_REC_BACKEND", "native")
+PADDLE_VL_REC_SERVER_URL = os.getenv("PADDLE_VL_REC_SERVER_URL", "").rstrip('/')
+PADDLE_VL_MODEL_DIR = os.getenv("PADDLE_VL_MODEL_DIR", "")
+PADDLE_VL_LAYOUT_DIR = os.getenv("PADDLE_VL_LAYOUT_DIR", "")
+PADDLE_VL_SERVICE_URL = os.getenv("PADDLE_VL_SERVICE_URL", "").rstrip('/')
+PADDLE_VL_TIMEOUT = int(os.getenv("PADDLE_VL_TIMEOUT_SECONDS", "900"))
 
 # ---- 任务形态 ------------------------------------------------------------
 # POST /api/v1/checks 之后，最多等待流水线完成 POST_WAIT_MS 毫秒：

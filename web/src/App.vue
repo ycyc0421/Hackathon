@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { isMock, listMockScenarios, setMockScenario, getEvaluation } from './api/index.js'
+import { isMock, listMockScenarios, setMockScenario, getEvaluation, getCheck } from './api/index.js'
 import { setMock } from './api/config.js'
 import { needsReview } from './utils/needsReview.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
@@ -84,6 +84,39 @@ function onDocumentClick(e) {
 const task = ref(null)
 const taskError = ref(null)
 const isRunning = ref(false)
+
+const restoreError = ref('')
+const terminalStatuses = new Set(['COMPLETED', 'PARTIAL', 'FAILED'])
+// Keep only a task identifier in the URL; reload the authoritative backend result.
+watch(() => [task.value?.task_id, task.value?.status], ([id]) => {
+  if (isMock()) return
+  const url = new URL(window.location.href)
+  if (id && terminalStatuses.has(task.value?.status)) url.searchParams.set('task', id)
+  else if (!id) url.searchParams.delete('task')
+  window.history.replaceState(null, '', url)
+})
+onMounted(async () => {
+  if (isMock()) return
+  const id = new URLSearchParams(window.location.search).get('task')
+  if (!id) return
+  if (!/^tsk_[A-Za-z0-9_-]{1,100}$/.test(id)) {
+    restoreError.value = '任务编号格式无效，请重新上传或检查链接。'
+    return
+  }
+  isRunning.value = true
+  try {
+    const restored = await getCheck(id)
+    if (!terminalStatuses.has(restored.status)) {
+      restoreError.value = '此任务尚未结束，请稍后刷新查看结果。'
+      return
+    }
+    task.value = restored
+    active.value = 'report'
+  } catch (error) {
+    restoreError.value = `无法恢复任务：${error.message || '请检查网络或任务链接'}`
+  } finally { isRunning.value = false }
+})
+
 
 provide('task', task)
 provide('taskError', taskError)
@@ -342,6 +375,7 @@ watch(active, updateIndicator)
     </nav>
 
     <main class="content">
+      <p v-if="restoreError" role="alert">{{ restoreError }}</p>
       <Transition name="fade" mode="out-in" @enter="onPageEnter">
         <component :is="current" :key="active" />
       </Transition>

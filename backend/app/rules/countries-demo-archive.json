@@ -1,0 +1,157 @@
+{
+  "version": "团队配置的目的国规则集 v1",
+  "updated_at": "2026-10-10",
+  "verified": false,
+  "verified_by": null,
+  "verified_at": null,
+  "_readme": [
+    "本文件是 F 侧的合规规则库。每条规则都必须带 rule_id 与 rule_source，",
+    "风险提示要能追溯到具体规则 —— 这是契约的硬要求，不得凭空给出。",
+    "!! verified=false：以下规则内容为团队自拟的演示版本，来源与适用条件尚未核实。",
+    "  此时 rules.py 会给所有基于规则的提示加『【演示规则·未经核实】』前缀，",
+    "  并在任务级 errors[] 追加一条 WARNING，避免被当成确定的合规结论。",
+    "  **演示时必须保留这个标记。** 标记只有在团队逐条核实来源和适用条件后才允许去掉。",
+    "如何去掉标记（三道缺一不可，防止误标）：",
+    "  1) verified 改成 true；",
+    "  2) verified_by 填核实人（A / C 的具体成员）；",
+    "  3) verified_at 填核实日期。",
+    "  rules.py 的 ruleset_verified() 要求 verified=true 且 verified_by 非空，",
+    "  只改 verified 不改 verified_by 不会生效。",
+    "逐条核对清单：rule_id 是否对应真实法规条款、severity 是否合理、",
+    "  适用条件（商品范围/贸易方式/是否仅特定情形）是否写全。",
+    "契约要求 rule_id 为 null 时，界面显示为『模型建议，未经规则校验』，与规则命中的风险分组显示。"
+  ],
+  "countries": {
+    "DE": {
+      "name": "德国",
+      "region": "EU",
+      "required_documents": [
+        {
+          "doc_type": "CERTIFICATE_OF_ORIGIN",
+          "rule_id": "DE-IMP-004",
+          "severity": "WARNING",
+          "title": "目的国为{country}，未在本票文件中找到原产地证明",
+          "detail": "依据规则 DE-IMP-004：申报目的地为德国的货物，随附单证中应包含原产地证明。本票 {doc_count} 份文件均未识别到该单证。"
+        }
+      ],
+      "hs_rules": [
+        {
+          "chapter_prefix": "69",
+          "rule_id": "DE-HS-6911",
+          "severity": "WARNING",
+          "title": "陶瓷制品需符合欧盟食品接触材料要求",
+          "detail": "依据规则 DE-HS-6911：HS 69 章项下陶瓷餐具及厨房用陶瓷进入德国市场，须符合 (EU) No 1935/2004 食品接触材料要求，建议随附符合性声明。"
+        },
+        {
+          "chapter_prefix": "85",
+          "rule_id": "DE-HS-85",
+          "severity": "WARNING",
+          "title": "电气产品需符合 CE 与 RoHS 要求",
+          "detail": "依据规则 DE-HS-85：HS 85 章项下电气设备进入德国市场，须加贴 CE 标志并符合 RoHS 有害物质限制要求。"
+        }
+      ]
+    },
+    "NL": {
+      "name": "荷兰",
+      "region": "EU",
+      "required_documents": [
+        {
+          "doc_type": "CERTIFICATE_OF_ORIGIN",
+          "rule_id": "NL-IMP-004",
+          "severity": "WARNING",
+          "title": "目的国为{country}，未在本票文件中找到原产地证明",
+          "detail": "依据规则 NL-IMP-004：申报目的地为荷兰的货物，随附单证中应包含原产地证明。本票 {doc_count} 份文件均未识别到该单证。"
+        }
+      ],
+      "hs_rules": [
+        {
+          "chapter_prefix": "69",
+          "rule_id": "NL-HS-6911",
+          "severity": "WARNING",
+          "title": "陶瓷制品需符合欧盟食品接触材料要求",
+          "detail": "依据规则 NL-HS-6911：HS 69 章项下陶瓷餐具及厨房用陶瓷进入荷兰市场，须符合 (EU) No 1935/2004 食品接触材料要求。"
+        }
+      ]
+    },
+    "FR": {
+      "name": "法国",
+      "region": "EU",
+      "required_documents": [
+        {
+          "doc_type": "CERTIFICATE_OF_ORIGIN",
+          "rule_id": "FR-IMP-004",
+          "severity": "WARNING",
+          "title": "目的国为{country}，未在本票文件中找到原产地证明",
+          "detail": "依据规则 FR-IMP-004：申报目的地为法国的货物，随附单证中应包含原产地证明。本票 {doc_count} 份文件均未识别到该单证。"
+        }
+      ],
+      "hs_rules": [
+        {
+          "chapter_prefix": "69",
+          "rule_id": "FR-HS-6911",
+          "severity": "WARNING",
+          "title": "陶瓷制品需符合欧盟食品接触材料要求",
+          "detail": "依据规则 FR-HS-6911：HS 69 章项下陶瓷餐具及厨房用陶瓷进入法国市场，须符合 (EU) No 1935/2004 食品接触材料要求。"
+        }
+      ]
+    },
+    "GB": {
+      "name": "英国",
+      "region": "UK",
+      "required_documents": [
+        {
+          "doc_type": "COMMERCIAL_INVOICE",
+          "rule_id": "GB-IMP-001",
+          "severity": "WARNING",
+          "title": "目的国为{country}，未在本票文件中找到商业发票",
+          "detail": "依据规则 GB-IMP-001：申报目的地为英国的货物，随附单证中应包含商业发票。本票 {doc_count} 份文件均未识别到该单证。"
+        }
+      ],
+      "hs_rules": [
+        {
+          "chapter_prefix": "69",
+          "rule_id": "GB-HS-6911",
+          "severity": "WARNING",
+          "title": "陶瓷餐具进入英国需符合食品接触材料要求",
+          "detail": "依据规则 GB-HS-6911：HS 69 章项下陶瓷餐具进入英国市场，须符合英国食品接触材料法规要求。"
+        }
+      ]
+    },
+    "US": {
+      "name": "美国",
+      "region": "US",
+      "required_documents": [
+        {
+          "doc_type": "COMMERCIAL_INVOICE",
+          "rule_id": "US-IMP-001",
+          "severity": "WARNING",
+          "title": "目的国为{country}，未在本票文件中找到商业发票",
+          "detail": "依据规则 US-IMP-001：申报目的地为美国的货物，随附单证中应包含商业发票。本票 {doc_count} 份文件均未识别到该单证。"
+        },
+        {
+          "doc_type": "PACKING_LIST",
+          "rule_id": "US-IMP-002",
+          "severity": "WARNING",
+          "title": "目的国为{country}，未在本票文件中找到装箱单",
+          "detail": "依据规则 US-IMP-002：申报目的地为美国的货物，随附单证中应包含装箱单。本票 {doc_count} 份文件均未识别到该单证。"
+        }
+      ],
+      "hs_rules": [
+        {
+          "chapter_prefix": "69",
+          "rule_id": "US-HS-6911",
+          "severity": "WARNING",
+          "title": "陶瓷餐具进入美国需完成 FDA 食品接触材料申报",
+          "detail": "依据规则 US-HS-6911：HS 69 章项下陶瓷餐具进入美国市场，须符合 FDA 食品接触材料要求，进口时需提交 FDA 事先通知。"
+        },
+        {
+          "chapter_prefix": "85",
+          "rule_id": "US-HS-85",
+          "severity": "WARNING",
+          "title": "电气产品进入美国需符合 FCC 要求",
+          "detail": "依据规则 US-HS-85：HS 85 章项下电气设备进入美国市场，须符合 FCC 电磁兼容要求并标注合规标识。"
+        }
+      ]
+    }
+  }
+}

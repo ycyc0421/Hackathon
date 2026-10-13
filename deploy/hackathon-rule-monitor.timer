@@ -1,0 +1,11 @@
+[Unit]
+Description=Hourly official rule source checks
+
+[Timer]
+OnCalendar=hourly
+RandomizedDelaySec=5min
+Persistent=true
+Unit=hackathon-rule-monitor.service
+
+[Install]
+WantedBy=timers.target
