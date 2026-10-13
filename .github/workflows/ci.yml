@@ -33,7 +33,19 @@ jobs:
           python backend/tools/test_compare.py
           python backend/tools/test_review_regressions.py
           python backend/tools/test_paddle_adapter.py
+          python backend/tools/test_paddle_vl.py
+          python backend/tools/test_vl_service.py
+          python backend/tools/test_delivery_boundaries.py
           python backend/tools/test_sqlite_store.py
+          python backend/tools/test_workflow.py
+          python backend/tools/test_trade_json.py
+          python backend/tools/test_static_rules.py
+          python backend/tools/test_rule_monitor.py
+          python backend/tools/test_review38.py
+          python backend/tools/test_reader_pages.py
+          python backend/tools/test_file_access.py
+          python backend/tools/test_unaligned_evidence.py
+          python backend/tools/accept_workflow.py
 
       - name: 接口与金标
         run: |

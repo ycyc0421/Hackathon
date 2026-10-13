@@ -22,6 +22,7 @@ class DeploymentTests(unittest.TestCase):
         (self.old / ".venv/unchanged").write_text("旧依赖")
         (self.new / "deploy").mkdir(parents=True)
         (self.new / "deploy" / backend.SERVICE).write_text("新服务配置")
+        (self.new / "deploy/hackathon.slice").write_text("[Slice]\nMemoryMax=8G\n")
         (self.new / "web/dist/assets").mkdir(parents=True)
         (self.new / "web/dist/index.html").write_text("新页面")
         (self.new / "web/dist/assets/app.js").write_text("新脚本")
@@ -39,6 +40,21 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual((self.root / "shared/backend.env").read_text(), "服务配置")
         self.assertEqual((self.root / "shared/data/task.json").read_text(), "已有任务")
         self.assertEqual((self.old / ".venv/unchanged").read_text(), "旧依赖")
+
+    @patch('backend.wait_healthy')
+    @patch('backend.wait_model_healthy', side_effect=RuntimeError('model startup failed'))
+    @patch('backend.run')
+    def test_vl_startup_failure_restores_api_and_removes_new_model_units(self, run, model_health, api_health):
+        config = 'PADDLE_OCR_ENABLED=1\nPADDLE_OCR_ENGINE=vl\nPADDLE_VL_SERVICE_URL=http://127.0.0.1:18082\n'
+        (self.root / 'shared/backend.env').write_text(config)
+        for name in backend.MODEL_SERVICES:
+            (self.new / 'deploy' / name).write_text('new model service')
+        with self.assertRaisesRegex(RuntimeError, 'model startup failed'):
+            backend.activate(self.root, self.new)
+        self.assertEqual((self.root / 'current').resolve(), self.old)
+        self.assertEqual(self.unit.read_text(), '旧服务配置')
+        self.assertTrue(all(not (self.unit.parent / name).exists() for name in backend.MODEL_SERVICES))
+        self.assertEqual((self.root / 'shared/backend.env').read_text(), config)
 
     @patch("backend.wait_healthy")
     @patch("backend.run")
@@ -180,6 +196,26 @@ class DeploymentTests(unittest.TestCase):
             'PADDLE_OCR_ENABLED=0\nPADDLE_OCR_ENABLED="1"\n'
         )
         self.assertEqual(backend.deployment_settings(self.root)["PADDLE_OCR_ENABLED"], "1")
+
+    @patch("backend.activate")
+    @patch("backend.run")
+    def test_native_vl_is_rejected_before_install(self, run, activate):
+        release_id = self.prepare_archive("PADDLE_OCR_ENABLED=1\nPADDLE_OCR_ENGINE=vl\n")
+        with self.assertRaisesRegex(ValueError, "8 GiB"):
+            backend.deploy(self.root, release_id)
+        run.assert_not_called()
+        activate.assert_not_called()
+
+    @patch("backend.urlopen")
+    @patch("backend.activate")
+    @patch("backend.run")
+    def test_vl_version_mismatch_never_activates(self, run, activate, urlopen):
+        from io import BytesIO
+        urlopen.return_value = BytesIO(b'{"status":"ok","pipeline_version":"v1.5","busy":false}')
+        release_id = self.prepare_archive("PADDLE_OCR_ENABLED=1\nPADDLE_OCR_ENGINE=vl\nPADDLE_VL_SERVICE_URL=http://127.0.0.1:18082\n")
+        with self.assertRaisesRegex(RuntimeError, "版本不符"):
+            backend.deploy(self.root, release_id)
+        activate.assert_not_called()
 
     @patch("backend.activate")
     @patch("backend.run")

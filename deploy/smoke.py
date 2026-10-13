@@ -78,7 +78,7 @@ def run(base, origin, output, ocr_enabled=False):
                 'notes': '自动部署联调验证：合成单证',
             })
             assert created.get('task_id'), '未返回任务编号'
-            deadline = time.monotonic() + (300 if is_ocr else 90)
+            deadline = time.monotonic() + (1800 if is_ocr else 90)
             while True:
                 task = request_json(f'/checks/{quote(created["task_id"], safe="")}')
                 if task['status'] not in ('PENDING', 'PROCESSING'):

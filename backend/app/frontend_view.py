@@ -39,8 +39,8 @@ def to_frontend_task(task: dict) -> dict:
             field["item_id"] = None
         for line in extraction.pop("line_items", []):
             item_id = members.get((file_id, line["item_no"]))
-            if item_id is None:
-                continue  # 未能对齐的行不能伪称属于另一商品
+            # Unaligned rows still carry evidence; null ownership does not
+            # turn them into document-level values (line_no remains present).
             for field in line["fields"]:
                 field["item_id"] = item_id
                 field["line_no"] = line["item_no"]

@@ -49,6 +49,10 @@ class ReadResult:
     failed: bool = False
     uncertain_item_codes: list[str] = field(default_factory=list)
     ocr_corrections: list[dict[str, str]] = field(default_factory=list)
+    structured: dict | None = None
+    page_texts: list[str] = field(default_factory=list)
+    model_outputs: list[dict] = field(default_factory=list)
+    source_blocks: list[dict] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -61,12 +65,20 @@ def guess_file_type(filename: str) -> FileType:
         return FileType.PDF
     if ext in IMAGE_EXT:
         return FileType.IMAGE
+    if ext == ".json":
+        return FileType.EDI
     return FileType.OTHER
 
 
 def read_document(filename: str, data: bytes) -> ReadResult:
     """入口：按文件类型分流。"""
     file_type = guess_file_type(filename)
+    if file_type is FileType.EDI:
+        from .trade_json import parse_trade_json
+        try:
+            return ReadResult(parse_method=ParseMethod.EDI_PARSE, structured=parse_trade_json(data))
+        except (ValueError, TypeError, KeyError, RecursionError) as exc:
+            return ReadResult(failed=True, error_message=f"项目交换 JSON 无效：{exc}")
     if file_type is FileType.PDF:
         return _read_pdf(data)
     if file_type is FileType.IMAGE:
@@ -127,6 +139,33 @@ def _pdf_image_coverage(page) -> float:
     return area / page_area
 
 
+def _native_table_text(data: bytes, page_index: int, text: str) -> str:
+    """Keep the column ownership of ruled native PDF tables, including blanks."""
+    from html import escape
+    from .paddle_reader import _header_key, _table_lines, _replace_table
+    try:
+        import pymupdf
+        with pymupdf.open(stream=data, filetype="pdf") as document:
+            candidates = []
+            for table in document[page_index].find_tables().tables:
+                grid = table.extract()
+                if not grid:
+                    continue
+                keys = {_header_key(cell or '') for cell in grid[0]} - {None}
+                if len(keys) >= 3 and 'description' in keys and 'quantity' in keys:
+                    candidates.append(grid)
+            if len(candidates) != 1:
+                return text
+            html = '<table>' + ''.join(
+                '<tr>' + ''.join('<td>' + escape(cell or '') + '</td>' for cell in row) + '</tr>'
+                for row in candidates[0]
+            ) + '</table>'
+            return _replace_table(text.splitlines(), _table_lines(html))
+    except (ImportError, ValueError, RuntimeError):
+        # Uncertain geometry retains the original conservative parsing path.
+        return text
+
+
 def _read_pdf(data: bytes) -> ReadResult:
     try:
         from pypdf import PdfReader
@@ -149,6 +188,8 @@ def _read_pdf(data: bytes) -> ReadResult:
                 # 小 logo 仅在本页文本不足时沿用扫描页检查。
                 if image_coverage >= 0.2 or (image_coverage > 0 and len(page_text.strip()) < MIN_TEXT_LAYER_CHARS):
                     unreadable_pages.append(index)
+                if index not in unreadable_pages:
+                    page_text = _native_table_text(data, index - 1, page_text)
                 chunks.append(page_text)
             except Exception:  # noqa: BLE001
                 unreadable_pages.append(index)
@@ -159,20 +200,23 @@ def _read_pdf(data: bytes) -> ReadResult:
 
     if unreadable_pages:
         if PADDLE_OCR_ENABLED:
-            images = _pdf_pages_to_images(data)
+            images = _pdf_pages_to_images(data, page_numbers=unreadable_pages, lazy=True)
             if images is None:
                 return ReadResult(page_count=page_count, error_message="PaddleOCR 处理扫描页需要 pymupdf", failed=True)
             from .paddle_reader import read_image as paddle_read_image
             uncertain_codes: list[str] = []
             corrections: list[dict[str, str]] = []
-            for index in unreadable_pages:
-                recognized = paddle_read_image(images[index - 1][1])
+            model_outputs, source_blocks = [], []
+            for index, (_, image) in zip(unreadable_pages, images):
+                recognized = paddle_read_image(image)
+                model_outputs.extend({'page': index, 'output': output} for output in recognized.model_outputs)
+                source_blocks.extend({**block, 'page': index} for block in recognized.source_blocks)
                 if not recognized.ok:
-                    return ReadResult(page_count=page_count, error_message=f"PDF 第 {index} 页：{recognized.error_message}", failed=True)
+                    return ReadResult(page_count=page_count, error_message=f"PDF 第 {index} 页：{recognized.error_message}", failed=True, model_outputs=model_outputs, source_blocks=source_blocks)
                 chunks[index - 1] = recognized.text
                 uncertain_codes.extend(recognized.uncertain_item_codes)
                 corrections.extend(recognized.ocr_corrections)
-            return ReadResult(text="\n".join(chunks).strip(), page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes, ocr_corrections=corrections)
+            return ReadResult(text="\n".join(chunks).strip(), page_texts=chunks, page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes, ocr_corrections=corrections, model_outputs=model_outputs, source_blocks=source_blocks)
         if llm_enabled():
             images = _pdf_pages_to_images(data)
             if images is not None:
@@ -184,25 +228,28 @@ def _read_pdf(data: bytes) -> ReadResult:
         )
 
     if len(text) >= MIN_TEXT_LAYER_CHARS:
-        return ReadResult(text=text, page_count=page_count, parse_method=ParseMethod.TEXT_LAYER)
+        return ReadResult(text=text, page_texts=chunks, page_count=page_count, parse_method=ParseMethod.TEXT_LAYER)
 
     # 没有文本层 —— 多半是扫描件
     if PADDLE_OCR_ENABLED:
-        images = _pdf_pages_to_images(data)
+        images = _pdf_pages_to_images(data, lazy=True)
         if images is None:
             return ReadResult(page_count=page_count, error_message="PaddleOCR 处理扫描 PDF 需要 pymupdf", failed=True)
         from .paddle_reader import read_image as paddle_read_image
         chunks = []
         uncertain_codes: list[str] = []
         corrections: list[dict[str, str]] = []
+        model_outputs, source_blocks = [], []
         for index, (_, image) in enumerate(images, start=1):
             recognized = paddle_read_image(image)
+            model_outputs.extend({'page': index, 'output': output} for output in recognized.model_outputs)
+            source_blocks.extend({**block, 'page': index} for block in recognized.source_blocks)
             if not recognized.ok:
-                return ReadResult(page_count=page_count, error_message=f"PDF 第 {index} 页：{recognized.error_message}", failed=True)
+                return ReadResult(page_count=page_count, error_message=f"PDF 第 {index} 页：{recognized.error_message}", failed=True, model_outputs=model_outputs, source_blocks=source_blocks)
             chunks.append(recognized.text)
             uncertain_codes.extend(recognized.uncertain_item_codes)
             corrections.extend(recognized.ocr_corrections)
-        return ReadResult(text="\n".join(chunks), page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes, ocr_corrections=corrections)
+        return ReadResult(text="\n".join(chunks), page_texts=chunks, page_count=page_count, parse_method=ParseMethod.OCR, uncertain_item_codes=uncertain_codes, ocr_corrections=corrections, model_outputs=model_outputs, source_blocks=source_blocks)
 
     if not llm_enabled():
         return ReadResult(
@@ -226,20 +273,22 @@ def _read_pdf(data: bytes) -> ReadResult:
     return _transcribe_with_llm(images, page_count=page_count)
 
 
-def _pdf_pages_to_images(data: bytes) -> list[tuple[str, bytes]] | None:
-    """扫描版 PDF 需要先渲染成图。依赖可选的 pymupdf。"""
+def _pdf_pages_to_images(data: bytes, *, page_numbers=None, lazy=False):
+    """Paddle consumes one rendered page at a time; LLM keeps its list API."""
     try:
         import pymupdf as fitz
     except ImportError:
         return None
 
-    images: list[tuple[str, bytes]] = []
-    doc = fitz.open(stream=data, filetype="pdf")
-    for page in doc:
-        pix = page.get_pixmap(dpi=200)
-        images.append(("image/png", pix.tobytes("png")))
-    doc.close()
-    return images
+    def pages():
+        with fitz.open(stream=data, filetype="pdf") as doc:
+            numbers = page_numbers if page_numbers is not None else range(1, len(doc) + 1)
+            for number in numbers:
+                pix = doc[number - 1].get_pixmap(dpi=200)
+                image = pix.tobytes("png")
+                del pix
+                yield ("image/png", image)
+    return pages() if lazy else list(pages())
 
 
 # --------------------------------------------------------------------------
@@ -304,6 +353,18 @@ def _image_size(data: bytes) -> tuple[int, int] | None:
 def _transcribe_with_llm(
     images: list[tuple[str, bytes]], page_count: int | None = None
 ) -> ReadResult:
+    if not images or (page_count is not None and page_count != len(images)):
+        return ReadResult(page_count=page_count, failed=True, error_message='多模态页图与原文件页数不一致，无法定位来源')
+    if len(images) > 1:
+        chunks = []
+        for number, image in enumerate(images, 1):
+            result = _transcribe_with_llm([image], page_count=1)
+            if not result.ok:
+                return ReadResult(page_count=len(images), failed=True,
+                                  error_message=f'PDF 第 {number} 页：{result.error_message}')
+            chunks.append(result.text)
+        return ReadResult(text='\n'.join(chunks), page_texts=chunks,
+                          page_count=len(images), parse_method=ParseMethod.OCR)
     try:
         import httpx
     except ImportError:
@@ -349,6 +410,7 @@ def _transcribe_with_llm(
         )
     return ReadResult(
         text=text,
+        page_texts=[text],
         page_count=page_count if page_count is not None else len(images),
         parse_method=ParseMethod.OCR,
     )

@@ -1,0 +1,25 @@
+{
+  "format": "hackathon-trade-json-v1",
+  "doc_type": "PACKING_LIST",
+  "fields": {
+    "packages": "1 CARTON",
+    "gross_weight": "10 KGS"
+  },
+  "line_items": [
+    {
+      "item_no": 1,
+      "fields": {
+        "item_code": "SKU-A1",
+        "description": "CERAMIC MUG BLUE",
+        "quantity": "100 PCS"
+      }
+    },
+    {
+      "item_no": 2,
+      "fields": {
+        "item_code": "SKU-B2",
+        "description": "GLASS CUP WHITE"
+      }
+    }
+  ]
+}

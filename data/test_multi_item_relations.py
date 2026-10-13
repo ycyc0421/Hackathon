@@ -118,8 +118,14 @@ class MultiItemRelationsTests(unittest.TestCase):
     def test_upgrade_backfills_without_changing_payload_or_audit(self):
         self.store.create(self.task)
         with closing(sqlite3.connect(self.store.db_path)) as conn, conn:
-            conn.execute("CREATE TABLE correction_audits (derived_id TEXT REFERENCES tasks(task_id), audit_json TEXT)")
-            conn.execute("INSERT INTO correction_audits VALUES (?,?)", (self.task["task_id"], "original audit"))
+            columns = {row[1] for row in conn.execute('PRAGMA table_info(correction_audits)')}
+            if not columns:
+                conn.execute("CREATE TABLE correction_audits (derived_id TEXT REFERENCES tasks(task_id), audit_json TEXT)")
+                conn.execute("INSERT INTO correction_audits VALUES (?,?)", (self.task["task_id"], "original audit"))
+            else:
+                conn.execute('INSERT INTO correction_audits (source_id,request_id,derived_id,request_hash,audit_json) VALUES (?,?,?,?,?)',
+                             (self.task['task_id'], 'migration-test', self.task['task_id'], 'unchanged', 'original audit'))
+        audit = self.query('SELECT * FROM correction_audits')
         payload = self.query("SELECT * FROM api_task_payloads")
         self.make_legacy_database()
         self.reopen()
@@ -128,7 +134,7 @@ class MultiItemRelationsTests(unittest.TestCase):
         self.assertEqual(self.query("SELECT item_id,position FROM risk_items ORDER BY position"),
                          [("itm_2", 0), ("itm_1", 1)])
         self.assertEqual(self.query("SELECT * FROM api_task_payloads"), payload)
-        self.assertEqual(self.query("SELECT * FROM correction_audits"), [(self.task["task_id"], "original audit")])
+        self.assertEqual(self.query("SELECT * FROM correction_audits"), audit)
         after = self.snapshot()
         self.reopen()
         self.assertEqual(self.snapshot(), after)

@@ -44,16 +44,16 @@ MAX_ROWS = 200
 
 # 表头关键词 → 行级 field_key。用于判断「这一行该有哪些字段」。
 HEADER_MAP: list[tuple[re.Pattern[str], str]] = [
-    (re.compile(r"ITEM\s*(?:NO|NUM|CODE)|ART\.?\s*(?:NO|CODE)|MODEL|货号|型号|商品编码", re.I), "item_code"),
-    (re.compile(r"DESCRIPTION|GOODS|COMMODITY|品名|货物描述", re.I), "description"),
+    (re.compile(r"SKU|ITEM\s*(?:NO|NUM|CODE)|ART\.?\s*(?:NO|CODE)|MODEL|货号|型号|商品编码", re.I), "item_code"),
+    (re.compile(r"DESCRIPTION(?:\s+OF\s+GOODS|\s*/\s*SKU)?|GOODS|COMMODITY|品名|货物描述", re.I), "description"),
     (re.compile(r"HS\s*CODE|H\.?\s*S\.?|TARIFF|税则号", re.I), "hs_code"),
     (re.compile(r"\bQTY\b|QUANTITY|数量", re.I), "quantity"),
     (re.compile(r"PACKAGES?|PKGS?|CARTONS?|CTNS?|CASES?|件数", re.I), "packages"),
-    (re.compile(r"N\.?\s*W\.?|NET\s*(?:WEIGHT|WT)|净重", re.I), "net_weight"),
-    (re.compile(r"G\.?\s*W\.?|GROSS\s*(?:WEIGHT|WT)|毛重", re.I), "gross_weight"),
+    (re.compile(r"N\.?\s*W\.?|NET\s*(?:WEIGHT|WT|KG)|净重", re.I), "net_weight"),
+    (re.compile(r"G\.?\s*W\.?|GROSS\s*(?:WEIGHT|WT|KG)|毛重", re.I), "gross_weight"),
     (re.compile(r"MEAS|VOLUME|CBM|体积", re.I), "volume"),
     (re.compile(r"UNIT\s*PRICE|单价", re.I), "unit_price"),
-    (re.compile(r"AMOUNT|VALUE|金额", re.I), "amount"),
+    (re.compile(r"AMOUNT(?:\s*\([A-Z]{3}\))?|VALUE|金额", re.I), "amount"),
 ]
 
 # 松散文本兜底用：从整行里找各类值
@@ -68,6 +68,8 @@ _MONEY_RE = re.compile(
 _ITEM_CODE_RE = re.compile(r"^[A-Z]{1,6}[-/]?\d{2,8}[A-Z]?$", re.I)
 
 CELL_SPLIT = re.compile(r"\s{2,}")
+# Internal placeholder used by the HTML table adapter to preserve empty cells.
+EMPTY_CELL = "\ue000"
 
 
 @dataclass
@@ -149,7 +151,7 @@ def split_table(text: str) -> tuple[str, list[str], list[str]]:
 def _cells(line: str) -> list[str]:
     """按 ≥2 个空格切单元格；切不动返回空列表。"""
     stripped = ROW_START.sub("", line.strip(), count=1)
-    parts = [p.strip() for p in CELL_SPLIT.split(stripped) if p.strip()]
+    parts = ["" if p.strip() == EMPTY_CELL else p.strip() for p in CELL_SPLIT.split(stripped)]
     return parts if len(parts) >= 2 else []
 
 
@@ -302,10 +304,65 @@ def _row_fields(assigned: dict[str, str], header_keys: set[str], confidence_ok: 
 # --------------------------------------------------------------------------
 # 3) 主入口
 # --------------------------------------------------------------------------
+def _stacked_table(text: str) -> tuple[str, bool]:
+    """Restore cell-per-line output only with explicit headers and numbered boundaries."""
+    lines = text.splitlines()
+    for start, line in enumerate(lines):
+        if line.strip().upper().rstrip('.') != 'NO':
+            continue
+        headers, keys = [], []
+        pos = start + 1
+        while pos < len(lines):
+            cell = lines[pos].strip()
+            matches = [key for pattern, key in HEADER_MAP if pattern.fullmatch(cell)]
+            if len(matches) != 1:
+                break
+            headers.append(cell); keys.append(matches[0]); pos += 1
+        if len(keys) < 3 or 'description' not in keys or 'quantity' not in keys:
+            continue
+        # Combined DESCRIPTION / SKU carries both attributes in the same cell.
+        combined = any(re.fullmatch(r'DESCRIPTION\s*/\s*SKU', h, re.I) for h in headers)
+        if not combined or keys[0] != 'description' or len(set(keys)) != len(keys):
+            return text, True
+        restored = ['NO.   ITEM NO.   ' + '   '.join(headers)]
+        number = 1
+        while pos < len(lines) and not TOTAL_LINE.match(lines[pos]):
+            if lines[pos].strip() != str(number):
+                return text, True
+            pos += 1
+            description = []
+            while pos < len(lines) and not re.fullmatch(r'\d[\d,.]*(?:\s*(?:PCS|SETS|UNITS))?', lines[pos].strip(), re.I):
+                description.append(lines[pos].strip()); pos += 1
+            desc = ' '.join(description)
+            code = re.search(r'\bSKU-[A-Za-z0-9-]+\b', desc)
+            if code is None or pos + len(keys) - 1 > len(lines):
+                return text, True
+            values = lines[pos:pos + len(keys) - 1]
+            if not all(v == EMPTY_CELL or re.fullmatch(r'\d[\d,.]*(?:\s*(?:PCS|SETS|UNITS))?', v.strip(), re.I) for v in values):
+                return text, True
+            for index, key in enumerate(keys[1:]):
+                if key in {'gross_weight', 'net_weight'} and 'KG' in headers[index + 1].upper():
+                    values[index] += ' KG'
+                elif key == 'volume' and headers[index + 1].upper() == 'CBM':
+                    values[index] += ' CBM'
+            restored.append('   '.join([str(number), code.group(), desc, *values]))
+            pos += len(keys) - 1; number += 1
+        if number == 1 or pos >= len(lines):
+            return text, True
+        return '\n'.join(lines[:start] + restored + lines[pos:]), False
+    return text, False
+
+
 def parse_line_items(text: str, page: int | None = None) -> TableResult:
     """把文本拆成 (票级文本, 品名行)。纯函数，不改入参。"""
+    text, stacked_failed = _stacked_table(text)
+    if stacked_failed:
+        return TableResult(doc_text=text, suspected=True)
     doc_text, row_lines, header_order = split_table(text)
     header_keys = set(header_order)
+    first_header = next((line for line in text.splitlines() if _looks_like_header(line)), None)
+    carton_header = first_header if first_header and any(
+        re.fullmatch(r'CARTONS?\.?|CTNS?\.?', cell, re.I) for cell in _cells(first_header)) else None
     if not row_lines:
         return TableResult(doc_text=doc_text)
 
@@ -358,11 +415,22 @@ def parse_line_items(text: str, page: int | None = None) -> TableResult:
             suspected = True
         seen_item_nos.add(item_no)
 
+        row_fields = _row_fields(assigned, header_keys, confidence_ok=reliable)
+        if carton_header:
+            package = next(field for field in row_fields if field['field_key'] == 'packages')
+            if package.get('normalized_value') is not None and package.get('unit') is None:
+                package['unit'] = 'CARTON'
+        for field in row_fields:
+            if field['raw_value'] is not None:
+                field['raw_text'] = line.replace(EMPTY_CELL, "").strip()
+                if field['field_key'] == 'packages' and carton_header:
+                    field['raw_text'] = carton_header + '\n' + field['raw_text']
+                field['page'] = page
         line_items.append(
             {
                 "item_no": item_no,
-                "raw_text": line.strip()[:200],
-                "fields": _row_fields(assigned, header_keys, confidence_ok=reliable),
+                "raw_text": line.replace(EMPTY_CELL, "").strip(),
+                "fields": row_fields,
             }
         )
 

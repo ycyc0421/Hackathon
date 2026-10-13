@@ -35,6 +35,10 @@ _FILENAME_HINTS: list[tuple[str, tuple[str, ...], int]] = [
 def classify(text: str, filename: str = "") -> str | None:
     """返回 DocType 的值，判不出来返回 None。"""
     upper = (text or "").upper()
+    # The current contract has no PROFORMA_INVOICE enum. Keep an explicitly
+    # titled proforma out of the commercial-invoice profile until agreed.
+    if re.search(r"\bPRO\s*FORMA\s+INVOICE\b|\bPROFORMA\s+INVOICE\b", upper):
+        return DocType.OTHER.value
     scores: dict[str, int] = {}
 
     for doc_type, keywords, weight in _KEYWORDS:
@@ -54,7 +58,8 @@ def classify(text: str, filename: str = "") -> str | None:
 
     name = Path(filename or "").stem.lower()
     for doc_type, hints, weight in _FILENAME_HINTS:
-        if any(h in name for h in hints):
+        if any((re.search(r"(?:^|[-_])" + re.escape(h) + r"(?:$|[-_])", name)
+                if len(h) <= 3 else h in name) for h in hints):
             return doc_type
 
     return None

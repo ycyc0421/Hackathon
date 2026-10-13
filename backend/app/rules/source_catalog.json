@@ -1,0 +1,49 @@
+{
+  "version": "official-sources-v2",
+  "sources": [
+    {
+      "source_id": "EU-FCM-LEGISLATION",
+      "url": "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/legislation_en",
+      "authority": "European Commission",
+      "kind": "official regulatory overview",
+      "review_status": "APPLICABILITY_REVIEW_REQUIRED"
+    },
+    {
+      "source_id": "EU-CERAMICS-84-500",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:01984L0500-20050520",
+      "authority": "EUR-Lex",
+      "fallback_urls": [
+        "https://publications.europa.eu/resource/celex/01984L0500-20050520"
+      ],
+      "accept": "application/pdf",
+      "accept_language": "eng",
+      "expected_pdf_text": [
+        "84/500/EEC",
+        "2005"
+      ],
+      "kind": "consolidated directive",
+      "review_status": "APPLICABILITY_REVIEW_REQUIRED"
+    },
+    {
+      "source_id": "FDA-CPG-545450",
+      "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/cpg-sec-545450-pottery-ceramics-import-and-domestic-lead-contamination",
+      "authority": "FDA",
+      "kind": "enforcement guidance; not a universal import certificate",
+      "review_status": "APPLICABILITY_REVIEW_REQUIRED"
+    },
+    {
+      "source_id": "GB-FOOD-PACKAGING",
+      "url": "https://www.gov.uk/food-labelling-and-packaging/overview",
+      "authority": "GOV.UK",
+      "kind": "official overview; territorial scope requires review",
+      "review_status": "APPLICABILITY_REVIEW_REQUIRED"
+    },
+    {
+      "source_id": "EU-FCM-REVISION",
+      "url": "https://food.ec.europa.eu/food-safety/chemical-safety/food-contact-materials/revision-eu-rules_en",
+      "authority": "European Commission",
+      "kind": "revision programme; proposed changes are not enacted law",
+      "review_status": "APPLICABILITY_REVIEW_REQUIRED"
+    }
+  ]
+}

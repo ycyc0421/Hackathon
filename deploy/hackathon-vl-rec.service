@@ -1,0 +1,20 @@
+[Unit]
+Description=PaddleOCR-VL-1.6 GGUF CPU recognition engine
+After=network.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=simple
+Slice=hackathon.slice
+ExecStart=%h/app/shared/vl-runtime/llama-b11429/llama-server --model %h/app/shared/models/PaddleOCR-VL-1.6-GGUF/PaddleOCR-VL-1.6-GGUF.gguf --mmproj %h/app/shared/models/PaddleOCR-VL-1.6-GGUF/PaddleOCR-VL-1.6-GGUF-mmproj.gguf --host 127.0.0.1 --port 18083 --ctx-size 8192 --parallel 1 --threads 4 --threads-batch 4 --temp 0 --no-webui
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=yes
+MemoryHigh=3G
+MemoryMax=4G
+TasksMax=64
+
+[Install]
+WantedBy=default.target

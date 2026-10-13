@@ -33,6 +33,7 @@ CORE_COMPARABLE: list[FieldSpec] = [
 
 # 单据标识：用于判定多份文件是否属于同一票货物
 IDENTIFIERS: list[FieldSpec] = [
+    FieldSpec("document_no", "本单据编号（不做跨单据相等比较）", "STRING", None),
     FieldSpec("bill_of_lading_no", "提单号", "STRING", None),
     FieldSpec("contract_no", "合同号", "STRING", None),
     FieldSpec("container_no", "集装箱号", "STRING", None),

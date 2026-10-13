@@ -1,0 +1,2 @@
+# Match the PDF reader version validated on the team's new server.
+pypdf==6.20.0

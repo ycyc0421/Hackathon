@@ -115,11 +115,21 @@ python backend/tools/run_challenge.py  # 09–11 挑战样例与金标断言
 - 文本层 PDF 已用上述合成样例验证；真实复杂版式的抽取准确率尚未评测。
 - 图片和无文本层 PDF 可选用本地 PaddleOCR。默认关闭，未配置识别通道时显式返回解析失败。
 - 目的国规则是未核实的演示规则，结果保留“演示规则·未经核实”标记，不能作为正式合规结论。
-- `confidence` 与 `bbox` 暂为 `null`；人工修正、报告导出和 EDI 解析尚未实现。
+- `confidence` 与 `bbox` 暂为 `null`；标准 EDIFACT/X12 尚未实现；候选人工修正与报告功能见下文。
 - 任务与结果使用 SQLite 持久化，并保留终态 JSON 兼容导出；重启时进行中任务标记为 FAILED / TASK_INTERRUPTED，需重新上传，不支持自动续跑。
 - `app/doc_profile.py` 的商业发票、装箱单、提单按已确认最小规则区分必需/可选；其他单证类型及更完整的适用字段表待数据侧确认。
 
-## 本地 PaddleOCR（可选）
+## PaddleOCR-VL 主模型与服务器运行
+
+选定主模型为 PaddleOCR-VL-1.6，图片和扫描页保留实际区域、HTML 网格、页码和原始模型输出。文本层 PDF 仍直接读取。设置 `PADDLE_OCR_ENABLED=1`、`PADDLE_OCR_ENGINE=vl` 和 `PADDLE_VL_SERVICE_URL=http://127.0.0.1:18082` 接入私有文档服务；失败显式保留，不自动调用额外通用 LLM。
+
+8 GiB CPU 服务器使用官方 GGUF 与固定 llama.cpp b11429。`deploy/prepare_vl_cpu.py` 校验固定模型、布局和引擎哈希；`hackathon-vl-rec.service`、`hackathon-paddle-vl.service` 与 API 同属 `hackathon.slice`，总上限为 8 GiB。模型服务仅监听本机 18082/18083。首次配置需先预热候选模型服务，之后发布脚本检查模型版本、就绪状态并同步重启匹配版本；失败恢复旧代码和服务配置。
+
+原件全部持久化后才开始推理。最多接纳四票运行或排队任务，第五票返回 HTTP 429 `CHECK_QUEUE_FULL`；排队只保存路径、PDF 逐页渲染。重启不自动续跑：未完成任务返回 FAILED/TASK_INTERRUPTED，逐文件结束状态，原件仍可下载。CPU 冷启动与复杂扫描可能需要数分钟，前端最长轮询 30 分钟、可取消；不能把等待截止当作后端已经失败。
+
+完整模型固定版本、服务器原件证据、回退与交付范围见 [F 服务器交付记录](../docs/PADDLE_VL_DELIVERY.md)。`packages` 表示包装件数；只有明确 CARTON/CTNS/箱证据才输出 CARTON，裸 PKGS 数值保留 `unit=null`。
+
+## 普通 PaddleOCR 路径（显式 legacy 配置）
 
 在独立 Python 3.12 环境，先按 PaddlePaddle 官方 CPU 渠道安装推理引擎，
 再安装 `requirements-ocr.txt`（PaddleOCR 3.7.0 文档解析组件与扫描 PDF 渲染依赖）：
@@ -130,7 +140,7 @@ python -m pip install -r backend/requirements-ocr.txt
 ```
 
 启动后端前设置
-`PADDLE_OCR_ENABLED=1`。模型首次推理时下载到本机缓存，模型文件不提交仓库。
+`PADDLE_OCR_ENABLED=1`、`PADDLE_OCR_ENGINE=legacy`。模型首次推理时下载到本机缓存，模型文件不提交仓库。
 文本层 PDF 仍直接读取；图片和扫描页使用 OCR。检测到商品明细表时，
 PP-StructureV3 提供行列结构，普通 OCR 提供正文原文。若表格结构、列数或
 页面识别不可靠，文件会显式解析失败。OCR 文字可能误识别，例如
@@ -155,8 +165,13 @@ PDF 验证见 [工作流说明](../.github/workflows/README.md#服务器首次�
 
 生产环境已启用本地 OCR，本地默认关闭。PowerShell 设置开关使用 `$env:PADDLE_OCR_ENABLED = '1'`。远程视觉模型配置见 `.env.example`；若同时启用 Paddle，代码优先选择 Paddle，失败不会自动切换到远程模型。
 
-扫描 PDF 当前按 200 DPI 渲染页面，复杂或多页文件可能占用较多内存，不能据单个样例承诺任意页数或并发容量。OCR 在线程内串行复用，但任务创建没有持久队列。服务配额、上线验证与备份见[部署运维](../docs/部署运维.md)。
+扫描 PDF 按 200 DPI 逐页渲染，复杂或多页文件仍须实测资源。OCR 在线程内串行复用，任务接纳有数量上限；没有自动续跑的持久队列。服务配额、上线验证与备份见[部署运维](../docs/部署运维.md)。
 
 ## SQLite 任务存储
 
 任务与结果已接入 SQLite；默认运行库位于共享 `.data/tasks.sqlite3`，旧 JSON 结果保留并迁入。商品组成员、OCR 证据及警告保存在同事务完整快照中。启动时未完成任务标记为 `FAILED / TASK_INTERRUPTED`，需重新上传。部署迁移与回退说明见根目录 `SQLITE_INTEGRATION.md`。
+
+
+## 候选工作流功能
+
+本分支增加人工修正与审计重算、JSON/HTML 报告导出、项目结构化 JSON 输入及官方来源动态监测。标准 EDIFACT/X12 尚未支持；新功能仍待合并及生产验收。详见 [工作流说明](../docs/workflow-and-rules.md)。

@@ -43,6 +43,7 @@ class Found:
     # 经模型标定的可信度：只有多模态通道能给出；正则通道保持 None
     confidence: float | None = None
     unreadable: bool = False  # 定位到了但读不出值 => UNRECOGNIZED
+    unit_hint: str | None = None
 
 
 # --------------------------------------------------------------------------
@@ -117,9 +118,10 @@ _PKG_BARE = re.compile(r"(?<![\d.])(\d{1,7})\s*" + PKG_WORD, re.I)
 
 
 def _measure_tail(text: str, pos: int) -> str:
+    text = text[:pos] + text[pos:].split("|", 1)[0]
     # 多空格可能只是数值与单位的间距；只有遇到下一字段标签才截断。
     return re.split(
-        r"[ \t]{2,}(?=(?:[GN]\.?\s*W\.?|(?:GROSS|NET)\s*(?:WEIGHT|WT)|"
+        r"(?:[ \t]{2,}|[ \t]*\|[ \t]*)(?=(?:[GN]\.?\s*W\.?|(?:GROSS|NET)(?:\s*(?:WEIGHT|WT))?|"
         r"PACKAGES?|CARTONS?|PKGS?|QTY|QUANTITY|MEAS(?:UREMENT)?\.?|VOLUME|"
         r"AMOUNT|TOTAL|毛重|净重|数量|件数|体积|金额|合计)"
         r"[ \t]*(?:[:：]|[+-]?\d|(?:" + KNOWN_CURRENCIES + r"|US\$)\b))",
@@ -141,7 +143,8 @@ def _m_packages(text: str) -> Found | None:
         raw = _measure_tail(text, start)
         # ONLY 是件数大写表述的结束词；未知单位仍保留，交给归一化明确失败。
         raw = re.sub(r"\s+ONLY[ .。]*$", "", raw, flags=re.I)
-        return Found(raw_text=line, raw_value=_clip(raw), score=score)
+        unit_hint = 'CARTON' if pattern is _PKG_LABELED and re.search(r'\bCARTONS?\b', m.group(0), re.I) else None
+        return Found(raw_text=line, raw_value=_clip(raw), score=score, unit_hint=unit_hint)
     return None
 
 
@@ -168,9 +171,11 @@ def _labeled_number(
 
 
 def _m_gross_weight(text: str) -> Found | None:
-    f = _labeled_number(text, r"(?<![A-Z])G\.?\s*W\.?(?![A-Z])|GROSS\s*(?:WEIGHT|WT)|毛重", KG_WORD, "KGS")
+    f = _labeled_number(text, r"(?<![A-Z])G\.?\s*W\.?(?![A-Z])|(?<![A-Z])GROSS(?:\s*(?:WEIGHT|WT))?(?![A-Z])|毛重", KG_WORD, "KGS")
     if f:
         return f
+    if re.search(r"\bNET\b|净重|N\.?W\.?", text, re.I):
+        return None
     # 提单上常写成裸的 '2400.00 KGS'，没有 G.W. 标签，降到低把握
     m = re.search(r"(?<![\d.])(\d[\d,.]*)\s*(?:" + KG_WORD + "|" + LB_WORD + ")", text, re.I)
     if m:
@@ -179,13 +184,17 @@ def _m_gross_weight(text: str) -> Found | None:
 
 
 def _m_net_weight(text: str) -> Found | None:
-    return _labeled_number(text, r"(?<![A-Z])N\.?\s*W\.?(?![A-Z])|NET\s*(?:WEIGHT|WT)|净重", KG_WORD, "KGS")
+    return _labeled_number(text, r"(?<![A-Z])N\.?\s*W\.?(?![A-Z])|(?<![A-Z])NET(?:\s*(?:WEIGHT|WT))?(?![A-Z])|净重", KG_WORD, "KGS")
 
 
 def _m_volume(text: str) -> Found | None:
-    return _labeled_number(
-        text, r"MEAS\.?|MEASUREMENT|VOLUME|体积|尺码", CBM_WORD, "CBM", score_with_unit=0.91, score_without_unit=0.72
+    found = _labeled_number(
+        text, r"(?<![A-Z])(?:MEAS\.?|MEASUREMENT|VOLUME)(?![A-Z])|体积|尺码", CBM_WORD, "CBM", score_with_unit=0.91, score_without_unit=0.72
     )
+    if found:
+        return found
+    match = re.search(r"(?<![\d.])\d[\d,.]*[ \t]*(?:CBM|M3|M³)\b", text, re.I)
+    return Found(raw_text=_line_of(text, match.start()), raw_value=match.group(), score=0.85) if match else None
 
 
 def _m_quantity(text: str) -> Found | None:
@@ -215,6 +224,16 @@ def _m_hs_code(text: str) -> Found | None:
 
 
 def _m_total_amount(text: str) -> Found | None:
+    # OCR may place a clearly labelled currency total on the following line.
+    # Require an explicit AMOUNT/VALUE label, currency, and a money-shaped value.
+    multiline = re.search(
+        r"^[ \t]*TOTAL[ \t]+(?:AMOUNT|VALUE)[ \t]*\([ \t]*(?P<cur>" + KNOWN_CURRENCIES + r")[ \t]*\)"
+        r"[ \t]*[:：]?[ \t]*\n[ \t]*\$?[ \t]*(?P<amt>\d[\d,]*\.\d{2})[ \t]*$",
+        text, re.I | re.M,
+    )
+    if multiline:
+        return Found(raw_text=multiline.group(0).strip(),
+                     raw_value=f"{multiline.group('cur').upper()} {multiline.group('amt')}", score=0.95)
     # 数字后面不能紧跟重量/体积/数量单位 —— 否则 'G.W. TOTAL: 3,180.00 KGS'
     # 会被当成本票总金额（实测踩过：票级金额因此变成"币种未知、无法确认"）。
     NOT_A_MONEY_UNIT = (
@@ -224,21 +243,18 @@ def _m_total_amount(text: str) -> Found | None:
     # 严格匹配：金额必须紧跟标签（中间可以有币种），避免把
     # 'TOTAL: SAY ONE HUNDRED AND TWENTY (120) CARTONS ONLY' 里的 120 当金额
     strict = re.search(
-        r"(?:TOTAL\s*(?:AMOUNT|VALUE|PRICE|CIF|FOB|INVOICE\s*VALUE)?|AMOUNT|INVOICE\s*VALUE|总金额|发票金额|合计)"
-        r"\s*[:：.]*\s*(?:(?P<cur>" + KNOWN_CURRENCIES + r"|US\$)\s*)?(?P<amt>\d[\d,.]*)"
-        r"(?![\d,.])"
-        r"(?!\s*" + PKG_WORD + r")" + NOT_A_MONEY_UNIT,
-        text,
-        re.I,
-    )
+        r"(?:TOTAL[ \t]*(?:AMOUNT|VALUE|PRICE|CIF|FOB|INVOICE[ \t]*VALUE)?|AMOUNT|INVOICE[ \t]*VALUE|总金额|发票金额|合计)"
+        r"[ \t]*(?:\([ \t]*(?P<bracket_cur>" + KNOWN_CURRENCIES + r")[ \t]*\))?"
+        r"[ \t]*[:：.]*[ \t]*(?:(?P<cur>" + KNOWN_CURRENCIES + r"|US\$)[ \t]*)?\$?[ \t]*(?P<amt>\d[\d,.]*)"
+        r"(?![\d,.])" + NOT_A_MONEY_UNIT, text, re.I)
     if strict:
-        cur = strict.group("cur")
+        cur = strict.group("cur") or strict.group("bracket_cur")
         raw = f"{cur} {strict.group('amt')}" if cur else strict.group("amt")
         return Found(raw_text=_line_of(text, strict.start()), raw_value=_clip(raw), score=0.95)
 
     # 兜底：'USD 12,500.00' 这种币种+金额的写法（币种必须来自已知列表）
     loose = re.search(
-        r"(?<![A-Z])(?P<cur>" + KNOWN_CURRENCIES + r"|US\$)\s*(?P<amt>\d[\d,.]*)"
+        r"(?<![A-Z])(?P<cur>" + KNOWN_CURRENCIES + r"|US\$)[ \t]*(?P<amt>\d[\d,.]*)"
         r"(?![\d,.])" + NOT_A_MONEY_UNIT,
         text,
         re.I,
@@ -300,7 +316,22 @@ def _m_description(text: str) -> Found | None:
     return None
 
 
+def _m_document_no(text: str) -> Found | None:
+    match = re.search(r"DOCUMENT[ \t]+NO\.?[ \t]*[:：][ \t]*([A-Za-z0-9][A-Za-z0-9/-]{2,30})", text, re.I)
+    return Found(raw_text=_line_of(text, match.start()), raw_value=match.group(1), score=0.98) if match else None
+
+
 def _m_invoice_no(text: str) -> Found | None:
+    reference = re.search(
+        r'^[ \t]*REFERENCES?[ \t]*:[^\n]*?\bCI[ \t]+(CI-[A-Za-z0-9/-]+)(?=[ \t]*\||[ \t]*$)',
+        text, re.I | re.M,
+    )
+    if reference:
+        return Found(raw_text=_line_of(text, reference.start()), raw_value=reference.group(1), score=0.98)
+    if re.search(r"^\s*COMMERCIAL INVOICE\s*$", text, re.M | re.I):
+        own_number = _m_document_no(text)
+        if own_number:
+            return own_number
     m = re.search(
         r"(?:INVOICE\s*(?:NO|NUM|NUMBER|#)|发票号|发票编号)\s*[:：.]*\s*([A-Za-z0-9][A-Za-z0-9\-/]{2,30})",
         text,
@@ -354,11 +385,40 @@ def _m_container_no(text: str) -> Found | None:
 
 
 def _m_shipper(text: str) -> Found | None:
+    structured = re.search(r'^SELLER: (.+)$', text, re.M)
+    if structured:
+        return Found(raw_text=structured.group(), raw_value=_clip(structured.group(1)), score=0.90)
+    pair = _paired_parties(text)
+    if pair:
+        return pair[0]
     return _labeled_text(text, r"(?:SHIPPER|发货人|卖方|SELLER)")
 
 
 def _m_consignee(text: str) -> Found | None:
+    structured = re.search(r'^BUYER: (.+)$', text, re.M)
+    if structured:
+        return Found(raw_text=structured.group(), raw_value=_clip(structured.group(1)), score=0.90)
+    pair = _paired_parties(text)
+    if pair:
+        return pair[1]
     return _labeled_text(text, r"(?:CONSIGNEE|收货人|买方|BUYER)")
+
+
+def _paired_parties(text: str) -> tuple[Found, Found] | None:
+    """Reject interleaved parties unless the structured adapter mapped them."""
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    seller = re.compile(r"(?:SELLER|SHIPPER)\s*/\s*EXPORTER", re.I)
+    buyer = re.compile(r"(?:BUYER|CONSIGNEE)\s*/\s*IMPORTER", re.I)
+    for i in range(len(lines) - 3):
+        if not seller.fullmatch(lines[i]) or not buyer.fullmatch(lines[i + 1]):
+            continue
+        first, second = lines[i + 2:i + 4]
+        if not first or not second or _OTHER_LABEL_WORDS.fullmatch(first) or _OTHER_LABEL_WORDS.fullmatch(second):
+            continue
+        evidence = '\n'.join(lines[i:i + 4])
+        return (Found(raw_text=evidence, raw_value=None, score=None, unreadable=True),
+                Found(raw_text=evidence, raw_value=None, score=None, unreadable=True))
+    return None
 
 
 def _m_port_of_loading(text: str) -> Found | None:
@@ -396,18 +456,21 @@ def _m_destination_country(text: str) -> Found | None:
 
 def _labeled_text(text: str, label_re: str) -> Found | None:
     """标签 + 同行的值；同行没值就取下一行。"""
-    m = re.search(label_re + r"\s*[:：.]*\s*", text, re.I)
+    m = re.search(label_re + r"(?:[ \t]*/[ \t]*(?:EXPORTER|IMPORTER))?[ \t]*[:：.]*[ \t]*", text, re.I)
     if not m:
         return None
     tail = _tail(text, m.end(), window=80)
     if not tail:
         tail = _next_nonempty_line(text, m.end())
-    if not tail or _OTHER_LABEL_WORDS.fullmatch(tail):
+    if not tail or _OTHER_LABEL_WORDS.fullmatch(tail) or re.fullmatch(
+        r"(?:SELLER|SHIPPER|BUYER|CONSIGNEE)\s*/\s*(?:EXPORTER|IMPORTER)", tail, re.I
+    ):
         return None
-    return Found(raw_text=_line_of(text, m.start()), raw_value=_clip(tail), score=0.90)
+    return Found(raw_text=_line_of(text, m.start()) + "\n" + tail, raw_value=_clip(tail), score=0.90)
 
 
 MATCHERS = {
+    "document_no": _m_document_no,
     "packages": _m_packages,
     "gross_weight": _m_gross_weight,
     "net_weight": _m_net_weight,
@@ -556,6 +619,8 @@ def extract_fields(
         if key in {"packages", "quantity", "gross_weight", "net_weight", "volume"}:
             normalized, detected_unit = N.to_measure(f.raw_value, key)
             unit = detected_unit
+            if key == 'packages' and normalized is not None and unit is None:
+                unit = f.unit_hint
         else:
             normalizer = NORMALIZERS.get(key, _norm_text)
             normalized, _ = normalizer(f.raw_value)

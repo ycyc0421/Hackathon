@@ -16,22 +16,66 @@ from urllib.request import urlopen
 
 
 SERVICE = "hackathon-backend.service"
+MODEL_SERVICES = ('hackathon-vl-rec.service', 'hackathon-paddle-vl.service')
+
+
+def wait_model_healthy():
+    deadline = time.monotonic() + 120
+    while time.monotonic() < deadline:
+        try:
+            with urlopen('http://127.0.0.1:18082/health', timeout=3) as response:
+                health = json.load(response)
+            if health.get('status') == 'ok' and health.get('pipeline_version') == 'v1.6' and health.get('rec_backend') == 'llama-cpp-server' and not health.get('busy'):
+                return
+        except (URLError, TimeoutError, ValueError):
+            pass
+        time.sleep(1)
+    raise RuntimeError('VL 服务未能在 120 秒内通过健康检查')
+
+
+def restore_model_units(unit_directory, release):
+    backup = release / 'previous-model-services.json'
+    if not backup.exists():
+        return
+    run('systemctl', '--user', 'stop', *MODEL_SERVICES)
+    previous = json.loads(backup.read_text())
+    for name, content in previous.items():
+        path = unit_directory / name
+        if content is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.write_text(content)
+    run('systemctl', '--user', 'daemon-reload')
+    if all(previous.get(name) is not None for name in MODEL_SERVICES):
+        run('systemctl', '--user', 'restart', *MODEL_SERVICES)
+        wait_model_healthy()
 
 
 def deployment_settings(root):
-    """只读取发布所需的两个配置项，其他服务配置不输出、不改写。"""
-    settings = {"BACKEND_PYTHON": str(root.parent / ".local/bin/python3.12"), "PADDLE_OCR_ENABLED": "0"}
+    """只读取发布所需配置，密钥和其他服务配置不输出、不改写。"""
+    settings = {"BACKEND_PYTHON": str(root.parent / ".local/bin/python3.12"), "PADDLE_OCR_ENABLED": "0",
+                "PADDLE_OCR_ENGINE": "legacy", "PADDLE_VL_SERVICE_URL": "",
+                "PADDLE_VL_REC_BACKEND": "native",
+                "PADDLE_VL_VERSION": "v1.6", "PADDLE_VL_TIMEOUT_SECONDS": "900"}
     for line in (root / "shared/backend.env").read_text().splitlines():
         name, separator, value = line.partition("=")
         name = name.strip()
         if not separator or name not in settings:
             continue
         tokens = shlex.split(value)
+        if not tokens and name == "PADDLE_VL_SERVICE_URL":
+            settings[name] = ""
+            continue
         if len(tokens) != 1:
             raise ValueError(f"{name} 必须配置一个值")
         settings[name] = tokens[0]
     if settings["PADDLE_OCR_ENABLED"] not in {"0", "1"}:
         raise ValueError("PADDLE_OCR_ENABLED 只能为 0 或 1")
+    if settings["PADDLE_OCR_ENGINE"] not in {"legacy", "vl"}:
+        raise ValueError("PADDLE_OCR_ENGINE 必须为 legacy 或 vl")
+    if settings["PADDLE_OCR_ENABLED"] == "1" and settings["PADDLE_OCR_ENGINE"] == "vl":
+        if settings["PADDLE_VL_SERVICE_URL"] != "http://127.0.0.1:18082":
+            raise ValueError("VL 发布必须使用已预热的本机独立模型服务 http://127.0.0.1:18082；禁止在 8 GiB API 进程直接加载模型")
     return settings
 
 
@@ -76,12 +120,24 @@ def activate(root, release):
     previous = current.resolve(strict=True)
     unit = root.parent / ".config/systemd/user" / SERVICE
     previous_unit = unit.read_bytes()
+    settings = deployment_settings(root)
+    vl_enabled = settings['PADDLE_OCR_ENABLED'] == '1' and settings['PADDLE_OCR_ENGINE'] == 'vl'
+    if vl_enabled:
+        previous_models = {name: (unit.parent / name).read_text() if (unit.parent / name).exists() else None for name in MODEL_SERVICES}
+        (release / 'previous-model-services.json').write_text(json.dumps(previous_models))
     (release / "previous-release.txt").write_text(str(previous) + "\n")
     (release / "previous-service.conf").write_bytes(previous_unit)
     try:
+        (unit.parent / "hackathon.slice").write_bytes((release / "deploy/hackathon.slice").read_bytes())
         unit.write_bytes((release / "deploy" / SERVICE).read_bytes())
+        if vl_enabled:
+            for name in MODEL_SERVICES:
+                (unit.parent / name).write_bytes((release / 'deploy' / name).read_bytes())
         switch_release(current, release)
         run("systemctl", "--user", "daemon-reload")
+        if vl_enabled:
+            run('systemctl', '--user', 'restart', *MODEL_SERVICES)
+            wait_model_healthy()
         run("systemctl", "--user", "restart", SERVICE)
         wait_healthy()
         run("systemctl", "--user", "is-active", "--quiet", SERVICE)
@@ -90,6 +146,7 @@ def activate(root, release):
         run("systemctl", "--user", "stop", SERVICE)
         switch_release(current, previous)
         unit.write_bytes(previous_unit)
+        restore_model_units(unit.parent, release)
         run("systemctl", "--user", "daemon-reload")
         run("systemctl", "--user", "restart", SERVICE)
         wait_healthy()
@@ -108,6 +165,10 @@ def rollback(root, release):
     unit = root.parent / ".config/systemd/user" / SERVICE
     unit.write_bytes((release / "previous-service.conf").read_bytes())
     switch_release(current, previous)
+    previous_environment = release / 'previous-backend.env'
+    if previous_environment.exists():
+        shutil.copyfile(previous_environment, root / 'shared/backend.env')
+    restore_model_units(unit.parent, release)
     run("systemctl", "--user", "daemon-reload")
     run("systemctl", "--user", "restart", SERVICE)
     wait_healthy()
@@ -152,13 +213,21 @@ def deploy(root, release_id):
     # 候选版本先用自己的临时数据自检，避免测试读写共享的运行中任务。
     env = {**os.environ, "LLM_BASE_URL": "", "LLM_API_KEY": "", "LLM_MODEL": "",
            "PADDLE_OCR_ENABLED": "0", "PYTHONDONTWRITEBYTECODE": "1"}
-    for script, args in (("test_sqlite_store.py", []), ("test_compare.py", []), ("test_review_regressions.py", []),
-                         ("test_paddle_adapter.py", []), ("selftest.py", ["--no-node"]), ("run_challenge.py", [])):
+    for script, args in (("test_review38.py", []), ("test_rule_monitor.py", []), ("test_workflow.py", []), ("test_trade_json.py", []), ("test_static_rules.py", []), ("test_sqlite_store.py", []), ("test_compare.py", []), ("test_review_regressions.py", []),
+                         ("test_paddle_adapter.py", []), ("test_paddle_vl.py", []), ("test_vl_service.py", []), ("test_delivery_boundaries.py", []), ("selftest.py", ["--no-node"]), ("run_challenge.py", [])):
         run(python, str(release / "backend/tools" / script), *args, cwd=release, env=env)
     if ocr_enabled:
         # 在切换服务前加载真实模型并验证图片；使用候选版本的临时任务数据。
-        run(python, str(release / "backend/tools/run_ocr_probe.py"), "11_de_multiitem_mixed",
-            cwd=release, env={**env, "PADDLE_OCR_ENABLED": "1"}, timeout=900)
+        probe_env = {**env, **{key: value for key, value in settings.items() if key.startswith("PADDLE_")}}
+        if settings["PADDLE_OCR_ENGINE"] == "vl":
+            with urlopen(settings["PADDLE_VL_SERVICE_URL"] + "/health", timeout=5) as response:
+                health = json.load(response)
+            if health.get("status") != "ok" or health.get("pipeline_version") != settings["PADDLE_VL_VERSION"] or health.get("rec_backend") != "llama-cpp-server" or health.get("busy"):
+                raise RuntimeError("独立 VL 服务尚未就绪、版本不符或正在推理，拒绝发布")
+            run(python, str(release / "backend/tools/accept_paddle_vl.py"), cwd=release, env=probe_env, timeout=2100)
+        else:
+            run(python, str(release / "backend/tools/run_ocr_probe.py"), "11_de_multiitem_mixed",
+                cwd=release, env=probe_env, timeout=900)
     temporary_data = release / "backend/.data"
     if temporary_data.exists():
         shutil.rmtree(temporary_data)

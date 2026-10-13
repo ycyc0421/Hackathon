@@ -18,17 +18,18 @@ import logging
 import re
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from . import __version__
-from .config import MAX_FILE_COUNT, MAX_FILE_SIZE, POST_WAIT_MS, ensure_dirs
+from .config import MAX_FILE_COUNT, MAX_FILE_SIZE, POST_WAIT_MS, UPLOAD_DIR, IMAGE_EXT, PADDLE_OCR_ENABLED, llm_enabled, ensure_dirs
 from .frontend_view import to_frontend_task
 from .models import CheckTask, dump, not_run_evaluation
 from .pipeline import rules
@@ -36,12 +37,24 @@ from .pipeline.normalize import country_name as country_name_of
 from .pipeline.runner import run_check
 from .store import store
 from .util import make_task_id, now_iso
+from . import workflow
+from . import rule_sources
+from .uploads import stage_uploads
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
 log = logging.getLogger("backend.api")
+_check_slots = threading.BoundedSemaphore(4)
+_check_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix='document-check')
+
+
+def _run_reserved_check(task_id, uploads):
+    try:
+        run_check(task_id, uploads)
+    finally:
+        _check_slots.release()
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -90,6 +103,10 @@ def _error_response(status_code: int, code: str, message: str) -> JSONResponse:
 async def _handle_api_error(_request, exc: ApiError) -> JSONResponse:
     return _error_response(exc.status_code, exc.code, exc.message)
 
+@app.exception_handler(workflow.WorkflowError)
+async def _handle_workflow(_request, exc):
+    return _error_response(exc.status, exc.code, exc.message)
+
 
 @app.exception_handler(RequestValidationError)
 async def _handle_validation(_request, exc: RequestValidationError) -> JSONResponse:
@@ -117,7 +134,36 @@ async def _handle_unexpected(_request, exc: Exception) -> JSONResponse:
 # --------------------------------------------------------------------------
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "version": __version__}
+    from .config import BASE_DIR
+    revision = BASE_DIR.parent.name.split('-')[0]
+    return {"status": "ok", "version": __version__,
+            'release_revision': revision if re.fullmatch(r'[0-9a-f]{40}', revision) else None}
+
+
+@app.get('/api/v1/capabilities')
+def capabilities() -> dict:
+    from .config import PADDLE_OCR_ENGINE, PADDLE_VL_VERSION, PADDLE_VL_DEVICE
+    return {
+        'version': __version__,
+        'upload_limits': {'max_file_count': MAX_FILE_COUNT, 'max_file_size_bytes': MAX_FILE_SIZE},
+        'formats': [
+            {'format': 'PDF', 'extensions': ['.pdf'], 'supported': True,
+             'text_layer': True, 'scan_ocr_configured': PADDLE_OCR_ENABLED or llm_enabled()},
+            {'format': 'IMAGE', 'extensions': sorted(IMAGE_EXT),
+             'supported': PADDLE_OCR_ENABLED or llm_enabled()},
+            {'format': 'hackathon-trade-json-v1', 'extensions': ['.json'], 'supported': True,
+             'encoding': 'UTF-8', 'max_file_size_bytes': 1048576, 'max_line_items': 200},
+            {'format': 'UN/EDIFACT', 'extensions': ['.edi'], 'supported': False,
+             'reason': '解析器尚未接入；项目 JSON 不代表 EDIFACT 支持'},
+            {'format': 'X12', 'extensions': ['.x12'], 'supported': False},
+        ],
+        'extension_case_sensitive': False,
+        'txt_as_edi_supported': False,
+        'original_download': True,
+        'ocr': {'enabled': PADDLE_OCR_ENABLED, 'engine': PADDLE_OCR_ENGINE,
+                'pipeline_version': PADDLE_VL_VERSION if PADDLE_OCR_ENGINE == 'vl' else None,
+                'device': PADDLE_VL_DEVICE if PADDLE_OCR_ENGINE == 'vl' else None},
+    }
 
 
 # --------------------------------------------------------------------------
@@ -165,43 +211,57 @@ async def create_check(
     if len(files) > MAX_FILE_COUNT:
         raise ApiError(413, "TOO_MANY_FILES", f"一次最多上传 {MAX_FILE_COUNT} 份文件")
 
-    uploads: list[tuple[str, bytes]] = []
-    for upload in files:
-        name = upload.filename or "unnamed"
-        uploads.append((name, await _read_limited(upload)))
+    if not _check_slots.acquire(blocking=False):
+        raise ApiError(429, 'CHECK_QUEUE_FULL', '已有四票任务正在处理或排队，请稍后重试')
+    try:
+        uploads: list[tuple[str, bytes]] = []
+        for upload in files:
+            name = re.split(r'[\\/]', upload.filename or 'unnamed')[-1] or 'unnamed'
+            uploads.append((name, await _read_limited(upload)))
 
-    task_id = make_task_id(store.next_seq())
-    store.create(
-        {
-            "task_id": task_id,
-            "status": "PENDING",
-            "created_at": now_iso(),
-            "finished_at": None,
-            "input": {
-                "destination_country": code,
-                "destination_country_name": destination_country_name or country_name_of(code),
-                "trade_mode": trade_mode,
-                "declared_currency": declared_currency,
-                "notes": notes,
-            },
-            "documents": [],
-            "extractions": [],
-            "comparisons": [],
-            "risks": [],
-            "summary": {
-                "document_count": 0,
-                "field_count": 0,
-                "item_count": 0,
-                "conflict_count": 0,
-                "missing_count": 0,
-                "risk_count": 0,
-                "unrecognized_count": 0,
-            },
-            "errors": [],
-        }
-    )
+        task_id = make_task_id(store.next_seq())
+        try:
+            documents = stage_uploads(UPLOAD_DIR, task_id, uploads)
+        except (OSError, ValueError) as exc:
+            log.error('原件持久化失败：%s', exc)
+            raise ApiError(500, 'SOURCE_SAVE_FAILED', '原件保存失败，任务未开始处理，请稍后重试') from exc
+        store.create(
+            {
+                "task_id": task_id,
+                "status": "PENDING",
+                "created_at": now_iso(),
+                "finished_at": None,
+                "input": {
+                    "destination_country": code,
+                    "destination_country_name": destination_country_name or country_name_of(code),
+                    "trade_mode": trade_mode,
+                    "declared_currency": declared_currency,
+                    "notes": notes,
+                },
+                "documents": documents,
+                "extractions": [],
+                "comparisons": [],
+                "risks": [],
+                "summary": {
+                    "document_count": len(documents),
+                    "field_count": 0,
+                    "item_count": 0,
+                    "conflict_count": 0,
+                    "missing_count": 0,
+                    "risk_count": 0,
+                    "unrecognized_count": 0,
+                },
+                "errors": [],
+            }
+        )
 
-    threading.Thread(target=run_check, args=(task_id, uploads), daemon=True).start()
+        staged = [(name, UPLOAD_DIR / task_id / f'f{index}.source') for index, (name, _) in enumerate(uploads, 1)]
+        _check_executor.submit(_run_reserved_check, task_id, staged)
+        del uploads
+
+    except BaseException:
+        _check_slots.release()
+        raise
 
     # 在 POST_WAIT_MS 内跑完就直接给结果，没跑完就让前端按契约轮询。
     # 两种前端（同步式 / 轮询式）都能直接对接。
@@ -236,6 +296,54 @@ def get_check(task_id: str) -> dict:
     return to_frontend_task(dump(_load_task(task_id)))
 
 
+@app.get('/api/v1/checks/{task_id}/files/{file_id}')
+def download_original(task_id: str, file_id: str):
+    task = dump(_load_task(task_id))
+    document = next((doc for doc in task['documents'] if doc['file_id'] == file_id), None)
+    if document is None:
+        raise ApiError(404, 'FILE_NOT_FOUND', '任务中没有该文件')
+    if re.search(r'[\\/]', document['file_name']):
+        raise ApiError(404, 'SOURCE_NOT_AVAILABLE', '保存的文件名无效，不能读取原件')
+    history = store.correction_history(task_id)
+    source_id = history[0]['source_task_id'] if history else task_id
+    source_dir = (UPLOAD_DIR / source_id).resolve()
+    root = UPLOAD_DIR.resolve()
+    path = (source_dir / f'{file_id}.source').resolve()
+    if not path.is_file():
+        # Preserve downloads for previously completed and derived tasks.
+        path = (source_dir / f"{file_id}_{document['file_name']}").resolve()
+    if not source_dir.is_relative_to(root) or not path.is_relative_to(source_dir) or not path.is_file():
+        raise ApiError(404, 'SOURCE_NOT_AVAILABLE', '原件未保存或已移除；不能从抽取结果重建原件')
+    return FileResponse(path, media_type='application/octet-stream', filename=document['file_name'],
+                        headers={'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store'})
+
+@app.get('/api/v1/checks/{task_id}/corrections')
+def get_corrections(task_id: str):
+    task = dump(_load_task(task_id))
+    return {'task_id':task_id,'result_hash':workflow.payload_hash(task),'corrections':store.correction_history(task_id)}
+
+@app.post('/api/v1/checks/{task_id}/corrections')
+def create_correction(task_id: str, request: workflow.CorrectionRequest):
+    _load_task(task_id)
+    return to_frontend_task(workflow.correct(store,task_id,request))
+
+@app.get('/api/v1/checks/{task_id}/report')
+def export_report(task_id: str, format: str = 'json'):
+    if format not in {'json','html'}:
+        raise ApiError(400,'INVALID_REPORT_FORMAT','报告支持 json 或 html')
+    envelope = workflow.report(store,task_id)
+    safe_id = re.sub(r'[^A-Za-z0-9_-]','_',task_id)
+    headers = {'Content-Disposition':f'attachment; filename="{safe_id}.{format}"','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; sandbox"}
+    if format == 'html':
+        return HTMLResponse(workflow.report_html(envelope),headers=headers)
+    return JSONResponse(envelope,headers=headers)
+
+
+@app.get('/api/v1/rules/sources')
+def get_rule_source_status():
+    return rule_sources.status()
+
+
 # --------------------------------------------------------------------------
 # GET /api/v1/evaluation/latest
 # --------------------------------------------------------------------------
@@ -255,6 +363,8 @@ def index() -> dict:
             "POST /api/v1/checks",
             "GET  /api/v1/checks/{task_id}",
             "GET  /api/v1/evaluation/latest",
+            "GET  /api/v1/capabilities",
+            "GET  /api/v1/checks/{task_id}/files/{file_id}",
             "GET  /health",
         ],
         "docs": "/docs",

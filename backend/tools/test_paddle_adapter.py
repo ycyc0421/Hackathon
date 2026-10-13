@@ -142,12 +142,13 @@ def main() -> None:
     html = "<table><tr><td>NO.</td><td>ITEM NO.</td><td>DESCRIPTION</td><td></td><td>QTY</td></tr><tr><td>1</td><td>YT-M001</td><td>陶瓷餐具16PC蓝</td><td></td><td>1800 PCS</td></tr></table>"
     rows = _table_lines(html)
     assert rows == ["NO.   ITEM NO.   DESCRIPTION   QTY", "1   YT-M001   陶瓷餐具16PC蓝   1800 PCS"]
+    assert _table_lines(html.replace('<td></td>', '<td colspan="2"></td>')) == rows
     try:
-        _table_lines(html.replace('<td></td>', '<td colspan="2"></td>'))
+        _table_lines(html.replace('<td>ITEM NO.</td>', '<td colspan="2">ITEM NO.</td>'))
     except ValueError:
         pass
     else:
-        raise AssertionError("Merged table cell was accepted")
+        raise AssertionError("Ambiguous spanning header was accepted")
     merged, uncertain, corrections = _check_descriptions(rows, ["YT-M001", "陶瓷餐具 16PC 蓝"])
     assert merged[1] == "1   YT-M001   陶瓷餐具 16PC 蓝   1800 PCS"
     assert uncertain == []

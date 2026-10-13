@@ -1,0 +1,29 @@
+[Unit]
+Description=Hackathon PaddleOCR-VL document model
+After=network.target
+After=hackathon-vl-rec.service
+Requires=hackathon-vl-rec.service
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=simple
+Slice=hackathon.slice
+WorkingDirectory=%h/app/current/backend
+EnvironmentFile=%h/app/shared/backend.env
+Environment=PADDLE_VL_SERVICE_URL=
+Environment=OMP_NUM_THREADS=4
+Environment=MKL_NUM_THREADS=4
+Environment=OPENBLAS_NUM_THREADS=4
+ExecStart=/usr/bin/env PADDLE_VL_SERVICE_URL= PADDLE_VL_REC_BACKEND=llama-cpp-server PADDLE_VL_REC_SERVER_URL=http://127.0.0.1:18083/v1 PADDLE_VL_LAYOUT_DIR=%h/app/shared/models/PP-DocLayoutV3 %h/app/current/.venv/bin/python -m uvicorn app.vl_service:app --host 127.0.0.1 --port 18082
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=yes
+MemoryHigh=3G
+MemoryMax=4G
+CPUQuota=400%
+TasksMax=128
+
+[Install]
+WantedBy=default.target
