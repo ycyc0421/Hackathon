@@ -21,16 +21,20 @@ MODEL_SERVICES = ('hackathon-vl-rec.service', 'hackathon-paddle-vl.service')
 
 def wait_model_healthy():
     deadline = time.monotonic() + 120
+    last_error = None
     while time.monotonic() < deadline:
         try:
             with urlopen('http://127.0.0.1:18082/health', timeout=3) as response:
                 health = json.load(response)
-            if health.get('status') == 'ok' and health.get('pipeline_version') == 'v1.6' and health.get('rec_backend') == 'llama-cpp-server' and not health.get('busy'):
+            # 包装服务启动不代表底层权重已加载；后者此时可能仍返回 503 Loading model。
+            with urlopen('http://127.0.0.1:18083/health', timeout=3) as response:
+                recognition = json.load(response)
+            if recognition.get('status') == 'ok' and health.get('status') == 'ok' and health.get('pipeline_version') == 'v1.6' and health.get('rec_backend') == 'llama-cpp-server' and not health.get('busy'):
                 return
-        except (URLError, TimeoutError, ValueError):
-            pass
+        except (URLError, TimeoutError, ValueError) as exc:
+            last_error = exc
         time.sleep(1)
-    raise RuntimeError('VL 服务未能在 120 秒内通过健康检查')
+    raise RuntimeError('VL 服务或底层识别模型未能在 120 秒内通过健康检查') from last_error
 
 
 def restore_model_units(unit_directory, release):
@@ -224,6 +228,7 @@ def deploy(root, release_id):
                 health = json.load(response)
             if health.get("status") != "ok" or health.get("pipeline_version") != settings["PADDLE_VL_VERSION"] or health.get("rec_backend") != "llama-cpp-server" or health.get("busy"):
                 raise RuntimeError("独立 VL 服务尚未就绪、版本不符或正在推理，拒绝发布")
+            wait_model_healthy()
             run(python, str(release / "backend/tools/accept_paddle_vl.py"), cwd=release, env=probe_env, timeout=2100)
         else:
             run(python, str(release / "backend/tools/run_ocr_probe.py"), "11_de_multiitem_mixed",
