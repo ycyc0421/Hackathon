@@ -95,7 +95,11 @@ jobs:
         working-directory: web
         run: npm run build
 
+      # 步骤级超时（低于 job 的 45 分钟）：录制正常约 10 分钟。
+      # 若脚本再出现"渲染完了但进程不退出"这类问题，这里会快速失败并
+      # 留下日志，而不是烧掉整个 job 的时间预算才发现。
       - name: 录制演示视频
+        timeout-minutes: 25
         working-directory: web
         env:
           # inputs.* 在 push / PR 触发时是空的，必须给默认值，
