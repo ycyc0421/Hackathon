@@ -315,7 +315,7 @@ onMounted(async () => {
               {{ g.title }} <span class="cmp-group-num">{{ g.list.length }}</span>
             </h3>
             <ul class="cmp-list">
-              <li v-for="c in g.list" :id="`cmp-${c.comparison_id}`" :key="c.comparison_id" class="cmp-item">
+              <li v-for="c in g.list" :id="`cmp-${c.comparison_id}`" :key="c.comparison_id" class="cmp-item" :class="`sev-${severityOf(c.severity).tone}`">
                 <div class="cmp-head">
                   <div class="cmp-title">
                     <!-- 表格与并排对照是平级的两种视图，用分段控件切换，而非展开/收起。

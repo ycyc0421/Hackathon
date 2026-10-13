@@ -33,6 +33,45 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-x: clip;
+}
+
+/* 全局背景光晕：两个极低透明度的模糊圆，给页面一点空间感 */
+.app::before,
+.app::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(120px);
+}
+
+.app::before {
+  width: 600px;
+  height: 600px;
+  top: -100px;
+  left: -150px;
+  background: var(--blue-100);
+  opacity: 0.35;
+}
+
+.app::after {
+  width: 500px;
+  height: 500px;
+  bottom: -120px;
+  right: -100px;
+  background: oklch(88% 0.06 200);
+  opacity: 0.25;
+}
+
+/* 确保内容在光晕层上面 */
+.topbar,
+.content,
+.footer {
+  position: relative;
+  z-index: 1;
 }
 
 .topbar {
@@ -52,11 +91,26 @@ body {
   display: flex;
   flex-direction: column;
   line-height: var(--leading-tight);
+  /* 品牌区现在是可点按钮（回首页）：重置 button 默认样式，视觉上保持原样 */
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+/* 可点品牌区（回首页）是键盘可达的导航控件，焦点样式与其他按钮同一规格 */
+.brand:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .brand-mark {
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   letter-spacing: 0.02em;
 }
 
@@ -97,7 +151,7 @@ body {
 
 .tab.active {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .tab.locked {
@@ -128,7 +182,7 @@ body {
   background: var(--danger);
   color: white;
   font-size: var(--text-xs);
-  line-height: 17px;
+  line-height: 17px; /* 字阶外特例：.tab-badge 固定尺寸徽章 */
   text-align: center;
 }
 
@@ -184,12 +238,20 @@ body {
   display: none;
 }
 
+/* 内容区：背景层固定不动，只有版心内容卡（.page-inner）参与纸张切页过渡 */
 .content {
   flex: 1;
-  width: 100%;
-  max-width: 1080px;
-  margin: 0 auto;
+  position: relative;           /* 层叠过渡的定位参照 */
+  overflow-x: clip;             /* 新纸从右飞入时不产生横向滚动条 */
   padding: var(--space-6);
+}
+
+/* 版心内容卡——这才是"那张纸"：限宽、白底、圆角、投影 */
+.page-inner {
+  position: relative;
+  max-width: 1032px;
+  margin: 0 auto;
+  min-height: calc(100vh - 56px - 80px); /* 撑满视口，切换时纸面不显得单薄 */
 }
 
 .footer {
@@ -220,7 +282,7 @@ body {
 .page-title {
   margin: 0;
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .page-sub {
@@ -239,7 +301,7 @@ body {
 .card-title {
   margin: 0 0 var(--space-1);
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .card-sub {
@@ -250,7 +312,7 @@ body {
 
 .title-num {
   color: var(--text-muted);
-  font-weight: 400;
+  font-weight: var(--weight-regular);
 }
 
 .section-head {
@@ -262,7 +324,7 @@ body {
 .section-title {
   margin: 0;
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /* ---------- 提示条 ---------- */
@@ -281,7 +343,7 @@ body {
 }
 
 .notice-title {
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .notice-detail {
@@ -318,6 +380,11 @@ body {
   color: var(--success);
 }
 
+/* NoticeBar 默认 slot 放操作按钮时，与正文之间留出节奏间距 */
+.notice .btn {
+  margin-top: var(--space-2);
+}
+
 /* ---------- 状态标签 ---------- */
 
 .badge {
@@ -325,7 +392,7 @@ body {
   padding: 1px 8px;
   border: 1px solid;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   white-space: nowrap;
 }
 
@@ -362,18 +429,44 @@ body {
 /* ---------- 表单 ---------- */
 
 .dropzone {
-  padding: 32px 20px;
-  border: 2px dashed var(--border);
-  border-radius: var(--radius-sm);
-  background: #fafbfc;
+  padding: var(--space-8) var(--space-5);
+  border: 2px dashed var(--border-hover);
+  border-radius: var(--radius-lg);
+  background: var(--gray-50);
   text-align: center;
   cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease),
+    background-color var(--duration-fast) var(--ease);
 }
 
 .dropzone:hover,
 .dropzone.active {
   border-color: var(--color-primary);
-  background: #f2f6fc;
+  background: var(--blue-50);
+}
+
+/* 上传图标：圆底 + 线性箭头，拖入/悬停时上浮一点确认目标区域 */
+.dropzone-icon {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--space-3);
+  padding: 12px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--duration-base) var(--ease);
+}
+
+.dropzone:hover .dropzone-icon,
+.dropzone.active .dropzone-icon {
+  transform: translateY(-3px);
 }
 
 /* 键盘可达（role=button）：聚焦描边与 chip 的 focus-visible 同款 */
@@ -383,13 +476,14 @@ body {
 }
 
 .dropzone-main {
-  font-size: 14px;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
   color: var(--text-body);
 }
 
 .dropzone-hint {
   margin-top: 6px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
 }
 
@@ -429,7 +523,7 @@ body {
   gap: 12px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .file-item:last-child {
@@ -463,7 +557,7 @@ body {
 }
 
 .field-label {
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
 }
 
@@ -529,7 +623,8 @@ textarea {
   color: var(--text-body);
   font-family: inherit;
   font-size: var(--text-sm);
-  font-weight: 500;
+  /* 全站强调元素（标题、选中态）统一 600；按钮是最主要操作，字重不应比它们更轻 */
+  font-weight: var(--weight-semibold);
   line-height: var(--leading-tight);
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease),
@@ -579,6 +674,8 @@ textarea {
   min-height: 28px;
 }
 
+/* 文字按钮。已登记的变体：.compare-foot .link-btn（对照面板脚注，xs 无下划线），
+   只有那里允许局部覆盖，其它场景不得再开新变体 */
 .link-btn {
   border: none;
   background: none;
@@ -599,6 +696,18 @@ textarea {
   color: var(--color-primary-active);
 }
 
+/* 键盘焦点可见性与 .btn 对齐：文字按钮同样是可聚焦控件 */
+.link-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.link-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ---------- 任务状态 ---------- */
 
 .status-row {
@@ -611,7 +720,7 @@ textarea {
 
 .status-meta {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* ---------- 加载状态：分阶段进度 / 上传进度 / 骨架屏 ---------- */
@@ -689,7 +798,7 @@ textarea {
 
 .stage-item.active {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .stage-item.active .stage-dot {
@@ -824,7 +933,7 @@ textarea {
   gap: 12px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .doc-item:last-child {
@@ -844,16 +953,26 @@ textarea {
 
 .doc-type {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .doc-error {
   color: var(--danger);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* 完成态主按钮：与上方文件列表拉开间距；横向留白加大一档，
    「查看待复核项（N）」这类长文案不至于顶到按钮边缘 */
+/* ---- CTA 按钮状态：任务未完成前灰色，完成后亮蓝色 ---- */
+/* .btn-pending 由 v-bind 在任务未达终态时加上 */
+.btn.primary.btn-pending {
+  background: var(--gray-300);
+  border-color: var(--gray-300);
+  color: var(--gray-500);
+  cursor: default;
+  pointer-events: none;
+}
+
 .next-actions {
   margin-top: var(--space-4);
 }
@@ -865,7 +984,7 @@ textarea {
 .next-hint {
   margin: 12px 0 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 /* ---------- 差异页 ---------- */
@@ -883,7 +1002,7 @@ textarea {
   background: #fff;
   color: var(--text-muted);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--text-13);
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease),
               color var(--duration-fast) var(--ease),
@@ -932,14 +1051,14 @@ textarea {
 .filter-note {
   margin: 10px 0 0;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* 按商品分组时的分组标题；单分组不渲染标题，样式与扁平列表一致 */
 .cmp-group-title {
   margin: 20px 0 0;
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
@@ -948,7 +1067,7 @@ textarea {
 .cmp-group-num {
   color: var(--text-muted);
   font-size: var(--text-sm);
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   font-variant-numeric: tabular-nums;
 }
 
@@ -963,8 +1082,24 @@ textarea {
 
 .cmp-item {
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px;
+  border-left: 4px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-raised);
+  transition: box-shadow var(--duration-fast) var(--ease);
+}
+
+.cmp-item:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+/* 左色条按严重度：问题红 / 注意橙 / 提示灰，扫一眼长列表就能找到问题项 */
+.cmp-item.sev-bad {
+  border-left-color: var(--danger);
+}
+
+.cmp-item.sev-warn {
+  border-left-color: var(--warning);
 }
 
 .cmp-head {
@@ -981,14 +1116,14 @@ textarea {
 }
 
 .cmp-label {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
 }
 
 .cmp-key {
   color: var(--text-muted);
-  font-family: 'JetBrainsMono Nerd Font', 'DejaVu Sans Mono', monospace;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 
 .cmp-badges {
@@ -999,7 +1134,7 @@ textarea {
 .cmp-note {
   margin: 8px 0 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 /* ---------- 表格（差异比对）---------- */
@@ -1016,7 +1151,7 @@ textarea {
   border-bottom: 1px solid var(--border);
   background: var(--surface-raised);
   color: var(--text-muted);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-size: var(--text-sm);
   position: sticky;
   top: 0;
@@ -1052,7 +1187,7 @@ textarea {
 }
 
 .cell-value {
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
@@ -1061,7 +1196,7 @@ textarea {
   color: var(--text-muted);
   font-family: var(--font-mono);
   /* 原文是关键证据，阅读级别不低于正文辅助信息，不用脚注级 12px */
-  font-size: 13px;
+  font-size: var(--text-13);
   word-break: break-all;
 }
 
@@ -1132,7 +1267,7 @@ textarea {
 
 .view-switch button[aria-pressed="true"] {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .view-switch button:focus-visible {
@@ -1143,7 +1278,7 @@ textarea {
 /* 收起态表格里与多数派不同的值：切到对照视图前也能定位「哪份文件不一样」 */
 .cell-value.divergent {
   color: var(--danger);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /*
@@ -1231,7 +1366,7 @@ textarea {
 
 .compare-value {
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-size: var(--text-base);
   font-variant-numeric: tabular-nums;
   word-break: break-all;
@@ -1240,7 +1375,7 @@ textarea {
 .compare-value.empty {
   color: var(--text-muted);
   font-style: italic;
-  font-weight: 400;
+  font-weight: var(--weight-regular);
 }
 
 .compare-page {
@@ -1253,7 +1388,7 @@ textarea {
   color: var(--text-muted);
   font-family: var(--font-mono);
   /* 同 .cell-raw：原文承担证据职责，不用脚注级 12px */
-  font-size: 13px;
+  font-size: var(--text-13);
   word-break: break-all;
 }
 
@@ -1275,7 +1410,7 @@ textarea {
 .empty {
   margin: 16px 0 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 /* ---------- 空状态 ---------- */
@@ -1293,7 +1428,7 @@ textarea {
 /* 纯文字排版：不用 emoji 插图，靠标题字重与语气色区分 */
 .empty-state-title {
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .empty-state-detail {
@@ -1335,12 +1470,12 @@ textarea {
 
 .meta-grid dt {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .meta-grid dd {
   margin: 2px 0 0;
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .stat-row {
@@ -1356,22 +1491,24 @@ textarea {
 .stat {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   min-width: 96px;
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  background: var(--surface-raised);
 }
 
 .stat-num {
-  font-size: var(--text-xl);
-  font-weight: 600;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
   font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* 零值的问题计数收敛为弱化灰，不抢「没问题」的语义 */
@@ -1380,7 +1517,11 @@ textarea {
 }
 
 .stat.zero .stat-num {
-  color: var(--text-muted);
+  color: var(--text-disabled);
+}
+
+.stat.zero {
+  border-style: dashed;
 }
 
 .stat.alert {
@@ -1413,10 +1554,25 @@ textarea {
 }
 
 .issue-item {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--danger);
-  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--danger);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  transition: box-shadow var(--duration-fast) var(--ease), border-color var(--duration-fast) var(--ease);
+}
+
+.issue-item:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+/* 左色条按严重度：问题红 / 注意橙 / 提示灰，与徽章同一口径 */
+.issue-item.sev-warn {
+  border-left-color: var(--warning);
+}
+
+.issue-item.sev-muted {
+  border-left-color: var(--gray-400);
 }
 
 /* 头部：字段名 + 商品归属 + 徽章，归属 pill 弱化、字段名最重 */
@@ -1428,7 +1584,8 @@ textarea {
 }
 
 .issue-label {
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
 }
 
 /* 各文件取值收进一块浅底区域，与头部/脚注分出层次 */
@@ -1446,7 +1603,7 @@ textarea {
 
 .issue-values strong {
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   color: var(--text-body);
 }
 
@@ -1457,13 +1614,15 @@ textarea {
 }
 
 .risk-item {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--warning);
+  border-radius: var(--radius-md);
 }
 
 .risk-item.suggested {
   border-style: dashed;
+  border-left: 4px solid var(--gray-300);
   background: var(--gray-50);
 }
 
@@ -1480,7 +1639,7 @@ textarea {
 
 .risk-title {
   margin-top: var(--space-1);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .risk-detail {
@@ -1498,13 +1657,13 @@ textarea {
 .err-item {
   display: flex;
   gap: 10px;
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .err-code {
   color: var(--danger);
-  font-family: 'JetBrainsMono Nerd Font', 'DejaVu Sans Mono', monospace;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   white-space: nowrap;
 }
 
@@ -1515,7 +1674,7 @@ textarea {
 .foot-note {
   margin: 12px 0 0;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /*
@@ -1523,16 +1682,46 @@ textarea {
  * 左边带 + 底色卡片承载，一眼可见；颜色跟随结论语气（tone），
  * 与文案同源推导，不出现"坏消息配蓝色"的错位。
  */
+/* 报告头：顶部一条状态色带 + 标题行（标题 + 任务状态徽章），结论是全页最大的一句话 */
+.report-head {
+  position: relative;
+  overflow: hidden;
+  padding-top: calc(var(--space-6) + 4px);
+}
+
+.report-head::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--gray-300);
+}
+
+.report-head.tone-bad::before { background: var(--danger); }
+.report-head.tone-warn::before { background: var(--warning); }
+.report-head.tone-ok::before { background: var(--success); }
+
+.report-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.report-kicker .card-title {
+  margin: 0;
+}
+
 .report-conclusion {
-  margin: var(--space-2) 0 var(--space-4);
-  padding: var(--space-3) var(--space-4);
+  margin: var(--space-4) 0 var(--space-5);
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--gray-400);
-  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--gray-400);
+  border-radius: var(--radius-md);
   background: var(--gray-50);
-  font-size: var(--text-base);
-  font-weight: 500;
-  line-height: var(--leading-relaxed);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-normal);
 }
 
 .report-conclusion.tone-bad {
@@ -1626,7 +1815,7 @@ textarea {
 }
 
 .issue-foot {
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 /* 报告页跳到差异页后的定位反馈：高亮背景淡去，约 1.6s 后由 JS 移除 class */
@@ -1718,7 +1907,7 @@ textarea {
   border-bottom: 1px solid var(--border);
   background: var(--surface-raised);
   color: var(--text-muted);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-size: var(--text-sm);
 }
 
@@ -1758,7 +1947,7 @@ textarea {
   justify-content: space-between;
   padding: 7px 0;
   border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .err-breakdown li:last-child {
@@ -1767,8 +1956,8 @@ textarea {
 
 .eb-label {
   color: var(--text-muted);
-  font-family: 'JetBrainsMono Nerd Font', 'DejaVu Sans Mono', monospace;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 
 .eb-count {
@@ -1787,8 +1976,8 @@ textarea {
   border-radius: 4px;
   background: var(--warning-bg);
   color: var(--warning);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
   white-space: nowrap;
   cursor: help; /* title 属性里有完整说明，提示用户可以悬浮查看 */
 }
@@ -1803,8 +1992,8 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text-muted);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
   white-space: nowrap;
 }
 
@@ -1847,7 +2036,7 @@ textarea {
 
 .app-select-caret {
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: var(--text-2xs);
   transition: transform var(--duration-fast) var(--ease);
 }
 
@@ -1906,7 +2095,7 @@ textarea {
 
 .app-select-option.selected {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /* ---------- 手机端适配（≤640px）---------- */
@@ -2026,7 +2215,7 @@ textarea {
 
   .bottom-tab.active {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
   }
 
   .bottom-tab.locked {
@@ -2245,9 +2434,9 @@ textarea {
   background: var(--surface-2, #f6f7f9);
   border: 1px solid var(--border);
   border-radius: 6px;
-  font-family: var(--font-mono, 'JetBrains Mono', 'WenQuanYi Micro Hei Mono', monospace);
-  font-size: 12px;
-  line-height: 1.6;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.6; /* 字阶外特例：.edi-source-text 等宽原文块 */
   white-space: pre-wrap;
   word-break: break-all;
   max-height: 320px;
@@ -2259,10 +2448,714 @@ textarea {
 .edi-source-error {
   margin: 0;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--text-muted);
 }
 
 .edi-source-error {
   color: var(--warn, #b45309);
+}
+
+/* ========== 首页 ========== */
+/* 入口页允许品牌表达（DESIGN.md「入口级 vs 功能页」）：两栏 Hero + 单证叠放示意，
+   示意图加载时散开一次；功能页仍保持克制。窄屏收一列 */
+
+.home {
+  gap: var(--space-10);
+}
+
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-10);
+  padding: var(--space-10) 0 var(--space-4);
+  position: relative;
+}
+
+/* 背景微动画：漂浮的光晕圆，极低不透明度，暗示"数据在流动" */
+.home-hero::before,
+.home-hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+}
+
+.home-hero::before {
+  width: 420px;
+  height: 420px;
+  top: -60px;
+  left: -80px;
+  background: var(--blue-100);
+  opacity: 0.5;
+  animation: hero-float-a 12s ease-in-out infinite;
+}
+
+.home-hero::after {
+  width: 320px;
+  height: 320px;
+  bottom: -40px;
+  right: 10%;
+  background: oklch(85% 0.08 200);
+  opacity: 0.3;
+  animation: hero-float-b 16s ease-in-out infinite;
+}
+
+@keyframes hero-float-a {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33%       { transform: translateY(-24px) translateX(12px); }
+  66%       { transform: translateY(16px) translateX(-8px); }
+}
+
+@keyframes hero-float-b {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  40%       { transform: translateY(20px) translateX(-16px); }
+  70%       { transform: translateY(-12px) translateX(8px); }
+}
+
+/* 确保 Hero 内容在光晕上面 */
+.home-hero-copy,
+.home-stack {
+  position: relative;
+  z-index: 1;
+}
+
+.home-eyebrow {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background: var(--blue-50);
+  color: var(--blue-700);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+}
+
+.home-hero-title {
+  margin: var(--space-4) 0 0;
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: var(--weight-semibold);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.home-hero-sub {
+  max-width: 34em;
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-muted);
+}
+
+.home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.btn.large {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--text-base);
+  border-radius: var(--radius-md);
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--duration-fast) var(--ease);
+}
+
+.btn:hover:not(:disabled) .btn-icon {
+  transform: translateX(2px);
+}
+
+.home-formats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-formats li {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ---- 单证叠放示意：三张纸错位叠放，最上面的发票件数与另两张不一致 ---- */
+.home-stack {
+  position: relative;
+  height: 340px;
+}
+
+/* 背后的蓝色光晕给示意图一个落点，不另起色 */
+.home-stack::before {
+  content: '';
+  position: absolute;
+  inset: 8% 4% 4% 10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--blue-100), transparent);
+  opacity: 0.9;
+}
+
+.home-sheet {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 240px;
+  height: 260px;
+  margin-left: -120px;
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+  animation: home-sheet-in 900ms var(--ease-page) both;
+}
+
+.sheet-3 {
+  --sheet-to: translate(-96px, 6px) rotate(-8deg);
+  animation-delay: 80ms;
+}
+
+.sheet-2 {
+  --sheet-to: translate(88px, 14px) rotate(7deg);
+  animation-delay: 160ms;
+}
+
+.sheet-1 {
+  --sheet-to: translate(0, -8px) rotate(0deg);
+  box-shadow: var(--shadow-lg);
+  animation-delay: 240ms;
+}
+
+/* 一次性散开：三张纸先叠成一摞，再错开到各自位置（呼应切页的纸张语言） */
+@keyframes home-sheet-in {
+  from {
+    opacity: 0;
+    transform: translate(0, 24px) rotate(0deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: var(--sheet-to);
+  }
+}
+
+.sheet-tag {
+  align-self: flex-start;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-muted);
+}
+
+.sheet-line {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--gray-100);
+}
+
+.sheet-line.w-40 { width: 40%; }
+.sheet-line.w-50 { width: 50%; }
+.sheet-line.w-60 { width: 60%; }
+.sheet-line.w-70 { width: 70%; }
+.sheet-line.w-80 { width: 80%; }
+
+.sheet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--gray-50);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.sheet-row b {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+  color: var(--text-body);
+}
+
+.sheet-row.conflict {
+  background: var(--danger-bg);
+  box-shadow: inset 0 0 0 1px oklch(from var(--danger) l c h / 0.45);
+}
+
+.sheet-row.conflict b {
+  color: var(--danger);
+}
+
+/* 冲突旗标：最后落下，指向发票上的冲突行 */
+.home-stack-flag {
+  position: absolute;
+  right: 4%;
+  bottom: 28px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--gray-900);
+  color: white;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-lg);
+  animation: home-flag-in 500ms var(--ease-page) 900ms both;
+}
+
+.home-stack-flag::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: var(--space-2);
+  border-radius: 50%;
+  background: var(--danger);
+  vertical-align: 1px;
+}
+
+@keyframes home-flag-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---- 当前任务条：左侧色条按有无待复核区分 ---- */
+.home-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--success);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-task.has-review {
+  border-left-color: var(--warning);
+}
+
+.home-task-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.home-task-id {
+  font-size: var(--text-13);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-task-review {
+  font-size: var(--text-13);
+  font-weight: var(--weight-semibold);
+  color: oklch(from var(--warning) calc(l - 0.12) c h);
+}
+
+/* ---- 三步流程：图标 + 编号，步骤之间用连接线串起来 ---- */
+.home-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+/* 连接线：从第一个图标中心(left: 24px)到第三个图标中心(right: 24px)，
+   图标圆心距两端都是 24px（图标宽 48px），对称完全准确 */
+.home-steps::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue-300), var(--blue-200), var(--blue-100));
+  border-radius: 1px;
+}
+
+.home-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.home-step-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  border: 2px solid var(--blue-200);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--blue-50);
+  flex-shrink: 0;
+}
+
+.home-step-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-step-num {
+  display: block;
+  margin-top: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.home-step-title {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.home-step-desc {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--text-muted);
+}
+
+/* ---- 演示场景 ---- */
+.home-section-head {
+  margin-bottom: var(--space-4);
+}
+
+.home-section-title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+}
+
+.home-section-sub {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.home-scenario-group + .home-scenario-group {
+  margin-top: var(--space-5);
+}
+
+.home-group-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.home-scenarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+/* 场景卡整卡可点：名称 / 一句话说明 / 预期结果徽章 + 「演示 →」 */
+.home-scenario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  font: inherit;
+  color: var(--text-body);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease),
+    box-shadow var(--duration-fast) var(--ease),
+    transform var(--duration-fast) var(--ease);
+}
+
+.home-scenario:hover {
+  border-color: var(--blue-300);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.home-scenario:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-scenario:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.home-scenario-name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.home-scenario-desc {
+  font-size: var(--text-13);
+  color: var(--text-muted);
+}
+
+.home-scenario-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+}
+
+.home-scenario-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity var(--duration-fast) var(--ease),
+    transform var(--duration-fast) var(--ease);
+}
+
+.home-scenario-go svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-scenario:hover .home-scenario-go,
+.home-scenario:focus-visible .home-scenario-go {
+  opacity: 1;
+  transform: none;
+}
+
+/* 触屏没有悬停：「演示 →」常显 */
+@media (hover: none) {
+  .home-scenario-go {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ≤860px：Hero 收一列，示意图放到文案下方并缩小 */
+@media (max-width: 860px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding-top: var(--space-6);
+  }
+
+  .home-stack {
+    height: 300px;
+  }
+}
+
+/* ≤640px：流程收一列（去掉横向连接线），任务条纵排 */
+@media (max-width: 640px) {
+  .home {
+    gap: var(--space-8);
+  }
+
+  .home-steps {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .home-steps::before {
+    display: none; /* 窄屏一列排列，连接线不需要 */
+  }
+
+  .home-sheet {
+    width: 200px;
+    height: 230px;
+    margin-left: -100px;
+  }
+
+  .sheet-3 {
+    --sheet-to: translate(-70px, 6px) rotate(-8deg);
+  }
+
+  .sheet-2 {
+    --sheet-to: translate(66px, 14px) rotate(7deg);
+  }
+
+  .home-task {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ==========================================================================
+   页面切换「纸张层叠」
+   顶栏/页脚固定不动；过渡对象只有版心内容列 .page-inner（那张"纸"）。
+   前进：新纸从 .content 右侧外插进来盖上；旧纸原地缩小压暗沉底。
+   后退镜像：上层纸向右抽走，露出底下的纸并回弹放大。
+   .content 是裁切容器，本身始终显示灰色背景（"桌面"），
+   层叠期间 .content.stacking 略微压暗让纸张边缘更可见。
+   注意：上传页内部任务状态仍复用全局 .fade 过渡类，与这里互不相关。
+   ========================================================================== */
+
+/* .content 是层叠裁切容器，.page-inner 的进出不溢出到它外面 */
+.content {
+  overflow-x: clip;
+}
+
+
+.page-stack-forward-enter-active,
+.page-stack-forward-leave-active,
+.page-stack-backward-enter-active,
+.page-stack-backward-leave-active {
+  transition: transform var(--duration-page) var(--ease-page),
+              opacity var(--duration-page) var(--ease-page);
+  will-change: transform, opacity;
+}
+
+/* 前进：新纸在上（斜向飞入），旧纸沉底 */
+.page-stack-forward-enter-active,
+.page-stack-backward-leave-active {
+  z-index: 2;
+}
+
+.page-stack-forward-leave-active,
+.page-stack-backward-enter-active {
+  z-index: 1;
+}
+
+/* 前进：新页从右下斜向飞入 */
+.page-stack-forward-enter-from {
+  transform: translateX(52%) translateY(28px);
+  opacity: 0;
+}
+
+/* 旧页缩小 + 渐隐 */
+.page-stack-forward-leave-to {
+  transform: scale(0.93) translateY(-10px);
+  opacity: 0;
+}
+
+/* 后退：旧页向右下斜飞出 */
+.page-stack-backward-leave-to {
+  transform: translateX(52%) translateY(28px);
+  opacity: 0;
+}
+
+/* 后退：底下的纸从缩小+透明还原 */
+.page-stack-backward-enter-from {
+  transform: scale(0.93) translateY(-10px);
+  opacity: 0;
+}
+
+/* 窄屏：平移幅度收小 */
+@media (max-width: 640px) {
+  .page-stack-forward-enter-from,
+  .page-stack-backward-leave-to {
+    transform: translateX(36%) translateY(20px);
+    opacity: 0;
+  }
+  .page-stack-forward-leave-to,
+  .page-stack-backward-enter-from {
+    transform: scale(0.95) translateY(-6px);
+    opacity: 0;
+  }
+}
+
+/* ========== 上传完成引导 ========== */
+/* 任务达终态后，「查看比对结果」按钮的一次性描边引导 + 轻微脉冲。
+   启动时机在 UploadPage.onNextActionsEnter：collapseHooks 高度展开结束后
+   才加 .playing，避免与高度动画同帧被 overflow 裁切。 */
+
+/* 按钮作为 SVG 的定位壳；不改按钮原有盒模型 */
+.cta-trace {
+  position: relative;
+}
+
+.cta-trace-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* 初始不可见；prefers-reduced-motion 下 JS 不启动（onNextActionsEnter
+     直接 return），描边始终不出现——全局规则只压时长不压状态，
+     靠它降级会留下瞬间到终态的描边环 */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cta-trace-rect {
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+/* .playing 由 JS 在高度展开结束后加上：opacity 立刻置 1（无过渡，防闪现），
+   dashoffset 从 100 过渡到 0，描边沿按钮描一圈 */
+.cta-trace-rect.playing {
+  opacity: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--duration-slower) var(--ease);
+}
+
+/* 描边完成后的淡出（JS 加 .done，transitionend 后两类一起移除）：
+   引导只播一次，播完不留永久描边环 */
+.cta-trace-rect.playing.done {
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease);
+}
+
+/* SVG 自身可见性跟随 rect（壳不参与过渡，仅 rect 的 .playing 生效） */
+.cta-trace-svg:has(.cta-trace-rect.playing) {
+  opacity: 1;
+}
+
+/* 描边结束后的一次性脉冲：1 → 1.03 → 1，一次即停。
+   时长取 --duration-base 的 2 倍（400ms）：比一次交互动效稍长，又不至于拖沓 */
+@keyframes cta-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.cta-pulse {
+  animation: cta-pulse calc(var(--duration-base) * 2) var(--ease) 1;
 }

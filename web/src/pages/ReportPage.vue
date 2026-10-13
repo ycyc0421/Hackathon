@@ -6,7 +6,7 @@
  * 真实任务可导出报告并创建人工修正版本。
  */
 import { computed, inject } from 'vue'
-import { formatTime, formatDuration, riskType, severity, processStatus } from '../api/formatters.js'
+import { formatTime, formatDuration, riskType, severity, processStatus, taskStatus } from '../api/formatters.js'
 import { buildConclusion } from '../utils/reportConclusion.js'
 import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
@@ -179,14 +179,20 @@ const severityOf = severity
       tone="bad"
       title="尚未取得检查结果"
       :detail="taskError.message"
-    />
+    >
+      <!-- 失败提示不能只给原因不给出口：直接引导回上传页重新检查 -->
+      <button class="btn primary" @click="navigate.go('upload')">去上传页重新检查</button>
+    </NoticeBar>
 
     <NoticeBar
       v-else-if="!task"
       tone="info"
       title="尚无检查结果"
       detail="请先在「上传」页创建一次检查。"
-    />
+    >
+      <!-- 空状态给出明确的下一步操作，而不是只提示一句说明 -->
+      <button class="btn primary" @click="navigate.go('upload')">去上传页创建检查</button>
+    </NoticeBar>
 
     <template v-else>
       <!-- 未完成 / 失败的检查不得呈现为"通过" -->
@@ -217,8 +223,11 @@ const severityOf = severity
         :detail="`${failedDocs.length} 份文件未能处理成功，其数据未参与比对。`"
       />
 
-      <section class="card">
-        <h2 class="card-title">检查概要</h2>
+      <section class="card report-head" :class="conclusion ? `tone-${conclusion.tone}` : ''">
+        <div class="report-kicker">
+          <h2 class="card-title">检查概要</h2>
+          <StatusBadge :status="taskStatus(task.status)" />
+        </div>
 
         <!-- 结论先行：一段话回答"这次检查要不要处理"。summary 缺失时不显示，不替后端下结论。
              tone 与文案同源推导（utils/reportConclusion.js），结论条按 tone 上色 -->
@@ -243,7 +252,7 @@ const severityOf = severity
           <div class="stat" :class="summary.unrecognized_count > 0 ? 'warn' : 'zero'">
             <span class="stat-num">{{ summary.unrecognized_count }}</span><span class="stat-label">无法比对</span>
           </div>
-          <div class="stat"><span class="stat-num">{{ summary.risk_count }}</span><span class="stat-label">风险提示</span></div>
+          <div class="stat" :class="summary.risk_count > 0 ? '' : 'zero'"><span class="stat-num">{{ summary.risk_count }}</span><span class="stat-label">风险提示</span></div>
         </div>
       </section>
 
@@ -277,7 +286,7 @@ const severityOf = severity
         />
 
         <ul v-if="issues.length" class="issue-list">
-          <li v-for="c in issues" :key="c.comparison_id" class="issue-item">
+          <li v-for="c in issues" :key="c.comparison_id" class="issue-item" :class="`sev-${severityOf(c.severity).tone}`">
             <div class="issue-head">
               <span class="issue-label">{{ c.label }}</span>
               <!-- 商品归属：多品名时问题条目必须能区分属于哪个商品；查不到目录时不猜 -->
