@@ -106,7 +106,7 @@ def _table_lines(html: str) -> list[str]:
         raise ValueError("未识别出唯一的商品明细表")
     table, spans, header_at = candidates[0]
     original_headers = table[0][:]
-    is_total = lambda value: bool(re.fullmatch(r'TOTAL(?:\s+(?:AMOUNT|QUANTITY|PACKAGES|WEIGHT))?(?:\s*\([A-Z]{3}\))?', value.strip(), re.I))
+    is_total = lambda value: bool(TOTAL_LINE.match(value.strip()))
     total_at = next((index for index, row in enumerate(table[1:], 1) if row and is_total(row[0])), len(table))
     footers = table[total_at:]
     if any(not row or not is_total(row[0]) for row in footers):
