@@ -72,8 +72,12 @@
   --color-primary: var(--blue-500);
   --color-primary-hover: var(--blue-600);
   --color-primary-active: var(--blue-700);
-  /* 品牌点缀色：不做操作色，只用于装饰与数据可视化 */
-  --color-accent: var(--teal-500);
+  /* 品牌点缀色：不做操作色，只用于装饰与数据可视化。
+     浅色下取**冷青绿**——它是蓝主色的搭档，两者组成的渐变干净；
+     注意不能用 --teal-*（那是柠檬黄绿族），浅色下当背景会糊成脏黄 */
+  --color-accent: oklch(58% 0.115 195);
+  --accent-tint: oklch(58% 0.115 195 / 0.12);
+  --accent-text: oklch(44% 0.10 195);
 
   /* 三层表面：桌面 → 纸 → 下沉。层级靠表面亮度差与投影建立 */
   --surface-desk: oklch(96.6% 0.005 250); /* 页面底，比纸暗，纸才浮得起来 */
@@ -103,10 +107,21 @@
   --desk-glow-b: var(--teal-200);
   --desk-glow-a-opacity: 0.28;
   --desk-glow-b-opacity: 0.26;
-  /* 品牌章渐变：跟随本主题的主色。浅色主色是蓝、暗色主色是柠檬绿，
-     章如果固定用强调色，浅色下会变成一块橄榄绿，和蓝主色打架 */
-  --brand-from: var(--blue-600);
-  --brand-to: var(--blue-800);
+  /* ===== 品牌色族：所有"品牌感"的装饰都走这几个 token =====
+     浅色主题下品牌色是蓝（主色），暗色主题下是柠檬黄绿（主色+强调色）。
+     装饰处如果直接写 var(--blue-*) ，暗色下会留下一片蓝，
+     读起来像"一个变暗的蓝色应用"——首页尤其明显。
+     集中成 token 后，换主题只改这里一处。 */
+  --brand-from: var(--blue-600);       /* 品牌章渐变起 */
+  --brand-to: var(--blue-800);         /* 品牌章渐变止 */
+  --brand-tint-bg: var(--blue-50);     /* 淡底：标签、悬停填充 */
+  --brand-tint-border: var(--blue-100);/* 淡底描边 */
+  --brand-tint-text: var(--blue-700);  /* 淡底上的文字 */
+  --brand-glow: var(--blue-100);       /* 大团柔光 */
+  --brand-glow-2: var(--blue-100);     /* 第二团柔光 */
+  --brand-glow-opacity: 0.5;
+  --brand-halo: var(--blue-50);        /* 元素周围的光晕环 */
+  --brand-ring: oklch(from var(--blue-500) l c h / 0.08);
 
   /* ========== 间距（4px 基数）========== */
   --space-1: 4px;
@@ -278,7 +293,10 @@
   --color-primary: var(--teal-500);
   --color-primary-hover: var(--teal-400);
   --color-primary-active: var(--teal-600);
+  /* 暗色下强调色就是柠檬黄绿本身 */
   --color-accent: var(--teal-500);
+  --accent-tint: oklch(from var(--teal-500) l c h / 0.14);
+  --accent-text: var(--teal-600);
 
   /* 三层表面：越高越亮。桌面最深，纸比桌面亮一档，子块夹在中间——
      与浅色同向（越高越亮），但绝对值全部重新定过。
@@ -316,9 +334,20 @@
   --desk-glow-b: var(--teal-500);
   --desk-glow-a-opacity: 0.11;
   --desk-glow-b-opacity: 0.07;
-  /* 暗色下主色就是强调色，章随之变柠檬绿渐变 */
+  /* 暗色下主色就是强调色，品牌色族随之整体换成柠檬黄绿。
+     淡底用强调色的低透明度叠加，不用实色——实色块在近黑底上太重 */
   --brand-from: var(--teal-400);
   --brand-to: var(--teal-700);
+  --brand-tint-bg: oklch(from var(--teal-500) l c h / 0.10);
+  --brand-tint-border: oklch(from var(--teal-500) l c h / 0.24);
+  --brand-tint-text: var(--teal-600);
+  --brand-glow: var(--teal-500);
+  /* 第二团光晕在暗色下用中性白：两团都是绿会腻，
+     而且 velopay 的暗色高级感本来就来自白色柔光 */
+  --brand-glow-2: oklch(96% 0.01 120);
+  --brand-glow-opacity: 0.10;
+  --brand-halo: oklch(from var(--teal-500) l c h / 0.16);
+  --brand-ring: oklch(from var(--teal-500) l c h / 0.16);
 
   /* 投影：近黑底上黑投影几乎不可见，只留一点点落定感。
      真正的层次交给边框与表面亮度差。 */
