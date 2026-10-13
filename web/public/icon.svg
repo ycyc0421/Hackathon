@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">单证校验</title>
+  <desc id="desc">蓝色圆角底上的两张叠放单证，以双向箭头表示交叉比对。</desc>
+  <defs>
+    <linearGradient id="background" x1="8" y1="4" x2="56" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#226A95"/>
+      <stop offset="1" stop-color="#103B60"/>
+    </linearGradient>
+    <linearGradient id="rear-paper" x1="15" y1="12" x2="38" y2="44" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A5F0E5"/>
+      <stop offset="1" stop-color="#4FBDBB"/>
+    </linearGradient>
+    <linearGradient id="front-paper" x1="26" y1="22" x2="48" y2="53" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E4F0F8"/>
+    </linearGradient>
+  </defs>
+  <!-- 深蓝底座与青绿单证沿用界面品牌色。 -->
+  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#background)"/>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="16.5" stroke="#FFFFFF" stroke-opacity=".12"/>
+  <!-- 两张错位纸页分别代表参与比对的单证。 -->
+  <path d="M18 12H30L39 21V40A4 4 0 0 1 35 44H18A4 4 0 0 1 14 40V16A4 4 0 0 1 18 12Z" fill="url(#rear-paper)"/>
+  <path d="M30 12V17A4 4 0 0 0 34 21H39L30 12Z" fill="#D6FFF4"/>
+  <path d="M28 23H40L50 33V51A4 4 0 0 1 46 55H28A4 4 0 0 1 24 51V27A4 4 0 0 1 28 23Z" fill="#082E4B" fill-opacity=".18"/>
+  <path d="M28 21H39L49 31V49A4 4 0 0 1 45 53H28A4 4 0 0 1 24 49V25A4 4 0 0 1 28 21Z" fill="url(#front-paper)"/>
+  <path d="M39 21V27A4 4 0 0 0 43 31H49L39 21Z" fill="#BCD9EB"/>
+  <!-- 双向箭头表达核对动作，不承担通过或失败的状态语义。 -->
+  <g stroke="#185477" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 31H38M34 27L38 31L34 35"/>
+    <path d="M42 41H24M28 37L24 41L28 45"/>
+  </g>
+</svg>
