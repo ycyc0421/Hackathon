@@ -132,6 +132,8 @@ let pendingScrollRestore = null
  * 锚点跳转（报告页 → 差异页条目，order 2 → 1）按同一规则算为后退。
  */
 const pageTransition = ref('page-stack-forward')
+/** 层叠进行中：.content 显出底下的「桌面」暗层，两张纸的边缘和缩小后的留白才看得见 */
+const stacking = ref(false)
 const orderOf = (name) =>
   router.getRoutes().find((r) => r.name === name)?.meta?.order ?? 0
 
@@ -168,6 +170,11 @@ function onPageEnter(el) {
     pendingScrollRestore = null
     window.scrollTo(0, y ?? 0)
   }
+  /* 后退时新纸从「被压低」状态放大回来：缩放原点对准视口中心而不是纸张
+     中心（长页面的纸张中心可能远在视口外，缩放会带着可见区域大幅漂移）。
+     用未受 transform 影响的 offsetTop 推算纸张在视口中的位置 */
+  const parentTop = el.offsetParent?.getBoundingClientRect().top ?? 0
+  el.style.transformOrigin = `50% ${window.innerHeight / 2 - (parentTop + el.offsetTop)}px`
   if (firstPageEnter) {
     firstPageEnter = false
     return
@@ -189,7 +196,11 @@ function onPageBeforeLeave(el) {
   el.style.top = `${rect.top}px`
   el.style.left = `${rect.left}px`
   el.style.width = `${rect.width}px`
+  el.style.height = `${rect.height}px`
   el.style.margin = '0'
+  /* 缩小时以视口中心为原点：纸张像被原地压下去，而不是朝纸张中心（可能在视口外）收缩 */
+  el.style.transformOrigin = `50% ${window.innerHeight / 2 - rect.top}px`
+  stacking.value = true
 }
 
 /**
@@ -202,7 +213,15 @@ function onPageLeaveDone(el) {
   el.style.top = ''
   el.style.left = ''
   el.style.width = ''
+  el.style.height = ''
   el.style.margin = ''
+  el.style.transformOrigin = ''
+  stacking.value = false
+}
+
+/** 进场结束（或被打断）清掉缩放原点，静止态不留内联样式 */
+function onPageAfterEnter(el) {
+  el.style.transformOrigin = ''
 }
 
 /**
@@ -373,17 +392,22 @@ watch(() => route.name, updateIndicator)
       </button>
     </nav>
 
-    <main class="content">
-      <!-- 纸张层叠：无 mode 并行渲染，新旧页同时在 DOM；
-           旧页在 before-leave 里 fixed 脱流锁定视觉原位，新页在文档流撑高 -->
+    <main class="content" :class="{ stacking }">
+      <!-- 纸张层叠：无 mode 并行渲染，新旧页同时在 DOM。每页包一张通栏不透明
+           的 .page-sheet 作为纸面（页面内容在纸内居中限宽），层叠时两张纸
+           互不透字；旧纸在 before-leave 里 fixed 脱流锁定视觉原位 -->
       <Transition
         :name="pageTransition"
         @enter="onPageEnter"
+        @after-enter="onPageAfterEnter"
+        @enter-cancelled="onPageAfterEnter"
         @before-leave="onPageBeforeLeave"
         @after-leave="onPageLeaveDone"
         @leave-cancelled="onPageLeaveDone"
       >
-        <component :is="current" :key="route.name" />
+        <div :key="route.name" class="page-sheet">
+          <component :is="current" />
+        </div>
       </Transition>
     </main>
 

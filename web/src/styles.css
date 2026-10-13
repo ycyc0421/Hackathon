@@ -199,12 +199,25 @@ body {
   display: none;
 }
 
+/* 内容区通栏：纸张（.page-sheet）铺满宽度，版心限宽下放到纸内的 .page。
+   这样层叠切页时整张纸从视口边缘飞入，而不是一条 1080px 的窄条 */
 .content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 1080px;
-  margin: 0 auto;
+}
+
+.page-sheet {
+  position: relative;
+  flex: 1;
+  background: var(--surface);
   padding: var(--space-6);
+}
+
+.page-sheet > .page {
+  max-width: 1032px;
+  margin: 0 auto;
 }
 
 .footer {
@@ -2070,7 +2083,7 @@ textarea {
   }
 
   /* 内容底部让出标签栏高度，防止被固定栏遮挡 */
-  .content {
+  .page-sheet {
     padding: var(--space-3);
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px) + var(--space-4));
   }
@@ -2303,38 +2316,253 @@ textarea {
 }
 
 /* ========== 首页 ========== */
-/* 入口页克制无装饰：不做入场动效，加载即所见；布局桌面优先，窄屏不破 */
+/* 入口页允许品牌表达（DESIGN.md「入口级 vs 功能页」）：两栏 Hero + 单证叠放示意，
+   示意图加载时散开一次；功能页仍保持克制。窄屏收一列 */
+
+.home {
+  gap: var(--space-10);
+}
 
 .home-hero {
-  padding: var(--space-8) 0 var(--space-6);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-10);
+  padding: var(--space-10) 0 var(--space-4);
+}
+
+.home-eyebrow {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background: var(--blue-50);
+  color: var(--blue-700);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
 }
 
 .home-hero-title {
-  margin: 0;
-  font-size: var(--text-3xl);
+  margin: var(--space-4) 0 0;
+  font-size: clamp(32px, 4vw, 44px);
   font-weight: var(--weight-semibold);
-  line-height: var(--leading-tight);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .home-hero-sub {
-  margin: var(--space-2) 0 0;
+  max-width: 34em;
+  margin: var(--space-4) 0 0;
   font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
   color: var(--text-muted);
 }
 
 .home-hero-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-5);
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
-/* 当前任务卡：状态徽章 + 任务号 + 待复核数 一行，按钮靠右 */
+.btn.large {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--text-base);
+  border-radius: var(--radius-md);
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--duration-fast) var(--ease);
+}
+
+.btn:hover:not(:disabled) .btn-icon {
+  transform: translateX(2px);
+}
+
+.home-formats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-formats li {
+  padding: 2px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ---- 单证叠放示意：三张纸错位叠放，最上面的发票件数与另两张不一致 ---- */
+.home-stack {
+  position: relative;
+  height: 340px;
+}
+
+/* 背后的蓝色光晕给示意图一个落点，不另起色 */
+.home-stack::before {
+  content: '';
+  position: absolute;
+  inset: 8% 4% 4% 10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--blue-100), transparent);
+  opacity: 0.9;
+}
+
+.home-sheet {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 240px;
+  height: 260px;
+  margin-left: -120px;
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+  animation: home-sheet-in 900ms var(--ease-page) both;
+}
+
+.sheet-3 {
+  --sheet-to: translate(-96px, 6px) rotate(-8deg);
+  animation-delay: 80ms;
+}
+
+.sheet-2 {
+  --sheet-to: translate(88px, 14px) rotate(7deg);
+  animation-delay: 160ms;
+}
+
+.sheet-1 {
+  --sheet-to: translate(0, -8px) rotate(0deg);
+  box-shadow: var(--shadow-lg);
+  animation-delay: 240ms;
+}
+
+/* 一次性散开：三张纸先叠成一摞，再错开到各自位置（呼应切页的纸张语言） */
+@keyframes home-sheet-in {
+  from {
+    opacity: 0;
+    transform: translate(0, 24px) rotate(0deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: var(--sheet-to);
+  }
+}
+
+.sheet-tag {
+  align-self: flex-start;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-muted);
+}
+
+.sheet-line {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--gray-100);
+}
+
+.sheet-line.w-40 { width: 40%; }
+.sheet-line.w-50 { width: 50%; }
+.sheet-line.w-60 { width: 60%; }
+.sheet-line.w-70 { width: 70%; }
+.sheet-line.w-80 { width: 80%; }
+
+.sheet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--gray-50);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.sheet-row b {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+  color: var(--text-body);
+}
+
+.sheet-row.conflict {
+  background: var(--danger-bg);
+  box-shadow: inset 0 0 0 1px oklch(from var(--danger) l c h / 0.45);
+}
+
+.sheet-row.conflict b {
+  color: var(--danger);
+}
+
+/* 冲突旗标：最后落下，指向发票上的冲突行 */
+.home-stack-flag {
+  position: absolute;
+  right: 4%;
+  bottom: 28px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--gray-900);
+  color: white;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-lg);
+  animation: home-flag-in 500ms var(--ease-page) 900ms both;
+}
+
+.home-stack-flag::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: var(--space-2);
+  border-radius: 50%;
+  background: var(--danger);
+  vertical-align: 1px;
+}
+
+@keyframes home-flag-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---- 当前任务条：左侧色条按有无待复核区分 ---- */
 .home-task {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--success);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-task.has-review {
+  border-left-color: var(--warning);
 }
 
 .home-task-head {
@@ -2354,70 +2582,139 @@ textarea {
 
 .home-task-review {
   font-size: var(--text-13);
-  color: var(--warning);
+  font-weight: var(--weight-semibold);
+  color: oklch(from var(--warning) calc(l - 0.12) c h);
 }
 
-/* 三步流程：桌面三列，窄屏一列 */
+/* ---- 三步流程：图标 + 编号，步骤之间用连接线串起来 ---- */
 .home-steps {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
+  gap: var(--space-6);
+}
+
+/* 连接线穿过三个图标中心 */
+.home-steps::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  right: calc((100% - 2 * var(--space-6)) / 3 - 24px);
+  height: 1px;
+  background: linear-gradient(90deg, var(--blue-200), var(--border));
+}
+
+.home-step {
+  position: relative;
+}
+
+.home-step-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  border: 1px solid var(--blue-100);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-step-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .home-step-num {
-  font-size: var(--text-13);
-  font-weight: var(--weight-semibold);
+  display: block;
+  margin-top: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   color: var(--text-muted);
 }
 
 .home-step-title {
-  margin: var(--space-2) 0 0;
+  margin: var(--space-1) 0 0;
   font-size: var(--text-lg);
   font-weight: var(--weight-semibold);
 }
 
 .home-step-desc {
-  margin: var(--space-2) 0 0;
-  font-size: var(--text-13);
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
   color: var(--text-muted);
 }
 
-/* 演示场景区：仅在示例数据模式下渲染 */
-.home-demo {
-  margin-top: var(--space-2);
+/* ---- 演示场景 ---- */
+.home-section-head {
+  margin-bottom: var(--space-4);
+}
+
+.home-section-title {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+}
+
+.home-section-sub {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.home-scenario-group + .home-scenario-group {
+  margin-top: var(--space-5);
+}
+
+.home-group-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
 }
 
 .home-scenarios {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-3);
 }
 
-/* 场景卡复用卡片观感但做成整卡可点按钮；
-   hover/active 与 .btn 同一节奏（token 化过渡），不另起动效 */
+/* 场景卡整卡可点：名称 / 一句话说明 / 预期结果徽章 + 「演示 →」 */
 .home-scenario {
-  display: block;
-  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-raised);
   font: inherit;
-  font-size: var(--text-13);
   color: var(--text-body);
   text-align: left;
   cursor: pointer;
   transition:
     border-color var(--duration-fast) var(--ease),
-    background-color var(--duration-fast) var(--ease);
+    box-shadow var(--duration-fast) var(--ease),
+    transform var(--duration-fast) var(--ease);
 }
 
 .home-scenario:hover {
-  border-color: var(--border-hover);
-  background: var(--surface);
+  border-color: var(--blue-300);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .home-scenario:active {
-  background: var(--gray-100);
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .home-scenario:focus-visible {
@@ -2425,11 +2722,101 @@ textarea {
   outline-offset: 2px;
 }
 
-/* ≤640px：三列流程与双列场景卡各收成一列，任务卡纵排，不破布局 */
-@media (max-width: 640px) {
-  .home-steps,
-  .home-scenarios {
+.home-scenario-name {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.home-scenario-desc {
+  font-size: var(--text-13);
+  color: var(--text-muted);
+}
+
+.home-scenario-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+}
+
+.home-scenario-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity var(--duration-fast) var(--ease),
+    transform var(--duration-fast) var(--ease);
+}
+
+.home-scenario-go svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-scenario:hover .home-scenario-go,
+.home-scenario:focus-visible .home-scenario-go {
+  opacity: 1;
+  transform: none;
+}
+
+/* 触屏没有悬停：「演示 →」常显 */
+@media (hover: none) {
+  .home-scenario-go {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ≤860px：Hero 收一列，示意图放到文案下方并缩小 */
+@media (max-width: 860px) {
+  .home-hero {
     grid-template-columns: 1fr;
+    gap: var(--space-6);
+    padding-top: var(--space-6);
+  }
+
+  .home-stack {
+    height: 300px;
+  }
+}
+
+/* ≤640px：流程收一列（去掉横向连接线），任务条纵排 */
+@media (max-width: 640px) {
+  .home {
+    gap: var(--space-8);
+  }
+
+  .home-steps {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .home-steps::before {
+    display: none;
+  }
+
+  .home-sheet {
+    width: 200px;
+    height: 230px;
+    margin-left: -100px;
+  }
+
+  .sheet-3 {
+    --sheet-to: translate(-70px, 6px) rotate(-8deg);
+  }
+
+  .sheet-2 {
+    --sheet-to: translate(66px, 14px) rotate(7deg);
   }
 
   .home-task {
@@ -2439,48 +2826,67 @@ textarea {
 }
 
 /* ==========================================================================
-   页面切换「纸张层叠」（替代原 fade out-in）
-   新页像一张纸从侧方滑入盖上来，旧页缩小变暗沉入底层；回退方向镜像。
-   并行渲染（无 mode）：新旧页同时在 DOM，旧页由 JS 钩子 fixed 脱流锁定在
-   视觉原位（见 App.vue onPageBeforeLeave），新页留在文档流撑起高度。
-   注意：上传页内部任务状态仍复用全局 .fade 过渡类，与这里的 page-stack
-   互不相关，不要合并。
+   页面切换「纸张层叠」
+   前进：新纸从视口右侧外整张飞入、带投影盖上来；旧纸原地缩小、变暗、圆角
+   显出，像被压到下面。后退镜像：上层纸向右抽走，露出底下被压低的纸并回弹放大。
+   并行渲染（无 mode）：旧纸由 App.vue onPageBeforeLeave fixed 脱流锁在视觉原位，
+   缩放原点由 JS 对准视口中心；新纸留在文档流撑高。
+   只动 transform / opacity（合成层），不逐帧动 filter、box-shadow。
+   注意：上传页内部任务状态仍复用全局 .fade 过渡类，与这里互不相关。
    ========================================================================== */
 
-/* 旧页 fixed 脱流后不再受 .content 裁剪，滑出方向的 24% 会超出视口右侧，
-   用 clip（不创建滚动容器，不影响 sticky 顶栏）挡掉横向溢出。
-   html 已有 scrollbar-gutter: stable 常驻纵向滚动条槽，过渡期间页高变化
-   不会引起横向抖动，无需再设 overflow-y: scroll */
+/* 新纸进场前在视口右侧外，用 clip 挡掉横向溢出（不创建滚动容器，不影响 sticky 顶栏）。
+   html 已有 scrollbar-gutter: stable，过渡期间页高变化不引起横向抖动 */
 body {
   overflow-x: clip;
 }
 
-.content {
-  /* 并行过渡的定位与裁剪边界：旧页 absolute/fixed 脱流时以它为参照，
-     新页滑入前的 24% 偏移裁在容器外 */
-  position: relative;
-  overflow-x: clip;
+/* 桌面：层叠期间在纸下面显出一层深色桌面，旧纸缩小后四周露出的就是它，
+   两张纸的边界才读得出来。静止时透明 */
+.content::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--gray-300);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-page) var(--ease-page);
+}
+
+.content.stacking::before {
+  opacity: 1;
 }
 
 .page-stack-forward-enter-active,
 .page-stack-forward-leave-active,
 .page-stack-backward-enter-active,
 .page-stack-backward-leave-active {
-  transition: transform var(--duration-page) var(--ease-page),
-              filter var(--duration-page) var(--ease-page),
-              box-shadow var(--duration-page) var(--ease-page);
+  transition: transform var(--duration-page) var(--ease-page);
+  border-radius: var(--radius-xl);
   will-change: transform;
 }
 
-/* 运动中的那张纸在上层：前进时是新页（从右盖上来），后退时是旧页（向右滑走） */
+/* 压暗用纸面上的遮罩层做 opacity 过渡，代替逐帧重绘的 filter */
+.page-stack-forward-leave-active::after,
+.page-stack-backward-enter-active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: inherit;
+  background: var(--gray-900);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-page) var(--ease-page);
+}
+
+/* 运动中的那张纸在上层：前进时是新纸（从右盖上来），后退时是旧纸（向右抽走）。
+   投影是静态的（不参与过渡），纸张落定后左缘投影已在视口外，移除时无跳变 */
 .page-stack-forward-enter-active,
 .page-stack-backward-leave-active {
   z-index: 2;
-}
-
-/* 后退时旧页是滑走的上层纸张，阴影随滑出全程保留（元素随后被移除，无跳变） */
-.page-stack-backward-leave-active {
-  box-shadow: var(--shadow-lg), 0 16px 48px rgba(0, 0, 0, 0.14);
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.10), -32px 0 80px rgba(0, 0, 0, 0.12);
 }
 
 .page-stack-forward-leave-active,
@@ -2488,25 +2894,38 @@ body {
   z-index: 1;
 }
 
-/* 前进（to.order > from.order）：新页从右侧 24% 滑入；旧页原地缩小变暗沉底。
-   新页阴影放在 enter-from：随滑入过渡渐隐到无，避免类移除时阴影硬跳 */
+/* 前进 */
 .page-stack-forward-enter-from {
-  transform: translateX(24%);
-  box-shadow: var(--shadow-lg), 0 16px 48px rgba(0, 0, 0, 0.14);
+  transform: translateX(100%);
 }
 
 .page-stack-forward-leave-to {
-  transform: scale(0.94);
-  filter: brightness(0.97);
+  transform: scale(0.9);
 }
 
-/* 后退镜像：新页从左侧 -24% 滑入，旧页向右滑出 */
+.page-stack-forward-leave-to::after {
+  opacity: 0.18;
+}
+
+/* 后退 */
 .page-stack-backward-enter-from {
-  transform: translateX(-24%);
+  transform: scale(0.9);
+}
+
+.page-stack-backward-enter-from::after {
+  opacity: 0.18;
 }
 
 .page-stack-backward-leave-to {
-  transform: translateX(24%);
+  transform: translateX(100%);
+}
+
+/* 窄屏：纸张占满屏幕，缩小幅度收一点，避免四周露出太多桌面显得像弹窗 */
+@media (max-width: 640px) {
+  .page-stack-forward-leave-to,
+  .page-stack-backward-enter-from {
+    transform: scale(0.94);
+  }
 }
 
 /* ========== 上传完成引导 ========== */
