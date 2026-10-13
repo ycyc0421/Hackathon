@@ -1,10 +1,8 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { isMock, listMockScenarios, setMockScenario, getEvaluation } from './api/index.js'
-import { setMock } from './api/config.js'
+import { isMock, getEvaluation } from './api/index.js'
 import { needsReview } from './utils/needsReview.js'
-import { SCENARIO_NAMES } from './state/scenarios.js'
 import {
   task, taskError, isRunning,
   uploadFiles, uploadCountry, uploadNotes, uploadScanWarnings,
@@ -13,7 +11,6 @@ import {
   pendingAnchor,
 } from './state/session.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
-import AppSelect from './components/AppSelect.vue'
 
 /* label 从路由 meta 取，这里只存页序 key 列表，避免两处维护同一份文案 */
 const PAGES = [
@@ -33,48 +30,6 @@ const active = computed(() => route.name)
  * 顶栏切换后整页刷新：任务、缓存、错误提示都属于旧数据源，不值得就地迁移。
  */
 const mock = ref(isMock())
-
-const SOURCE_OPTIONS = [
-  { value: 'mock', label: '示例数据' },
-  { value: 'backend', label: '真实后端' },
-]
-
-function onSourceChange(value) {
-  const next = value === 'mock'
-  if (next === mock.value) return
-  setMock(next)
-  window.location.reload()
-}
-
-/** mock 场景选择。中文名在 state/scenarios.js 共享（首页演示区复用），场景数据以 api 层注册表为准 */
-const mockScenario = ref('single-item')
-const scenarioOptions = listMockScenarios().map((key) => ({
-  value: key,
-  label: SCENARIO_NAMES[key] ?? key,
-}))
-
-function onScenarioChange() {
-  setMockScenario(mockScenario.value)
-}
-
-/**
- * 移动端（≤640px）mock 工具收进徽标弹层：顶栏只留数据源徽标，
- * 点徽标在其下方弹出小面板，面板内放场景/来源两个下拉。
- * 桌面端徽标只是标识，点击不响应；弹层开/关走 CSS 透明度过渡。
- */
-const mockPanelOpen = ref(false)
-
-function toggleMockPanel() {
-  if (!window.matchMedia('(max-width: 640px)').matches) return
-  mockPanelOpen.value = !mockPanelOpen.value
-}
-
-/** 点面板外任意处收起 */
-function onDocumentClick(e) {
-  if (!mockPanelOpen.value) return
-  if (e.target.closest?.('.mock-tools')) return
-  mockPanelOpen.value = false
-}
 
 /** 当前检查任务。由上传页写入，差异页和报告页读取（ref 本体在 state/session.js） */
 provide('task', task)
@@ -301,13 +256,11 @@ onMounted(() => {
     resizeObserver.observe(tabsRef.value)
   }
   window.addEventListener('resize', updateIndicator)
-  document.addEventListener('click', onDocumentClick)
 })
 
 onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   window.removeEventListener('resize', updateIndicator)
-  document.removeEventListener('click', onDocumentClick)
 })
 
 watch(() => route.name, updateIndicator)
@@ -340,37 +293,6 @@ watch(() => route.name, updateIndicator)
         <span class="tab-indicator" :style="indicatorStyle" aria-hidden="true" />
       </nav>
 
-      <div class="mock-tools">
-        <!-- 徽标在桌面端只是标识；≤640px 时是可点按钮，开合下方的 mock-selects 弹层 -->
-        <button
-          type="button"
-          class="flag-btn"
-          :class="mock ? 'mock-flag' : 'backend-flag'"
-          :title="mock ? '前端正在使用本地示例数据，未连接后端' : '前端直连后端接口，所见均为真实处理结果'"
-          @click="toggleMockPanel"
-        >{{ mock ? '示例数据' : '真实后端' }}</button>
-        <!-- 桌面端 display:contents 平铺在顶栏；≤640px 变成徽标下方的弹层 -->
-        <div class="mock-selects" :class="{ open: mockPanelOpen }">
-          <div v-if="mock" class="mock-field">
-            <AppSelect
-              v-model="mockScenario"
-              :options="scenarioOptions"
-              title="选择示例场景，下次提交检查时生效"
-              @change="onScenarioChange"
-            />
-            <p class="mock-note">选择示例场景，下次提交检查时生效</p>
-          </div>
-          <div class="mock-field">
-            <AppSelect
-              :model-value="mock ? 'mock' : 'backend'"
-              :options="SOURCE_OPTIONS"
-              title="切换数据来源，切换后页面自动刷新"
-              @change="onSourceChange"
-            />
-            <p class="mock-note">切换数据来源，切换后页面自动刷新</p>
-          </div>
-        </div>
-      </div>
     </header>
 
     <!-- 移动端主导航：≤640px 显示（顶栏页签隐藏），选中态用颜色/字重表达，不用滑动指示条 -->

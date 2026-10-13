@@ -186,52 +186,6 @@ body {
   text-align: center;
 }
 
-.mock-tools {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.mock-flag {
-  padding: 3px var(--space-3);
-  border: 1px dashed var(--warning);
-  border-radius: var(--radius-sm);
-  background: var(--warning-bg);
-  color: var(--warning);
-  font-size: var(--text-xs);
-}
-
-/* 与 .mock-flag 对应的「真实后端」徽标：实线边框、成功色 */
-.backend-flag {
-  padding: 3px var(--space-3);
-  border: 1px solid var(--success);
-  border-radius: var(--radius-sm);
-  background: var(--success-bg);
-  color: var(--success);
-  font-size: var(--text-xs);
-}
-
-/* 徽标按钮化：视觉沿用 mock-flag/backend-flag，只补按钮基础属性。
-   桌面端点击无行为（App.vue 里按断点拦截），保持默认光标 */
-.flag-btn {
-  font-family: inherit;
-  cursor: default;
-}
-
-/* mock 下拉容器：桌面端摊平进顶栏（contents 不产生自身盒子，
-   两个下拉的排布与间距和原先直接放在 .mock-tools 下完全一致） */
-.mock-selects {
-  display: contents;
-}
-
-.mock-field {
-  display: contents;
-}
-
-/* 弹层内的说明文字只在移动端弹层中出现 */
-.mock-note {
-  display: none;
-}
 
 /* 移动端底部标签栏：桌面端不渲染 */
 .bottom-tabs {
@@ -1844,7 +1798,6 @@ textarea {
   /* 交互元素在纸面上没有意义 */
   .topbar,
   .footer,
-  .mock-tools,
   .bottom-tabs,
   .link-btn,
   .actions {
@@ -2121,66 +2074,6 @@ textarea {
   /* 徽标成为弹层的开合按钮 */
   .flag-btn {
     cursor: pointer;
-  }
-
-  /* mock 工具收进徽标弹层：容器从 contents 变成定位面板，
-     默认透明 + 不可见，open 时淡入并轻微下移 */
-  .mock-tools {
-    margin-left: auto;
-    position: relative;
-  }
-
-  .mock-selects {
-    position: absolute;
-    top: calc(100% + var(--space-2));
-    right: 0;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    width: 220px;
-    padding: var(--space-3);
-    background: var(--surface-raised);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-4px);
-    pointer-events: none;
-    transition: opacity var(--duration-fast) var(--ease),
-                transform var(--duration-fast) var(--ease),
-                visibility 0s var(--duration-fast);
-  }
-
-  .mock-selects.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-    pointer-events: auto;
-    transition: opacity var(--duration-fast) var(--ease),
-                transform var(--duration-fast) var(--ease);
-  }
-
-  /* 弹层内每个下拉占一行，附一句说明 */
-  .mock-field {
-    display: block;
-  }
-
-  .mock-field .app-select {
-    display: block;
-  }
-
-  .mock-field .app-select-trigger {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .mock-note {
-    display: block;
-    margin: var(--space-1) 0 0;
-    font-size: var(--text-xs);
-    color: var(--text-muted);
   }
 
   /* 底部标签栏：固定于屏幕底部，四页签等宽，含安全区内边距。
@@ -3158,4 +3051,131 @@ textarea {
 
 .cta-pulse {
   animation: cta-pulse calc(var(--duration-base) * 2) var(--ease) 1;
+}
+
+/* ==========================================================================
+   首页特性卡片区、统计卡、技术亮点 badge（2026-10 大改版）
+   ========================================================================== */
+
+/* ---- 统计数字展示（演示数据三列）---- */
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.home-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-5) var(--space-4);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.home-stat-num {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.home-stat-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* ---- 特性卡片区：4 列 ---- */
+.home-features {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.home-feature-card {
+  padding: var(--space-5);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--duration-fast) var(--ease),
+    box-shadow var(--duration-fast) var(--ease);
+}
+
+.home-feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.home-feature-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-3);
+  border-radius: 50%;
+  border: 2px solid var(--blue-200);
+  color: var(--color-primary);
+  background: var(--blue-50);
+}
+
+.home-feature-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.home-feature-title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+}
+
+.home-feature-desc {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: var(--leading-relaxed);
+}
+
+/* ---- 技术亮点 badge ---- */
+.home-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.home-badge {
+  padding: 4px var(--space-3);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ≤860px：特性卡收 2 列 */
+@media (max-width: 860px) {
+  .home-features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ≤560px：统计卡 1 列，特性卡 1 列 */
+@media (max-width: 560px) {
+  .home-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .home-features {
+    grid-template-columns: 1fr;
+  }
 }

@@ -29,6 +29,47 @@ function continueTask() {
   router.push(reviewCount.value > 0 ? '/diff' : '/report')
 }
 
+/* 首页统计数字（演示数据，标注说明） */
+const STATS = [
+  { num: '10 种', label: '支持场景' },
+  { num: '3+', label: '单票同时比对' },
+  { num: '秒级', label: '出结果' },
+]
+
+/* 特性卡片 */
+const FEATURES = [
+  {
+    title: 'OCR 智能识别',
+    desc: '图片单证和扫描件自动识别，PaddleOCR 本地推理，数据不出境。',
+    icon: 'M15 10l-4 4-2-2M3 7l3 3 5-5M3 14l3 3 8-8M18 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2',
+  },
+  {
+    title: '多文件交叉比对',
+    desc: '同时上传发票、箱单、提单和 EDI 报文，字段级精准对照。',
+    icon: 'M8 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h2M16 4h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-2M9 9h6M9 12h6M9 15h3',
+  },
+  {
+    title: '规则合规提示',
+    desc: '内置 HS 编码规则库，自动检测品名、重量与价格异常。',
+    icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  },
+  {
+    title: '可存档报告',
+    desc: '冲突和风险一览无遗，每条问题附有原文证据，可溯源可存档。',
+    icon: 'M7 3h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm7 0v5h5M9 13l2 2 4-4',
+  },
+]
+
+/* 技术亮点 badge */
+const TECH_BADGES = [
+  'PaddleOCR',
+  '本地部署',
+  '数据不出境',
+  'Vue 3',
+  '开源',
+  '无 API Key',
+]
+
 /* 图标为内联 SVG 路径（24×24 线性，stroke 继承 currentColor），不引入图标库 */
 const STEPS = [
   {
@@ -137,6 +178,32 @@ function runScenario(key) {
       </div>
       <button class="btn primary" @click="continueTask">继续查看</button>
     </section>
+
+    <!-- 统计数字：演示数据，三列展示核心指标 -->
+    <section class="home-stats" aria-label="产品概览（演示数据）">
+      <div v-for="s in STATS" :key="s.num" class="home-stat">
+        <span class="home-stat-num">{{ s.num }}</span>
+        <span class="home-stat-label">{{ s.label }}</span>
+      </div>
+    </section>
+
+    <!-- 特性卡片区：四个核心能力 -->
+    <section class="home-features" aria-label="核心功能">
+      <div v-for="f in FEATURES" :key="f.title" class="home-feature-card">
+        <div class="home-feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path :d="f.icon" />
+          </svg>
+        </div>
+        <h3 class="home-feature-title">{{ f.title }}</h3>
+        <p class="home-feature-desc">{{ f.desc }}</p>
+      </div>
+    </section>
+
+    <!-- 技术亮点 badge 行 -->
+    <div class="home-badges" aria-label="技术特点">
+      <span v-for="b in TECH_BADGES" :key="b" class="home-badge">{{ b }}</span>
+    </div>
 
     <section class="home-steps">
       <div v-for="s in STEPS" :key="s.num" class="home-step">
