@@ -118,10 +118,25 @@ provide('diffViews', diffViews)
  * 对应卡片）时不恢复，锚点滚动优先。
  */
 const scrollMemo = new Map()
-/** 切页过渡结束后待恢复的滚动位置（out-in：新页挂载晚于 active 变化一个离场过渡） */
+/**
+ * 切页过渡的滚动恢复目标（纸张层叠：before-enter 里同步 scrollTo，见下）。
+ * 旧页在 before-leave 已 fixed 脱流不再撑高，文档高度由新页内容决定，
+ * 进场前滚动不会被钳位，是安全的。
+ */
 let pendingScrollRestore = null
 
+/**
+ * 纸张层叠方向：按路由 meta.order 比较 from/to 得出前进/后退，
+ * 动态切换两套过渡类。首页 order 最小（-1），去向任何页都是前进；
+ * 锚点跳转（报告页 → 差异页条目，order 2 → 1）按同一规则算为后退。
+ */
+const pageTransition = ref('page-stack-forward')
+const orderOf = (name) =>
+  router.getRoutes().find((r) => r.name === name)?.meta?.order ?? 0
+
 watch(() => route.name, (to, from) => {
+  pageTransition.value =
+    orderOf(to) >= orderOf(from) ? 'page-stack-forward' : 'page-stack-backward'
   scrollMemo.set(from, window.scrollY)
   pendingScrollRestore = null
   if (pendingAnchor.value) return // 锚点跳转由 DiffPage 挂载时滚动，不恢复
@@ -130,25 +145,47 @@ watch(() => route.name, (to, from) => {
 })
 
 /**
- * 滚动恢复必须在新页淡入第一帧之前完成，用 enter 钩子（元素插入后、
- * 过渡开始前同步触发）；after-enter 才 scrollTo 会让新页先从头淡入
- * 约 200ms 再硬跳，肉眼可见。
- * out-in 下旧页已离场，新页内容在插入时即完成渲染，文档高度就是新页
- * 高度，此时 scrollTo 不会被钳位。
- * 没有记忆位置的页面，同一时刻归零，不残留上一页的滚动。
- * 锚点跳转（报告条目 → 差异页卡片）不在这里滚动，由 DiffPage 挂载时定位。
+ * 滚动恢复新时序（并行过渡，不再是 out-in）：
+ * before-enter 在新页插入前同步触发，此刻旧页已 fixed 脱流、文档高度
+ * 由新页内容决定，立即 scrollTo 既不会钳位也不会被后续布局推走。
+ * 有记忆位置恢复记忆，否则归零；锚点跳转不在这里滚动，
+ * DiffPage 挂载时的锚点定位优先于滚动记忆。
  */
-function onPageEnter() {
+function onPageBeforeEnter() {
   if (anchorJump) {
     anchorJump = false
     return
   }
-  if (pendingScrollRestore != null) {
-    window.scrollTo(0, pendingScrollRestore)
-    pendingScrollRestore = null
-    return
-  }
-  window.scrollTo(0, 0)
+  const y = pendingScrollRestore
+  pendingScrollRestore = null
+  window.scrollTo(0, y ?? 0)
+}
+
+/**
+ * 旧页脱流：量出视口位置后用 fixed 锁定（top 已是视口坐标，天然补偿了
+ * scrollY，before-enter 的 scrollTo 不会带它走），旧页在视觉原位缩小/
+ * 滑出，不随新页滚动位置跳。宽度锁为实测宽，防止脱流后宽度塌陷。
+ */
+function onPageBeforeLeave(el) {
+  const rect = el.getBoundingClientRect()
+  el.style.position = 'fixed'
+  el.style.top = `${rect.top}px`
+  el.style.left = `${rect.left}px`
+  el.style.width = `${rect.width}px`
+  el.style.margin = '0'
+}
+
+/**
+ * 清理脱流内联样式。元素本身会被 Vue 移除，这里是防御性清理：
+ * 离场被取消（leave-cancelled）时元素会留在 DOM，样式必须还原；
+ * prefers-reduced-motion 下过渡近瞬切，同样不能残留 fixed。
+ */
+function onPageLeaveDone(el) {
+  el.style.position = ''
+  el.style.top = ''
+  el.style.left = ''
+  el.style.width = ''
+  el.style.margin = ''
 }
 
 /**
@@ -320,7 +357,15 @@ watch(() => route.name, updateIndicator)
     </nav>
 
     <main class="content">
-      <Transition name="fade" mode="out-in" @enter="onPageEnter">
+      <!-- 纸张层叠：无 mode 并行渲染，新旧页同时在 DOM；
+           旧页在 before-leave 里 fixed 脱流锁定视觉原位，新页在文档流撑高 -->
+      <Transition
+        :name="pageTransition"
+        @before-enter="onPageBeforeEnter"
+        @before-leave="onPageBeforeLeave"
+        @after-leave="onPageLeaveDone"
+        @leave-cancelled="onPageLeaveDone"
+      >
         <component :is="current" :key="route.name" />
       </Transition>
     </main>

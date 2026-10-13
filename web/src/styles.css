@@ -2430,3 +2430,74 @@ textarea {
     align-items: stretch;
   }
 }
+
+/* ==========================================================================
+   页面切换「纸张层叠」（替代原 fade out-in）
+   新页像一张纸从侧方滑入盖上来，旧页缩小变暗沉入底层；回退方向镜像。
+   并行渲染（无 mode）：新旧页同时在 DOM，旧页由 JS 钩子 fixed 脱流锁定在
+   视觉原位（见 App.vue onPageBeforeLeave），新页留在文档流撑起高度。
+   注意：上传页内部任务状态仍复用全局 .fade 过渡类，与这里的 page-stack
+   互不相关，不要合并。
+   ========================================================================== */
+
+/* 旧页 fixed 脱流后不再受 .content 裁剪，滑出方向的 24% 会超出视口右侧，
+   用 clip（不创建滚动容器，不影响 sticky 顶栏）挡掉横向溢出。
+   html 已有 scrollbar-gutter: stable 常驻纵向滚动条槽，过渡期间页高变化
+   不会引起横向抖动，无需再设 overflow-y: scroll */
+body {
+  overflow-x: clip;
+}
+
+.content {
+  /* 并行过渡的定位与裁剪边界：旧页 absolute/fixed 脱流时以它为参照，
+     新页滑入前的 24% 偏移裁在容器外 */
+  position: relative;
+  overflow-x: clip;
+}
+
+.page-stack-forward-enter-active,
+.page-stack-forward-leave-active,
+.page-stack-backward-enter-active,
+.page-stack-backward-leave-active {
+  transition: transform var(--duration-page) var(--ease-page),
+              filter var(--duration-page) var(--ease-page),
+              box-shadow var(--duration-page) var(--ease-page);
+  will-change: transform;
+}
+
+/* 运动中的那张纸在上层：前进时是新页（从右盖上来），后退时是旧页（向右滑走） */
+.page-stack-forward-enter-active,
+.page-stack-backward-leave-active {
+  z-index: 2;
+}
+
+/* 后退时旧页是滑走的上层纸张，阴影随滑出全程保留（元素随后被移除，无跳变） */
+.page-stack-backward-leave-active {
+  box-shadow: var(--shadow-lg), 0 16px 48px rgba(0, 0, 0, 0.14);
+}
+
+.page-stack-forward-leave-active,
+.page-stack-backward-enter-active {
+  z-index: 1;
+}
+
+/* 前进（to.order > from.order）：新页从右侧 24% 滑入；旧页原地缩小变暗沉底。
+   新页阴影放在 enter-from：随滑入过渡渐隐到无，避免类移除时阴影硬跳 */
+.page-stack-forward-enter-from {
+  transform: translateX(24%);
+  box-shadow: var(--shadow-lg), 0 16px 48px rgba(0, 0, 0, 0.14);
+}
+
+.page-stack-forward-leave-to {
+  transform: scale(0.94);
+  filter: brightness(0.97);
+}
+
+/* 后退镜像：新页从左侧 -24% 滑入，旧页向右滑出 */
+.page-stack-backward-enter-from {
+  transform: translateX(-24%);
+}
+
+.page-stack-backward-leave-to {
+  transform: translateX(24%);
+}
