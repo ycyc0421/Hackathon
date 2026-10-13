@@ -1,4 +1,10 @@
-/* 设计 Token - 色彩、间距、字体统一定义 */
+/* 设计 Token - 色彩、间距、字体统一定义
+ *
+ * 视觉语言：**纸感工作台**。整个产品的内核是单证与比对，界面因此按
+ * 「桌面 → 纸 → 浮起」三层表面组织，而不是靠 1px 边框区分每一块。
+ * 桌面是页面底（--surface-desk），纸是内容卡（--surface-raised），
+ * 卡内子块再用 --surface-sunken 下沉。层级靠圆角梯度 + 极轻投影 + 边框
+ * 减淡建立，边框只作最后一道保底，不承担主要层次职责。 */
 
 :root {
   /* ========== 中性灰阶（冷灰，微带蓝调）========== */
@@ -25,27 +31,51 @@
   --blue-800: oklch(30% 0.11 240);
   --blue-900: oklch(22% 0.08 240);
 
-  /* ========== 语义色 ========== */
-  --success: oklch(58% 0.13 145);
+  /* ========== 品牌第二色（青绿）==========
+     沉稳蓝仍是主色（操作、选中、链接）。青绿只做数据与品牌点缀：
+     图表、指标条、首页装饰、Hero 渐变。与蓝同属冷调（色相 240 → 195），
+     不抢语义色的辨识度——成功/警告/错误三色必须始终比它更"响"。 */
+  --teal-50: oklch(97% 0.02 195);
+  --teal-100: oklch(93% 0.045 195);
+  --teal-200: oklch(87% 0.075 195);
+  --teal-300: oklch(78% 0.10 195);
+  --teal-400: oklch(68% 0.115 195);
+  --teal-500: oklch(58% 0.115 195);
+  --teal-600: oklch(49% 0.10 195);
+  --teal-700: oklch(41% 0.085 195);
+
+  /* ========== 语义色 ==========
+     饱和度比初版提一档：状态色是界面最需要"一眼分开"的信息，
+     偏灰的语义色在纸感浅底上会被中性灰吃掉。 */
+  --success: oklch(56% 0.15 148);
   --success-bg: oklch(from var(--success) l c h / 0.1);
+  --success-strong: oklch(44% 0.14 148);
 
-  --warning: oklch(68% 0.15 65);
-  --warning-bg: oklch(from var(--warning) l c h / 0.1);
+  --warning: oklch(66% 0.16 62);
+  --warning-bg: oklch(from var(--warning) l c h / 0.12);
+  --warning-strong: oklch(50% 0.14 55);
 
-  --danger: oklch(58% 0.16 25);
+  --danger: oklch(56% 0.19 25);
   --danger-bg: oklch(from var(--danger) l c h / 0.1);
+  --danger-strong: oklch(45% 0.18 25);
 
-  --info: oklch(62% 0.10 230);
+  --info: oklch(60% 0.12 230);
   --info-bg: oklch(from var(--info) l c h / 0.1);
 
   /* ========== 功能色（语义映射）========== */
   --color-primary: var(--blue-500);
   --color-primary-hover: var(--blue-600);
   --color-primary-active: var(--blue-700);
+  /* 品牌点缀色：不做操作色，只用于装饰与数据可视化 */
+  --color-accent: var(--teal-500);
 
-  --surface: var(--gray-50);
-  --surface-raised: #fff;
-  --border: var(--gray-200);
+  /* 三层表面：桌面 → 纸 → 下沉。层级靠表面亮度差与投影建立 */
+  --surface-desk: oklch(96.6% 0.005 250); /* 页面底，比纸暗，纸才浮得起来 */
+  --surface: var(--surface-desk);         /* 兼容既有引用 */
+  --surface-raised: #fff;                 /* 纸：内容卡 */
+  --surface-sunken: oklch(97.2% 0.004 250); /* 卡内子块，比纸略沉 */
+  --border: oklch(92% 0.006 250);         /* 边框减淡：层次已由表面承担 */
+  --border-strong: oklch(86% 0.008 250);  /* 需要明确边界处（拖拽区、表头） */
   --border-hover: var(--gray-300);
 
   --text-body: var(--gray-900);
@@ -64,16 +94,28 @@
   --space-12: 48px;
   --space-16: 64px;
 
-  /* ========== 圆角 ========== */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* ========== 圆角 ==========
+     克制档位：企业工具不需要大圆角，越大越显得轻浮。
+     只保留"层级越高、圆角略大"的微弱梯度，不做夸张的胶囊化。 */
+  --radius-sm: 5px;   /* 按钮、输入框、徽章 */
+  --radius-md: 7px;   /* 卡内子块、卡片 */
+  --radius-lg: 9px;   /* 纸：内容卡 */
+  --radius-xl: 12px;  /* 首页大块容器 */
+  --radius-pill: 999px; /* 仅用于胶囊标签（chips / 徽章） */
 
-  /* ========== 阴影 ========== */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.10), 0 8px 24px rgba(0, 0, 0, 0.08);
+  /* ========== 阴影 ==========
+     纸感靠"极轻而多层"的投影，不靠深投影。纸的投影带一点冷色
+     （蓝调黑而非纯黑），与冷灰表面同源，白纸上不会显脏。 */
+  --shadow-xs: 0 1px 2px oklch(30% 0.02 250 / 0.05);
+  --shadow-sm: 0 1px 2px oklch(30% 0.02 250 / 0.04),
+               0 2px 6px oklch(30% 0.02 250 / 0.05);
+  --shadow-md: 0 2px 4px oklch(30% 0.02 250 / 0.04),
+               0 8px 20px oklch(30% 0.02 250 / 0.07);
+  --shadow-lg: 0 4px 8px oklch(30% 0.02 250 / 0.05),
+               0 16px 40px oklch(30% 0.02 250 / 0.09);
+  /* 纸的落定投影：纸浮在桌面上，投影要向下、略散 */
+  --shadow-paper: 0 1px 1px oklch(30% 0.02 250 / 0.03),
+                  0 12px 32px -8px oklch(30% 0.02 250 / 0.10);
 
   /* ========== 字体 ========== */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -111,6 +153,7 @@
   --duration-slow: 300ms;
   --duration-slower: 1600ms; /* 长反馈动画如高亮淡出、阶段点脉冲 */
   --duration-page: 300ms; /* 页面层叠切换专用 */
+  --duration-scan: 3400ms; /* 首页扫描线一个来回（入口级，允许慢） */
 
   /* 全站唯一的缓动曲线：DESIGN.md 动画一节要求所有过渡显式使用它，不设备选 */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);

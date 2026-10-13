@@ -268,11 +268,17 @@ watch(() => route.name, updateIndicator)
 <template>
   <ErrorBoundary>
     <div class="app">
+      <!-- 桌面层的第二团光晕：与 .app::before 的蓝光形成对角 -->
+      <span class="desk-glow" aria-hidden="true" />
+
       <header class="topbar">
       <!-- 品牌区做成可点按钮：任何页面都可回首页，入口语义一致 -->
       <button type="button" class="brand" @click="router.push({ name: 'home' })">
-        <span class="brand-mark">单证校验</span>
-        <span class="brand-sub">跨境物流 · 交叉比对与合规提示</span>
+        <span class="brand-mark-icon" aria-hidden="true" />
+        <span class="brand-text">
+          <span class="brand-mark">单证校验</span>
+          <span class="brand-sub">跨境物流 · 交叉比对与合规提示</span>
+        </span>
       </button>
 
       <!-- 首页是入口页，不渲染顶栏页签（含指示条），减少干扰 -->
