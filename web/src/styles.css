@@ -56,7 +56,7 @@ body {
 
 .brand-mark {
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   letter-spacing: 0.02em;
 }
 
@@ -97,7 +97,7 @@ body {
 
 .tab.active {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .tab.locked {
@@ -128,7 +128,7 @@ body {
   background: var(--danger);
   color: white;
   font-size: var(--text-xs);
-  line-height: 17px;
+  line-height: 17px; /* 字阶外特例：.tab-badge 固定尺寸徽章 */
   text-align: center;
 }
 
@@ -220,7 +220,7 @@ body {
 .page-title {
   margin: 0;
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .page-sub {
@@ -239,7 +239,7 @@ body {
 .card-title {
   margin: 0 0 var(--space-1);
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .card-sub {
@@ -250,7 +250,7 @@ body {
 
 .title-num {
   color: var(--text-muted);
-  font-weight: 400;
+  font-weight: var(--weight-regular);
 }
 
 .section-head {
@@ -262,7 +262,7 @@ body {
 .section-title {
   margin: 0;
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /* ---------- 提示条 ---------- */
@@ -281,7 +281,7 @@ body {
 }
 
 .notice-title {
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .notice-detail {
@@ -325,7 +325,7 @@ body {
   padding: 1px 8px;
   border: 1px solid;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   white-space: nowrap;
 }
 
@@ -383,13 +383,13 @@ body {
 }
 
 .dropzone-main {
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--text-body);
 }
 
 .dropzone-hint {
   margin-top: 6px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
 }
 
@@ -429,7 +429,7 @@ body {
   gap: 12px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .file-item:last-child {
@@ -463,7 +463,7 @@ body {
 }
 
 .field-label {
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
 }
 
@@ -529,7 +529,7 @@ textarea {
   color: var(--text-body);
   font-family: inherit;
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   line-height: var(--leading-tight);
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease),
@@ -611,7 +611,7 @@ textarea {
 
 .status-meta {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* ---------- 加载状态：分阶段进度 / 上传进度 / 骨架屏 ---------- */
@@ -689,7 +689,7 @@ textarea {
 
 .stage-item.active {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .stage-item.active .stage-dot {
@@ -824,7 +824,7 @@ textarea {
   gap: 12px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .doc-item:last-child {
@@ -844,12 +844,12 @@ textarea {
 
 .doc-type {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .doc-error {
   color: var(--danger);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* 完成态主按钮：与上方文件列表拉开间距；横向留白加大一档，
@@ -865,7 +865,7 @@ textarea {
 .next-hint {
   margin: 12px 0 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 /* ---------- 差异页 ---------- */
@@ -883,7 +883,7 @@ textarea {
   background: #fff;
   color: var(--text-muted);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--text-13);
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease),
               color var(--duration-fast) var(--ease),
@@ -932,14 +932,14 @@ textarea {
 .filter-note {
   margin: 10px 0 0;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* 按商品分组时的分组标题；单分组不渲染标题，样式与扁平列表一致 */
 .cmp-group-title {
   margin: 20px 0 0;
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
@@ -948,7 +948,7 @@ textarea {
 .cmp-group-num {
   color: var(--text-muted);
   font-size: var(--text-sm);
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   font-variant-numeric: tabular-nums;
 }
 
@@ -981,14 +981,14 @@ textarea {
 }
 
 .cmp-label {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
 }
 
 .cmp-key {
   color: var(--text-muted);
-  font-family: 'JetBrainsMono Nerd Font', 'DejaVu Sans Mono', monospace;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 
 .cmp-badges {
@@ -999,7 +999,7 @@ textarea {
 .cmp-note {
   margin: 8px 0 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 /* ---------- 表格（差异比对）---------- */
@@ -1016,7 +1016,7 @@ textarea {
   border-bottom: 1px solid var(--border);
   background: var(--surface-raised);
   color: var(--text-muted);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-size: var(--text-sm);
   position: sticky;
   top: 0;
@@ -1052,7 +1052,7 @@ textarea {
 }
 
 .cell-value {
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
@@ -1061,7 +1061,7 @@ textarea {
   color: var(--text-muted);
   font-family: var(--font-mono);
   /* 原文是关键证据，阅读级别不低于正文辅助信息，不用脚注级 12px */
-  font-size: 13px;
+  font-size: var(--text-13);
   word-break: break-all;
 }
 
@@ -1132,7 +1132,7 @@ textarea {
 
 .view-switch button[aria-pressed="true"] {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .view-switch button:focus-visible {
@@ -1143,7 +1143,7 @@ textarea {
 /* 收起态表格里与多数派不同的值：切到对照视图前也能定位「哪份文件不一样」 */
 .cell-value.divergent {
   color: var(--danger);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /*
@@ -1231,7 +1231,7 @@ textarea {
 
 .compare-value {
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-size: var(--text-base);
   font-variant-numeric: tabular-nums;
   word-break: break-all;
@@ -1240,7 +1240,7 @@ textarea {
 .compare-value.empty {
   color: var(--text-muted);
   font-style: italic;
-  font-weight: 400;
+  font-weight: var(--weight-regular);
 }
 
 .compare-page {
@@ -1253,7 +1253,7 @@ textarea {
   color: var(--text-muted);
   font-family: var(--font-mono);
   /* 同 .cell-raw：原文承担证据职责，不用脚注级 12px */
-  font-size: 13px;
+  font-size: var(--text-13);
   word-break: break-all;
 }
 
@@ -1275,7 +1275,7 @@ textarea {
 .empty {
   margin: 16px 0 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 /* ---------- 空状态 ---------- */
@@ -1293,7 +1293,7 @@ textarea {
 /* 纯文字排版：不用 emoji 插图，靠标题字重与语气色区分 */
 .empty-state-title {
   font-size: var(--text-lg);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .empty-state-detail {
@@ -1335,12 +1335,12 @@ textarea {
 
 .meta-grid dt {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .meta-grid dd {
   margin: 2px 0 0;
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .stat-row {
@@ -1365,13 +1365,13 @@ textarea {
 
 .stat-num {
   font-size: var(--text-xl);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /* 零值的问题计数收敛为弱化灰，不抢「没问题」的语义 */
@@ -1428,7 +1428,7 @@ textarea {
 }
 
 .issue-label {
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /* 各文件取值收进一块浅底区域，与头部/脚注分出层次 */
@@ -1446,7 +1446,7 @@ textarea {
 
 .issue-values strong {
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   color: var(--text-body);
 }
 
@@ -1480,7 +1480,7 @@ textarea {
 
 .risk-title {
   margin-top: var(--space-1);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .risk-detail {
@@ -1498,13 +1498,13 @@ textarea {
 .err-item {
   display: flex;
   gap: 10px;
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .err-code {
   color: var(--danger);
-  font-family: 'JetBrainsMono Nerd Font', 'DejaVu Sans Mono', monospace;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   white-space: nowrap;
 }
 
@@ -1515,7 +1515,7 @@ textarea {
 .foot-note {
   margin: 12px 0 0;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 /*
@@ -1531,7 +1531,7 @@ textarea {
   border-radius: var(--radius-sm);
   background: var(--gray-50);
   font-size: var(--text-base);
-  font-weight: 500;
+  font-weight: var(--weight-medium);
   line-height: var(--leading-relaxed);
 }
 
@@ -1718,7 +1718,7 @@ textarea {
   border-bottom: 1px solid var(--border);
   background: var(--surface-raised);
   color: var(--text-muted);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-size: var(--text-sm);
 }
 
@@ -1758,7 +1758,7 @@ textarea {
   justify-content: space-between;
   padding: 7px 0;
   border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .err-breakdown li:last-child {
@@ -1767,8 +1767,8 @@ textarea {
 
 .eb-label {
   color: var(--text-muted);
-  font-family: 'JetBrainsMono Nerd Font', 'DejaVu Sans Mono', monospace;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 
 .eb-count {
@@ -1787,8 +1787,8 @@ textarea {
   border-radius: 4px;
   background: var(--warning-bg);
   color: var(--warning);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
   white-space: nowrap;
   cursor: help; /* title 属性里有完整说明，提示用户可以悬浮查看 */
 }
@@ -1803,8 +1803,8 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--text-muted);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
   white-space: nowrap;
 }
 
@@ -1847,7 +1847,7 @@ textarea {
 
 .app-select-caret {
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: var(--text-2xs);
   transition: transform var(--duration-fast) var(--ease);
 }
 
@@ -1906,7 +1906,7 @@ textarea {
 
 .app-select-option.selected {
   color: var(--color-primary);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 /* ---------- 手机端适配（≤640px）---------- */
@@ -2026,7 +2026,7 @@ textarea {
 
   .bottom-tab.active {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
   }
 
   .bottom-tab.locked {
@@ -2245,9 +2245,9 @@ textarea {
   background: var(--surface-2, #f6f7f9);
   border: 1px solid var(--border);
   border-radius: 6px;
-  font-family: var(--font-mono, 'JetBrains Mono', 'WenQuanYi Micro Hei Mono', monospace);
-  font-size: 12px;
-  line-height: 1.6;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.6; /* 字阶外特例：.edi-source-text 等宽原文块 */
   white-space: pre-wrap;
   word-break: break-all;
   max-height: 320px;
@@ -2259,7 +2259,7 @@ textarea {
 .edi-source-error {
   margin: 0;
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--text-muted);
 }
 

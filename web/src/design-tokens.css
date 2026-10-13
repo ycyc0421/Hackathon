@@ -78,17 +78,26 @@
   /* ========== 字体 ========== */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI",
                "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", Consolas,
+  /* 本机常见安装名为 JetBrainsMono Nerd Font，两个家族名都列出避免渲染分叉 */
+  --font-mono: "JetBrains Mono", "JetBrainsMono Nerd Font", "SF Mono", Consolas,
                "Liberation Mono", monospace;
 
   /* ========== 字号 ========== */
+  --text-2xs: 10px; /* 徽章/装饰符号专用 */
   --text-xs: 12px;
+  --text-13: 13px; /* 辅助文字事实档位，原文/卡片辅助信息用，介于 xs 与 sm 之间 */
   --text-sm: 14px;
   --text-base: 16px;
   --text-lg: 18px;
   --text-xl: 20px;
   --text-2xl: 24px;
   --text-3xl: 30px;
+
+  /* ========== 字重 ========== */
+  /* 字重三档：正文/按钮与结论强调/标题与选中态 */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
 
   /* ========== 行高 ========== */
   --leading-tight: 1.25;
@@ -100,6 +109,8 @@
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 300ms;
+  --duration-slower: 1600ms; /* 长反馈动画如高亮淡出、阶段点脉冲 */
+  --duration-page: 380ms; /* 页面层叠切换专用 */
 
   /* 全站唯一的缓动曲线：DESIGN.md 动画一节要求所有过渡显式使用它，不设备选 */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
