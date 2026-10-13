@@ -10,6 +10,7 @@ import {
   evaluation, evaluationLoaded,
   pendingAnchor,
 } from './state/session.js'
+import { theme, toggleTheme } from './state/theme.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 
 /* label 从路由 meta 取，这里只存页序 key 列表，避免两处维护同一份文案 */
@@ -297,6 +298,19 @@ watch(() => route.name, updateIndicator)
         </button>
         <span class="tab-indicator" :style="indicatorStyle" aria-hidden="true" />
       </nav>
+
+      <!-- 主题切换：放在顶栏最右，与导航分离。
+           aria-pressed 表达"暗色是否开启"，图标是纯 CSS 的日/月。 -->
+      <button
+        type="button"
+        class="theme-toggle"
+        :aria-pressed="theme === 'dark'"
+        :title="theme === 'dark' ? '切换到浅色' : '切换到暗色'"
+        :aria-label="theme === 'dark' ? '切换到浅色主题' : '切换到暗色主题'"
+        @click="toggleTheme"
+      >
+        <span class="theme-icon" aria-hidden="true" />
+      </button>
 
     </header>
 
