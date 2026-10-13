@@ -1,23 +1,30 @@
 <script setup>
 import { ref, computed, provide, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { isMock, listMockScenarios, setMockScenario, getEvaluation } from './api/index.js'
 import { setMock } from './api/config.js'
 import { needsReview } from './utils/needsReview.js'
+import {
+  task, taskError, isRunning,
+  uploadFiles, uploadCountry, uploadNotes, uploadScanWarnings,
+  diffFilter, diffViews,
+  evaluation, evaluationLoaded,
+  pendingAnchor,
+} from './state/session.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import AppSelect from './components/AppSelect.vue'
-import UploadPage from './pages/UploadPage.vue'
-import DiffPage from './pages/DiffPage.vue'
-import ReportPage from './pages/ReportPage.vue'
-import EvalPage from './pages/EvalPage.vue'
 
+/* label 从路由 meta 取，这里只存页序 key 列表，避免两处维护同一份文案 */
 const PAGES = [
-  { key: 'upload', label: '上传', component: UploadPage },
-  { key: 'diff', label: '差异', component: DiffPage },
-  { key: 'report', label: '报告', component: ReportPage },
-  { key: 'eval', label: '评测', component: EvalPage },
+  { key: 'upload', label: '上传' },
+  { key: 'diff', label: '差异' },
+  { key: 'report', label: '报告' },
+  { key: 'eval', label: '评测' },
 ]
 
-const active = ref('upload')
+const route = useRoute()
+const router = useRouter()
+const active = computed(() => route.name)
 
 /**
  * 数据源：mock 示例数据 / 真实后端。初始值在 config.js 里按
@@ -80,25 +87,15 @@ function onDocumentClick(e) {
   mockPanelOpen.value = false
 }
 
-/** 当前检查任务。由上传页写入，差异页和报告页读取 */
-const task = ref(null)
-const taskError = ref(null)
-const isRunning = ref(false)
-
+/** 当前检查任务。由上传页写入，差异页和报告页读取（ref 本体在 state/session.js） */
 provide('task', task)
 provide('taskError', taskError)
 provide('isRunning', isRunning)
 
 /**
- * 上传页表单状态提升到 App 层：文件列表/目的国/备注在切页返回时保留，
- * 与任务状态（task）的生命周期一致——任务还在、输入却丢了，层级不一致。
- * scanWarnings 由文件内容异步检测得出，一并在 App 层持有，
- * 否则返回上传页时文件还在、扫描件警告却丢了。
+ * 上传页表单状态提升到会话层（state/session.js）：文件列表/目的国/备注在
+ * 切页返回时保留，与任务状态（task）的生命周期一致。
  */
-const uploadFiles = ref([])
-const uploadCountry = ref('DE')
-const uploadNotes = ref('')
-const uploadScanWarnings = ref(new Set())
 provide('uploadFiles', uploadFiles)
 provide('uploadCountry', uploadCountry)
 provide('uploadNotes', uploadNotes)
@@ -107,27 +104,21 @@ provide('uploadScanWarnings', uploadScanWarnings)
 /**
  * 跨页导航：报告页的条目可以直接跳到差异页对应位置。
  * anchor 经 pendingAnchor 传给目标页（页面随切页重挂载，挂载时消费并清空）。
+ * go 的签名不变，页面零改动；内部从改 active ref 换成 router.push。
  */
-const pendingAnchor = ref(null)
 /** 本次切页是否锚点跳转：是则滚动交给目标页挂载时的锚点定位，进场钩子不碰滚动 */
 let anchorJump = false
 
 function go(page, anchor) {
   pendingAnchor.value = anchor ?? null
   anchorJump = !!anchor
-  active.value = page
+  router.push({ name: page })
 }
 
 provide('pendingAnchor', pendingAnchor)
 provide('navigate', { go })
 
-/**
- * 差异页跨页状态提升到 App 层：筛选与每张卡片的 表格/对照 选择
- * 在切页返回时保留——页面内容（task）还在，查看进度却丢了，层级不一致。
- * 与 uploadFiles 同一模式；views 保持 new Map 整体赋值的响应式写法。
- */
-const diffFilter = ref('problems')
-const diffViews = ref(new Map())
+/** 差异页筛选与每张卡片的 表格/对照 选择（ref 本体在 state/session.js） */
 provide('diffFilter', diffFilter)
 provide('diffViews', diffViews)
 
@@ -140,7 +131,7 @@ const scrollMemo = new Map()
 /** 切页过渡结束后待恢复的滚动位置（out-in：新页挂载晚于 active 变化一个离场过渡） */
 let pendingScrollRestore = null
 
-watch(active, (to, from) => {
+watch(() => route.name, (to, from) => {
   scrollMemo.set(from, window.scrollY)
   pendingScrollRestore = null
   if (pendingAnchor.value) return // 锚点跳转由 DiffPage 挂载时滚动，不恢复
@@ -188,13 +179,7 @@ provide('sourceFiles', {
   clear: () => sourceFiles.clear(),
 })
 
-/**
- * 评测数据缓存提升到 App 层：
- * 切页时 EvalPage 会卸载重挂载，缓存留在 provide 里，
- * 重挂载时直接复用，不再每次切页都重新请求一次。
- */
-const evaluation = ref(null)
-const evaluationLoaded = ref(false)
+/** 评测数据缓存提升到会话层（state/session.js），重挂载时直接复用 */
 provide('evaluation', evaluation)
 provide('evaluationLoaded', evaluationLoaded)
 
@@ -218,7 +203,7 @@ const problemCount = computed(() => {
   return task.value.comparisons?.filter(needsReview).length ?? 0
 })
 
-const current = computed(() => PAGES.find((p) => p.key === active.value)?.component)
+const current = computed(() => route.matched.at(-1)?.components?.default)
 
 /** 没有任务时，差异页和报告页没有内容可显示 */
 function isLocked(key) {
@@ -264,7 +249,7 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', onDocumentClick)
 })
 
-watch(active, updateIndicator)
+watch(() => route.name, updateIndicator)
 </script>
 
 <template>
@@ -284,7 +269,7 @@ watch(active, updateIndicator)
           :class="{ active: active === p.key, locked: isLocked(p.key) }"
           :disabled="isLocked(p.key)"
           :title="isLocked(p.key) ? '先在上传页创建一次检查' : ''"
-          @click="active = p.key"
+          @click="router.push({ name: p.key })"
         >
           {{ p.label }}
           <span v-if="p.key === 'diff' && problemCount" class="tab-badge">{{ problemCount }}</span>
@@ -334,7 +319,7 @@ watch(active, updateIndicator)
         :class="{ active: active === p.key, locked: isLocked(p.key) }"
         :disabled="isLocked(p.key)"
         :title="isLocked(p.key) ? '先在上传页创建一次检查' : ''"
-        @click="active = p.key"
+        @click="router.push({ name: p.key })"
       >
         {{ p.label }}
         <span v-if="p.key === 'diff' && problemCount" class="tab-badge">{{ problemCount }}</span>
@@ -343,7 +328,7 @@ watch(active, updateIndicator)
 
     <main class="content">
       <Transition name="fade" mode="out-in" @enter="onPageEnter">
-        <component :is="current" :key="active" />
+        <component :is="current" :key="route.name" />
       </Transition>
     </main>
 
