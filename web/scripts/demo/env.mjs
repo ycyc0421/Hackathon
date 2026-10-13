@@ -235,19 +235,23 @@ export async function startServer({ webDir, port = 4173, prefer = 'preview', log
   }
 
   log(`  启动 ${label} → ${url}`)
-  const child = spawn('npx', args, {
+
+  // 直接跑 vite 的入口脚本，**不要**经 npx 中转。
+  // npx 会再 fork 一层，真正的 vite 成了孙进程：杀 npx 杀不掉 vite，
+  // 而 vite 还占着继承来的 stdout/stderr 管道，Node 的事件循环因此
+  // 永不退出——CI 上表现为"录制明明已完成，进程却挂到超时被取消"。
+  const viteBin = join(webDir, 'node_modules', 'vite', 'bin', 'vite.js')
+  const spawnArgs = [viteBin, ...args.slice(1)]
+
+  // detached: true 让子进程自成进程组，便于连同它 fork 出的 esbuild
+  // 一起整组杀掉；stdio 用 'ignore' 彻底断开管道，杜绝句柄把父进程留住。
+  const child = spawn(process.execPath, spawnArgs, {
     cwd: webDir,
-    stdio: ['ignore', 'pipe', 'pipe'],
+    stdio: ['ignore', 'ignore', 'ignore'],
     env: process.env,
-    detached: false,
+    detached: true,
   })
-  let output = ''
-  child.stdout.on('data', (d) => {
-    output += d.toString()
-  })
-  child.stderr.on('data', (d) => {
-    output += d.toString()
-  })
+  child.unref()
   let exited = null
   child.once('exit', (code) => {
     exited = code
@@ -258,29 +262,28 @@ export async function startServer({ webDir, port = 4173, prefer = 'preview', log
     if (exited !== null) {
       throw new PreflightError(
         `${label} 启动即退出（code ${exited}）`,
-        `输出：\n${output.trim().split('\n').slice(-12).join('\n')}`
+        `请手动跑一次 npx vite --port ${port} 看报错（录制期不再回传 vite 输出）`
       )
     }
     if (await httpReady(url)) break
     await new Promise((r) => setTimeout(r, 400))
   }
   if (!(await httpReady(url))) {
-    child.kill('SIGTERM')
+    killGroup(child, 'SIGTERM')
     throw new PreflightError(
       `${label} 在 60 秒内没有就绪`,
-      `输出：\n${output.trim().split('\n').slice(-12).join('\n')}`
+      `输出：见 vite 自身的日志（stdio 已断开，不再回传）`
     )
   }
   log(`  ${label} 就绪`)
 
   const stop = async () => {
-    if (child.exitCode !== null || child.signalCode) return
-    child.kill('SIGTERM')
+    killGroup(child, 'SIGTERM')
     const t = Date.now()
     while (child.exitCode === null && Date.now() - t < 5000) {
       await new Promise((r) => setTimeout(r, 100))
     }
-    if (child.exitCode === null) child.kill('SIGKILL')
+    if (child.exitCode === null) killGroup(child, 'SIGKILL')
   }
   return { url, stop, reused: false }
 }
@@ -310,6 +313,20 @@ export function registerCleanup(cleanups) {
     })
   }
   return () => run()
+}
+
+/** 整组杀进程：子进程是 detached 的，负 pid 才能带走它 fork 出的 esbuild */
+function killGroup(child, signal) {
+  if (child.exitCode !== null || child.signalCode) return
+  try {
+    process.kill(-child.pid, signal)
+  } catch {
+    try {
+      child.kill(signal)
+    } catch {
+      /* 已经退出 */
+    }
+  }
 }
 
 /** 端口是否可用（给 --port 自动挑端口用） */
