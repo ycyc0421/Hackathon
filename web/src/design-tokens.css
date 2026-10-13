@@ -110,7 +110,7 @@
   --duration-base: 200ms;
   --duration-slow: 300ms;
   --duration-slower: 1600ms; /* 长反馈动画如高亮淡出、阶段点脉冲 */
-  --duration-page: 620ms; /* 页面层叠切换专用：整张纸飞过一屏，需要比元素级动效长 */
+  --duration-page: 300ms; /* 页面层叠切换专用 */
 
   /* 全站唯一的缓动曲线：DESIGN.md 动画一节要求所有过渡显式使用它，不设备选 */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);

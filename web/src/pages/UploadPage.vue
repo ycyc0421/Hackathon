@@ -803,10 +803,6 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
             >
               <button class="btn primary cta-trace" @click="navigate.go('diff')">
                 {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
-                <!-- 一次性描边引导：rect 几何由 JS 按按钮实测像素写入
-                     （onNextActionsEnter），dashoffset 100→0 描一圈后淡出清除。
-                     初始 opacity 0，仅 .playing 时可见；prefers-reduced-motion
-                     下 JS 直接不启动，描边始终不出现 -->
                 <svg class="cta-trace-svg" aria-hidden="true">
                   <rect
                     class="cta-trace-rect"
@@ -816,7 +812,7 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
                   />
                 </svg>
               </button>
-              <p class="next-hint">差异页默认按「需关注」筛选，可切换查看全部比对。</p>
+
             </div>
           </Transition>
         </div>

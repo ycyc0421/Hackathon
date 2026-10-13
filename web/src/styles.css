@@ -33,6 +33,45 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow-x: clip;
+}
+
+/* 全局背景光晕：两个极低透明度的模糊圆，给页面一点空间感 */
+.app::before,
+.app::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(120px);
+}
+
+.app::before {
+  width: 600px;
+  height: 600px;
+  top: -100px;
+  left: -150px;
+  background: var(--blue-100);
+  opacity: 0.35;
+}
+
+.app::after {
+  width: 500px;
+  height: 500px;
+  bottom: -120px;
+  right: -100px;
+  background: oklch(88% 0.06 200);
+  opacity: 0.25;
+}
+
+/* 确保内容在光晕层上面 */
+.topbar,
+.content,
+.footer {
+  position: relative;
+  z-index: 1;
 }
 
 .topbar {
@@ -199,25 +238,20 @@ body {
   display: none;
 }
 
-/* 内容区通栏：纸张（.page-sheet）铺满宽度，版心限宽下放到纸内的 .page。
-   这样层叠切页时整张纸从视口边缘飞入，而不是一条 1080px 的窄条 */
+/* 内容区：背景层固定不动，只有版心内容卡（.page-inner）参与纸张切页过渡 */
 .content {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.page-sheet {
-  position: relative;
-  flex: 1;
-  background: var(--surface);
+  position: relative;           /* 层叠过渡的定位参照 */
+  overflow-x: clip;             /* 新纸从右飞入时不产生横向滚动条 */
   padding: var(--space-6);
 }
 
-.page-sheet > .page {
+/* 版心内容卡——这才是"那张纸"：限宽、白底、圆角、投影 */
+.page-inner {
+  position: relative;
   max-width: 1032px;
   margin: 0 auto;
+  min-height: calc(100vh - 56px - 80px); /* 撑满视口，切换时纸面不显得单薄 */
 }
 
 .footer {
@@ -929,6 +963,16 @@ textarea {
 
 /* 完成态主按钮：与上方文件列表拉开间距；横向留白加大一档，
    「查看待复核项（N）」这类长文案不至于顶到按钮边缘 */
+/* ---- CTA 按钮状态：任务未完成前灰色，完成后亮蓝色 ---- */
+/* .btn-pending 由 v-bind 在任务未达终态时加上 */
+.btn.primary.btn-pending {
+  background: var(--gray-300);
+  border-color: var(--gray-300);
+  color: var(--gray-500);
+  cursor: default;
+  pointer-events: none;
+}
+
 .next-actions {
   margin-top: var(--space-4);
 }
@@ -2180,7 +2224,7 @@ textarea {
   }
 
   /* 内容底部让出标签栏高度，防止被固定栏遮挡 */
-  .page-sheet {
+  .content {
     padding: var(--space-3);
     padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px) + var(--space-4));
   }
@@ -2426,6 +2470,57 @@ textarea {
   align-items: center;
   gap: var(--space-10);
   padding: var(--space-10) 0 var(--space-4);
+  position: relative;
+}
+
+/* 背景微动画：漂浮的光晕圆，极低不透明度，暗示"数据在流动" */
+.home-hero::before,
+.home-hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(80px);
+}
+
+.home-hero::before {
+  width: 420px;
+  height: 420px;
+  top: -60px;
+  left: -80px;
+  background: var(--blue-100);
+  opacity: 0.5;
+  animation: hero-float-a 12s ease-in-out infinite;
+}
+
+.home-hero::after {
+  width: 320px;
+  height: 320px;
+  bottom: -40px;
+  right: 10%;
+  background: oklch(85% 0.08 200);
+  opacity: 0.3;
+  animation: hero-float-b 16s ease-in-out infinite;
+}
+
+@keyframes hero-float-a {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33%       { transform: translateY(-24px) translateX(12px); }
+  66%       { transform: translateY(16px) translateX(-8px); }
+}
+
+@keyframes hero-float-b {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  40%       { transform: translateY(20px) translateX(-16px); }
+  70%       { transform: translateY(-12px) translateX(8px); }
+}
+
+/* 确保 Hero 内容在光晕上面 */
+.home-hero-copy,
+.home-stack {
+  position: relative;
+  z-index: 1;
 }
 
 .home-eyebrow {
@@ -2691,19 +2786,25 @@ textarea {
   gap: var(--space-6);
 }
 
-/* 连接线穿过三个图标中心 */
+/* 连接线：从第一个图标中心(left: 24px)到第三个图标中心(right: 24px)，
+   图标圆心距两端都是 24px（图标宽 48px），对称完全准确 */
 .home-steps::before {
   content: '';
   position: absolute;
   top: 24px;
   left: 24px;
-  right: calc((100% - 2 * var(--space-6)) / 3 - 24px);
-  height: 1px;
-  background: linear-gradient(90deg, var(--blue-200), var(--border));
+  right: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue-300), var(--blue-200), var(--blue-100));
+  border-radius: 1px;
 }
 
 .home-step {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .home-step-icon {
@@ -2711,11 +2812,12 @@ textarea {
   place-items: center;
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-lg);
+  border-radius: 50%;
   background: var(--surface-raised);
-  border: 1px solid var(--blue-100);
+  border: 2px solid var(--blue-200);
   color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 0 0 4px var(--blue-50);
+  flex-shrink: 0;
 }
 
 .home-step-icon svg {
@@ -2730,9 +2832,10 @@ textarea {
 
 .home-step-num {
   display: block;
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
@@ -2899,7 +3002,7 @@ textarea {
   }
 
   .home-steps::before {
-    display: none;
+    display: none; /* 窄屏一列排列，连接线不需要 */
   }
 
   .home-sheet {
@@ -2924,66 +3027,33 @@ textarea {
 
 /* ==========================================================================
    页面切换「纸张层叠」
-   前进：新纸从视口右侧外整张飞入、带投影盖上来；旧纸原地缩小、变暗、圆角
-   显出，像被压到下面。后退镜像：上层纸向右抽走，露出底下被压低的纸并回弹放大。
-   并行渲染（无 mode）：旧纸由 App.vue onPageBeforeLeave fixed 脱流锁在视觉原位，
-   缩放原点由 JS 对准视口中心；新纸留在文档流撑高。
-   只动 transform / opacity（合成层），不逐帧动 filter、box-shadow。
+   顶栏/页脚固定不动；过渡对象只有版心内容列 .page-inner（那张"纸"）。
+   前进：新纸从 .content 右侧外插进来盖上；旧纸原地缩小压暗沉底。
+   后退镜像：上层纸向右抽走，露出底下的纸并回弹放大。
+   .content 是裁切容器，本身始终显示灰色背景（"桌面"），
+   层叠期间 .content.stacking 略微压暗让纸张边缘更可见。
    注意：上传页内部任务状态仍复用全局 .fade 过渡类，与这里互不相关。
    ========================================================================== */
 
-/* 新纸进场前在视口右侧外，用 clip 挡掉横向溢出（不创建滚动容器，不影响 sticky 顶栏）。
-   html 已有 scrollbar-gutter: stable，过渡期间页高变化不引起横向抖动 */
-body {
+/* .content 是层叠裁切容器，.page-inner 的进出不溢出到它外面 */
+.content {
   overflow-x: clip;
 }
 
-/* 桌面：层叠期间在纸下面显出一层深色桌面，旧纸缩小后四周露出的就是它，
-   两张纸的边界才读得出来。静止时透明 */
-.content::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background: var(--gray-300);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--duration-page) var(--ease-page);
-}
-
-.content.stacking::before {
-  opacity: 1;
-}
 
 .page-stack-forward-enter-active,
 .page-stack-forward-leave-active,
 .page-stack-backward-enter-active,
 .page-stack-backward-leave-active {
-  transition: transform var(--duration-page) var(--ease-page);
-  border-radius: var(--radius-xl);
-  will-change: transform;
+  transition: transform var(--duration-page) var(--ease-page),
+              opacity var(--duration-page) var(--ease-page);
+  will-change: transform, opacity;
 }
 
-/* 压暗用纸面上的遮罩层做 opacity 过渡，代替逐帧重绘的 filter */
-.page-stack-forward-leave-active::after,
-.page-stack-backward-enter-active::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-  border-radius: inherit;
-  background: var(--gray-900);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--duration-page) var(--ease-page);
-}
-
-/* 运动中的那张纸在上层：前进时是新纸（从右盖上来），后退时是旧纸（向右抽走）。
-   投影是静态的（不参与过渡），纸张落定后左缘投影已在视口外，移除时无跳变 */
+/* 前进：新纸在上（斜向飞入），旧纸沉底 */
 .page-stack-forward-enter-active,
 .page-stack-backward-leave-active {
   z-index: 2;
-  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.10), -32px 0 80px rgba(0, 0, 0, 0.12);
 }
 
 .page-stack-forward-leave-active,
@@ -2991,37 +3061,41 @@ body {
   z-index: 1;
 }
 
-/* 前进 */
+/* 前进：新页从右下斜向飞入 */
 .page-stack-forward-enter-from {
-  transform: translateX(100%);
+  transform: translateX(52%) translateY(28px);
+  opacity: 0;
 }
 
+/* 旧页缩小 + 渐隐 */
 .page-stack-forward-leave-to {
-  transform: scale(0.9);
+  transform: scale(0.93) translateY(-10px);
+  opacity: 0;
 }
 
-.page-stack-forward-leave-to::after {
-  opacity: 0.18;
-}
-
-/* 后退 */
-.page-stack-backward-enter-from {
-  transform: scale(0.9);
-}
-
-.page-stack-backward-enter-from::after {
-  opacity: 0.18;
-}
-
+/* 后退：旧页向右下斜飞出 */
 .page-stack-backward-leave-to {
-  transform: translateX(100%);
+  transform: translateX(52%) translateY(28px);
+  opacity: 0;
 }
 
-/* 窄屏：纸张占满屏幕，缩小幅度收一点，避免四周露出太多桌面显得像弹窗 */
+/* 后退：底下的纸从缩小+透明还原 */
+.page-stack-backward-enter-from {
+  transform: scale(0.93) translateY(-10px);
+  opacity: 0;
+}
+
+/* 窄屏：平移幅度收小 */
 @media (max-width: 640px) {
+  .page-stack-forward-enter-from,
+  .page-stack-backward-leave-to {
+    transform: translateX(36%) translateY(20px);
+    opacity: 0;
+  }
   .page-stack-forward-leave-to,
   .page-stack-backward-enter-from {
-    transform: scale(0.94);
+    transform: scale(0.95) translateY(-6px);
+    opacity: 0;
   }
 }
 

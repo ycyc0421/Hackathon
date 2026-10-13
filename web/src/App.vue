@@ -17,7 +17,6 @@ import AppSelect from './components/AppSelect.vue'
 
 /* label 从路由 meta 取，这里只存页序 key 列表，避免两处维护同一份文案 */
 const PAGES = [
-  { key: 'home', label: '首页' },
   { key: 'upload', label: '上传' },
   { key: 'diff', label: '差异' },
   { key: 'report', label: '报告' },
@@ -173,8 +172,8 @@ function onPageEnter(el) {
   /* 后退时新纸从「被压低」状态放大回来：缩放原点对准视口中心而不是纸张
      中心（长页面的纸张中心可能远在视口外，缩放会带着可见区域大幅漂移）。
      用未受 transform 影响的 offsetTop 推算纸张在视口中的位置 */
-  const parentTop = el.offsetParent?.getBoundingClientRect().top ?? 0
-  el.style.transformOrigin = `50% ${window.innerHeight / 2 - (parentTop + el.offsetTop)}px`
+  /* 后退进场：压缩状态回弹放大。版心内容列居中，以自身中点为原点即可 */
+  el.style.transformOrigin = '50% 50%'  
   if (firstPageEnter) {
     firstPageEnter = false
     return
@@ -196,9 +195,8 @@ function onPageBeforeLeave(el) {
   el.style.top = `${rect.top}px`
   el.style.left = `${rect.left}px`
   el.style.width = `${rect.width}px`
-  el.style.height = `${rect.height}px`
   el.style.margin = '0'
-  /* 缩小时以视口中心为原点：纸张像被原地压下去，而不是朝纸张中心（可能在视口外）收缩 */
+  /* 缩放原点对齐视口中心（版心内容列，不是整屏），长页面滚动后不会漂移 */
   el.style.transformOrigin = `50% ${window.innerHeight / 2 - rect.top}px`
   stacking.value = true
 }
@@ -213,7 +211,6 @@ function onPageLeaveDone(el) {
   el.style.top = ''
   el.style.left = ''
   el.style.width = ''
-  el.style.height = ''
   el.style.margin = ''
   el.style.transformOrigin = ''
   stacking.value = false
@@ -394,7 +391,7 @@ watch(() => route.name, updateIndicator)
 
     <main class="content" :class="{ stacking }">
       <!-- 纸张层叠：无 mode 并行渲染，新旧页同时在 DOM。每页包一张通栏不透明
-           的 .page-sheet 作为纸面（页面内容在纸内居中限宽），层叠时两张纸
+           的 .page-inner 作为纸面（版心限宽卡片容器），层叠时两张纸
            互不透字；旧纸在 before-leave 里 fixed 脱流锁定视觉原位 -->
       <Transition
         :name="pageTransition"
@@ -405,16 +402,13 @@ watch(() => route.name, updateIndicator)
         @after-leave="onPageLeaveDone"
         @leave-cancelled="onPageLeaveDone"
       >
-        <div :key="route.name" class="page-sheet">
+        <div :key="route.name" class="page-inner">
           <component :is="current" />
         </div>
       </Transition>
     </main>
 
-      <footer class="footer">
-        <span>契约草案 v0.1 · 未冻结</span>
-        <span v-if="task" class="task-ref">任务 {{ task.task_id }}</span>
-      </footer>
+
     </div>
   </ErrorBoundary>
 </template>
