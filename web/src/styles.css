@@ -395,18 +395,44 @@ body {
 /* ---------- 表单 ---------- */
 
 .dropzone {
-  padding: 32px 20px;
-  border: 2px dashed var(--border);
-  border-radius: var(--radius-sm);
-  background: #fafbfc;
+  padding: var(--space-8) var(--space-5);
+  border: 2px dashed var(--border-hover);
+  border-radius: var(--radius-lg);
+  background: var(--gray-50);
   text-align: center;
   cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease),
+    background-color var(--duration-fast) var(--ease);
 }
 
 .dropzone:hover,
 .dropzone.active {
   border-color: var(--color-primary);
-  background: #f2f6fc;
+  background: var(--blue-50);
+}
+
+/* 上传图标：圆底 + 线性箭头，拖入/悬停时上浮一点确认目标区域 */
+.dropzone-icon {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto var(--space-3);
+  padding: 12px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--duration-base) var(--ease);
+}
+
+.dropzone:hover .dropzone-icon,
+.dropzone.active .dropzone-icon {
+  transform: translateY(-3px);
 }
 
 /* 键盘可达（role=button）：聚焦描边与 chip 的 focus-visible 同款 */
@@ -416,7 +442,8 @@ body {
 }
 
 .dropzone-main {
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
   color: var(--text-body);
 }
 

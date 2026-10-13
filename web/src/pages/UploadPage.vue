@@ -525,6 +525,9 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
         @keydown.space.prevent="fileInput?.click()"
       >
         <!-- 手机没有拖放，窄屏只提示点击选择 -->
+        <svg class="dropzone-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
+        </svg>
         <div class="dropzone-main">{{ isMobile ? '点击选择文件' : '把文件拖到这里，或点击选择' }}</div>
         <div class="dropzone-hint">
           支持 {{ UPLOAD_LIMITS.accept.split(',').join(' / ') }}，单个不超过
