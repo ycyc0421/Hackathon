@@ -53,16 +53,6 @@ const FEATURES = [
   },
 ]
 
-/* 技术亮点 badge */
-const TECH_BADGES = [
-  'PaddleOCR',
-  '本地部署',
-  '数据不出境',
-  'Vue 3',
-  '开源',
-  '无 API Key',
-]
-
 /* 图标为内联 SVG 路径（24×24 线性，stroke 继承 currentColor），不引入图标库 */
 const STEPS = [
   {
@@ -172,9 +162,9 @@ function runScenario(key) {
       <button class="btn primary" @click="continueTask">继续查看</button>
     </section>
 
-    <!-- 特性卡片区：四个核心能力 -->
+    <!-- 特性卡片区：四个核心能力，交错淡入 -->
     <section class="home-features" aria-label="核心功能">
-      <div v-for="f in FEATURES" :key="f.title" class="home-feature-card">
+      <div v-for="(f, i) in FEATURES" :key="f.title" class="home-feature-card" :style="`--i:${i}`">
         <div class="home-feature-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <path :d="f.icon" />
@@ -185,13 +175,62 @@ function runScenario(key) {
       </div>
     </section>
 
-    <!-- 技术亮点 badge 行 -->
-    <div class="home-badges" aria-label="技术特点">
-      <span v-for="b in TECH_BADGES" :key="b" class="home-badge">{{ b }}</span>
-    </div>
+    <!-- 比对预览：字段级比对示意，硬编码演示数据 -->
+    <section class="home-preview" aria-label="比对预览示意">
+      <div class="home-preview-head">
+        <h2 class="home-preview-title">字段级精准比对</h2>
+        <p class="home-preview-sub">逐份抽取，逐字段对照，冲突和缺失一目了然</p>
+      </div>
+      <div class="home-preview-table" aria-hidden="true">
+        <div class="preview-thead">
+          <span class="preview-field-col">字段</span>
+          <span class="preview-doc-col">商业发票</span>
+          <span class="preview-doc-col">装箱单</span>
+          <span class="preview-doc-col">提单</span>
+          <span class="preview-status-col">状态</span>
+        </div>
+        <div class="preview-row preview-row--match">
+          <span class="preview-field">HS 编码</span>
+          <span class="preview-val">8471.30.00</span>
+          <span class="preview-val">8471.30.00</span>
+          <span class="preview-val">8471.30.00</span>
+          <span class="preview-badge preview-badge--match">一致</span>
+        </div>
+        <div class="preview-row preview-row--conflict">
+          <span class="preview-field">件数</span>
+          <span class="preview-val preview-val--conflict">100 CTNS</span>
+          <span class="preview-val">120 CTNS</span>
+          <span class="preview-val">120 CTNS</span>
+          <span class="preview-badge preview-badge--conflict">不一致</span>
+        </div>
+        <div class="preview-row preview-row--match">
+          <span class="preview-field">净重</span>
+          <span class="preview-val">2,400 KG</span>
+          <span class="preview-val">2,400 KG</span>
+          <span class="preview-val">2,400 KG</span>
+          <span class="preview-badge preview-badge--match">一致</span>
+        </div>
+        <div class="preview-row preview-row--missing">
+          <span class="preview-field">目的港</span>
+          <span class="preview-val">DEHAM</span>
+          <span class="preview-val preview-val--missing">—</span>
+          <span class="preview-val">DEHAM</span>
+          <span class="preview-badge preview-badge--missing">部分缺失</span>
+        </div>
+        <div class="preview-row preview-row--match">
+          <span class="preview-field">毛重</span>
+          <span class="preview-val">2,560 KG</span>
+          <span class="preview-val">2,560 KG</span>
+          <span class="preview-val">2,560 KG</span>
+          <span class="preview-badge preview-badge--match">一致</span>
+        </div>
+      </div>
+      <p class="home-preview-note">示意数据，不代表真实任务结果</p>
+    </section>
 
+    <!-- 三步流程：连接线先画完，图标依次浮现 -->
     <section class="home-steps">
-      <div v-for="s in STEPS" :key="s.num" class="home-step">
+      <div v-for="(s, i) in STEPS" :key="s.num" class="home-step" :style="`--step-i:${i}`">
         <div class="home-step-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path :d="s.icon" /></svg>
         </div>
