@@ -14,7 +14,7 @@
  * - 成功采用返回的子任务，原任务与原始证据保留，不自行改 comparisons/summary；
  * - 处理中切换任务时，过期的响应不覆盖新任务。
  */
-import { computed, inject, ref, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, ref, watch } from 'vue'
 import { isMock, getCorrections, createCorrection, exportReport } from '../api/index.js'
 
 const task = inject('task')
@@ -38,6 +38,8 @@ const reason = ref('')
  * 置 null，下次提交重新读取 result_hash 并生成新 request_id。
  */
 let pending = null
+let activeRequest = null
+onBeforeUnmount(() => activeRequest?.abort())
 
 const terminal = computed(() => ['COMPLETED','PARTIAL','FAILED'].includes(task.value?.status))
 /** 可导出：真实后端、已到终态、当前任务没有请求错误。mock/未结束不发真实请求 */
@@ -60,55 +62,66 @@ const chosen = computed(() => options.value.find(o => o.id === selection.value))
 /** 输入变化 → 作废旧载荷，下次提交重新读取上下文与新 request_id */
 watch([selection,value,reason], () => { pending = null })
 /** 切换任务 → 清空选择、错误与成功提示，避免旧状态串到新任务 */
-watch(() => task.value?.task_id, () => { selection.value = ''; value.value = ''; reason.value = ''; pending = null; error.value = ''; message.value = '' })
+watch(() => task.value?.task_id, () => {
+  activeRequest?.abort()
+  selection.value = ''; value.value = ''; reason.value = ''; pending = null; error.value = ''; message.value = ''
+}, { flush: 'sync' })
 
 async function revise() {
   if (!editable.value || !chosen.value || !value.value.trim() || !reason.value.trim() || busy.value) return
   busy.value = true; error.value = ''; message.value = ''
   const sourceId = task.value.task_id
+  const change = { file_id: chosen.value.file_id, item_no: chosen.value.item_no, field_key: chosen.value.field_key, value: value.value }
+  const submittedReason = reason.value
+  const controller = new AbortController()
+  activeRequest = controller
   try {
     if (!pending) {
-      const source = await getCorrections(sourceId)
+      const source = await getCorrections(sourceId, { signal: controller.signal })
+      if (controller.signal.aborted || task.value?.task_id !== sourceId) return
       pending = {
         request_id: crypto.randomUUID(),
         source_hash: source.result_hash,
-        reason: reason.value,
-        changes: [{ file_id: chosen.value.file_id, item_no: chosen.value.item_no, field_key: chosen.value.field_key, value: value.value }],
+        reason: submittedReason,
+        changes: [change],
       }
     }
-    const child = await createCorrection(sourceId, pending)
+    const child = await createCorrection(sourceId, pending, { signal: controller.signal })
     // 竞态守卫：提交期间若已切到别的任务，丢弃过期响应，不覆盖新任务
-    if (task.value?.task_id !== sourceId) return
+    if (controller.signal.aborted || task.value?.task_id !== sourceId) return
     task.value = child
     message.value = '已创建修正任务并重算。原任务和原始证据保留，报告包含修正审计。'
     // 成功后旧载荷已消费，下一次修改会重新读取上下文
     pending = null
     selection.value = ''; value.value = ''; reason.value = ''
   } catch (e) {
-    if (task.value?.task_id !== sourceId) return
+    if (controller.signal.aborted || task.value?.task_id !== sourceId) return
     // 冲突：源结果已变化，旧 source_hash 失效，必须重新读取上下文后再提交
+    if (e?.status === 409) pending = null
     error.value = e?.status === 409
-      ? '源任务结果已变化，请重新读取后再提交修正。'
+      ? '修正上下文冲突，请刷新任务并核对内容后重新提交。'
       : (e?.message || '修正失败，请重试')
-  } finally { busy.value = false }
+  } finally { activeRequest = null; busy.value = false }
 }
 
 async function download(format) {
   if (!available.value || busy.value) return
   busy.value = true; error.value = ''
   const id = task.value.task_id
+  const controller = new AbortController()
+  activeRequest = controller
   try {
-    const blob = await exportReport(id, format)
-    if (task.value?.task_id !== id) return
+    const blob = await exportReport(id, format, { signal: controller.signal })
+    if (controller.signal.aborted || task.value?.task_id !== id) return
     const url = URL.createObjectURL(blob)
     const anchor = document.createElement('a')
     anchor.href = url; anchor.download = `report-${id}.${format}`; anchor.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   } catch (e) {
-    if (task.value?.task_id !== id) return
+    if (controller.signal.aborted || task.value?.task_id !== id) return
     // 任何失败都不下载错误内容、不显示成功
     error.value = e?.message || '导出失败'
-  } finally { busy.value = false }
+  } finally { activeRequest = null; busy.value = false }
 }
 </script>
 

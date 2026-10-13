@@ -33,7 +33,7 @@ export const REQUEST_TIMEOUT_MS = 30_000
  * 两者都会让 fetch / res.json() 在读体阶段也中断；
  * 主动取消归 CANCELED，本地截止归 TIMEOUT，互不混淆。
  */
-export async function requestOnce(path, options = {}, { base = '', timeoutMs = REQUEST_TIMEOUT_MS, signal } = {}) {
+export async function requestOnce(path, options = {}, { base = '', timeoutMs = REQUEST_TIMEOUT_MS, signal, responseType = 'json' } = {}) {
   if (signal?.aborted) throw new ApiError('已取消', { kind: 'CANCELED' })
 
   const ctrl = new AbortController()
@@ -89,10 +89,10 @@ export async function requestOnce(path, options = {}, { base = '', timeoutMs = R
     }
 
     try {
-      return await res.json()
+      return await (responseType === 'blob' ? res.blob() : res.json())
     } catch {
       if (ctrl.signal.aborted) throw abortError()
-      throw new ApiError('后端返回的内容不是合法 JSON', { kind: 'PARSE', status: res.status })
+      throw new ApiError(responseType === 'blob' ? '读取报告文件失败' : '后端返回的内容不是合法 JSON', { kind: 'PARSE', status: res.status })
     }
   } finally {
     clearTimeout(timer)
@@ -100,71 +100,9 @@ export async function requestOnce(path, options = {}, { base = '', timeoutMs = R
   }
 }
 
-/**
- * 下载二进制报告（Blob）。仅在确需二进制返回时使用，不替代 JSON 请求路径。
- *
- * 错误分类与 requestOnce 一致：连接层错误归 NETWORK、本地截止归 TIMEOUT、
- * 主动取消归 CANCELED、后端返回契约错误体归 SERVER——页面按 kind 提示，
- * 且任何失败都不得把错误内容当作报告文件下载下来。
- */
-export async function requestBlob(path, options = {}, { base = '', timeoutMs = REQUEST_TIMEOUT_MS, signal } = {}) {
-  if (signal?.aborted) throw new ApiError('已取消', { kind: 'CANCELED' })
-
-  const ctrl = new AbortController()
-  const onExternalAbort = () => ctrl.abort()
-  signal?.addEventListener('abort', onExternalAbort, { once: true })
-  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
-
-  const abortError = () =>
-    signal?.aborted
-      ? new ApiError('已取消', { kind: 'CANCELED' })
-      : new ApiError(`请求超过 ${Math.round(timeoutMs / 1000)} 秒未响应`, { kind: 'TIMEOUT' })
-
-  try {
-    let res
-    try {
-      res = await fetch(`${base}${path}`, { ...options, signal: ctrl.signal })
-    } catch {
-      if (ctrl.signal.aborted) throw abortError()
-      throw new ApiError('无法连接后端，请确认服务已启动、代理配置正确', { kind: 'NETWORK' })
-    }
-
-    if (!res.ok) {
-      // 失败响应通常是 JSON 错误体（契约错误），按文本读出，不当文件下载
-      let code = null
-      let message = `请求失败（HTTP ${res.status}）`
-      let hasContractError = false
-      try {
-        const body = await res.json()
-        if (body?.error?.message) {
-          message = body.error.message
-          hasContractError = true
-        }
-        if (body?.error?.code) code = body.error.code
-      } catch (e) {
-        if (ctrl.signal.aborted) throw abortError()
-        /* 错误体不是 JSON，用默认文案 */
-      }
-      if (res.status >= 500 && !hasContractError) {
-        throw new ApiError('无法连接后端，请确认服务已启动、代理配置正确', {
-          kind: 'NETWORK',
-          code,
-          status: res.status,
-        })
-      }
-      throw new ApiError(message, { kind: 'SERVER', code, status: res.status })
-    }
-
-    try {
-      return await res.blob()
-    } catch {
-      if (ctrl.signal.aborted) throw abortError()
-      throw new ApiError('读取报告文件失败', { kind: 'PARSE', status: res.status })
-    }
-  } finally {
-    clearTimeout(timer)
-    signal?.removeEventListener('abort', onExternalAbort)
-  }
+/** 报告下载复用同一套截止、取消和错误处理，仅成功响应按 Blob 读取。 */
+export function requestBlob(path, options = {}, config = {}) {
+  return requestOnce(path, options, { ...config, responseType: 'blob' })
 }
 
 /**

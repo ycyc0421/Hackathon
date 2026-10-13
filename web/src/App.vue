@@ -87,9 +87,10 @@ const isRunning = ref(false)
 
 const restoreError = ref('')
 const terminalStatuses = new Set(['COMPLETED', 'PARTIAL', 'FAILED'])
-// Keep only a task identifier in the URL; reload the authoritative backend result.
+// URL 仅保存任务编号，刷新后重新读取后端结果。
 watch(() => [task.value?.task_id, task.value?.status], ([id]) => {
   if (isMock()) return
+  if (id) restoreError.value = ''
   const url = new URL(window.location.href)
   if (id && terminalStatuses.has(task.value?.status)) url.searchParams.set('task', id)
   else if (!id) url.searchParams.delete('task')
