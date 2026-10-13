@@ -115,15 +115,20 @@ def correct(store, task_id, request):
                 unchecked.discard((change.file_id, change.item_no))
             # raw values, coordinates and measured confidence remain source evidence.
             changes.append({**change.model_dump(), 'before':before, 'after':copy.deepcopy(field)})
-        # A document's revised currency applies to its money fields; include implied changes.
+        # 修改币种时同步金额单位；补填金额缺少单位时继承文件已确认的币种，并记录审计。
         for extraction in task['extractions']:
-            if (extraction['file_id'],None,'currency') not in seen:
+            currency_changed = (extraction['file_id'],None,'currency') in seen
+            currency = next((f['normalized_value'] for f in extraction['fields']
+                             if f['field_key']=='currency' and f['status'] in {'EXTRACTED','LOW_CONFIDENCE'}), None)
+            if not currency:
                 continue
-            currency = next(f['normalized_value'] for f in extraction['fields'] if f['field_key']=='currency')
             groups = [(None,extraction['fields'])] + [(li['item_no'],li['fields']) for li in extraction['line_items']]
             for item_no, fields in groups:
                 for field in fields:
                     if field['field_key'] in {'total_amount','amount','unit_price'} and field.get('normalized_value') is not None:
+                        if not currency_changed and (field.get('unit') is not None or
+                                (extraction['file_id'],item_no,field['field_key']) not in seen):
+                            continue
                         before = copy.deepcopy(field)
                         field['unit'] = currency
                         if before != field:

@@ -199,16 +199,19 @@ def recognize_image(data: bytes) -> ReadResult:
 
 
 def locate_fields(fields: list[dict], rows: list[dict], blocks: list[dict]):
-    compact = lambda text: re.sub(r'\s+', '', text or '').casefold()
     for row, group in [(False, fields)] + [(True, item['fields']) for item in rows]:
         for field in group:
-            value = compact(field.get('raw_value'))
-            if not value:
+            value = field.get('raw_value')
+            page = field.get('page')
+            # 页码由逐页抽取确定；不能用其他页的同值覆盖或猜测来源。
+            if not value or not value.strip() or page is None:
                 continue
-            candidates = [block for block in blocks if value in compact(block['text'])
+            pattern = (r'(?<![\w.,/-])' + r'\s*'.join(re.escape(part) for part in value.split())
+                       + r'(?![\w.,/-])')
+            candidates = [block for block in blocks if block['page'] == page
+                          and re.search(pattern, block['text'], re.I)
                           and (not row or block['label'] == 'table')]
             if len(candidates) == 1:
-                field['page'] = candidates[0]['page']
                 if candidates[0]['bbox'] is not None:
                     field['bbox'] = candidates[0]['bbox']
                     field['bbox_unit'] = 'PX'

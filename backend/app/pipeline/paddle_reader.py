@@ -9,7 +9,7 @@ from io import BytesIO
 from threading import Lock
 
 from .reader import ReadResult
-from .rows import EMPTY_CELL, HEADER_MAP, _looks_like_header
+from .rows import EMPTY_CELL, HEADER_MAP, TOTAL_LINE, _looks_like_header
 from ..config import MIN_TEXT_LAYER_CHARS
 from ..models import ParseMethod
 
@@ -348,6 +348,10 @@ def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[l
     corrections: list[dict[str, str]] = []
     out = [table_lines[0]]
     for row in table_lines[1:]:
+        # 合计行保留给票级抽取，不按商品列读取或核验品名。
+        if TOTAL_LINE.match(row):
+            out.append(row)
+            continue
         cells = row.split("   ")
         code = cells[code_at]
         where = next((i for i, text in enumerate(ocr_lines)
@@ -358,10 +362,9 @@ def _check_descriptions(table_lines: list[str], ocr_lines: list[str]) -> tuple[l
         else:
             structured = cells[desc_at]
             compact = lambda value: re.sub(r"\s+", "", value).casefold()
-            # Ordinary OCR may read a printed SKU below its description.
-            # Only accept a nearby line that agrees exactly, or through the
-            # narrowly allowed O/0 measure correction.
-            candidates = ocr_lines[max(0, where - 8):where] + ocr_lines[where + 1:where + 2]
+            # 按表头列序核对货号旁的品名，不跨商品行寻找相同文字。
+            candidates = (ocr_lines[where + 1:where + 2] if code_at < desc_at
+                          else ocr_lines[max(0, where - 1):where])
             matches = [candidate.strip() for candidate in candidates if
                        compact(candidate) == compact(structured) or
                        compact(_correct_zero_confusion(candidate)) == compact(structured) or
