@@ -451,27 +451,27 @@ const extractProgress = computed(() => {
 /** 待复核条目数：与差异页「需关注」、顶栏角标同一口径 */
 const reviewCount = computed(() => task.value?.comparisons?.filter(needsReview).length ?? 0)
 
+/** 任务已到终态（按钮可点）：COMPLETED 或 PARTIAL */
+const taskDone = computed(() => task.value?.status === 'COMPLETED' || task.value?.status === 'PARTIAL')
+
 /**
  * 「查看比对结果」一次性描边引导的启动时机。
  *
- * 必须在 collapseHooks 的高度展开动画【结束之后】启动（@after-enter），
- * 不能与高度展开同帧：展开期间 .next-actions 的 height/overflow 是内联受控的，
- * 按钮还在被「长高」的过程中，此时播描边会一半被 overflow 裁掉、
- * 且两条动画抢同一注意力，引导反而看不清。
+ * 描边引导从 status-row 的 @after-enter 触发（任务头部展开完成时），
+ * 而不是从 next-actions 区块：按钮已常驻在 status-row 右上角，
+ * 不再随 next-actions 的高度展开入场，不存在被 overflow 裁掉的问题。
+ * 只在有待复核项（reviewCount > 0）且任务刚到终态时触发，灰色禁用态不播。
  *
- * 描边 transitionend 后再给按钮加一次轻微脉冲（一次即停）。全程只播一次；
- * 组件因 key 变化或切页返回重挂载即视为新语境，允许重播（after-enter 只会
- * 在本次挂载的入场完成后触发一次，天然不会循环）。
+ * 描边 transitionend 后给按钮一次轻微脉冲（一次即停）。全程只播一次。
  */
-function onNextActionsEnter(el) {
-  const rect = el.querySelector?.('.cta-trace-rect')
+function onStatusRowEnter(el) {
   const btn = el.querySelector?.('.cta-trace')
-  if (!rect || !btn) return
-  // prefers-reduced-motion：全局规则只把过渡时长压到 0.01ms，transition 照样
-  // 走到终态——加了 .playing 会瞬间呈现完整描边环且不再消失。干脆不启动。
+  const rect = el.querySelector?.('.cta-trace-rect')
+  if (!btn || !rect) return
+  // 只有任务完成且有待复核项时才播引导
+  const taskDone = task.value?.status === 'COMPLETED' || task.value?.status === 'PARTIAL'
+  if (!taskDone || reviewCount.value === 0) return
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  // rect 几何按按钮实测像素写死：viewBox 拉伸只保描边宽不保几何，
-  // 宽按钮上圆角会被拉成椭圆角、四边内缩不均（x 与 y 缩放比不同）
   rect.setAttribute('x', '1')
   rect.setAttribute('y', '1')
   rect.setAttribute('width', String(btn.offsetWidth - 2))
@@ -480,8 +480,6 @@ function onNextActionsEnter(el) {
   rect.addEventListener(
     'transitionend',
     () => {
-      // 描边完成后淡出再清类：引导只播一次，播完界面回归克制基线，
-      // 不允许留一个永久的描边环
       rect.classList.add('done')
       rect.addEventListener(
         'transitionend',
@@ -489,12 +487,14 @@ function onNextActionsEnter(el) {
         { once: true }
       )
       btn.classList.add('cta-pulse')
-      // 脉冲结束后清类，避免内联态残留；动画只播一次，无需循环
       btn.addEventListener('animationend', () => btn.classList.remove('cta-pulse'), { once: true })
     },
     { once: true }
   )
 }
+
+/** 任务完成且可点（COMPLETED 或 PARTIAL）时触发描边引导 */
+function onNextActionsEnter() { /* 已迁移到 onStatusRowEnter，保留空函数避免 template 引用报错 */ }
 
 /**
  * 是否提示 EDI 能力说明：真实模式且已选含 EDI 文件时显示。
@@ -670,7 +670,7 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
             整行用收合动画入场：与进度条收起同帧发生时，
             硬插入会把文件列表瞬间顶开，看起来像卡片尺寸异常抖动。
           -->
-          <Transition :css="false" v-bind="collapseHooks">
+          <Transition :css="false" v-bind="collapseHooks" @after-enter="onStatusRowEnter">
             <div v-if="task" class="status-row">
               <StatusBadge :status="statusInfo" />
               <span class="status-meta">任务 {{ task.task_id }}</span>
@@ -678,6 +678,18 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
                 <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
               </Transition>
               <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
+              <!-- 常驻右上角按钮：灰色=不可用，蓝色=可跳转；有待复核项时到终态后描边引导一次 -->
+              <button
+                class="btn cta-trace status-cta"
+                :class="{ primary: taskDone, 'status-cta--active': taskDone && reviewCount > 0 }"
+                :disabled="!taskDone"
+                @click="navigate.go('diff')"
+              >
+                {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
+                <svg class="cta-trace-svg" aria-hidden="true">
+                  <rect class="cta-trace-rect" rx="4" fill="none" pathLength="100" />
+                </svg>
+              </button>
             </div>
           </Transition>
 
@@ -795,26 +807,6 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
             </li>
           </ul>
 
-          <!-- 完成态主路径：收合动画入场，直接给去差异页的按钮 -->
-          <Transition :css="false" v-bind="collapseHooks" @after-enter="onNextActionsEnter">
-            <div
-              v-if="task && (task.status === 'COMPLETED' || task.status === 'PARTIAL')"
-              class="next-actions"
-            >
-              <button class="btn primary cta-trace" @click="navigate.go('diff')">
-                {{ reviewCount > 0 ? `查看待复核项（${reviewCount}）` : '查看比对结果' }}
-                <svg class="cta-trace-svg" aria-hidden="true">
-                  <rect
-                    class="cta-trace-rect"
-                    rx="4"
-                    fill="none"
-                    pathLength="100"
-                  />
-                </svg>
-              </button>
-
-            </div>
-          </Transition>
         </div>
       </Transition>
     </section>
