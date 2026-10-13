@@ -1,0 +1,139 @@
+name: 演示视频
+run-name: 录制演示视频 · ${{ github.ref_name }}
+
+# 为什么是独立工作流而不是 ci.yml 里的一个 job：
+#
+# 1) **并行**。它是独立的一次运行，与 ci.yml 的三个 job（后端回归、契约校验、
+#    前端构建）完全并发，互不排队，也不会拖长主 CI 的关键路径。
+# 2) **不阻塞部署**。deploy.yml 的 revision 只检查 ci.yml 在该提交上是否成功，
+#    本工作流慢或失败都不会挡住发布。视频是产物，不是发布的前置条件——
+#    首页有 VITE_HOME_DEMO=0 的回退开关，视频还没出片时首页照样能发。
+# 3) **按需触发**。逐帧渲染 + 编码比普通 CI 慢得多，不适合每次 push 都跑，
+#    所以用 paths 收窄到"改了录制脚本或视频产物"时才自动跑。
+#
+# 触发方式：
+#   - push / PR 且命中 paths：自动录制并校验产物
+#   - workflow_dispatch：手动出新片；可用 base_url 直接录已部署站点
+#
+# 改了前端页面（选择器、布局）也可能让录制失败，但那种改动很频繁，
+# 每次都渲染不划算——这类情况请手动 workflow_dispatch 一次。
+
+on:
+  workflow_dispatch:
+    inputs:
+      time_k:
+        description: '页面时间放慢倍率（越大动画越平滑，录制越慢）'
+        required: false
+        default: '4'
+      fps:
+        description: '帧率'
+        required: false
+        default: '60'
+      base_url:
+        description: '直接录制已部署站点（留空则用本地 vite preview）'
+        required: false
+        default: ''
+
+  push:
+    branches: [main, web/*]
+    paths:
+      - 'web/scripts/**'
+      - 'web/public/demo.mp4'
+      - 'web/public/demo-poster.jpg'
+      - '.github/workflows/demo-video.yml'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - 'web/scripts/**'
+      - 'web/public/demo.mp4'
+      - 'web/public/demo-poster.jpg'
+      - '.github/workflows/demo-video.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    name: 录制 web/public/demo.mp4
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+
+      - name: 安装契约与前端依赖
+        run: |
+          npm ci
+          npm ci --prefix web
+
+      # playwright-core 不写进 web/package.json（AGENTS.md 规定 web 只允许
+      # vue + vue-router + vite + @vitejs/plugin-vue）。录制脚本先试正常
+      # import('playwright-core')，所以装到仓库根目录即可被解析到。
+      - name: 安装录制依赖（playwright-core 与 Chromium）
+        run: |
+          npm i --no-save playwright-core
+          npx --no-install playwright-core install --with-deps chromium
+
+      - name: 确认 ffmpeg 可用
+        run: ffmpeg -hide_banner -version | head -1
+
+      # 构建产物既是 vite preview 的输入，也顺带验证了"前端能构建"。
+      - name: 构建前端
+        working-directory: web
+        run: npm run build
+
+      - name: 录制演示视频
+        working-directory: web
+        env:
+          # inputs.* 在 push / PR 触发时是空的，必须给默认值，
+          # 否则脚本会收到空字符串而解析失败
+          DEMO_TIME_K: ${{ inputs.time_k || '4' }}
+        run: |
+          args=(--fps "${{ inputs.fps || '60' }}")
+          if [ -n "${{ inputs.base_url }}" ]; then
+            args+=(--base-url "${{ inputs.base_url }}")
+          fi
+          node scripts/record-demo.mjs "${args[@]}"
+
+      - name: 校验产物
+        run: |
+          set -euo pipefail
+          test -s web/public/demo.mp4 || { echo 'demo.mp4 未生成'; exit 1; }
+          test -s web/public/demo-poster.jpg || { echo 'demo-poster.jpg 未生成'; exit 1; }
+          ffprobe -v error \
+            -show_entries stream=codec_name,width,height,r_frame_rate,nb_frames \
+            -show_entries format=duration,size \
+            -of default=noprint_wrappers=1 web/public/demo.mp4
+          ls -la web/public/demo.mp4 web/public/demo-poster.jpg
+
+      - name: 上传演示视频
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-video
+          path: |
+            web/public/demo.mp4
+            web/public/demo-poster.jpg
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: 说明产物去向
+        if: always()
+        run: |
+          {
+            echo '## 演示视频已录制'
+            echo ''
+            echo '产物在本次运行的 Artifacts 里（`demo-video`）：`demo.mp4` 与 `demo-poster.jpg`。'
+            echo '这两个文件是仓库要提交的产物（首页 `<video>` 引用它们），下载后覆盖 `web/public/` 下的同名文件即可。'
+            echo ''
+            echo '工作流不自动提交：`web/` 的改动按 AGENTS.md 必须走分支与 PR。'
+            echo ''
+            echo '首页可用 `VITE_HOME_DEMO=0 npm run build` 关掉视频区块；'
+            echo '视频还没出片时用这个开关发布，首页布局不受影响。'
+          } >> "$GITHUB_STEP_SUMMARY"
