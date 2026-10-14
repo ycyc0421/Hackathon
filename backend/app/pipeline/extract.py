@@ -120,9 +120,9 @@ _PKG_BARE = re.compile(r"(?<![\d.])(\d{1,7})\s*" + PKG_WORD, re.I)
 
 def _measure_tail(text: str, pos: int) -> str:
     text = text[:pos] + text[pos:].split("|", 1)[0]
-    # 多空格可能只是数值与单位的间距；只有遇到下一字段标签才截断。
+    # OCR 可能将字段间距压成单空格；只在下一已知标签及值起始处截断。
     return re.split(
-        r"(?:[ \t]{2,}|[ \t]*\|[ \t]*)(?=(?:[GN]\.?\s*W\.?|(?:GROSS|NET)(?:\s*(?:WEIGHT|WT))?|"
+        r"(?:[ \t]+|[ \t]*\|[ \t]*)(?=(?:[GN]\.?\s*W\.?|(?:GROSS|NET)(?:\s*(?:WEIGHT|WT))?|"
         r"PACKAGES?|CARTONS?|PKGS?|QTY|QUANTITY|MEAS(?:UREMENT)?\.?|VOLUME|"
         r"AMOUNT|TOTAL|毛重|净重|数量|件数|体积|金额|合计)"
         r"[ \t]*(?:[:：]|[+-]?\d|(?:" + KNOWN_CURRENCIES + r"|US\$)\b))",

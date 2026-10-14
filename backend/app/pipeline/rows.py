@@ -165,6 +165,29 @@ def _number_of(cell: str | None) -> str | None:
     return m.group(0) if m else None
 
 
+def _restore_shifted_units(parts: list[str], header_order: list[str]) -> list[str]:
+    """Restore only a complete, explicit unit chain across adjacent measure cells."""
+    if len(parts) != len(header_order):
+        return parts
+    for index in range(len(header_order) - 2):
+        keys = header_order[index:index + 3]
+        if keys != ["quantity", "packages", "gross_weight"]:
+            continue
+        quantity, packages, weight = parts[index:index + 3]
+        if not re.fullmatch(r"[-+]?\d[\d,.]*", quantity):
+            continue
+        package_match = re.fullmatch(r"(PCS|PIECES?|UNITS?|个|只)\s+([-+]?\d[\d,.]*)", packages, re.I)
+        weight_match = re.fullmatch(r"(CARTONS?|CTNS?|箱)\s+([-+]?\d[\d,.]*)", weight, re.I)
+        if package_match is None or weight_match is None:
+            continue
+        restored = [quantity + " " + package_match[1],
+                    package_match[2] + " " + weight_match[1], weight_match[2]]
+        if all(N.to_measure(value, key)[0] is not None for key, value in zip(keys, restored)):
+            # Move units only: all numbers, their order and the original row evidence remain.
+            return parts[:index] + restored + parts[index + 3:]
+    return parts
+
+
 def _assign_from_cells(parts: list[str], header_order: list[str]) -> dict[str, str]:
     """按表头顺序把单元格分给各列。
 
@@ -173,6 +196,7 @@ def _assign_from_cells(parts: list[str], header_order: list[str]) -> dict[str, s
     """
     out: dict[str, str] = {}
     if header_order and len(parts) == len(header_order):
+        parts = _restore_shifted_units(parts, header_order)
         for key, value in zip(header_order, parts):
             out[key] = value
         return out
