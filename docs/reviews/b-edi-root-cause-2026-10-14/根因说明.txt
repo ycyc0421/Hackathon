@@ -1,0 +1,40 @@
+2026-10-14 EDI 缺口定位
+
+结论：标准 EDIFACT 解析与后端接入尚未实现；不是 OCR 模型识别失败，也不是当前前端把 .edi 挡住。
+固定核查主分支和只读线上 health：852cc57736a0347fb21533d9f4f90a8a66b19812。
+
+实际链路：前端接受 .edi/.EDI -> multipart 上传 -> 全部原件落盘 -> guess_file_type 返回 OTHER -> runner 在读取前标 UNSUPPORTED / UNSUPPORTED_FILE_TYPE 并 continue -> 单EDI FAILED，混合已支持文件 PARTIAL。
+
+直接代码证据
+1. backend/app/pipeline/reader.py:67-75：只识别PDF、图片、.json；.edi/.x12/.txt均OTHER。
+2. backend/app/pipeline/runner.py:137-155：OTHER直接continue；read_document在第157行，EDI文件不会执行到这里。
+3. backend/app/pipeline/reader.py:81-84及trade_json.py:48-55：现有EDI/EDI_PARSE调用parse_trade_json，正文使用json.loads，只接受hackathon-trade-json-v1。该枚举的出现不证明实现了EDIFACT。
+4. backend/app/main.py:154-158及线上/capabilities：项目JSON supported=true，UN/EDIFACT和X12 supported=false，明确说明“解析器尚未接入”。
+5. backend/app/config.py:68的EDI_EXT没有被任何Python调用者使用；不是只补配置就能启动解析。
+
+实施缺口
+当前main没有读取UNB/UNH、UNA/release等并生成业务字段/商品行的运行时EDI解析入口。backend/tools/make_edi_samples.py是生成素材；data/seed_data.py导入既有任务JSON；web/src/mock/check-edi-*.json和对应测试是手工返回夹具，均非解析器。已检查三个公开数据/存储分支目录，也未发现EDI解析入口；这不代表个人没有未推送的代码。
+backend/tests/test_trade_json.py:35-39当前明确测试standard.edi为OTHER并失败，因此CI绿色验证的是这个现有能力边界；不能据CI宣布EDI成功解析。
+
+独立验证
+在独立本地FastAPI/SQLite运行真实multipart上传，OCR配置为开启，调用观察器仅包裹原函数、不替换返回：
+- 原包完整INVOIC、错误UNT段数、截断EDI三文件全部OTHER/UNSUPPORTED/FAILED。
+- 三个任务read_document调用0、图片/OCR入口0、PDF/OCR入口0；原件读取/下载字节不变。
+- 独立标明的项目JSON对照COMPLETED/EDI_PARSE；read_document调用1，OCR仍0。
+7项检查通过。说明标准EDI在语法解析之前就已被拒绝，当前不能区分有效报文和报文语法错误；不是这三份原件共同触发OCR模型故障。
+线上本轮只读核对之前任务，未重新上传：EDI-only任务tsk_20261014_0016_4ca5b008bbf9仍FAILED/OTHER/UNSUPPORTED；混合tsk_20261014_0017_1a29c18496be仍PARTIAL，PDF正常EXTRACTED。
+
+接手路径（与issue40既有分工一致）
+C交付解析器固定入口/提交、版本编码范围、字段/商品行/单位/来源及明确语法错误；F接入文件分流和结构化结果、状态/错误/能力声明；B按原件HTTP回归，D复用现有上传与展示。
+先完成INVOIC:D:96A:UN、单UNH、ASCII/严格UTF-8的闭环；先前为建议范围，仍由C/F确认。按段级证据填raw_text，不编造page/bbox；错误UNT/截断失败、DESADV/多消息/其他版本范围外明确不支持。复用已有23个样例，不先新增OCR/LLM依赖。
+只把.edi认成EDI但仍调用parse_trade_json会因正文不是JSON而失败；必须有真正的协议解析和字段映射。
+
+验收范围调整
+按用户新指令，地址比较、评测范围/历史展示、刷新后原件入口暂缓，不作为本轮阻塞。保留原测试时点事实，不把暂缓标为已修复；本轮优先定位EDI。
+
+公开证据
+当前固定代码：https://github.com/ycyc0421/Hackathon/blob/852cc57736a0347fb21533d9f4f90a8a66b19812/backend/app/pipeline/reader.py#L67
+原issue40及F最后公开解析器交付依赖：https://github.com/ycyc0421/Hackathon/issues/40#issuecomment-6128163933
+上一轮公开构造数据与完整报告：https://github.com/ycyc0421/Hackathon/issues/38#issuecomment-6160904764
+本目录probe_pipeline.py/local-trace.json及三完整任务返回为本轮独立证据；read_live.py/health.json/capabilities.json/edi-task.json/mixed-task.json为当前只读线上证据。
+未修改业务代码、原始单据或部署，未启动OCR推理或通用LLM。
