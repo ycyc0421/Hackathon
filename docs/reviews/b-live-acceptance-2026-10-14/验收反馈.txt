@@ -1,0 +1,50 @@
+2026-10-14 B 独立验收反馈
+
+结论：旧的编号/数量/净毛重/包装数/扫描解析主线在本轮样例中通过；不能给整体验收通过。
+目前可复现的待补项为收货地址比较、评测范围/历史展示、刷新后原件入口；EDI 成功解析仍未实现。
+
+版本与部署
+- 主线上传及浏览器验收实际版本 e4d7f23daf84fd0235b62ca7e8ae1d19370aa828，开始/结束线上 health 均一致。
+- 验收途中 PR66 合并。最新主分支和线上版本 e82465b2824fedca30b26a29427b6157ba7cfeb4。
+- 新 main CI 与整站发布均成功：https://github.com/ycyc0421/Hackathon/actions/runs/38510303235 。日志显示三个普通样例、ocr_png、ocr_scan 均 COMPLETED。
+- 新版本另测评测读取、历史、老任务及 PNG 原件跨发布保留、SHP-00093 文本上传；未把旧版本的 OCR 上传冒充为新版本重新推理。PR66 不改变提取、归一和比较文件。
+- 历史截图任务的底层 503 Loading model 已由 F 的服务器日志确认：https://github.com/ycyc0421/Hackathon/pull/54#issuecomment-6159092995 。B 本轮未登录服务器或重启模型，不以热态回归宣称独立冷启动测试。
+
+本轮线上范围
+- 12 个 API 上传任务/33 个文件引用；其中 10 个支持格式任务 COMPLETED，EDI-only FAILED、PDF+EDI PARTIAL 为能力边界预期，不能计为 EDI 成功解析。
+- 另一个真实浏览器上传任务完成；新版本再上传一个地址差异文本任务。合计 14 个上传任务，另建 1 个合成修正版本。
+- 原件文件未修改；扫描 PDF 为 PNG 无损派生输入，单独标明；保存输入 SHA256、完整返回和报告。
+- 固定范围字段/来源/状态检查 1256/1256；旧版捕获契约/引用/计数 40 项、新版捕获 21 项通过。不是整体准确率或未知数据泛化结论。
+
+旧问题复验
+1. SHP-00002：CI/PI/PL 三个 document_no 均读出；PL 包装数55、净重463.60、毛重503.43；三SKU逐行对齐，检出880/888数量差异，两侧原文和页码保留。document_no 不进行跨不同单据相等比较。
+2. 四商品行与空HS：04_de_multiitem、SHP-00007、SHP-00097保留四行；缺HS提示保留，未把空列变成列错位。SHP-00011本单据与商业发票引用按当前契约检查；辅助PI/PL引用键不在当前字段契约，未声称覆盖。
+3. 衬衫三原始扫描PDF：全部 EXTRACTED/OCR，500 PCS；两发票1400 USD、单价2.8 USD；PL包装数20且unit=null（原文PKGS不能默认箱）、净/毛重150/170 KGS、体积1.680 CBM；PL金额null/NOT_IN_DOC。编号和买卖方正确，品名原文一致。耗时292.58秒，仅为本次线上观察。
+4. 截图失败的同一提单PNG及另外两份PNG：全部成功走OCR，四SKU和真实颜色冲突保留，原件下载哈希一致；派生扫描PDF同样通过。B这两任务分别49.44/42.66秒，非容量或SLA测试。
+5. 报告与修正：content/archive报告契约通过；前端HTML/归档JSON真实导出成功。合成任务修正保留原始证据、生成子版本并重算冲突；重试幂等，旧hash拒绝409；父任务不变。后端HTML接口410迁移提示为预期行为。
+6. 浏览器：上传、原文抽屉/下载SHA/关闭焦点/刷新恢复报告通过；390px页面无横向溢出，未捕获未处理页面异常。未测试全部浏览器、所有版式、完整无障碍或并发容量。
+
+新增评测复验（e82465b，本地隔离HTTP，未运行OCR）
+- 使用原数据包test划分15票/45份文本PDF；15票全部COMPLETED。刚生成实际预测再计分，金标不上传，输出为独立本地数据库，不写生产评测目录。
+- 字段：TP880/FP260/FN959，precision77.19%、recall47.85%、F1 59.08%。分母含未实现字段、严格字符串/单位差异；不是OCR识字率，未把这959项全归为模型错误。
+- 冲突：TP6/FP0/FN3，precision100%、recall66.67%、F1 80%。三个漏检均为consignee_address：SHP-00090、SHP-00093、SHP-00100。已直接抽取原PDF文字确认地址不同。
+- 保存/最新读取/历史读取/新客户端读取、伪造满分拒绝且旧记录不变、损坏文件FAILED无分数、零分母null等12项通过。历史客户端重建是本地接口验证，不是生产服务重启。
+- 线上最新评测DONE来自F此前保存的2票/6份合成扫描PNG，scope.code_revision=7e73a97a0b90c762bbadc907a30b46f50d4d5d00；B只读核对schema、计数算术和历史，没有冒充重跑这两票评测。历史中还有文本通道结果，按通道各自解释。
+
+待补项与优先级（均不需要先更换OCR或接入通用LLM）
+P1 / C、F：地址字段与比较。SHP-00093文本原件商业发票为999 Different Market Street, Suite77，PI/PL为425 Warehouse Street, Suite4。同买家、不同地址；最新线上任务tsk_20261014_0006_d16b4cf65d49返回COMPLETED、0冲突且无consignee_address字段。后端补提取、状态及比较，前端展示未完成覆盖；不能将0冲突当整票一致。90和100同类。
+P1 / D：评测范围和历史。线上已展示DONE，但页面缺scope.dataset_kind/input_kind/split/limitations及历史选择。当前只测2票、开发用合成数据、旧被测提交等限制必须能看见。后端/runs和scope已可读，前端接入即可；不能把历史成绩称作当前部署或全场景能力。
+P2 / D：刷新后的原件入口。任务tsk_20261014_0019_1f9b548f746e刷新后报告恢复、切差异/全部/对照后查看原文按钮为0且未请求/files；API原件仍可下载。App.vue:222仅新建内存Map并依赖上传setAll，ComparePane只在Map有File时渲染。建议按file_id懒加载原件，保留页码、下载与失败提示。这是当前已记录的限制，非服务端原件丢失。
+独立能力 / C、F：EDIFACT/X12解析仍不支持。JSON项目格式不代表EDI解析完成；前端失败/PARTIAL和报告展示已正确保留。
+
+验收边界
+不评价法规适用；RULES_UNVERIFIED保留。没有生产重启、改配置、停止服务、正式评测发布、模型训练或完整100票新线上OCR评测。数据已用于开发，不是盲测。
+初始验收脚本对report_version类型、内部line_items和描述必为NOT_CHECKED的假设已按公开契约修正；原始预测与初始失败检查保留在harness-reconciliation.json，不用重跑或改输入消除记录。
+
+主要证据索引
+- input-manifest.json；tasks/、reports/、archives/：12票原始线上返回。
+- latest-address-task.json、address-conflict-source.json：新版本地址漏报与原文字段。
+- browser/：真实上传、原件下载、报告、刷新及评测页面截图/日志。
+- evaluation-e82465b-test-text-run3/：独立15票实际预测、金标指纹、逐票错例、评测摘要。
+- evaluation-e82465b-api-acceptance.json、latest-live-acceptance.json：新增功能实际检查。
+- meta/：版本、能力、部署记录和团队公开回复，均不含认证请求头或凭据。

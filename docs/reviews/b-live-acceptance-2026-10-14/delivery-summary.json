@@ -1,0 +1,76 @@
+{
+  "recorded_at": "2026-10-14T04:23:53.404063+00:00",
+  "latest_main": "e82465b2824fedca30b26a29427b6157ba7cfeb4",
+  "initial_live": "e4d7f23daf84fd0235b62ca7e8ae1d19370aa828",
+  "conclusion": "PARTIAL_ACCEPTANCE",
+  "supported_upload_cases_passed": 10,
+  "expected_unsupported_cases": 2,
+  "browser_uploads": 1,
+  "additional_latest_text_uploads": 1,
+  "correction_revisions": 1,
+  "local_text_evaluation": {
+    "status": "DONE",
+    "dataset_version": "synthetic-hackathon-v2",
+    "sample_count": 15,
+    "model_version": "text-layer-pipeline@e82465b2824f（未运行 OCR）",
+    "metrics": {
+      "field_extraction": {
+        "precision": 0.7719298245614035,
+        "recall": 0.478520935290919,
+        "f1": 0.590802282645183
+      },
+      "conflict_detection": {
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8
+      }
+    },
+    "error_breakdown": {
+      "字段漏读或值不符": 959,
+      "字段多读或值不符": 260,
+      "冲突漏检": 3,
+      "冲突误报": 0,
+      "未完整完成的货票": 0
+    },
+    "run_at": "2026-10-14T04:17:39.155794+00:00",
+    "scope": {
+      "dataset_kind": "合成数据，单一英文版式",
+      "input_kind": "文本 PDF（非 OCR）",
+      "split": "test",
+      "document_count": 45,
+      "code_revision": "e82465b2824fedca30b26a29427b6157ba7cfeb4",
+      "scorer_version": "synthetic-exact-v1",
+      "dataset_sha256": "b349aa73ef4b99e1b433d9a61c4b764d7c031accf5865ee66833c941a44f41b8",
+      "limitations": [
+        "本数据集曾用于开发和回归，不能视为未见测试集或泛化准确率。",
+        "仅计入当前输入通道；派生扫描件与文本 PDF 不是独立业务样本，不合并计算总体分数。",
+        "金标为数据包生成预期；包含尚未实现的字段，未按支持范围删减分母。",
+        "字符串仅做 Unicode、大小写和空白归一；不自动等同中英品名或业务近义词。",
+        "目的国规则未核实，风险提示未评分；字段错误可能同时计为漏读与多读，分类不可直接相加。"
+      ],
+      "metric_definitions": {
+        "field_extraction": "以文件名、货号、字段键、归一值和单位组成事实，多重集合微平均；错误值计 FP 和 FN。只评分金标定义的字段键，不评分页码坐标。",
+        "conflict_detection": "以货号和字段键标识冲突；CONFLICT 为正类，漏检或未检查计 FN，多报计 FP；内部风险不充作冲突。"
+      },
+      "counts": {
+        "field_extraction": {
+          "tp": 880,
+          "fp": 260,
+          "fn": 959
+        },
+        "conflict_detection": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 3
+        }
+      }
+    }
+  },
+  "remaining": [
+    "Address comparison not implemented; live zero conflicts reproduced",
+    "Evaluation scope and history not displayed by frontend",
+    "Original preview lost after refresh",
+    "Successful EDI parsing unsupported"
+  ],
+  "production_modified": false
+}
