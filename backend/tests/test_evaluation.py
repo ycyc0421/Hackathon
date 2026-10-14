@@ -104,6 +104,35 @@ def test_unsupported_risk_score_cannot_appear_without_counts():
         validate_result(data)
 
 
+def test_done_without_scope_is_read_not_failed():
+    """契约里 scope 是可选的（旧结果可缺省）。缺范围只表示不知道分数的适用边界，
+    页面如实说明即可，不能把一份真实跑出来的分数整份判成失败。"""
+    data = result()
+    del data['scope']
+    assert validate_result(data).status.value == 'DONE'
+
+
+def test_count_without_score_is_allowed_but_score_without_count_is_not():
+    """计数可以多于指标（未评分的指标如实留空），反过来则不允许。"""
+    data = result()
+    data['scope']['counts']['risk_hint'] = {'tp': 0, 'fp': 0, 'fn': 0}
+    assert validate_result(data).status.value == 'DONE'
+    data = result()
+    del data['scope']['counts']['field_extraction']
+    with pytest.raises(ValueError, match='范围'):
+        validate_result(data)
+
+
+def test_rounded_scores_are_accepted_but_fabricated_ones_are_not():
+    """结果文件按展示精度保存分数，容差要容忍舍入；伪造的满分仍须被挡住。"""
+    data = result()
+    data['metrics']['field_extraction'] = {'precision': 0.5, 'recall': 0.5, 'f1': 0.5}
+    assert validate_result(data).status.value == 'DONE'
+    data['metrics']['field_extraction'] = {'precision': 1.0, 'recall': 1.0, 'f1': 1.0}
+    with pytest.raises(ValueError, match='不一致'):
+        validate_result(data)
+
+
 def test_publication_survives_client_restart_and_preserves_history(client, tmp_path, monkeypatch):
     monkeypatch.setenv('EVALUATION_RESULT_PATH', str(tmp_path / 'latest.json'))
     from tools.evaluate_dataset import publish
