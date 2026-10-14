@@ -54,6 +54,7 @@ class ReadResult:
     page_texts: list[str] = field(default_factory=list)
     model_outputs: list[dict] = field(default_factory=list)
     source_blocks: list[dict] = field(default_factory=list)
+    unsupported: bool = False
 
     def __post_init__(self):
         if self.failed and self.error_message:
@@ -72,12 +73,23 @@ def guess_file_type(filename: str) -> FileType:
         return FileType.IMAGE
     if ext == ".json":
         return FileType.EDI
+    if ext == ".edi":
+        return FileType.EDI
     return FileType.OTHER
 
 
 def read_document(filename: str, data: bytes) -> ReadResult:
     """入口：按文件类型分流。"""
     file_type = guess_file_type(filename)
+    if Path(filename).suffix.lower() == '.edi':
+        from .edifact import EdifactUnsupported, parse_edifact
+        try:
+            return ReadResult(parse_method=ParseMethod.EDI_PARSE, structured=parse_edifact(data))
+        except EdifactUnsupported:
+            return ReadResult(failed=True, unsupported=True,
+                              error_message='暂不支持的 EDI 报文范围：仅支持单个 INVOIC D96A 的选定字段。')
+        except ValueError:
+            return ReadResult(failed=True, error_message='EDI 解析失败：报文语法、信封或字段无效，请核对原件。')
     if file_type is FileType.EDI:
         from .trade_json import parse_trade_json
         try:

@@ -30,6 +30,13 @@ _JSON_REASONS = {
 
 def parse_failure(message):
     text = str(message or '')
+    # EDI diagnostics are fixed text; do not route missing-envelope errors to OCR.
+    for public in (
+        '暂不支持的 EDI 报文范围：仅支持单个 INVOIC D96A 的选定字段。',
+        'EDI 解析失败：报文语法、信封或字段无效，请核对原件。',
+    ):
+        if text.endswith(public):
+            return public
     page = re.search(r'PDF 第 ([0-9, ]+) 页', text)
     prefix = f'PDF 第 {page[1]} 页：' if page else ''
     if '重复 JSON 键：' in text:

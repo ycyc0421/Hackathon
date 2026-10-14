@@ -1,11 +1,14 @@
-# 后端：单票多品名单证核验
+# 后端模块：单票多品名单证核验与合规引擎
 
-上传同一票货物的多份单证，抽取整票及商品行字段，跨文件比对并返回可追溯结果。
-对外返回以 [`docs/schema/check-task.schema.json`](../docs/schema/check-task.schema.json) 为准。
+基于 FastAPI 构建的跨境物流单证核验后端服务。负责接收同一票货物的多份单证文件，执行版面解析、字段抽取、单位归一化、多品名行对齐、跨文件比对与目的国规则匹配，并提供结构化报告导出、人工修正重算与系统评测读取接口。
 
-## 运行
+对外数据结构严格遵循 [`docs/schema/check-task.schema.json`](../docs/schema/check-task.schema.json)、[`docs/schema/report-content.schema.json`](../docs/schema/report-content.schema.json) 与 [`docs/schema/evaluation.schema.json`](../docs/schema/evaluation.schema.json)。
 
-部署使用 Python 3.12，本地建议保持相同版本。以下命令从仓库根目录执行：
+---
+
+## 本地启动
+
+建议使用 Python 3.12（与生产环境一致）。在仓库根目录执行：
 
 ```sh
 python3.12 -m venv backend/.venv
@@ -14,185 +17,116 @@ python -m pip install -r backend/requirements.txt
 python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 ```
 
-Windows PowerShell 用 `python -m venv backend/.venv` 创建环境，随后执行 `backend/.venv/Scripts/Activate.ps1`，其余 python 命令相同。
+> Windows PowerShell 可使用 `python -m venv backend/.venv` 创建虚拟环境，随后执行 `backend\.venv\Scripts\Activate.ps1`。如需自定义环境变量，可将 `backend/.env.example` 复制为 `backend/.env`，并在启动命令末尾追加 `--env-file backend/.env`。
 
-`.env.example` 只是模板，应用不会自动读取 .env。需要配置时复制为 `backend/.env`，在启动命令末尾加 `--env-file backend/.env`；不要提交含密钥的配置。
+启动后可访问交互式接口文档：<http://127.0.0.1:8000/docs>。本地前端通过 `VITE_PROXY_API=http://127.0.0.1:8000 npm --prefix web run dev` 即可代理连接。
 
-接口文档：<http://127.0.0.1:8000/docs>。本地前端用 `VITE_PROXY_API=http://127.0.0.1:8000 npm --prefix web run dev` 开启 Vite 的 `/api` 代理连接。
+---
 
-## 接口
+## 核心 API 端点
 
-| 方法 | 路径 | 用途 |
+| 方法 | 路径 | 说明 |
 |---|---|---|
-| `POST` | `/api/v1/checks` | 上传并创建任务；返回 `task_id` 与当前状态，快速完成时直接返回结果 |
-| `GET` | `/api/v1/checks/{task_id}` | 轮询状态及读取结果 |
-| `GET` | `/api/v1/evaluation/latest` | 评测状态；尚无正式金标评测时返回 `NOT_RUN` |
+| `POST` | `/api/v1/checks` | 上传单证并创建检查任务（`multipart/form-data`），返回 `task_id` 与初始状态 |
+| `GET` | `/api/v1/checks/{task_id}` | 轮询任务进度与逐文件解析状态，终态时返回完整比对结果 |
+| `GET` | `/api/v1/checks/{task_id}/report` | 获取结构化报告（`view=content`）或完整证据与审计归档（`view=archive`） |
+| `GET` | `/api/v1/checks/{task_id}/corrections` | 获取当前任务的结果指纹（`result_hash`）与历史人工修正审计链 |
+| `POST` | `/api/v1/checks/{task_id}/corrections` | 提交人工修正并触发派生任务重算（不重跑 OCR，保留原件证据） |
+| `GET` | `/api/v1/checks/{task_id}/files/{file_id}` | 下载任务保存的原始单证文件字节 |
+| `GET` | `/api/v1/evaluation/latest` | 读取最新发布的固定数据集评测摘要（无结果时返回 `NOT_RUN`） |
+| `GET` | `/api/v1/evaluation/runs` | 读取最近发布的评测历史批次列表（最多 30 份） |
+| `GET` | `/api/v1/rules/sources` | 查询目的国规则关联的官方法规来源目录与动态监测状态 |
+| `GET` | `/api/v1/capabilities` | 查询当前实例支持的单证格式、上传限额与 OCR 通道就绪状态 |
 
-`POST` 使用 `multipart/form-data`：`files` 与两位国家代码 `destination_country` 必填；
-`destination_country_name`、`trade_mode`、`declared_currency`、`notes` 可选。
-最多上传 10 份，单份上限 20 MiB。未完成的任务返回 `PENDING` 或 `PROCESSING`。
-已创建任务的处理失败通过 `GET` 的 `status: FAILED` 与 `errors[]` 表示；参数错误、超限、
-未知任务和内部错误返回非 2xx 与统一的 `error.code` / `error.message`。
+### 请求与错误规范
 
-前端可按错误码映射文案：
+- **上传限制**：单次最多上传 10 份文件，单文件上限 20 MiB。`files` 与两位国家代码 `destination_country` 必填。
+- **错误分层**：
+  - 请求参数不合法（400）、文件超限（413）、任务不存在（404）、并发队列已满（429）等请求级错误直接返回非 2xx 与统一 `{ "error": { "code", "message" } }` 结构。
+  - 任务创建后的单文件解析失败或版式异常，通过 2xx 响应中的任务状态（`PARTIAL` / `FAILED`）、文件级 `process_status` 及任务级 `errors[]` 表达。
 
-| 位置 | `code` | 含义 |
-|---|---|---|
-| 非 2xx `error.code` | `INVALID_REQUEST`、`INVALID_DESTINATION_COUNTRY`、`INVALID_CURRENCY`、`NO_FILE` | 请求参数错误（400） |
-| 非 2xx `error.code` | `FILE_TOO_LARGE`、`TOO_MANY_FILES` | 上传超限（413） |
-| 非 2xx `error.code` | `TASK_NOT_FOUND`、`NOT_FOUND` | 任务或路径不存在（404） |
-| 非 2xx `error.code` | `METHOD_NOT_ALLOWED`、`HTTP_ERROR`、`INTERNAL_ERROR`、`CONTRACT_VIOLATION` | 方法不允许、其他 HTTP 错误或服务端错误 |
-| 任务 `errors[].code` | `DOC_PARSE_FAILED`、`UNSUPPORTED_FILE_TYPE`、`MULTI_LINE_ITEMS_SUSPECTED` | 单文件解析失败、格式不支持、品名表格未可靠切行 |
-| 任务 `errors[].code` | `RULES_UNVERIFIED`、`ALL_DOCUMENTS_FAILED`、`INTERNAL_ERROR`、`CONTRACT_VIOLATION` | 演示规则警告、全部文件失败或处理异常 |
+---
 
-已创建任务的处理错误需先看任务 `status` 和 `errors[]`；不能仅凭 GET 返回 200 显示“检查完成”。
+## 标准 EDIFACT（`INVOIC:D:96A:UN`）解析支持
 
-`items[]` 是任务内的商品目录；商品级字段和比对使用 `item_id` 关联。
-行序不一致时优先按货号、其次按描述对齐；无法可靠对齐时给 `NOT_CHECKED`，不猜测一致或冲突。
-`suggested_action` 只提供可执行的核对建议，不指定哪份文件正确；无可靠建议时为 `null`。
+`.edi` / `.EDI` 文件走独立的確定性解析器 `app/pipeline/edifact.py`（不经过 PDF 抽取、OCR 或通用 LLM）：
 
-## 处理中的逐文件进度
+- **支持范围**：当前支持单个 `INVOIC:D:96A:UN`（语法版本 3）的选定字段子集，编码为 ASCII 或严格 UTF-8（可带 BOM），单文件上限 1 MiB、商品行上限 200 行。
+- **信封校验与字段映射**：
+  - 校验 `UNB/UNZ` 交换信封、`UNH/UNT` 报文引用与段计数、`CNT` 商品行数，支持默认或 `UNA` 声明的服务字符、`?` 转义序列及点/逗号十进制小数。
+  - 提取发票编号、买卖/收发主体、装运日期、币种、整票包装/毛净重/体积/总额，以及商品行（`LIN/PIA/IMD/QTY/MEA/MOA/PRI/PAC`）的货号、品名、HS 编码、数量、毛净重、金额、单价与包装件数。
+  - 单位按明确限定符归一：`PCE → PCS`、`KGM → KGS`、`CT → CARTON`、`MTQ → CBM`；每个有效字段均保留原始 EDI 段作为 `raw_text`（`page`、`bbox`、`confidence` 为 `null`）。
+- **降级与错误边界**：
+  - `DESADV`、多报文信封、X12、其他目录版本或未知业务段显式返回 `UNSUPPORTED`；
+  - 信封缺失、`UNT/UNZ` 段数不符或转义损坏返回 `FAILED / DOC_PARSE_FAILED`；与 PDF/图片混合上传时保留成功文件并返回 `PARTIAL`。
 
-创建任务仍以空 documents 开始。流水线按上传顺序处理，每份解析前发布 PARSING 占位，结束后把同一 file_id 更新为 EXTRACTED、FAILED 或 UNSUPPORTED。尚未开始的文件不在该增量列表中，前端按本地文件名补齐排队项。
+---
 
-每次发布对 documents 深拷贝，防止后续原地更新影响读取快照，并同步 summary.document_count 为已发布条目数（不是上传总数）。extractions、comparisons、risks 和最终任务状态仍在收尾发布；调用方不可把处理中空结果当作没有问题。失败分支保留原错误信息。
+## 处理流水线与结果语义
 
-任务创建与进度回写立即提交 SQLite；JSON 兼容导出仍只在收尾 persist，不生成中间态 JSON 文件。短文件可能在两轮轮询间完成，接口不保证客户端观察到每一次状态转换。
+1. **逐文件增量进度**：任务创建后按上传顺序逐份解析文件。每份文件开始解析时写入 `PARSING` 快照，完成后更新为 `EXTRACTED`、`FAILED` 或 `UNSUPPORTED`，并实时提交至 SQLite，供前端平稳展示真实进度。
+2. **多品名对齐与比对**：
+   - `items[]` 为任务内的商品目录，商品级字段与比对项通过 `item_id` 关联，整票级字段的 `item_id` 为 `null`。
+   - 跨文件行序不同时，优先按商品货号（`item_code`）、其次按规范化品名描述对齐；无法可靠对齐时标记为 `NOT_CHECKED` 并附带原因，绝不按行号盲目猜测。
+3. **严格的结论边界**：
+   - `MATCH` 仅表示参与比对的已识别值一致，不代表整票合规通过。
+   - `NOT_CHECKED`、`UNRECOGNIZED`、`SINGLE_SOURCE` 及解析失败均独立呈现，不混同于“无问题”。
+   - `canonical_value` 恒为 `null`，系统只指出差异并提供 `suggested_action` 核对建议，不替业务人员裁定哪份单证正确。
 
-## 结果判读与前端联调
+---
 
-- 对外结果中，`items[]` 是商品目录；`extractions[].fields[]` 的商品级字段和 `comparisons[]` 用 `item_id` 关联它，票级字段的 `item_id` 为 `null`。后端内部虽有单文件商品行与对齐状态，对外 Schema 不直接返回 `line_items[]` 或 `alignment_status`。提单只有整票汇总时，不要求它提供商品行。
-- 行可靠对应后才比较商品级字段；只有一份文件提供某商品行时，对应字段最多给 `SINGLE_SOURCE`；多份文件有疑似行却无法可靠对应时给 `NOT_CHECKED`，并在 `note` 说明原因。单品名票的 `items[]` 可以为空，票级字段仍可比对。
-- `MATCH` 只表示**参与比对的已识别值一致**，不是整票合规通过。`NOT_CHECKED`、`UNRECOGNIZED`、`SINGLE_SOURCE` 和解析失败都不能当作一致；前端应展示状态、来源文件、原值及 `note`。`suggested_action` 是核对建议，不代替结论。
-- 有文件解析失败时，该文件进入 `errors[]`，任务可能为 `PARTIAL` 或 `FAILED`；前端需按任务状态显示失败。表格疑似多品名却无法可靠切行时，后端给 `MULTI_LINE_ITEMS_SUSPECTED` 警告并降级，不把猜出的行当成确定结果。
-
-## 项目结构
+## 目录结构
 
 ```text
 backend/
 ├── app/
-│   ├── main.py             FastAPI 路由与统一错误响应
-│   ├── models.py           内部数据模型与状态校验
-│   ├── frontend_view.py    将内部结果映射到对外 Schema
-│   ├── doc_profile.py      单证类型与必需字段表（前三类按已确认规则）
-│   ├── store.py            任务存储与已完成结果落盘
-│   ├── rules/              目的国演示规则配置
-│   └── pipeline/           文件读取、抽取、归一、行对齐、比对与规则检查
-├── samples/                01–11 合成单证；challenge/ 为金标预期
-├── tools/                  样例生成、接口自检与挑战样例验证
-├── requirements.txt        Python 依赖
-└── .env.example            可选运行配置示例
+│   ├── main.py             FastAPI 路由、并发控制与统一错误响应
+│   ├── models.py           内部领域模型与状态机校验
+│   ├── frontend_view.py    内部模型到公开 CheckTask Schema 的投影层
+│   ├── report_content.py   报告契约 v2（content / archive 视图）投影层
+│   ├── doc_profile.py      单证类型与必需/可选/不适用字段规则表
+│   ├── evaluation.py       评测结果读取与计分一致性校验
+│   ├── store.py            SQLite 任务持久化、修正审计与旧版 JSON 兼容导出
+│   ├── rules/              目的国规则配置、官方来源目录与监测读取
+│   └── pipeline/           PDF/OCR/EDIFACT 解析、字段抽取、归一化、行对齐与交叉比对
+├── samples/                01–11 合成单证、challenge 挑战集、EDI 样本与专项回归材料
+├── tools/                  数据集评测（evaluate_dataset.py）、OCR 探针与验收脚本
+├── tests/                  pytest 自动化测试套件
+├── requirements.txt        核心服务运行依赖
+└── requirements-ocr.txt    本地 PaddleOCR 扩展依赖
 ```
 
-## 验证与样例
+---
 
-`samples/` 是已生成的合成单证，`tools/` 用于复现和验证核验结果；**启动后端不需要运行这些脚本，也不需要重新生成样例**。
-自动化回归统一放在 `backend/tests/`，由 pytest 自动发现；新增 `test_*.py` 不需要修改 CI 的命令清单。在仓库根目录使用 Python 3.12：
+## OCR 引擎与生产运行配置
+
+系统支持文本层 PDF 直读与扫描件/图片 OCR 识别。生产环境采用 **PaddleOCR-VL-1.6**（结合 `PP-DocLayoutV3` 版面分析与 `llama.cpp` GGUF CPU 推理服务）：
+
+- **启用主模型（VL 通道）**：设置 `PADDLE_OCR_ENABLED=1`、`PADDLE_OCR_ENGINE=vl`、`PADDLE_VL_SERVICE_URL=http://127.0.0.1:18082`。保留实际区域、HTML 表格网格、页码与原始读数；遇到无法唯一定位的复杂多表或缺失关键列时显式标记失败。
+- **启用传统通道（Legacy）**：安装 `requirements-ocr.txt` 后设置 `PADDLE_OCR_ENABLED=1`、`PADDLE_OCR_ENGINE=legacy`（使用 `PP-StructureV3` + 常规 OCR）。对数字 `0` 与字母 `O` 的单位混淆做受控校正并附加 `OCR_AUTO_CORRECTED` 告警与 `LOW_CONFIDENCE` 标记。
+- **资源与队列保护**：原件全部落盘后开始推理；API 最多同时接纳 4 票运行或排队任务，超出时返回 HTTP 429 `CHECK_QUEUE_FULL`。服务重启时会将未完成的任务收尾为 `FAILED / TASK_INTERRUPTED`，原件保留可下载。
+
+详见 [OCR 主模型交付说明](../docs/PADDLE_VL_DELIVERY.md) 与 [部署运维手册](../docs/部署运维.md)。
+
+---
+
+## 自动化测试与验证
+
+在仓库根目录安装测试依赖并执行 pytest：
 
 ```sh
 python -m pip install -r backend/requirements.txt -r requirements-test.txt
 npm ci
-python -m pytest                       # 后端全部回归，含接口与样例契约
-python -m pytest -m "not integration"  # 排除样例接口验收；仍包含原有 HTTP 单元回归
-python -m pytest backend/tests/test_compare.py  # 指定文件
-python -m pytest -k money_currency     # 指定行为
-python -m pytest data                  # 数据层回归
-python -m pytest deploy                # 部署和回退回归，不发布服务
+python -m pytest                               # 运行全部后端回归（含接口、EDIFACT、样例与 Schema 校验）
+python -m pytest backend/tests/test_edifact.py # 单独运行 EDIFACT 解析与混合比对回归
+python -m pytest -m "not integration"          # 仅运行快速单元测试
+python -m pytest data                          # 运行 SQLite 数据层测试
+python -m pytest deploy                        # 运行部署与回退逻辑测试
 ```
 
-测试工具版本固定在根目录 `requirements-test.txt`，不加入服务运行依赖。pytest 兼容现有 unittest 用例与子测试；测试默认每条最多 60 秒，未知标记或配置直接失败。完整后端回归必须安装 Node.js 和 npm 依赖，缺少样例或契约校验工具都会失败，不会跳过后显示通过。
-
-`conftest.py` 在收集测试前隔离数据库配置、关闭真实 OCR/LLM，并让规则来源使用随仓库分发的静态目录；每条测试独立使用临时数据库、上传目录和任务执行器。接口样例强制走轮询路径，等待终态后断言结果并调用现有 Ajv 校验器，覆盖 01–11、未启用 OCR 的图片失败和评测返回。测试中需要模型结果时使用受控替身，不下载模型或调用外部模型服务。
-
-复现 CI 并保留报告：
-
-```sh
-mkdir -p backend/.out
-python -m pytest --junitxml=backend/.out/junit.xml --basetemp=backend/.out/pytest-tmp --durations=10
-```
-
-`--basetemp` 指定的目录会由 pytest 清理重建，只能指向测试专用目录。失败时 CI 仍上传 JUnit 和本次接口 JSON，保留 7 天；这些结果来自合成样例，不是正式准确率评测。
-
-`tools/selftest.py`、`tools/run_challenge.py` 和 `tools/accept_workflow.py` 保留给手工诊断或部署候选自检。部署脚本中的标准库测试入口同步迁移到 `backend/tests/`，服务环境无需安装 pytest。需要真实 OCR 时显式运行 `tools/run_ocr_probe.py`、`tools/accept_paddle_vl.py` 或 `tools/test_shirt_originals.py`；它们不参与普通 CI 的自动发现。
-
-| 样例 | 验证内容 |
-|---|---|
-| `01`–`03` | 单品名一致、冲突、部分解析失败 |
-| `04`–`07` | 多品名对齐、行序变化、缺行及无法对齐 |
-| `08_de_bilingual_format` | 中英文字段、数字和日期格式差异 |
-| `09_us_format_mixed` | 三份单证语言和日期写法不同，但值一致 |
-| `10_de_ambiguity_conflict` | 欧式小数、歧义日期、`US$` 币种及真实数量冲突 |
-| `11_de_multiitem_mixed` | 四品名、行序变化、跨语言描述及颜色冲突 |
-
-09–11 的预期结果见[金标清单](samples/challenge/金标预期.md)。样例已包含文本层 PDF
-与 PNG；重新生成需 `fpdf2`、`Pillow` 和 Windows 字体：
-`python backend/tools/make_challenge_samples.py`。
-验证输出写入忽略提交的 `backend/.out/`。
-
-## 能力边界
-
-- 文本层 PDF 已用上述合成样例验证；真实复杂版式的抽取准确率尚未评测。
-- 图片和无文本层 PDF 可选用本地 PaddleOCR。默认关闭，未配置识别通道时显式返回解析失败。
-- 目的国规则是未核实的演示规则，结果保留“演示规则·未经核实”标记，不能作为正式合规结论。
-- `confidence` 与 `bbox` 暂为 `null`；标准 EDIFACT/X12 尚未实现；候选人工修正与报告功能见下文。
-- 任务与结果使用 SQLite 持久化，并保留终态 JSON 兼容导出；重启时进行中任务标记为 FAILED / TASK_INTERRUPTED，需重新上传，不支持自动续跑。
-- `app/doc_profile.py` 的商业发票、装箱单、提单按已确认最小规则区分必需/可选；其他单证类型及更完整的适用字段表待数据侧确认。
-
-## PaddleOCR-VL 主模型与服务器运行
-
-选定主模型为 PaddleOCR-VL-1.6，图片和扫描页保留实际区域、HTML 网格、页码和原始模型输出。文本层 PDF 仍直接读取。设置 `PADDLE_OCR_ENABLED=1`、`PADDLE_OCR_ENGINE=vl` 和 `PADDLE_VL_SERVICE_URL=http://127.0.0.1:18082` 接入私有文档服务；失败显式保留，不自动调用额外通用 LLM。
-
-8 GiB CPU 服务器使用官方 GGUF 与固定 llama.cpp b11429。`deploy/prepare_vl_cpu.py` 校验固定模型、布局和引擎哈希；`hackathon-vl-rec.service`、`hackathon-paddle-vl.service` 与 API 同属 `hackathon.slice`，总上限为 8 GiB。模型服务仅监听本机 18082/18083。首次配置需先预热候选模型服务，之后发布脚本检查模型版本、就绪状态并同步重启匹配版本；失败恢复旧代码和服务配置。
-
-原件全部持久化后才开始推理。最多接纳四票运行或排队任务，第五票返回 HTTP 429 `CHECK_QUEUE_FULL`；排队只保存路径、PDF 逐页渲染。重启不自动续跑：未完成任务返回 FAILED/TASK_INTERRUPTED，逐文件结束状态，原件仍可下载。CPU 冷启动与复杂扫描可能需要数分钟，前端最长轮询 30 分钟、可取消；不能把等待截止当作后端已经失败。
-
-完整模型固定版本、服务器原件证据、回退与交付范围见 [F 服务器交付记录](../docs/PADDLE_VL_DELIVERY.md)。`packages` 表示包装件数；只有明确 CARTON/CTNS/箱证据才输出 CARTON，裸 PKGS 数值保留 `unit=null`。
-
-## 普通 PaddleOCR 路径（显式 legacy 配置）
-
-在独立 Python 3.12 环境，先按 PaddlePaddle 官方 CPU 渠道安装推理引擎，
-再安装 `requirements-ocr.txt`（PaddleOCR 3.7.0 文档解析组件与扫描 PDF 渲染依赖）：
-
-```sh
-python -m pip install paddlepaddle==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/
-python -m pip install -r backend/requirements-ocr.txt
-```
-
-启动后端前设置
-`PADDLE_OCR_ENABLED=1`、`PADDLE_OCR_ENGINE=legacy`。模型首次推理时下载到本机缓存，模型文件不提交仓库。
-文本层 PDF 仍直接读取；图片和扫描页使用 OCR。检测到商品明细表时，
-PP-StructureV3 提供行列结构，普通 OCR 提供正文原文。若表格结构、列数或
-页面识别不可靠，文件会显式解析失败。OCR 文字可能误识别，例如
-`350ML` → `35OML`，结果必须保留原文供人工核对。
-两套识别输出仅在数字 `0` 与字母 `O` 混淆、且一方符合明确的数字加单位
-格式时，才校正并给 `OCR_AUTO_CORRECTED` 警告。商品字段保留校正前的 OCR
-读数作为 `raw_text` / `raw_value`，归一值使用校正后的候选；字段标为
-`LOW_CONFIDENCE`，若跨文件比对一致，仍附 `WARNING` 与人工核对说明。其他品名分歧返回
-`NOT_CHECKED` 和 `OCR_TEXT_DISAGREEMENT` 警告。
-当前本地 OCR 只接受可交叉核验的单张商品表；一页多张表、缺少货号或品名列时，
-文件显式解析失败，不丢弃明细后继续给出比对结论。表头支持抽取层已有的中英文列名。
+默认测试环境自动隔离临时 SQLite 数据库与上传目录，并关闭外部 OCR/LLM 调用以确保确定性。如需针对真实 OCR 通道运行探针：
 
 ```sh
 export PADDLE_OCR_ENABLED=1
-python backend/tools/run_ocr_probe.py
+python backend/tools/run_ocr_probe.py 11_de_multiitem_mixed
 ```
-
-该探针单独运行 09–11 的 PNG，不进入默认 CI；CI 仍只运行无需下载模型的
-文本层 PDF 与纯逻辑回归。探针要求所选样例的文件全部经过 OCR 成功处理；11 号
-还须保留 4 个商品行并检出颜色差异。自动部署的 Python 选择、OCR 开关和公网扫描
-PDF 验证见 [工作流说明](../.github/workflows/README.md#服务器首次初始化)。
-
-生产环境已启用本地 OCR，本地默认关闭。PowerShell 设置开关使用 `$env:PADDLE_OCR_ENABLED = '1'`。远程视觉模型配置见 `.env.example`；若同时启用 Paddle，代码优先选择 Paddle，失败不会自动切换到远程模型。
-
-扫描 PDF 按 200 DPI 逐页渲染，复杂或多页文件仍须实测资源。OCR 在线程内串行复用，任务接纳有数量上限；没有自动续跑的持久队列。服务配额、上线验证与备份见[部署运维](../docs/部署运维.md)。
-
-## SQLite 任务存储
-
-任务与结果已接入 SQLite；默认运行库位于共享 `.data/tasks.sqlite3`，旧 JSON 结果保留并迁入。商品组成员、OCR 证据及警告保存在同事务完整快照中。启动时未完成任务标记为 `FAILED / TASK_INTERRUPTED`，需重新上传。部署迁移与回退说明见根目录 `SQLITE_INTEGRATION.md`。
-
-
-## 候选工作流功能
-
-本分支增加人工修正与审计重算、结构化 JSON 报告与显式归档导出（HTML/打印由前端负责）、项目结构化 JSON 输入及官方来源动态监测。标准 EDIFACT/X12 尚未支持；新功能仍待合并及生产验收。详见 [工作流说明](../docs/workflow-and-rules.md)。
-
-报告 v2 的字段、关联、历史版本和 HTML 迁移见 [接口说明](../docs/report-content-api.md)。

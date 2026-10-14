@@ -424,8 +424,8 @@ onMounted(async () => {
       <section v-else class="card">
         <EmptyState
           tone="info"
-          title="后端未返回任何比对结果"
-          detail="本次任务没有产出可比对的字段。如需人工确认，请查看「报告」页。"
+          title="暂无可比对的字段"
+          detail="本次任务没有产出可交叉比对的字段。完整文件状态与提示请查看「报告」页。"
         />
       </section>
     </template>

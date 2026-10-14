@@ -5,7 +5,7 @@
  * 归一化是后端的事，这里拿到的 normalized_value 已经是可比较的值。
  */
 
-import { lookup, SEVERITY, TASK_STATUS, PROCESS_STATUS, FIELD_STATUS, COMPARISON_STATUS, RISK_TYPE, ERROR_LEVEL, API_ERROR_KIND } from './labels.js'
+import { lookup, SEVERITY, TASK_STATUS, PROCESS_STATUS, DOC_TYPE, FIELD_STATUS, COMPARISON_STATUS, RISK_TYPE, ERROR_LEVEL, API_ERROR_KIND } from './labels.js'
 import { backendErrorText } from './errors.js'
 
 /**
@@ -58,6 +58,7 @@ export function confidenceText(c) {
 
 export const taskStatus = (v) => lookup(TASK_STATUS, v)
 export const processStatus = (v) => lookup(PROCESS_STATUS, v)
+export const docType = (v) => (v ? lookup(DOC_TYPE, v, '类型未识别').text : '类型未识别')
 export const fieldStatus = (v) => lookup(FIELD_STATUS, v)
 export const comparisonStatus = (v) => lookup(COMPARISON_STATUS, v)
 export const severity = (v) => lookup(SEVERITY, v, '提示')

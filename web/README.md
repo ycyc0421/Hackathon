@@ -1,10 +1,12 @@
-# 前端：单证上传、差异、报告与评测
+# 前端模块：单证上传、差异比对、检查报告与系统评测
 
-Vue 3 + Vite 单页应用，四个页面通过条件渲染切换。公开数据结构见[数据契约](../docs/数据契约.md)，后端启动见[后端说明](../backend/README.md)。
+基于 Vue 3 + Vue Router + Vite 构建的单页应用。对外数据结构以 [数据契约](../docs/数据契约.md) 与 [报告内容接口](../docs/report-content-api.md) 为准，后端服务启动方式见 [后端说明](../backend/README.md)。
 
-## 本地开发
+---
 
-命令从仓库根目录运行，需要 Node.js 20：
+## 本地开发与联调
+
+在仓库根目录执行（需 Node.js 20+）：
 
 ```sh
 npm ci
@@ -12,54 +14,66 @@ npm --prefix web ci
 npm --prefix web run dev
 ```
 
-访问 Vite 输出的本地地址。真实模式需要另开终端启动后端。使用环境变量启用 Vite 开发代理，无需改源码：
+启动后访问 Vite 输出的本地地址。连接本地后端（默认 `http://127.0.0.1:8000`）时，通过环境变量开启开发代理，无需修改源码：
 
 ```sh
 VITE_PROXY_API=http://127.0.0.1:8000 npm --prefix web run dev
 ```
 
-PowerShell 先设置 `$env:VITE_PROXY_API = 'http://127.0.0.1:8000'`，再运行开发命令。也可把代理目标设为 `https://hackathon.ychome.net` 连接已部署后端；目标地址不带 /api/v1。代理只在开发服务器生效，浏览器仍请求同源 /api/v1，无需额外跨域配置。
+> Windows PowerShell 先执行 `$env:VITE_PROXY_API = 'http://127.0.0.1:8000'`，再运行 `npm --prefix web run dev`。代理目标不带 `/api/v1`，浏览器在开发与生产环境均请求同源 `/api/v1`。
 
-## 示例与真实模式
+---
 
-默认示例模式使用 `src/mock/`，不会上传文件至后端。顶栏可切换模式，选择保存到浏览器；URL 参数优先于保存值：`?mock=0` 使用真实接口，`?mock=1` 使用示例数据。
+## 数据源切换（真实后端 / 示例数据）
 
-前端默认请求同源 `/api/v1`。本地确需连接其他服务时，可在启动或构建前设置 `VITE_API_BASE` 为含 `/api/v1` 的基础地址；这是构建时配置，变更后重启开发服务或重新构建。跨源服务还需正确配置 CORS。
+应用支持在运行时切换真实后端与内置示例数据（`src/mock/`），无需重新构建：
 
-线上统一使用 `https://hackathon.ychome.net`。首次访问默认示例不表示后端不可用，验收必须切到真实模式。
+- **真实后端模式（默认）**：首次访问直接连接后端接口；也可通过 `?mock=0` 显式切回。
+- **示例数据模式（`?mock=1`）**：使用前端内置的契约样例模拟上传进度、比对结果与评测看板，不向服务器发送文件。顶栏下方常驻提示条标明当前处于示例数据模式。
 
-## 验证与构建
+> 注意：应用采用 Hash 路由，查询参数请置于 `#` 之前（例如 `/?mock=1#/upload`），同时兼容 `#/upload?mock=1` 写法。模式选择会保存在浏览器的 `localStorage` 中。
+
+---
+
+## 校验与构建
 
 ```sh
-npm run validate
-node --test tests/*.test.mjs
-npm --prefix web run build
+npm run validate               # 校验 JSON Schema 与契约示例
+node --test tests/*.test.mjs   # 运行前端逻辑与报告生成单元测试（119 项）
+npm --prefix web run build     # 构建生产静态产物（输出至 web/dist）
 ```
 
-构建产物为 `web/dist`，不提交 Git。CI 构建后与同一提交的后端一起打包，Nginx 提供静态文件并代理 API，见[工作流说明](../.github/workflows/README.md)。仓库保留的 Worker、wrangler 与旧 npm deploy 命令是历史路径，不是当前生产发布入口。
+---
 
-纯静态托管只提供页面；真实模式仍需可访问的 API 及对应代理或跨源配置。构建成功不能代替上传、差异查看、失败状态与评测空态的浏览器检查。
+## 目录结构
 
-## 目录与边界
-
-| 位置 | 职责 |
+| 路径 | 职责说明 |
 |---|---|
-| `src/api/config.js` | 模式选择、API 地址、轮询参数 |
-| `src/api/index.js` | 统一请求入口，页面不直接 fetch |
-| `src/api/labels.js` | 枚举的中文文案与状态样式 |
-| `src/api/formatters.js` | 字段显示格式 |
-| `src/pages/` | 上传、差异、报告、评测 |
-| `src/components/` | 共享交互组件 |
-| `src/utils/needsReview.js` | 人工复核条目口径 |
-| `src/design-tokens.css`、`src/styles.css` | 设计变量与全站样式 |
+| `src/router.js` | Hash 路由表（首页 `/`、上传 `/upload`、差异 `/diff`、报告 `/report`、评测 `/eval`）与路由守卫 |
+| `src/state/` | 跨页会话状态（`session.js`）、深浅色主题切换（`theme.js`）、演示场景元数据（`scenarios.js`） |
+| `src/api/config.js` | 数据源解析、API 基础路径、轮询与重试参数 |
+| `src/api/request.js` | 请求超时控制、取消传播、自动重试、XHR 上传进度与轮询循环 |
+| `src/api/index.js` | 统一数据访问入口（页面与组件不直接调用 `fetch`） |
+| `src/api/labels.js` | 契约状态枚举的中文文案与语义色映射 |
+| `src/api/errors.js` | 后端错误码到用户可读提示的映射 |
+| `src/api/formatters.js` | 数值、金额、时间、耗时及状态徽章格式化 |
+| `src/report/` | 结构化报告（v2）的前端自包含 HTML 排版与导出（`document.js`、`styles.js`） |
+| `src/pages/` | 五个核心页面视图（`HomePage`、`UploadPage`、`DiffPage`、`ReportPage`、`EvalPage`） |
+| `src/components/` | 共享组件（原文预览抽屉 `SourcePreview`、并排对照 `ComparePane`、报告导出与修正 `WorkflowActions` 等） |
+| `src/utils/` | 待复核判定（`needsReview.js`）、多数派差异计算（`divergence.js`）、报告结论推导（`reportConclusion.js`）、高度自适应过渡（`animateHeight.js`） |
+| `src/design-tokens.css` / `src/styles.css` | 双主题设计变量与全站样式 |
 
-- 上传到终态共用一个任务视图；阶段条、文件列表与等待时间持续可见，完成后就地更新。上传 100% 只代表字节发完，创建任务仍可能等待。
-- 后端逐份发布 PARSING 及文件终态，前端用已选文件名补齐尚未开始的条目；已处理计数包括 EXTRACTED、FAILED、UNSUPPORTED。短任务可能在两次轮询间完成，页面不补播未观察到的状态。
-- 多品名依赖后端商品目录与 item_id；字段中文名直接使用 label。
-- MATCH 表示参与值一致，含 LOW_CONFIDENCE 时仍需人工复核；不能据此宣布整票合规。
-- 缺置信度、页码或坐标时降级显示；未评测显示“尚未评测”，不能填假数字。
-- 报告页展示结果，尚无报告文件导出或人工修正接口。
-- 当前轮询 1.5 秒一次、最多 60 次，耗时 OCR 可能超出窗口；停止轮询不等于取消任务。
-- 上传页扫描件提示仍有“后端仅支持文本 PDF”的旧文案，和已启用 OCR 的生产环境不一致，后续应用改动需修正。
+---
 
-依赖保持 vue、vite、@vitejs/plugin-vue，不引入路由、状态库、UI 库或 HTTP 客户端。设计与动效规范见[设计系统](DESIGN.md)。
+## 核心交互与降级原则
+
+1. **全生命周期单视图进度**：上传页从文件上传、排队解析到终态保持同一张任务卡片与文件列表就地更新；上传百分比仅表示字节传输进度，轮询窗口最长支持 30 分钟以容纳扫描件 OCR 推理。
+2. **启发式扫描件预检**：本地预检未发现 PDF 文本层时，仅提示「疑似扫描件，将通过 OCR 识别」，不阻断提交。
+3. **同屏原文核对**：在差异页点击「查看原文」会在页面右侧滑出原件预览抽屉（PDF 自动定位到对应页码，图片原比例展示，EDI/JSON 按纯文本安全渲染），避免新开标签页打断核对视线。
+4. **严格的降级展示**：
+   - `MATCH` 仅表示参与比对的已识别值一致；若包含 `LOW_CONFIDENCE` 取值，仍归入「需关注」提醒人工复核。
+   - 缺失 `confidence`、`bbox` 或 `page` 时自动隐藏对应展示项，不伪造默认值。
+   - 规则提示按是否具备 `rule_id` 拆分为「依据规则的提示」与「未经规则校验的提示」两张独立卡片。
+   - 评测数据未生成时如实展示「尚未评测」，不填充默认数值。
+
+视觉语言、双主题配色与动效规范详见 [前端设计系统](DESIGN.md)。

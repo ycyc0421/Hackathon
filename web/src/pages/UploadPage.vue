@@ -412,16 +412,6 @@ const displayDocs = computed(() => {
         : { text: '排队中', tone: 'muted' },
     }))
   }
-  if (!live.length) {
-    return files.value.map((f) => ({
-      key: fileKey(f),
-      name: f.name,
-      error: null,
-      status: phase.value === 'uploading'
-        ? { text: '上传中', tone: 'running' }
-        : { text: '排队中', tone: 'muted' },
-    }))
-  }
   // 后端按处理进度增量回写 documents（逐份 PARSING → EXTRACTED）：
   // 已返回的用真实状态，还没轮到的用本地文件名补在队尾，状态「排队中」。
   // 后端不回写中间态时 live 要么为空（走上面的本地占位）要么一次全量，
@@ -643,7 +633,7 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
       v-if="!isRunning && !task && !taskError"
       tone="info"
       title="尚未上传单证"
-      :detail="`把同一票货物的发票、箱单、提单等单证拖到上方虚线框，选好目的国后点「开始检查」。支持 ${UPLOAD_LIMITS.accept.split(',').join(' / ')}，单个不超过 ${UPLOAD_LIMITS.maxFileSizeMB}MB，最多 ${UPLOAD_LIMITS.maxFiles} 份。`"
+      :detail="`把同一票货物的发票、装箱单、提单等单证拖到上方虚线框，选好目的国后点「开始检查」。支持 ${UPLOAD_LIMITS.accept.split(',').join(' / ')}，单个不超过 ${UPLOAD_LIMITS.maxFileSizeMB}MB，最多 ${UPLOAD_LIMITS.maxFiles} 份。`"
     />
 
     <!-- 任务状态 -->
