@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from ..doc_profile import profile_of
 from ..schema_fields import BY_KEY, CORE_COMPARABLE, FieldSpec
 from . import normalize as N
+from .addresses import extract_address, normalize_address
 
 # 内部启发式分数低于该值 => LOW_CONFIDENCE（作用于 score，不是对外 confidence）
 LOW_SCORE_THRESHOLD = 0.75
@@ -404,6 +405,14 @@ def _m_consignee(text: str) -> Found | None:
     return _labeled_text(text, r"(?:CONSIGNEE|收货人|买方|BUYER)")
 
 
+def _m_address(text: str, role: str) -> Found | None:
+    match = extract_address(text, role)
+    if match is None:
+        return None
+    return Found(raw_text=match.raw_text, raw_value=match.raw_value,
+                 score=0.90 if not match.unreadable else None, unreadable=match.unreadable)
+
+
 def _paired_parties(text: str) -> tuple[Found, Found] | None:
     """Reject interleaved parties unless the structured adapter mapped them."""
     lines = [line.strip() for line in text.splitlines() if line.strip()]
@@ -487,6 +496,8 @@ MATCHERS = {
     "container_no": _m_container_no,
     "shipper": _m_shipper,
     "consignee": _m_consignee,
+    "shipper_address": lambda text: _m_address(text, "shipper"),
+    "consignee_address": lambda text: _m_address(text, "consignee"),
     "port_of_loading": _m_port_of_loading,
     "port_of_discharge": _m_port_of_discharge,
     "destination_country": _m_destination_country,
@@ -529,6 +540,8 @@ def _norm_text(raw: str | None):
 
 
 NORMALIZERS = {
+    "shipper_address": lambda raw: (normalize_address(raw), None),
+    "consignee_address": lambda raw: (normalize_address(raw), None),
     "packages": _norm_number,
     "gross_weight": _norm_number,
     "net_weight": _norm_number,
