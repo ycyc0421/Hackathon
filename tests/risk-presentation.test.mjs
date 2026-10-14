@@ -63,6 +63,14 @@ test('parseRuleSources 将内部规则集版本转为可读中文，并拒绝非
 
   const unsafe = parseRuleSourceToken('javascript:alert(1)')
   assert.equal(unsafe.href, null)
+
+  const nestedParens = presentRisk({
+    title: '【演示规则·未经核实】瓷制餐厨用品支持资料待人工核对（品名：陶瓷马克杯 (350ML) 白）',
+    detail: '说明正文',
+    rule_source: null,
+  })
+  assert.equal(nestedParens.title, '瓷制餐厨用品支持资料待人工核对')
+  assert.equal(nestedParens.itemScope, '陶瓷马克杯 (350ML) 白')
 })
 
 test('visibleTaskErrors 在已有规则风险提示时收敛重复的 RULES_UNVERIFIED', () => {

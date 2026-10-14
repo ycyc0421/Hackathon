@@ -27,8 +27,11 @@ const UNVERIFIED_SOURCE_SUFFIXES = [
   '(官方来源候选；适用条件未经人工核实)',
 ]
 
-/** 匹配标题末尾形如 `（品名：陶瓷 马克杯 350ML 白）` 或 `(品名: ...)` 的商品归属后缀 */
-const ITEM_SCOPE_SUFFIX_RE = /\s*[（(]品名[：:]\s*([^）)]*?)\s*[）)]\s*$/
+/**
+ * 匹配标题末尾形如 `（品名：陶瓷 马克杯 350ML 白）` 或 `(品名: ...)` 的商品归属后缀。
+ * 注意：商品名自身可能含括号（如 `（品名：陶瓷杯 (350ML)）`），因此用贪婪匹配取最后一个 `（品名：` 到行尾闭合括号。
+ */
+const ITEM_SCOPE_SUFFIX_RE = /^(.*?\S)\s*[（(]品名[：:]\s*(.+?)\s*[）)]\s*$/
 
 /** 匹配后端内部规则集版本号（如 `static-source-candidates-v4`），转为可读中文说明 */
 const INTERNAL_RULESET_VERSION_RE = /^static-source-candidates-(v\d+(?:\.\d+)*)$/i
@@ -82,6 +85,9 @@ export function parseRuleSourceToken(rawToken) {
 /**
  * 将 `rule_source` 字符串拆分为结构化来源条目列表。
  *
+ * 注意：使用负向前瞻 `(?![^&;]{1,10};)` 避免误切分 URL 查询参数中偶发的 HTML 实体（如 `&amp;`），
+ * 仅按全角分号 `；` 或两侧非 HTML 实体的半角分号切分多来源列表。
+ *
  * @param {string | null | undefined} rawSource
  * @returns {{ sources: Array<{ text: string, href: string | null }>, hadUnverifiedSuffix: boolean }}
  */
@@ -98,7 +104,7 @@ export function parseRuleSources(rawSource) {
   }
 
   const parts = cleaned
-    .split(/[；;]+/)
+    .split(/；|;\s*(?=https?:\/\/|$)/i)
     .map((part) => parseRuleSourceToken(part))
     .filter(Boolean)
 
@@ -133,9 +139,9 @@ export function presentRisk(risk, { taskHasUnverifiedError = false } = {}) {
   let itemScope = null
   const scopeMatch = title.match(ITEM_SCOPE_SUFFIX_RE)
   if (scopeMatch) {
-    const extracted = scopeMatch[1].trim()
+    title = scopeMatch[1].trim()
+    const extracted = scopeMatch[2].trim()
     if (extracted) itemScope = extracted
-    title = title.slice(0, scopeMatch.index).trim()
   }
 
   for (const disclaimer of UNVERIFIED_DETAIL_DISCLAIMERS) {
