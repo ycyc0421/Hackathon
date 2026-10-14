@@ -9,7 +9,10 @@ import { task } from './state/session.js'
 /**
  * hash 模式：静态托管（Cloudflare Pages）没有 history rewrite 能力，
  * 直接刷新 /diff 会 404，hash 模式 URL 不经过服务端，最稳。
- * meta.order 承载页序（底部标签/顶栏页签的排列依据），meta.label 承载文案。
+ *
+ * meta.order 只承载纸张层叠的前进/后退方向（页签排列与文案在 App.vue 的 PAGES）；
+ * meta.label 目前无人读取，改导航请改 App.vue 的 PAGES。
+ * 评测页不在导航里，保留 order 3 只为了让「首页 → 评测」算前进、「评测 → 首页」算后退。
  */
 const routes = [
   { path: '/', name: 'home', component: HomePage, meta: { order: -1, label: '首页' } },

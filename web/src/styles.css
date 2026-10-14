@@ -1977,6 +1977,50 @@ textarea {
   margin-top: var(--space-8);
 }
 
+/* 范围提示条与下面第一块之间留出间距 */
+.eval-done > .notice {
+  margin-bottom: var(--space-5);
+}
+
+/* 复现证据：默认收起的附录。正文只留结论，口径与指纹收在这里。
+   原生 details/summary（与 DocumentNumbers 的「原始读数与原文」同一做法）。 */
+.eval-provenance {
+  margin-top: var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  /* 64 位指纹与 40 位提交号都是不可断的长串，允许任意断行避免撑破版心 */
+  overflow-wrap: anywhere;
+}
+
+.eval-provenance summary {
+  cursor: pointer;
+  color: var(--text-body);
+  font-weight: var(--weight-medium);
+  user-select: none;
+}
+
+.eval-provenance summary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.eval-provenance p {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  /* 整串可一次选中，方便复制去核对 */
+  user-select: all;
+}
+
+/* 评测页的 meta-grid 里会出现 40 位提交号这类不可断长串，
+   180px 的格子装不下，允许任意断行避免撑破版心。
+   只作用于评测页：报告页同样用 .meta-grid，那里的值都不长。 */
+.eval-done .meta-grid dd {
+  overflow-wrap: anywhere;
+}
+
 /* ---------- 评测页指标卡 ---------- */
 
 /* 每个指标一张小卡，卡内三项（精确率 / 召回率 / F1）各一条比例条 + 数值。
@@ -2052,6 +2096,40 @@ textarea {
   text-align: right;
 }
 
+/* 计数条（TP/FP/FN）：卡内子块，用「下沉」表面而不是再加一层边框——
+   桌面/纸/下沉三层表面已经表达了从属关系（DESIGN.md：一层壳，不套娃）。
+   比例与计数并置，读者能当场验算 precision/recall。 */
+.metric-counts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+}
+
+.metric-counts dt {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+/* 缩写（TP/FP/FN）是注记不是内容，压到最小档并降一档颜色 */
+.metric-count-abbr {
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--text-disabled);
+}
+
+.metric-counts dd {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-medium);
+}
+
 .err-breakdown {
   margin: 12px 0 0;
   padding: 0;
@@ -2099,6 +2177,54 @@ textarea {
   font-variant-numeric: tabular-nums;
   text-align: right;
   color: var(--text-muted);
+}
+
+/* 已知局限：契约给的是成句说明，逐条直出。
+   散文不套盒子——加边框会让它看起来像一组"结论卡"（DESIGN.md：一层壳，不套娃）。 */
+.limit-list {
+  margin: var(--space-4) 0 0;
+  padding-left: var(--space-5);
+  color: var(--text-body);
+  font-size: var(--text-13);
+  line-height: 1.7;
+}
+
+.limit-list li + li {
+  margin-top: var(--space-2);
+}
+
+/* 指标口径：指标名 + 一段说明，纵向成对，说明用正文行高读得下去 */
+.definition-list {
+  margin: var(--space-2) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.definition-list dt {
+  color: var(--text-body);
+  font-size: var(--text-13);
+  font-weight: var(--weight-medium);
+}
+
+.definition-list dd {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-13);
+  line-height: 1.7;
+}
+
+.eval-provenance-title {
+  margin: var(--space-3) 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+/* 长哈希与提交号：等宽 + 允许任意断行（同 .edi-source-text 的做法），
+   整串可一次选中，方便复制去核对 */
+.eval-provenance p {
+  font-family: var(--font-mono);
 }
 
 /* ============================================================

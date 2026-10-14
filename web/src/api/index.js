@@ -31,6 +31,8 @@ import partialSample from '../mock/check-partial.json'
 import multiItemSample from '../mock/check-multi-item.json'
 import cleanSample from '../mock/check-clean.json'
 import evaluationDoneSample from '../mock/evaluation-done.json'
+// 扫描通道的评测示例（真实 OCR 形态）：与文本通道那份一起演示「按通道选择批次」
+import evaluationScanSample from '../mock/evaluation-scan.json'
 // EDI 合成场景夹具（issue #40）：手工构造的 API 形状数据，非真实接口输出，
 // input.notes 中保留了合成标识。注册进示例体系供页面验收，不表示后端已解析 EDI。
 import ediOnlySample from '../mock/check-edi-only.json'
@@ -230,9 +232,16 @@ export async function getEvaluation(options = {}) {
   }
 }
 
-/** 已持久化的评测摘要，旧后端尚无历史接口时保留最新结果。 */
+/**
+ * 已持久化的评测摘要（按时间倒序），供页面按通道和时间选择批次。
+ * 旧后端尚无历史接口时返回空数组，页面不渲染批次选择器。
+ * mock 下返回两份示例（文本通道 / 扫描通道），否则示例模式看不到批次选择器。
+ */
 export async function getEvaluationRuns() {
-  if (isMock()) return []
+  if (isMock()) {
+    await sleep(120)
+    return [evaluationDoneSample, evaluationScanSample].map((s) => stripComment(JSON.parse(JSON.stringify(s))))
+  }
   try {
     return await request('/evaluation/runs', {}, {
       base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS,

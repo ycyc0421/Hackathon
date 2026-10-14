@@ -1,0 +1,43 @@
+{
+  "_comment": "mock 评测结果（DONE，扫描通道批次）。与 evaluation-done.json 同属示例数据，不代表真实能力；两份一起用于演示「可按通道和时间选择评测批次」。数值取自实际 OCR 跑分的形态：扫描通道样本少、字段召回明显低于文本通道，冲突检出同样只覆盖少量样本。结构须与 docs/schema/evaluation.schema.json 一致；counts 与 metrics 必须互相算得出来（tests/eval-mock-schema.test.mjs 固定住这条）。scope 为合成占位：code_revision 与 dataset_sha256 都不是真实提交号或数据指纹。",
+  "status": "DONE",
+  "dataset_version": "golden-v1",
+  "sample_count": 2,
+  "model_version": "PaddleOCR-VL-v1.6 / CPU / pipeline@mock",
+  "metrics": {
+    "field_extraction": { "precision": 0.788, "recall": 0.488, "f1": 0.603 },
+    "conflict_detection": { "precision": 1.0, "recall": 0.5, "f1": 0.667 }
+  },
+  "error_breakdown": {
+    "字段漏读或值不符": 125,
+    "字段多读或值不符": 32,
+    "冲突漏检": 1,
+    "冲突误报": 0,
+    "未完整完成的货票": 0
+  },
+  "run_at": "2026-10-08T09:15:00Z",
+  "scope": {
+    "dataset_kind": "合成数据，单一英文版式",
+    "input_kind": "模拟扫描 PNG（真实 OCR）",
+    "split": "test",
+    "document_count": 6,
+    "code_revision": "0f1e2d3c4b5a69788796a5b4c3d2e1f0a1b2c3d4",
+    "scorer_version": "synthetic-exact-v1",
+    "dataset_sha256": "3b8d1f6a9c2e5b7d0a4f8c1e6b9d2a5f8c3e7b1d4a9f6c2e5b8d1a4f7c0e3b6d",
+    "limitations": [
+      "本数据集曾用于开发和回归，不能视为未见测试集或泛化准确率。",
+      "仅计入当前输入通道；派生扫描件与文本 PDF 不是独立业务样本，不合并计算总体分数。",
+      "金标为数据包生成预期；包含尚未实现的字段，未按支持范围删减分母。",
+      "字符串仅做 Unicode、大小写和空白归一；不自动等同中英品名或业务近义词。",
+      "目的国规则未核实；字段错误可能同时计为漏读与多读，分类不可直接相加。"
+    ],
+    "metric_definitions": {
+      "field_extraction": "以文件名、货号、字段键、归一值和单位组成事实，多重集合微平均；错误值计 FP 和 FN。只评分金标定义的字段键，不评分页码坐标。",
+      "conflict_detection": "以货号和字段键标识冲突；CONFLICT 为正类，漏检或未检查计 FN，多报计 FP；内部风险不充作冲突。"
+    },
+    "counts": {
+      "field_extraction": { "tp": 119, "fp": 32, "fn": 125 },
+      "conflict_detection": { "tp": 1, "fp": 0, "fn": 1 }
+    }
+  }
+}

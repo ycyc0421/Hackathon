@@ -13,12 +13,12 @@ import {
 import { theme, toggleTheme } from './state/theme.js'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 
-/* label 从路由 meta 取，这里只存页序 key 列表，避免两处维护同一份文案 */
+/* 导航页序。文案在这里，页序方向在 router 的 meta.order（两处各管一件事）。
+   评测页不进导航：它不属于「上传 → 差异 → 报告」这条流程，只从首页进入。 */
 const PAGES = [
   { key: 'upload', label: '上传' },
   { key: 'diff', label: '差异' },
   { key: 'report', label: '报告' },
-  { key: 'eval', label: '评测' },
 ]
 
 const route = useRoute()
@@ -262,6 +262,11 @@ function isLocked(key) {
   return (key === 'diff' || key === 'report') && !task.value
 }
 
+/* 不渲染导航壳的页面：首页是入口页；评测页只从首页进入，
+   也不该在顶栏被列出来（评测是"关于系统本身"的页面，不是流程里的一步）。 */
+const NO_NAV = new Set(['home', 'eval'])
+const showNav = computed(() => !NO_NAV.has(active.value))
+
 /** 下划线指示条：按当前标签的实测位置与宽度移动，跟随窗口尺寸变化 */
 const tabsRef = ref(null)
 const indicatorStyle = ref({ opacity: '0' })
@@ -285,12 +290,21 @@ async function updateIndicator() {
 }
 
 let resizeObserver = null
-onMounted(() => {
-  updateIndicator()
-  if (tabsRef.value && typeof ResizeObserver !== 'undefined') {
+
+/* nav 只在非首页/非评测页存在：挂载那一刻它可能还不存在，
+   observer 需要跟着 ref 出现再挂一次，否则从评测页切回流程页后
+   页签宽度变化（角标出现、字体加载）量不到，指示条会停在旧位置。 */
+watch(tabsRef, (el) => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
+  if (el && typeof ResizeObserver !== 'undefined') {
     resizeObserver = new ResizeObserver(updateIndicator)
-    resizeObserver.observe(tabsRef.value)
+    resizeObserver.observe(el)
   }
+  updateIndicator()
+})
+
+onMounted(() => {
   window.addEventListener('resize', updateIndicator)
 })
 
@@ -318,8 +332,8 @@ watch(() => route.name, updateIndicator)
         </span>
       </button>
 
-      <!-- 首页是入口页，不渲染顶栏页签（含指示条），减少干扰 -->
-      <nav v-if="active !== 'home'" ref="tabsRef" class="tabs">
+      <!-- 首页是入口页，评测页只从首页进入：两者都不渲染顶栏页签（含指示条） -->
+      <nav v-if="showNav" ref="tabsRef" class="tabs">
         <button
           v-for="p in PAGES"
           :key="p.key"
@@ -352,7 +366,7 @@ watch(() => route.name, updateIndicator)
     <p v-if="mock" class="mock-notice" role="status">示例数据模式：结果与处理过程均为模拟，不代表真实检查或评测。</p>
 
     <!-- 移动端主导航：≤640px 显示（顶栏页签隐藏），选中态用颜色/字重表达，不用滑动指示条 -->
-    <nav v-if="active !== 'home'" class="bottom-tabs" aria-label="页面导航">
+    <nav v-if="showNav" class="bottom-tabs" aria-label="页面导航">
       <button
         v-for="p in PAGES"
         :key="p.key"

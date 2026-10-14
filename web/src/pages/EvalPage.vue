@@ -10,7 +10,7 @@ import { ref, computed, inject, onMounted } from 'vue'
 import { getEvaluation, getEvaluationRuns, isMock, ApiError } from '../api/index.js'
 import { backendErrorText } from '../api/errors.js'
 import { formatTime } from '../api/formatters.js'
-import { EVALUATION_SPLITS } from '../api/labels.js'
+import { EVALUATION_SPLITS, EVALUATION_METRICS, EVALUATION_TEXT } from '../api/labels.js'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import EmptyState from '../components/EmptyState.vue'
@@ -68,24 +68,36 @@ const isDone = computed(() => evaluation.value?.status === 'DONE')
 /** 首次加载（还没有任何可显示内容）才显示骨架屏；之后的刷新保留旧内容 */
 const loadingInitial = computed(() => loading.value && !evaluation.value && !error.value)
 
-/** 指标分组的中文名。统计口径需数据侧与后端侧确认 */
-const METRIC_GROUPS = [
-  { key: 'field_extraction', label: '字段抽取' },
-  { key: 'conflict_detection', label: '冲突检出' },
-  { key: 'risk_hint', label: '风险提示' },
-]
-
 const metricRows = computed(() => {
   const m = evaluation.value?.metrics
   if (!m) return []
-  return METRIC_GROUPS.filter((g) => m[g.key]).map((g) => ({
-    key: g.key,
-    label: g.label,
-    ...m[g.key],
-    counts: scope.value?.counts?.[g.key],
-    definition: scope.value?.metric_definitions?.[g.key],
+  /* 按 EVALUATION_METRICS 的顺序出卡片，不遍历 metrics 的键：
+     $defs.Metrics 是 additionalProperties:false，后端不可能合法地多出第四项。
+     scope.metric_definitions 则相反（additionalProperties: string），
+     那里要按实际键展示，不能只认这三项。 */
+  return Object.entries(EVALUATION_METRICS)
+    .filter(([key]) => m[key])
+    .map(([key, label]) => ({
+      key,
+      label,
+      ...m[key],
+      counts: scope.value?.counts?.[key] ?? null,
+      definition: scope.value?.metric_definitions?.[key],
+    }))
+})
+
+/** 指标口径：契约给的是「指标名 → 一段中文说明」，键可能超出页面已知的指标 */
+const definitionRows = computed(() => {
+  const defs = scope.value?.metric_definitions
+  if (!defs) return []
+  return Object.entries(defs).map(([key, text]) => ({
+    key,
+    label: EVALUATION_METRICS[key] ?? key,
+    text,
   }))
 })
+
+const limitations = computed(() => scope.value?.limitations ?? [])
 
 function pct(v) {
   if (v === null || v === undefined) return '—'
@@ -112,7 +124,7 @@ const maxErrCount = computed(() =>
         {{ loading ? '读取中…' : '刷新' }}
       </button>
     </div>
-    <p class="page-desc">查看固定数据集上的实测表现。普通上传不会启动评测；刷新只读取已保存的结果。</p>
+    <p class="page-sub">查看固定数据集上的实测表现。普通上传不会启动评测；刷新只读取已保存的结果。</p>
     <div v-if="runs.length" class="field">
       <span id="evaluation-run-label" class="field-label">选择评测批次</span>
       <AppSelect v-model="selectedRun" :options="runOptions" :disabled="loading" block
@@ -172,8 +184,15 @@ const maxErrCount = computed(() =>
         />
 
         <div v-else-if="isDone" key="done" class="eval-done">
-          <NoticeBar tone="info" :title="scope?.input_kind ?? '本批次未记录评测范围'"
-            :detail="scope ? scope.dataset_kind + '；完成跑分不代表达到质量要求。' : '请先核对数据来源和计分口径，不据此推断完整模型能力。'" />
+          <!-- 范围提示条：说清这份分数是在什么通道、什么数据上得到的。
+               scope 是契约里的可选字段，旧结果没有——那时如实说明范围未记录，
+               不能省略这一段（省略会被读成"没有范围限制"）。 -->
+          <NoticeBar
+            tone="info"
+            :title="scope?.input_kind ?? '本批次未记录评测范围'"
+            :detail="scope ? scope.dataset_kind + '；完成跑分不代表达到质量要求。' : EVALUATION_TEXT.scopeMissing"
+          />
+
           <h3 class="card-title">本次评测信息</h3>
           <dl class="meta-grid">
             <div><dt>测试集版本</dt><dd>{{ evaluation.dataset_version ?? '—' }}</dd></div>
@@ -209,27 +228,37 @@ const maxErrCount = computed(() =>
                 </span>
                 <span class="metric-value">{{ pct(m.value) }}</span>
               </div>
-              <p v-if="row.counts" class="foot-note">
-                正确 {{ row.counts.tp }} · 多报 {{ row.counts.fp }} · 漏报 {{ row.counts.fn }}<br />
-                预测项 {{ row.counts.tp + row.counts.fp }} · 金标项 {{ row.counts.tp + row.counts.fn }}
-              </p>
-              <p v-if="row.definition" class="foot-note">{{ row.definition }}</p>
+              <!-- 计数与比例同源、同卡并置：比例就是计数的换算，并排才能当场验算。
+                   该指标没有计数时整条不渲染（不补 0、不显示 0/0）。 -->
+              <dl v-if="row.counts" class="metric-counts">
+                <div>
+                  <dt>命中<span class="metric-count-abbr">TP</span></dt>
+                  <dd>{{ row.counts.tp }}</dd>
+                </div>
+                <div>
+                  <dt>误报<span class="metric-count-abbr">FP</span></dt>
+                  <dd>{{ row.counts.fp }}</dd>
+                </div>
+                <div>
+                  <dt>漏检<span class="metric-count-abbr">FN</span></dt>
+                  <dd>{{ row.counts.fn }}</dd>
+                </div>
+              </dl>
             </article>
           </div>
-          <p class="foot-note">
-            分母为零显示“—”；本页不设达标阈值。字段错值会同时计为多报与漏报，错误分类不可直接相加。
-          </p>
+          <p class="foot-note">{{ EVALUATION_TEXT.formula }}本页不设达标阈值。</p>
+          <!-- 契约允许某指标只给计数不给分数（当前跑分不计风险提示），
+               缺了要明说，不能让读者把"没评"读成"没问题" -->
           <p v-if="!evaluation.metrics?.risk_hint" class="foot-note">风险提示：本批次未评测，不代表没有风险。</p>
-          <section v-if="scope" class="eval-section-title">
-            <h3 class="card-title">范围与局限</h3>
-            <ul><li v-for="limitation in scope.limitations" :key="limitation">{{ limitation }}</li></ul>
-            <details class="eval-provenance">
-              <summary>版本与数据指纹</summary>
-              <p>被测提交：{{ scope.code_revision }}</p>
-              <p>计分版本：{{ scope.scorer_version }}</p>
-              <p>数据指纹：{{ scope.dataset_sha256 }}</p>
-            </details>
-          </section>
+
+          <template v-if="limitations.length">
+            <h3 class="card-title eval-section-title">已知局限</h3>
+            <!-- limitations 在契约里就是成句中文，不是语义代码：逐条直出，
+                 不建立代码→文案映射（那套映射会静默丢掉后端新增的条目） -->
+            <ul class="limit-list">
+              <li v-for="(limitation, i) in limitations" :key="i">{{ limitation }}</li>
+            </ul>
+          </template>
 
           <template v-if="errorBreakdown.length">
             <h3 class="card-title eval-section-title">错误分类</h3>
@@ -243,7 +272,28 @@ const maxErrCount = computed(() =>
                 <span class="eb-count">{{ e.count }}</span>
               </li>
             </ul>
+            <p class="foot-note">{{ EVALUATION_TEXT.breakdownNote }}</p>
           </template>
+
+          <!-- 指标口径与复现证据：口径可能很长，64 位指纹也不适合摆在正文里，
+               两者都是"这份分数怎么来的"，收在同一个可展开块里，正文只留结论。 -->
+          <details v-if="scope" class="eval-provenance">
+            <summary>指标口径与复现证据</summary>
+            <template v-if="definitionRows.length">
+              <h4 class="eval-provenance-title">指标口径</h4>
+              <dl class="definition-list">
+                <div v-for="d in definitionRows" :key="d.key">
+                  <dt>{{ d.label }}</dt>
+                  <dd>{{ d.text }}</dd>
+                </div>
+              </dl>
+            </template>
+            <h4 class="eval-provenance-title">复现指纹</h4>
+            <p>被测提交：{{ scope.code_revision }}</p>
+            <p>计分版本：{{ scope.scorer_version }}</p>
+            <p>数据集指纹（SHA-256）：{{ scope.dataset_sha256 }}</p>
+            <p class="foot-note">{{ EVALUATION_TEXT.evidenceNote }}</p>
+          </details>
         </div>
       </Transition>
     </section>
@@ -256,9 +306,3 @@ const maxErrCount = computed(() =>
     />
   </div>
 </template>
-
-<style scoped>
-.meta-grid dd, .eval-provenance { overflow-wrap: anywhere; }
-.eval-provenance, .eval-section-title ul { font-size: var(--text-sm); color: var(--text-muted); }
-.eval-done > .notice { margin-bottom: var(--space-5); }
-</style>
