@@ -130,8 +130,6 @@ jobs:
 
       - name: 验证前端、公网接口及 OCR 图片和扫描 PDF（启用时）
         id: smoke
-        env:
-          SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
         run: |
           npm ci
           ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=20 -o ServerAliveCountMax=6 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
@@ -140,14 +138,57 @@ jobs:
           import json, os
           print(json.dumps({"SITE_ORIGIN": os.environ["SITE_ORIGIN"]}))
           PY
+
+      - name: 收集公网探针诊断
+        if: always() && steps.backend.outcome == 'success' && steps.smoke.outcome != 'skipped'
+        id: smoke-evidence
+        timeout-minutes: 2
+        env:
+          SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
+        run: |
           mkdir -p "$SMOKE_OUTPUT_DIR"
+          ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=20 -o ServerAliveCountMax=6 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
+          target="$BACKEND_SSH_USER@$BACKEND_SSH_HOST"
           scp "${ssh_options[@]}" "$target:app/releases/$RELEASE_ID/smoke-output/*.json" "$SMOKE_OUTPUT_DIR/"
-          node backend/tools/validate_outputs.mjs "$SMOKE_OUTPUT_DIR"
+          if [ "${{ steps.smoke.outcome }}" = 'success' ]; then
+            node backend/tools/validate_outputs.mjs "$SMOKE_OUTPUT_DIR"
+          fi
 
       - name: 公网联调失败时回退整站
-        if: failure() && steps.backend.outcome == 'success' && steps.smoke.outcome == 'failure'
+        id: rollback
+        if: failure() && steps.backend.outcome == 'success' && (steps.smoke.outcome == 'failure' || steps.smoke-evidence.outcome == 'failure')
         run: |
           ssh -i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=20 -o ServerAliveCountMax=6 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts" "$BACKEND_SSH_USER@$BACKEND_SSH_HOST" "python3 - $RELEASE_ID --rollback" < deploy/backend.py
+
+      - name: 记录发布与证据收集结果
+        if: always() && (steps.backend.outcome == 'success' || steps.backend.outcome == 'failure')
+        env:
+          SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
+          BACKEND_OUTCOME: ${{ steps.backend.outcome }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+          COLLECTION_OUTCOME: ${{ steps.smoke-evidence.outcome }}
+          ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          output = Path(os.environ['SMOKE_OUTPUT_DIR'])
+          output.mkdir(parents=True, exist_ok=True)
+          data = {key.lower(): os.environ[key] for key in (
+              'RELEASE_ID', 'BACKEND_OUTCOME', 'SMOKE_OUTCOME', 'COLLECTION_OUTCOME', 'ROLLBACK_OUTCOME')}
+          data['recorded_at'] = datetime.now(timezone.utc).isoformat()
+          (output / 'deployment.diagnostic.json').write_text(json.dumps(data), encoding='utf-8')
+          PY
+
+      - name: 保存失败探针证据
+        if: always() && (steps.backend.outcome == 'failure' || steps.smoke.outcome == 'failure' || steps.smoke-evidence.outcome == 'failure' || steps.rollback.outcome == 'failure')
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-smoke-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/backend-smoke/*.diagnostic.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: 清理临时密钥
         if: always()
