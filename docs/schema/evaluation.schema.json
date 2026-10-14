@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/ycyc0421/Hackathon/schema/evaluation.schema.json",
   "title": "Evaluation",
-  "description": "评测结果。GET /api/v1/evaluation/latest 的返回体。设计上就支持『尚未评测』，避免看板被迫填假数字。",
+  "description": "评测结果。GET /api/v1/evaluation/latest 的返回体，也是 /api/v1/evaluation/runs 数组的元素。设计上就支持『尚未评测』，避免看板被迫填假数字。",
   "type": "object",
   "required": [
     "status",

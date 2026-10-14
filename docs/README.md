@@ -13,6 +13,7 @@
 | 启动后端或配置 OCR | [后端 README](../backend/README.md) |
 | 开发页面或切换数据源 | [前端 README](../web/README.md)、[设计系统](../web/DESIGN.md) |
 | 对接接口、排查字段语义 | [数据契约](数据契约.md)、[Schema 使用说明](schema/README.md) |
+| 跑评测、看分数口径与范围 | [系统评测与持久化](评测运行.md) |
 | 初始化独立 SQLite 测试库 | [数据层 README](../data/README.md) |
 | 配置 GitHub 自动部署 | [CI/CD 工作流](../.github/workflows/README.md) |
 | 查线上版本、回退、排障 | [部署运维](部署运维.md) |
@@ -37,4 +38,4 @@
 | [backend/samples](../backend/samples/) | 合成单证、挑战样例及预期结果 | 不是实际业务准确率评测 |
 | [data/generated](../data/generated/) | 字段级结构化测试输入 | 不是原始 OCR 图片，也不一定可直接提交 API |
 
-多品名 `items[]` 与 `item_id + field_key` 已在当前接口实现。仍待决策的是评测口径、正式适用规则及新增业务范围，不应再把多品名结构写成未确定。
+多品名 `items[]` 与 `item_id + field_key` 已在当前接口实现。评测的计分口径与运行范围见[系统评测](评测运行.md)；仍待决策的是正式适用规则及新增业务范围，不应再把多品名结构写成未确定。
