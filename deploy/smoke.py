@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 import re
 import sys
@@ -53,9 +54,13 @@ def save_task_diagnostic(output, name, task, task_id):
         'task_id': task_id,
         'status': task.get('status'),
         'error_codes': [error.get('code') for error in task.get('errors', [])],
+        'errors': [
+            {key: error.get(key) for key in ('code', 'level', 'file_ids')}
+            for error in task.get('errors', [])
+        ],
         'documents': [
-            {'process_status': document.get('process_status'),
-             'error_code': document.get('error_code')}
+            {'file_id': document.get('file_id'),
+             'process_status': document.get('process_status')}
             for document in task.get('documents', [])
         ],
         'parse_methods': [extraction.get('parse_method') for extraction in task.get('extractions', [])],
@@ -67,7 +72,39 @@ def save_task_diagnostic(output, name, task, task_id):
 
 def run(base, origin, output, ocr_enabled=False):
     output.mkdir(parents=True, exist_ok=True)
+    diagnostic = {'stage': 'preflight', 'case': None, 'task_id': None, 'outcome': 'running'}
+    try:
+        _run(base, origin, output, ocr_enabled, diagnostic)
+        diagnostic['outcome'] = 'passed'
+    except BaseException as exc:
+        diagnostic['outcome'] = 'failed'
+        # Exception text can contain URLs, account paths and response bodies.
+        diagnostic['failure_kind'] = next((kind.__name__ for kind in (
+            httpx.ReadTimeout, httpx.ConnectTimeout, httpx.ConnectError,
+            httpx.TimeoutException, httpx.RequestError, json.JSONDecodeError,
+            AssertionError, KeyboardInterrupt,
+        ) if isinstance(exc, kind)), 'ProbeError')
+        raise
+    finally:
+        diagnostic['recorded_at'] = datetime.now(timezone.utc).isoformat()
+        (output / 'probe.diagnostic.json').write_text(
+            json.dumps(diagnostic, ensure_ascii=False), encoding='utf-8')
+
+
+def _run(base, origin, output, ocr_enabled, diagnostic):
     with httpx.Client(headers={'Origin': origin}, timeout=30) as client:
+        def on_request(request):
+            diagnostic['method'] = request.method
+            diagnostic['http_status'] = None
+            diagnostic['edge_challenge'] = False
+
+        def on_response(response):
+            diagnostic['http_status'] = response.status_code
+            diagnostic['edge_challenge'] = response.headers.get('cf-mitigated') == 'challenge'
+
+        client.event_hooks['request'].append(on_request)
+        client.event_hooks['response'].append(on_response)
+
         def request_json(path, method='GET', **kwargs):
             response = client.request(method, f'{base}{path}', **kwargs)
             verify_response(response, origin, path)
@@ -87,16 +124,19 @@ def run(base, origin, output, ocr_enabled=False):
             cases += [('ocr_png', 'DE'), ('ocr_scan', 'DE')]
         print('OCR 公网验证：' + ('包含图片和扫描 PDF' if ocr_enabled else '共享配置未启用，仅验证文本 PDF'), flush=True)
         for name, country in cases:
+            diagnostic.update(stage='prepare_upload', case=name, task_id=None)
             is_ocr = name in ('ocr_png', 'ocr_scan')
             files = ocr_uploads(scan=name == 'ocr_scan') if is_ocr else [
                 ('files', (path.name, path.read_bytes(), 'application/pdf'))
                 for path in sorted((Path('backend/samples') / name).glob('*.pdf'))
             ]
+            diagnostic['stage'] = 'upload'
             created = request_json('/checks', 'POST', files=files, data={
                 'destination_country': country,
                 'notes': '自动部署联调验证：合成单证',
             })
             assert created.get('task_id'), '未返回任务编号'
+            diagnostic.update(stage='poll', task_id=created['task_id'])
             deadline = time.monotonic() + (1800 if is_ocr else 90)
             while True:
                 task = request_json(f'/checks/{quote(created["task_id"], safe="")}')
@@ -105,6 +145,7 @@ def run(base, origin, output, ocr_enabled=False):
                     break
                 assert time.monotonic() < deadline, '任务轮询超时'
                 time.sleep(1)
+            diagnostic['stage'] = 'verify_task'
             assert task['status'] == 'COMPLETED', (
                 f'{name}：任务未完成；任务 {created["task_id"]} 状态为 {task["status"]}，'
                 f'错误码：{", ".join(error["code"] for error in task.get("errors", []))}'
@@ -128,10 +169,13 @@ def run(base, origin, output, ocr_enabled=False):
             (output / f'{name}.json').write_text(json.dumps(task, ensure_ascii=False), encoding='utf-8')
             print(f'联调通过：{name}，{task["status"]}', flush=True)
 
+        diagnostic.update(stage='frontend', case=None, task_id=None)
         verify_frontend(client, origin)
+        diagnostic['stage'] = 'missing_task'
         missing = client.get(f'{base}/checks/tsk_missing_deployment_probe', timeout=15)
         assert missing.status_code == 404
         assert missing.json()['error']['code'] == 'TASK_NOT_FOUND'
+        diagnostic['stage'] = 'evaluation'
         evaluation = request_json('/evaluation/latest')
         (output / 'evaluation.json').write_text(json.dumps(evaluation, ensure_ascii=False), encoding='utf-8')
 
