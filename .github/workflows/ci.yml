@@ -3,7 +3,7 @@ run-name: CI 验证（不部署）· ${{ github.head_ref || github.ref_name }}
 
 on:
   push:
-    branches: [main, web/*]
+    branches: [main]
   pull_request:
     branches: [main]
 

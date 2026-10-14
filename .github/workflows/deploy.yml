@@ -26,6 +26,7 @@ jobs:
       actions: read
     outputs:
       sha: ${{ steps.revision.outputs.sha }}
+      ci_run_id: ${{ steps.revision.outputs.ci_run_id }}
     steps:
       - name: 跳过过期提交，手动发布也必须已有成功的 CI
         id: revision
@@ -39,9 +40,10 @@ jobs:
             echo "::notice::主分支已有更新，跳过本次旧版本发布。"
             exit 0
           fi
-          passed=$(gh run list --repo "$GH_REPO" --workflow ci.yml --commit "$REVISION" --event push --status success --json databaseId --jq length)
-          test "$passed" -gt 0
+          ci_run_id=$(gh run list --repo "$GH_REPO" --workflow ci.yml --branch main --commit "$REVISION" --event push --status success --json databaseId --jq '.[0].databaseId // empty')
+          test -n "$ci_run_id"
           echo "sha=$REVISION" >> "$GITHUB_OUTPUT"
+          echo "ci_run_id=$ci_run_id" >> "$GITHUB_OUTPUT"
 
   deploy-backend:
     name: 发布整站与公网验证
@@ -52,6 +54,7 @@ jobs:
     environment: production
     permissions:
       contents: read
+      actions: read
       deployments: write
     env:
       SITE_ORIGIN: ${{ secrets.SITE_ORIGIN }}
@@ -79,6 +82,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
 
       - name: 检查联调配置
         env:
@@ -101,11 +105,16 @@ jobs:
               raise SystemExit("BACKEND_SSH_USER 必须是普通维护用户")
           PY
 
-      - name: 预先构建联调前端（尚未发布）
-        working-directory: web
-        run: |
-          npm ci
-          npm run build
+      - name: 复用同一提交通过 CI 的前端产物
+        uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist
+          github-token: ${{ github.token }}
+          run-id: ${{ needs.revision.outputs.ci_run_id }}
+
+      - name: 确认前端产物完整
+        run: test -s web/dist/index.html
 
       - name: 准备部署密钥和服务器指纹
         env:
