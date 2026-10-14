@@ -1,0 +1,24 @@
+2026-10-14 B：最小 EDI 接入与候选版本验收
+
+基线：852cc57736a0347fb21533d9f4f90a8a66b19812。
+范围：新增独立 edifact.py，只接入单个 INVOIC:D:96A:UN 的选定字段；既有 PDF、图片、OCR、项目 JSON、比较、存储和前端算法不重写。不增加运行依赖或公开 Schema 枚举。
+
+现有原件与预期不修改。23份公开构造EDI的边界为11份解析成功、2份语法失败（UNT计数/截断）、10份范围外不支持（其余DESADV/多消息）。这不是完整EDIFACT认证；X12、其他版本、额外业务段及非1单价基数尚不支持。地址比较、评测/历史界面、刷新后原件入口按用户指令暂缓。
+
+本地独立验收结果
+- 后端全套：239 passed、3个Windows平台跳过、30 subtests passed；其中新增EDI测试91项。
+- 数据层：23 passed、17 subtests passed；一项预期警告确认保留manifest外用户文件。
+- 前端既有逻辑：119 passed；原契约夹具11份、报告契约校验和生产构建通过。
+- 修改前/后29组同输入实际HTTP返回逐字相同：仅排除task_id、created_at、finished_at；PDF、项目JSON、图片/OCR未配置失败及混合路径均包含。该对照未运行真实OCR。
+- 真实Chromium到隔离候选API：17项检查通过，涵盖EDI成功、金额差异、失败、混合PDF、原文预览/下载SHA及HTML/归档JSON导出，未发现未处理页面异常。归档保留内部line_items，最初检查脚本按公开平铺结构检查造成一项假失败，已按实际下载归档复核，初始记录保留在本地；未修改预测或原件。
+- 独立复审：19个结构/控制字符错误有效值负例均拒绝，117种短缺映射段无IndexError；原段证据保留，page/bbox/置信度null，币种不默认、净毛重不串、票/行包装不重复加总。
+- 原样例、金标夹具、生成数据和web/src字节保持不变。
+
+公开范围与留档
+GitHub仅提交代码、使用既有公开构造样例的测试、范围说明和本脱敏验收摘要；显式文件白名单提交，不上传实际返回、原件副本、运行数据库、机器日志、附件、模型、SSH/API凭据或本地路径。
+本地保留基线/候选完整返回、输入与输出SHA256、初次失败、JUnit、浏览器截图/下载及复现脚本。最初缺AJV造成的契约检查失败也保留，安装锁定依赖后的最终回归全通过。
+Linux专用部署测试因Windows缺fcntl无法在本机收集，由本PR的Linux CI验证；没有为测试改部署代码。Windows跳过项同样由Linux CI补验。
+
+结论：本轮限定范围的本地候选验收通过。生产未修改，尚未合并/部署；真实线上EDI和真实OCR部署回归须在后端合并后进行，不把本地或CI结果称为线上验收。已有OCR/PDF代码主体保持原路径。
+
+复现：安装backend/requirements.txt、requirements-test.txt及根npm ci；运行python -m pytest、python -m pytest data、python -m pytest deploy（Linux）、node --test tests/*.test.mjs、npm run validate、node backend/tools/validate_reports.mjs、npm run build --prefix web。

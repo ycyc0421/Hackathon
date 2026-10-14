@@ -3,6 +3,25 @@
 上传同一票货物的多份单证，抽取整票及商品行字段，跨文件比对并返回可追溯结果。
 对外返回以 [`docs/schema/check-task.schema.json`](../docs/schema/check-task.schema.json) 为准。
 
+## 首批标准 EDI 支持
+
+`.edi` / `.EDI` 走独立的 `pipeline/edifact.py`，不经过 PDF 文本抽取、OCR 或通用 LLM，也不改项目 JSON 的解析路径。当前支持 **单个 `INVOIC:D:96A:UN`、语法版本 3 的选定字段子集**，ASCII 或严格 UTF-8（可带 BOM），文件上限 1 MiB、商品行上限 200。它不是完整 EDIFACT 兼容或法规认证。
+
+解析器验证 UNB/UNZ 信封、UNH/UNT 引用及段数、CNT 商品行数，识别默认或 UNA 声明的 ASCII 服务字符、release 转义和点/逗号小数。字段包括发票编号、CZ/CN 主体、装运日期、币种、票级包装/重量/体积/总额，以及 LIN/PIA/IMD/QTY/MEA/MOA/PRI/PAC 的货号、品名、HS、数量、净毛重、金额、单价和包装。只映射明确的限定符和段作用域：`PCE→PCS`、`KGM→KGS`、`CT→CARTON`、`MTQ→CBM`；单价仅支持明确基数 1 的 PCE/PCS。订单引用不冒充合同号，买方/供应方不冒充物流收发货方，票级数量不从行值伪造原文。
+
+每个有效值保留原 EDI 段作为 `raw_text`；`page`、`bbox`、置信度均为 null。没有币种不默认 USD，未知数值或单位不能成为可比的猜测值。同作用域的矛盾值被拒绝；字段未载明/必需字段缺失沿用既有状态和比较规则。
+
+DESADV、多报文、X12、其他目录/语法版本、未知业务段及非 1 单价基数仍为 `UNSUPPORTED`；单报文信封、UNT/UNZ 或转义损坏为 `FAILED / DOC_PARSE_FAILED`。混合上传保留成功文件并返回 PARTIAL，原件字节可下载。公开错误为受控文案，不包含底层路径、凭据或报文片段。
+
+回归使用已公开的构造原件，原件和独立预期不修改：
+
+```sh
+python -m pytest backend/tests/test_edifact.py
+python -m pytest
+```
+
+支持范围以 `/api/v1/capabilities` 为准。字段含义参考 [UNECE D96A](https://service.unece.org/trade/untdid/d96a/)；本实现仅覆盖上述声明子集。测试通过不等于已部署或所有 EDI 模板可用。
+
 ## 运行
 
 部署使用 Python 3.12，本地建议保持相同版本。以下命令从仓库根目录执行：
