@@ -1,0 +1,53 @@
+{
+  "source_commit": "fca14f56910333c4bac8c72cfd6428ffe2fb6f2a",
+  "mode": "ocr",
+  "evidence": "real loopback TCP HTTP with isolated SQLite and upload paths",
+  "execution_status": "FINISHED",
+  "python": "3.12.13 (main, Apr 14 2026, 14:31:26) [MSC v.1944 64 bit (AMD64)]",
+  "checked_at": "2026-10-12T12:40:31.989383+00:00",
+  "external_llm_enabled": false,
+  "fresh_ocr_invoked": true,
+  "ocr_observation": "save raw model outputs without changing predictions",
+  "diagnostic_runtime_override": null,
+  "http_tasks": 2,
+  "uploaded_files": 6,
+  "task_statuses": {
+    "COMPLETED": 2
+  },
+  "field_checks": 63,
+  "field_checks_failed": 3,
+  "field_failures_by_key": {
+    "description": 3
+  },
+  "checks": 93,
+  "checks_failed": 0,
+  "checks_by_category": {
+    "source_integrity": 12,
+    "integration": 6,
+    "parse": 6,
+    "rows": 6,
+    "evidence": 62,
+    "conflict": 1
+  },
+  "failures_by_category": {},
+  "address_gap_cases": [],
+  "production_accessed": false,
+  "candidate_source_modified": false,
+  "limits": [
+    "synthetic single-template text benchmark",
+    "no browser acceptance",
+    "no production deployment/restart acceptance",
+    "no verified country-law or certificate-bodies acceptance"
+  ],
+  "packages": {
+    "fastapi": "0.143.0",
+    "pydantic": "2.14.1",
+    "httpx": "0.28.1",
+    "uvicorn": "0.54.0",
+    "pypdf": "6.20.0",
+    "pymupdf": "1.28.2",
+    "paddleocr": "3.7.0",
+    "paddlepaddle": "3.2.0",
+    "paddlex": "3.7.2"
+  }
+}

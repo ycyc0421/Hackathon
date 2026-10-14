@@ -1,0 +1,2702 @@
+[
+  {
+    "case": "SHP-00001",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00001",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00001",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00002",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00002",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00002",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00003",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00003",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00003",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00004",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00004",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00004",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00005",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00005",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00005",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00006",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00006",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00006",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00007",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00007",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00007",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00008",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00008",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00008",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00009",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00009",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00009",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00010",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00010",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00010",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00011",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00011",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00011",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00012",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00012",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00012",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00013",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00013",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00013",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00014",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00014",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00014",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00015",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00015",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00015",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00016",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00016",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00016",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00017",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00017",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00017",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00018",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00018",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00018",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00019",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00019",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00019",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00020",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00020",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00020",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00021",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00021",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00021",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00022",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00022",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00022",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00023",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00023",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00023",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00024",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00024",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00024",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00025",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00025",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00025",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00026",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00026",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00026",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00027",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00027",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00027",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00028",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00028",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00028",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00029",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00029",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00029",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00030",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00030",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00030",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00031",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00031",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00031",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00032",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00032",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00032",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00033",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00033",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00033",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00034",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00034",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00034",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00035",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00035",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00035",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00036",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00036",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00036",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00037",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00037",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00037",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00038",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00038",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00038",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00039",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00039",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00039",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00040",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00040",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00040",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00041",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00041",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00041",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00042",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00042",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00042",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00043",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00043",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00043",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00044",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00044",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00044",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00045",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00045",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00045",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00046",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00046",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00046",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00047",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00047",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00047",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00048",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00048",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00048",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00049",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00049",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00049",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00050",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00050",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00050",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00051",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00051",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00051",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00052",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00052",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00052",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00053",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00053",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00053",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00054",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00054",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00054",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00055",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00055",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00055",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00056",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00056",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00056",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00057",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00057",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00057",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00058",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00058",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00058",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00059",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00059",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00059",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Hamburg, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00060",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00060",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00060",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00061",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00061",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00061",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00062",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00062",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00062",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00063",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00063",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00063",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00064",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00064",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00064",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00065",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00065",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00065",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00066",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00066",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00066",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00067",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00067",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00067",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00068",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00068",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00068",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00069",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00069",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00069",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00070",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00070",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00070",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00071",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00071",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00071",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00072",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00072",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00072",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00073",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00073",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00073",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00074",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00074",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00074",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00075",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00075",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00075",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00076",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00076",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00076",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00077",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00077",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00077",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00078",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00078",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00078",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00079",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00079",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00079",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00080",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00080",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00080",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00081",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00081",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00081",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "New York, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00082",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00082",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00082",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00083",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00083",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00083",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00084",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00084",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00084",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00085",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00085",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00085",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00086",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00086",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00086",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00087",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00087",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00087",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00088",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00088",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00088",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Los Angeles, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00089",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00089",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00089",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00090",
+    "file": "proforma_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00090",
+    "file": "commercial_invoice.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00090",
+    "file": "packing_list.pdf",
+    "expected": "US",
+    "actual": "US",
+    "raw_value": "Seattle, United States",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00091",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00091",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00091",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Liverpool, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00092",
+    "file": "proforma_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00092",
+    "file": "commercial_invoice.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00092",
+    "file": "packing_list.pdf",
+    "expected": "DE",
+    "actual": "DE",
+    "raw_value": "Bremerhaven, Germany",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00093",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00093",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00093",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00094",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00094",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00094",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00095",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00095",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00095",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00096",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00096",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00096",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00097",
+    "file": "proforma_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00097",
+    "file": "commercial_invoice.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00097",
+    "file": "packing_list.pdf",
+    "expected": "GB",
+    "actual": "GB",
+    "raw_value": "Felixstowe, United Kingdom",
+    "status": "EXTRACTED",
+    "passed": true
+  },
+  {
+    "case": "SHP-00098",
+    "file": "proforma_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00098",
+    "file": "commercial_invoice.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00098",
+    "file": "packing_list.pdf",
+    "expected": "SG",
+    "actual": null,
+    "raw_value": "Singapore, Singapore",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00099",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00099",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00099",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Sydney, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00100",
+    "file": "proforma_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00100",
+    "file": "commercial_invoice.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  },
+  {
+    "case": "SHP-00100",
+    "file": "packing_list.pdf",
+    "expected": "AU",
+    "actual": null,
+    "raw_value": "Melbourne, Australia",
+    "status": "NORMALIZE_FAILED",
+    "passed": false
+  }
+]

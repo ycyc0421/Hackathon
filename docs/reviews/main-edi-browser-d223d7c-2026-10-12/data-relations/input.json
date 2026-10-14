@@ -1,0 +1,14 @@
+[
+  {
+    "name": "商业发票-INV20261015.pdf",
+    "sha256": "276876727d8cab09dbe2e9789e3c08070f0ad8e6501d54de7def1fcdce723549"
+  },
+  {
+    "name": "提单-BL20261015.pdf",
+    "sha256": "7aee0a764d96d18dd64508309ed1a5c47af7afb08a858534ab88dc3b9cba90e7"
+  },
+  {
+    "name": "装箱单-PL20261015.pdf",
+    "sha256": "f38887dbae08f6dfadf738a4fa4c6e1d998390f0e54a51ee5dcca5441e6090e6"
+  }
+]

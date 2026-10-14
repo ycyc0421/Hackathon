@@ -1,0 +1,966 @@
+[
+  {
+    "test": "edi-only",
+    "url": "http://127.0.0.1:64894/api/v1/checks",
+    "method": "POST",
+    "http_status": 200,
+    "body": {
+      "task_id": "tsk_20261012_0001_c833f05cd9d1",
+      "status": "FAILED",
+      "created_at": "2026-10-12T22:55:06+08:00",
+      "finished_at": "2026-10-12T22:55:06+08:00",
+      "input": {
+        "destination_country": "DE",
+        "destination_country_name": "德国",
+        "trade_mode": null,
+        "declared_currency": null,
+        "notes": null
+      },
+      "documents": [
+        {
+          "file_id": "f1",
+          "file_name": "INVOICE.EDI",
+          "file_type": "OTHER",
+          "doc_type": null,
+          "process_status": "UNSUPPORTED",
+          "page_count": null,
+          "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+        }
+      ],
+      "extractions": [],
+      "items": [],
+      "comparisons": [],
+      "risks": [
+        {
+          "risk_id": "rsk_1",
+          "type": "OTHER",
+          "severity": "WARNING",
+          "title": "【演示规则·未经核实】有 1 份文件未能解析，无法确认是否缺少：原产地证明",
+          "detail": "本票有 1 份文件未能解析（INVOICE.EDI）。未解析的文件可能正是所需的 原产地证明，因此**无法确认**这些单证是否已提供，不作「未提供」的结论。请先修复解析（配置多模态兜底或改用带文本层的 PDF），或人工核对原件后再判断合规性。（说明：本提示来自团队自拟的演示规则，来源与适用条件尚未核实，不得作为合规依据。）",
+          "related_field_keys": [
+            "destination_country"
+          ],
+          "related_file_ids": [
+            "f1"
+          ],
+          "destination_country": "DE",
+          "rule_id": null,
+          "rule_source": "团队配置的目的国规则集 v1（团队自拟的演示规则，来源与适用条件未经核实）",
+          "suggested_action": null
+        }
+      ],
+      "summary": {
+        "document_count": 1,
+        "field_count": 0,
+        "conflict_count": 0,
+        "missing_count": 0,
+        "risk_count": 1,
+        "unrecognized_count": 0
+      },
+      "errors": [
+        {
+          "code": "UNSUPPORTED_FILE_TYPE",
+          "message": "INVOICE.EDI 暂不支持：当前仅支持 PDF 与图片",
+          "level": "WARNING",
+          "file_ids": [
+            "f1"
+          ]
+        },
+        {
+          "code": "RULES_UNVERIFIED",
+          "message": "本票合规提示来自团队自拟的演示规则集，来源与适用条件尚未核实，不得作为合规依据。",
+          "level": "WARNING",
+          "file_ids": []
+        },
+        {
+          "code": "ALL_DOCUMENTS_FAILED",
+          "message": "全部文件均未能处理成功，无法完成比对与合规校验",
+          "level": "FATAL",
+          "file_ids": [
+            "f1"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": "edi-only",
+    "url": "http://127.0.0.1:64894/api/v1/checks/tsk_20261012_0001_c833f05cd9d1",
+    "method": "GET",
+    "http_status": 200,
+    "body": {
+      "task_id": "tsk_20261012_0001_c833f05cd9d1",
+      "status": "FAILED",
+      "created_at": "2026-10-12T22:55:06+08:00",
+      "finished_at": "2026-10-12T22:55:06+08:00",
+      "input": {
+        "destination_country": "DE",
+        "destination_country_name": "德国",
+        "trade_mode": null,
+        "declared_currency": null,
+        "notes": null
+      },
+      "documents": [
+        {
+          "file_id": "f1",
+          "file_name": "INVOICE.EDI",
+          "file_type": "OTHER",
+          "doc_type": null,
+          "process_status": "UNSUPPORTED",
+          "page_count": null,
+          "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+        }
+      ],
+      "extractions": [],
+      "items": [],
+      "comparisons": [],
+      "risks": [
+        {
+          "risk_id": "rsk_1",
+          "type": "OTHER",
+          "severity": "WARNING",
+          "title": "【演示规则·未经核实】有 1 份文件未能解析，无法确认是否缺少：原产地证明",
+          "detail": "本票有 1 份文件未能解析（INVOICE.EDI）。未解析的文件可能正是所需的 原产地证明，因此**无法确认**这些单证是否已提供，不作「未提供」的结论。请先修复解析（配置多模态兜底或改用带文本层的 PDF），或人工核对原件后再判断合规性。（说明：本提示来自团队自拟的演示规则，来源与适用条件尚未核实，不得作为合规依据。）",
+          "related_field_keys": [
+            "destination_country"
+          ],
+          "related_file_ids": [
+            "f1"
+          ],
+          "destination_country": "DE",
+          "rule_id": null,
+          "rule_source": "团队配置的目的国规则集 v1（团队自拟的演示规则，来源与适用条件未经核实）",
+          "suggested_action": null
+        }
+      ],
+      "summary": {
+        "document_count": 1,
+        "field_count": 0,
+        "conflict_count": 0,
+        "missing_count": 0,
+        "risk_count": 1,
+        "unrecognized_count": 0
+      },
+      "errors": [
+        {
+          "code": "UNSUPPORTED_FILE_TYPE",
+          "message": "INVOICE.EDI 暂不支持：当前仅支持 PDF 与图片",
+          "level": "WARNING",
+          "file_ids": [
+            "f1"
+          ]
+        },
+        {
+          "code": "RULES_UNVERIFIED",
+          "message": "本票合规提示来自团队自拟的演示规则集，来源与适用条件尚未核实，不得作为合规依据。",
+          "level": "WARNING",
+          "file_ids": []
+        },
+        {
+          "code": "ALL_DOCUMENTS_FAILED",
+          "message": "全部文件均未能处理成功，无法完成比对与合规校验",
+          "level": "FATAL",
+          "file_ids": [
+            "f1"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "url": "http://127.0.0.1:64894/api/v1/checks",
+    "method": "POST",
+    "http_status": 200,
+    "body": {
+      "task_id": "tsk_20261012_0002_044dca946209",
+      "status": "PARTIAL",
+      "created_at": "2026-10-12T22:55:09+08:00",
+      "finished_at": "2026-10-12T22:55:09+08:00",
+      "input": {
+        "destination_country": "DE",
+        "destination_country_name": "德国",
+        "trade_mode": null,
+        "declared_currency": null,
+        "notes": null
+      },
+      "documents": [
+        {
+          "file_id": "f1",
+          "file_name": "INVOICE.EDI",
+          "file_type": "OTHER",
+          "doc_type": null,
+          "process_status": "UNSUPPORTED",
+          "page_count": null,
+          "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+        },
+        {
+          "file_id": "f2",
+          "file_name": "synthetic-packing-list.pdf",
+          "file_type": "PDF",
+          "doc_type": "PACKING_LIST",
+          "process_status": "EXTRACTED",
+          "page_count": 1,
+          "error_message": null
+        }
+      ],
+      "extractions": [
+        {
+          "file_id": "f2",
+          "doc_type": "PACKING_LIST",
+          "parse_method": "TEXT_LAYER",
+          "fields": [
+            {
+              "field_key": "packages",
+              "label": "件数",
+              "raw_text": "PACKAGES: 100 CARTON",
+              "raw_value": "100 CARTON",
+              "normalized_value": 100,
+              "unit": "CARTON",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "gross_weight",
+              "label": "毛重",
+              "raw_text": "GROSS WEIGHT: 1080.00 KGS",
+              "raw_value": "1080.00 KGS",
+              "normalized_value": 1080,
+              "unit": "KGS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "net_weight",
+              "label": "净重",
+              "raw_text": "NET WEIGHT: 900.00 KGS",
+              "raw_value": "900.00 KGS",
+              "normalized_value": 900,
+              "unit": "KGS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "volume",
+              "label": "体积",
+              "raw_text": "VOLUME: 4.80 CBM",
+              "raw_value": "4.80 CBM",
+              "normalized_value": 4.8,
+              "unit": "CBM",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "quantity",
+              "label": "数量",
+              "raw_text": "QTY: 2500 PCS",
+              "raw_value": "2500 PCS",
+              "normalized_value": 2500,
+              "unit": "PCS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "hs_code",
+              "label": "HS 编码",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "total_amount",
+              "label": "总金额",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "currency",
+              "label": "币种",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "description",
+              "label": "货物描述",
+              "raw_text": "Description: CERAMIC MUG 350ML WHITE",
+              "raw_value": "CERAMIC MUG 350ML WHITE",
+              "normalized_value": "陶瓷 马克杯 350ML 白",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "invoice_no",
+              "label": "发票号",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "shipment_date",
+              "label": "装运日期",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            }
+          ]
+        }
+      ],
+      "items": [],
+      "comparisons": [
+        {
+          "comparison_id": "cmp_1",
+          "item_id": null,
+          "field_key": "packages",
+          "label": "件数",
+          "value_type": "NUMBER",
+          "unit": "CARTON",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "100 CARTON",
+              "normalized_value": 100,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_2",
+          "item_id": null,
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "value_type": "NUMBER",
+          "unit": "KGS",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "1080.00 KGS",
+              "normalized_value": 1080,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_3",
+          "item_id": null,
+          "field_key": "net_weight",
+          "label": "净重",
+          "value_type": "NUMBER",
+          "unit": "KGS",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "900.00 KGS",
+              "normalized_value": 900,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_4",
+          "item_id": null,
+          "field_key": "volume",
+          "label": "体积",
+          "value_type": "NUMBER",
+          "unit": "CBM",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "4.80 CBM",
+              "normalized_value": 4.8,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_5",
+          "item_id": null,
+          "field_key": "quantity",
+          "label": "数量",
+          "value_type": "NUMBER",
+          "unit": "PCS",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "2500 PCS",
+              "normalized_value": 2500,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_6",
+          "item_id": null,
+          "field_key": "description",
+          "label": "货物描述",
+          "value_type": "STRING",
+          "unit": null,
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "CERAMIC MUG 350ML WHITE",
+              "normalized_value": "陶瓷 马克杯 350ML 白",
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        }
+      ],
+      "risks": [
+        {
+          "risk_id": "rsk_1",
+          "type": "OTHER",
+          "severity": "WARNING",
+          "title": "【演示规则·未经核实】有 1 份文件未能解析，无法确认是否缺少：原产地证明",
+          "detail": "本票有 1 份文件未能解析（INVOICE.EDI）。未解析的文件可能正是所需的 原产地证明，因此**无法确认**这些单证是否已提供，不作「未提供」的结论。请先修复解析（配置多模态兜底或改用带文本层的 PDF），或人工核对原件后再判断合规性。（说明：本提示来自团队自拟的演示规则，来源与适用条件尚未核实，不得作为合规依据。）",
+          "related_field_keys": [
+            "destination_country"
+          ],
+          "related_file_ids": [
+            "f1"
+          ],
+          "destination_country": "DE",
+          "rule_id": null,
+          "rule_source": "团队配置的目的国规则集 v1（团队自拟的演示规则，来源与适用条件未经核实）",
+          "suggested_action": null
+        }
+      ],
+      "summary": {
+        "document_count": 2,
+        "field_count": 11,
+        "conflict_count": 0,
+        "missing_count": 0,
+        "risk_count": 1,
+        "unrecognized_count": 0
+      },
+      "errors": [
+        {
+          "code": "UNSUPPORTED_FILE_TYPE",
+          "message": "INVOICE.EDI 暂不支持：当前仅支持 PDF 与图片",
+          "level": "WARNING",
+          "file_ids": [
+            "f1"
+          ]
+        },
+        {
+          "code": "RULES_UNVERIFIED",
+          "message": "本票合规提示来自团队自拟的演示规则集，来源与适用条件尚未核实，不得作为合规依据。",
+          "level": "WARNING",
+          "file_ids": []
+        }
+      ]
+    }
+  },
+  {
+    "test": "mixed-pdf-edi",
+    "url": "http://127.0.0.1:64894/api/v1/checks/tsk_20261012_0002_044dca946209",
+    "method": "GET",
+    "http_status": 200,
+    "body": {
+      "task_id": "tsk_20261012_0002_044dca946209",
+      "status": "PARTIAL",
+      "created_at": "2026-10-12T22:55:09+08:00",
+      "finished_at": "2026-10-12T22:55:09+08:00",
+      "input": {
+        "destination_country": "DE",
+        "destination_country_name": "德国",
+        "trade_mode": null,
+        "declared_currency": null,
+        "notes": null
+      },
+      "documents": [
+        {
+          "file_id": "f1",
+          "file_name": "INVOICE.EDI",
+          "file_type": "OTHER",
+          "doc_type": null,
+          "process_status": "UNSUPPORTED",
+          "page_count": null,
+          "error_message": "暂不支持该文件格式，当前仅支持 PDF 与图片"
+        },
+        {
+          "file_id": "f2",
+          "file_name": "synthetic-packing-list.pdf",
+          "file_type": "PDF",
+          "doc_type": "PACKING_LIST",
+          "process_status": "EXTRACTED",
+          "page_count": 1,
+          "error_message": null
+        }
+      ],
+      "extractions": [
+        {
+          "file_id": "f2",
+          "doc_type": "PACKING_LIST",
+          "parse_method": "TEXT_LAYER",
+          "fields": [
+            {
+              "field_key": "packages",
+              "label": "件数",
+              "raw_text": "PACKAGES: 100 CARTON",
+              "raw_value": "100 CARTON",
+              "normalized_value": 100,
+              "unit": "CARTON",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "gross_weight",
+              "label": "毛重",
+              "raw_text": "GROSS WEIGHT: 1080.00 KGS",
+              "raw_value": "1080.00 KGS",
+              "normalized_value": 1080,
+              "unit": "KGS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "net_weight",
+              "label": "净重",
+              "raw_text": "NET WEIGHT: 900.00 KGS",
+              "raw_value": "900.00 KGS",
+              "normalized_value": 900,
+              "unit": "KGS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "volume",
+              "label": "体积",
+              "raw_text": "VOLUME: 4.80 CBM",
+              "raw_value": "4.80 CBM",
+              "normalized_value": 4.8,
+              "unit": "CBM",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "quantity",
+              "label": "数量",
+              "raw_text": "QTY: 2500 PCS",
+              "raw_value": "2500 PCS",
+              "normalized_value": 2500,
+              "unit": "PCS",
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "hs_code",
+              "label": "HS 编码",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "total_amount",
+              "label": "总金额",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "currency",
+              "label": "币种",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "description",
+              "label": "货物描述",
+              "raw_text": "Description: CERAMIC MUG 350ML WHITE",
+              "raw_value": "CERAMIC MUG 350ML WHITE",
+              "normalized_value": "陶瓷 马克杯 350ML 白",
+              "unit": null,
+              "confidence": null,
+              "status": "EXTRACTED",
+              "page": 1,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "invoice_no",
+              "label": "发票号",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            },
+            {
+              "field_key": "shipment_date",
+              "label": "装运日期",
+              "raw_text": null,
+              "raw_value": null,
+              "normalized_value": null,
+              "unit": null,
+              "confidence": null,
+              "status": "NOT_IN_DOC",
+              "page": null,
+              "bbox": null,
+              "bbox_unit": null,
+              "item_id": null
+            }
+          ]
+        }
+      ],
+      "items": [],
+      "comparisons": [
+        {
+          "comparison_id": "cmp_1",
+          "item_id": null,
+          "field_key": "packages",
+          "label": "件数",
+          "value_type": "NUMBER",
+          "unit": "CARTON",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "100 CARTON",
+              "normalized_value": 100,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_2",
+          "item_id": null,
+          "field_key": "gross_weight",
+          "label": "毛重",
+          "value_type": "NUMBER",
+          "unit": "KGS",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "1080.00 KGS",
+              "normalized_value": 1080,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_3",
+          "item_id": null,
+          "field_key": "net_weight",
+          "label": "净重",
+          "value_type": "NUMBER",
+          "unit": "KGS",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "900.00 KGS",
+              "normalized_value": 900,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_4",
+          "item_id": null,
+          "field_key": "volume",
+          "label": "体积",
+          "value_type": "NUMBER",
+          "unit": "CBM",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "4.80 CBM",
+              "normalized_value": 4.8,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_5",
+          "item_id": null,
+          "field_key": "quantity",
+          "label": "数量",
+          "value_type": "NUMBER",
+          "unit": "PCS",
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "2500 PCS",
+              "normalized_value": 2500,
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        },
+        {
+          "comparison_id": "cmp_6",
+          "item_id": null,
+          "field_key": "description",
+          "label": "货物描述",
+          "value_type": "STRING",
+          "unit": null,
+          "status": "SINGLE_SOURCE",
+          "canonical_value": null,
+          "severity": "INFO",
+          "rule_id": null,
+          "note": "只有 synthetic-packing-list.pdf 提供该字段，无法交叉比对。 INVOICE.EDI 未能处理，本次比对未包含该文件数据。",
+          "values": [
+            {
+              "file_id": "f2",
+              "file_name": "synthetic-packing-list.pdf",
+              "raw_value": "CERAMIC MUG 350ML WHITE",
+              "normalized_value": "陶瓷 马克杯 350ML 白",
+              "field_status": "EXTRACTED",
+              "page": 1,
+              "bbox": null
+            }
+          ],
+          "suggested_action": null
+        }
+      ],
+      "risks": [
+        {
+          "risk_id": "rsk_1",
+          "type": "OTHER",
+          "severity": "WARNING",
+          "title": "【演示规则·未经核实】有 1 份文件未能解析，无法确认是否缺少：原产地证明",
+          "detail": "本票有 1 份文件未能解析（INVOICE.EDI）。未解析的文件可能正是所需的 原产地证明，因此**无法确认**这些单证是否已提供，不作「未提供」的结论。请先修复解析（配置多模态兜底或改用带文本层的 PDF），或人工核对原件后再判断合规性。（说明：本提示来自团队自拟的演示规则，来源与适用条件尚未核实，不得作为合规依据。）",
+          "related_field_keys": [
+            "destination_country"
+          ],
+          "related_file_ids": [
+            "f1"
+          ],
+          "destination_country": "DE",
+          "rule_id": null,
+          "rule_source": "团队配置的目的国规则集 v1（团队自拟的演示规则，来源与适用条件未经核实）",
+          "suggested_action": null
+        }
+      ],
+      "summary": {
+        "document_count": 2,
+        "field_count": 11,
+        "conflict_count": 0,
+        "missing_count": 0,
+        "risk_count": 1,
+        "unrecognized_count": 0
+      },
+      "errors": [
+        {
+          "code": "UNSUPPORTED_FILE_TYPE",
+          "message": "INVOICE.EDI 暂不支持：当前仅支持 PDF 与图片",
+          "level": "WARNING",
+          "file_ids": [
+            "f1"
+          ]
+        },
+        {
+          "code": "RULES_UNVERIFIED",
+          "message": "本票合规提示来自团队自拟的演示规则集，来源与适用条件尚未核实，不得作为合规依据。",
+          "level": "WARNING",
+          "file_ids": []
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,94 @@
+{
+  "commit": "d223d7cfe94acccc60b96656f2f93f866b63e087",
+  "checks": 8,
+  "failed": 0,
+  "detail": [
+    {
+      "check": "real three-file task completed",
+      "passed": true,
+      "actual": "COMPLETED"
+    },
+    {
+      "check": "four item groups printed in the original CI/PL",
+      "passed": true,
+      "actual": 4
+    },
+    {
+      "check": "all actual line fields saved in relation table",
+      "passed": true,
+      "actual": {
+        "expected": 80,
+        "actual": 80
+      }
+    },
+    {
+      "check": "grouped fields retain ownership and line numbers",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "relation values/page/raw source match full payload",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "all actual risk-to-item relations retained",
+      "passed": true,
+      "actual": {
+        "expected": [
+          [
+            "rsk_2",
+            "itm_1"
+          ],
+          [
+            "rsk_3",
+            "itm_2"
+          ],
+          [
+            "rsk_4",
+            "itm_3"
+          ],
+          [
+            "rsk_5",
+            "itm_4"
+          ]
+        ],
+        "actual": [
+          [
+            "rsk_2",
+            "itm_1"
+          ],
+          [
+            "rsk_3",
+            "itm_2"
+          ],
+          [
+            "rsk_4",
+            "itm_3"
+          ],
+          [
+            "rsk_5",
+            "itm_4"
+          ]
+        ]
+      }
+    },
+    {
+      "check": "SQLite foreign key integrity",
+      "passed": true,
+      "actual": null
+    },
+    {
+      "check": "completed multi-item public result identical after restart",
+      "passed": true,
+      "actual": null
+    }
+  ],
+  "evidence": "real socket HTTP/current main; relational DB compared to actual full payload; process stop/restart",
+  "limits": [
+    "one repository multi-item fixture",
+    "not PR37 composition or historical migration acceptance",
+    "no OCR",
+    "no verified legal rules"
+  ]
+}

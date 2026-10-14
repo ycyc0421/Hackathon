@@ -1,0 +1,8 @@
+{
+  "source_commit": "fca14f56910333c4bac8c72cfd6428ffe2fb6f2a",
+  "status": "INCOMPLETE",
+  "error_type": "AssertionError",
+  "message": "Timed out: SHP-00001 after 300 seconds",
+  "evidence": "TestClient with fresh OCR and enable_mkldnn=False",
+  "limits": "No terminal response recorded; this is not an accuracy result."
+}

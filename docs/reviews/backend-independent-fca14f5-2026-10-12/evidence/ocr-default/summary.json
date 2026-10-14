@@ -1,0 +1,70 @@
+{
+  "source_commit": "fca14f56910333c4bac8c72cfd6428ffe2fb6f2a",
+  "mode": "ocr",
+  "evidence": "real loopback TCP HTTP with isolated SQLite and upload paths",
+  "python": "3.13.12 | packaged by conda-forge | (main, Feb  5 2026, 05:41:12) [MSC v.1944 64 bit (AMD64)]",
+  "checked_at": "2026-10-12T12:27:06.206902+00:00",
+  "external_llm_enabled": false,
+  "fresh_ocr_invoked": true,
+  "ocr_observation": "save raw model outputs without changing predictions",
+  "diagnostic_runtime_override": null,
+  "http_tasks": 2,
+  "uploaded_files": 6,
+  "task_statuses": {
+    "FAILED": 2
+  },
+  "field_checks": 63,
+  "field_checks_failed": 63,
+  "field_failures_by_key": {
+    "invoice_no": 3,
+    "shipper": 6,
+    "consignee": 6,
+    "currency": 3,
+    "total_amount": 5,
+    "description": 3,
+    "item_code": 6,
+    "hs_code": 4,
+    "quantity": 6,
+    "unit_price": 4,
+    "amount": 2,
+    "packages": 3,
+    "net_weight": 3,
+    "gross_weight": 3,
+    "volume": 3,
+    "document_no": 3
+  },
+  "checks": 29,
+  "checks_failed": 13,
+  "checks_by_category": {
+    "source_integrity": 12,
+    "integration": 4,
+    "parse": 6,
+    "rows": 6,
+    "conflict": 1
+  },
+  "failures_by_category": {
+    "parse": 6,
+    "rows": 6,
+    "integration": 1
+  },
+  "address_gap_cases": [],
+  "production_accessed": false,
+  "candidate_source_modified": false,
+  "limits": [
+    "synthetic single-template text benchmark",
+    "no browser acceptance",
+    "no production deployment/restart acceptance",
+    "no verified country-law or certificate-bodies acceptance"
+  ],
+  "packages": {
+    "fastapi": "0.143.0",
+    "pydantic": "2.14.1",
+    "httpx": "0.28.1",
+    "uvicorn": "0.54.0",
+    "pypdf": "6.20.0",
+    "pymupdf": "1.28.2",
+    "paddleocr": "3.7.0",
+    "paddlepaddle": "3.3.1",
+    "paddlex": "3.7.2"
+  }
+}
