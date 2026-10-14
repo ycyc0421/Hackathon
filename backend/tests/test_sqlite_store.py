@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class StoreTests(unittest.TestCase):
     def setUp(self):
-        self.tmp = TemporaryDirectory(dir=ROOT / 'backend/.out')
+        self.tmp = TemporaryDirectory()
         self.path = Path(self.tmp.name)
         self.db = self.path / 'tasks.db'
         self.legacy = self.path / 'legacy'
@@ -121,5 +121,4 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(other.read_bytes(), before)
 
 if __name__ == '__main__':
-    (ROOT / 'backend/.out').mkdir(exist_ok=True)
     unittest.main()

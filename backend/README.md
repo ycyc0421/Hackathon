@@ -87,14 +87,33 @@ backend/
 ## 验证与样例
 
 `samples/` 是已生成的合成单证，`tools/` 用于复现和验证核验结果；**启动后端不需要运行这些脚本，也不需要重新生成样例**。
-需要验证时，在仓库根目录先执行 `npm ci`，再运行：
+自动化回归统一放在 `backend/tests/`，由 pytest 自动发现；新增 `test_*.py` 不需要修改 CI 的命令清单。在仓库根目录使用 Python 3.12：
 
 ```sh
-python backend/tools/selftest.py       # 01–08、评测返回及 Schema
-python backend/tools/test_compare.py   # 数值、币种、行对齐断言
-python backend/tools/test_review_regressions.py  # 审查边界：列序、单位、HS、混合 PDF 等
-python backend/tools/run_challenge.py  # 09–11 挑战样例与金标断言
+python -m pip install -r backend/requirements.txt -r requirements-test.txt
+npm ci
+python -m pytest                       # 后端全部回归，含接口与样例契约
+python -m pytest -m "not integration"  # 排除样例接口验收；仍包含原有 HTTP 单元回归
+python -m pytest backend/tests/test_compare.py  # 指定文件
+python -m pytest -k money_currency     # 指定行为
+python -m pytest data                  # 数据层回归
+python -m pytest deploy                # 部署和回退回归，不发布服务
 ```
+
+测试工具版本固定在根目录 `requirements-test.txt`，不加入服务运行依赖。pytest 兼容现有 unittest 用例与子测试；测试默认每条最多 60 秒，未知标记或配置直接失败。完整后端回归必须安装 Node.js 和 npm 依赖，缺少样例或契约校验工具都会失败，不会跳过后显示通过。
+
+`conftest.py` 在收集测试前隔离数据库配置、关闭真实 OCR/LLM，并让规则来源使用随仓库分发的静态目录；每条测试独立使用临时数据库、上传目录和任务执行器。接口样例强制走轮询路径，等待终态后断言结果并调用现有 Ajv 校验器，覆盖 01–11、未启用 OCR 的图片失败和评测返回。测试中需要模型结果时使用受控替身，不下载模型或调用外部模型服务。
+
+复现 CI 并保留报告：
+
+```sh
+mkdir -p backend/.out
+python -m pytest --junitxml=backend/.out/junit.xml --basetemp=backend/.out/pytest-tmp --durations=10
+```
+
+`--basetemp` 指定的目录会由 pytest 清理重建，只能指向测试专用目录。失败时 CI 仍上传 JUnit 和本次接口 JSON，保留 7 天；这些结果来自合成样例，不是正式准确率评测。
+
+`tools/selftest.py`、`tools/run_challenge.py` 和 `tools/accept_workflow.py` 保留给手工诊断或部署候选自检。部署脚本中的标准库测试入口同步迁移到 `backend/tests/`，服务环境无需安装 pytest。需要真实 OCR 时显式运行 `tools/run_ocr_probe.py`、`tools/accept_paddle_vl.py` 或 `tools/test_shirt_originals.py`；它们不参与普通 CI 的自动发现。
 
 | 样例 | 验证内容 |
 |---|---|

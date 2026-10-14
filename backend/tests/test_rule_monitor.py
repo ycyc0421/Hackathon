@@ -8,8 +8,8 @@ from pathlib import Path
 from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request
-import crawl_rule_sources as crawler
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from tools import crawl_rule_sources as crawler
 from app import rule_sources
 
 
@@ -30,9 +30,10 @@ class RuleMonitorTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.output = Path(self.temp.name)
         self.source = {'source_id':'test', 'url':'https://www.fda.gov/test'}
-        self.opener = patch.object(crawler, 'build_opener').start().return_value
+        opener_patch = patch.object(crawler, 'build_opener')
+        self.addCleanup(opener_patch.stop)
+        self.opener = opener_patch.start().return_value
     def tearDown(self):
-        patch.stopall()
         self.temp.cleanup()
     def fetch(self, raw=b'official source', previous=None):
         self.opener.open.side_effect = None
