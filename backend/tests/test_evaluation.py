@@ -102,3 +102,64 @@ def test_unsupported_risk_score_cannot_appear_without_counts():
     data['metrics']['risk_hint'] = {'precision': 1}
     with pytest.raises(ValueError, match='范围'):
         validate_result(data)
+
+
+def test_publication_survives_client_restart_and_preserves_history(client, tmp_path, monkeypatch):
+    monkeypatch.setenv('EVALUATION_RESULT_PATH', str(tmp_path / 'latest.json'))
+    from tools.evaluate_dataset import publish
+    first = result()
+    publish(first, tmp_path)
+    second = deepcopy(first)
+    second['run_at'] = '2026-10-14T01:00:00Z'
+    second['scope']['input_kind'] = '模拟扫描 PNG'
+    publish(second, tmp_path)
+    # 新建客户端仍从磁盘读取；发布不修改第一批记录。
+    from fastapi.testclient import TestClient
+    from app.main import app
+    with TestClient(app) as restarted:
+        latest = restarted.get('/api/v1/evaluation/latest').json()
+        history = restarted.get('/api/v1/evaluation/runs').json()
+    assert latest['run_at'] == second['run_at']
+    assert [entry['run_at'] for entry in history] == [second['run_at'], first['run_at']]
+    invalid = deepcopy(second)
+    invalid['metrics']['field_extraction']['f1'] = 1
+    with pytest.raises(ValueError):
+        publish(invalid, tmp_path)
+    assert json.loads((tmp_path / 'latest.json').read_text()) == second
+
+
+def test_dataset_hash_and_scan_gold_mapping(tmp_path):
+    import csv
+    import hashlib
+    from tools.evaluate_dataset import read_dataset
+    (tmp_path / 'inputs').mkdir()
+    (tmp_path / 'docs/fixtures/result').mkdir(parents=True)
+    gold = task()
+    gold['documents'][0]['file_name'] = 'invoice.pdf'
+    (tmp_path / 'docs/fixtures/result/one.json').write_text(json.dumps(gold))
+    extraction = deepcopy(gold['extractions'][0])
+    extraction['file_id'] = 'f1_scan'
+    (tmp_path / 'scan-gold.json').write_text(json.dumps(extraction))
+    (tmp_path / 'inputs/invoice.pdf').write_bytes(b'%PDF-source')
+    (tmp_path / 'inputs/invoice.scan.png').write_bytes(b'png-source')
+    hashes = {name: hashlib.sha256((tmp_path / name).read_bytes()).hexdigest()
+              for name in ['inputs/invoice.pdf', 'inputs/invoice.scan.png']}
+    (tmp_path / 'input_sha256.json').write_text(json.dumps(hashes))
+    (tmp_path / 'dataset_provenance.json').write_text('{"dataset_version":"unit"}')
+    fields = ['shipment_group_id', 'file_type', 'parent_document_id', 'local_path', 'split', 'extraction_path']
+    with (tmp_path / 'dataset_manifest.csv').open('w') as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows([
+            dict(zip(fields, ['one', 'PDF', '', 'inputs/invoice.pdf', 'test', 'unused'])),
+            dict(zip(fields, ['one', 'IMAGE', 'f1', 'inputs/invoice.scan.png', 'test', 'scan-gold.json'])),
+        ])
+    cases, _, _, text_hash = read_dataset(tmp_path, 'test', 'text')
+    scanned, _, _, scan_hash = read_dataset(tmp_path, 'test', 'png')
+    assert len(cases) == len(scanned) == 1
+    assert text_hash != scan_hash
+    assert scanned[0][2]['documents'][0]['file_name'] == 'invoice.scan.png'
+    assert scanned[0][2]['extractions'][0]['file_id'] == 'f1'
+    (tmp_path / 'inputs/invoice.pdf').write_bytes(b'changed')
+    with pytest.raises(ValueError, match='哈希'):
+        read_dataset(tmp_path, 'test', 'text')

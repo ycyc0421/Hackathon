@@ -81,8 +81,9 @@ def publish(result, directory):
     directory.mkdir(parents=True, exist_ok=True)
     (directory / 'runs').mkdir(exist_ok=True)
     name = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ') + '.json'
-    write_json(directory / 'runs' / name, result)
     temporary = directory / (name + '.tmp')
+    write_json(temporary, result)
+    temporary.replace(directory / 'runs' / name)
     write_json(temporary, result)
     temporary.replace(directory / 'latest.json')
 
