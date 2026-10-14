@@ -31,14 +31,14 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from . import __version__
 from .config import MAX_FILE_COUNT, MAX_FILE_SIZE, POST_WAIT_MS, UPLOAD_DIR, IMAGE_EXT, PADDLE_OCR_ENABLED, llm_enabled, ensure_dirs
 from .frontend_view import to_frontend_task
-from .models import CheckTask, dump, not_run_evaluation
+from .models import CheckTask, dump
 from .pipeline import rules
 from .pipeline.normalize import country_name as country_name_of
 from .pipeline.runner import run_check
 from .store import store
 from .util import make_task_id, now_iso
 from . import workflow
-from . import rule_sources
+from . import rule_sources, evaluation
 from .uploads import stage_uploads
 
 logging.basicConfig(
@@ -350,9 +350,12 @@ def get_rule_source_status():
 # --------------------------------------------------------------------------
 @app.get("/api/v1/evaluation/latest")
 def latest_evaluation() -> dict:
-    # 金标集与评测由 C / D 提供，当前一律返回 NOT_RUN，
-    # 界面显示「尚未评测」，不用默认值填数字 —— 契约规则 3：不伪造数据
-    return dump(not_run_evaluation())
+    return evaluation.latest()
+
+
+@app.get("/api/v1/evaluation/runs")
+def evaluation_history() -> list:
+    return evaluation.history()
 
 
 @app.get("/")

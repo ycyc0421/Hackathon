@@ -444,6 +444,27 @@ class Metrics(BaseModel):
     risk_hint: Optional[PRF] = None
 
 
+class MetricCounts(BaseModel):
+    model_config = STRICT
+    tp: int = PField(ge=0)
+    fp: int = PField(ge=0)
+    fn: int = PField(ge=0)
+
+
+class EvaluationScope(BaseModel):
+    model_config = STRICT
+    dataset_kind: str = PField(min_length=1)
+    input_kind: str = PField(min_length=1)
+    split: str = PField(min_length=1)
+    document_count: int = PField(ge=0)
+    code_revision: str = PField(min_length=1)
+    scorer_version: str = PField(min_length=1)
+    dataset_sha256: str = PField(min_length=1)
+    limitations: list[str]
+    metric_definitions: dict[str, str]
+    counts: dict[str, MetricCounts]
+
+
 class Evaluation(BaseModel):
     """GET /api/v1/evaluation/latest 的返回体。设计上就支持「尚未评测」。"""
 
@@ -455,6 +476,7 @@ class Evaluation(BaseModel):
     metrics: Optional[Metrics] = None
     error_breakdown: Optional[dict[str, int]] = None
     run_at: Optional[str] = None
+    scope: Optional[EvaluationScope] = None
 
     @model_validator(mode="after")
     def _check(self) -> "Evaluation":
