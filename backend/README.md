@@ -107,6 +107,7 @@ python -m pytest deploy                # 部署和回退回归，不发布服务
 复现 CI 并保留报告：
 
 ```sh
+mkdir -p backend/.out
 python -m pytest --junitxml=backend/.out/junit.xml --basetemp=backend/.out/pytest-tmp --durations=10
 ```
 
