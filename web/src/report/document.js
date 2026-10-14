@@ -39,6 +39,7 @@ import {
 } from '../api/labels.js'
 import { buildConclusion, comparisonCounts } from '../utils/reportConclusion.js'
 import { needsReview } from '../utils/needsReview.js'
+import { presentRisk } from '../utils/riskPresentation.js'
 import { REPORT_CSS } from './styles.js'
 
 /* --------------------------------------------------------------------------
@@ -458,31 +459,46 @@ function sourceLabel(sourceId, sourceNames) {
   return name ? `${name}（${sourceId}）` : sourceId
 }
 
+function formatRiskSourcesHtml(sources) {
+  if (!sources?.length) return null
+  const rendered = sources.map((s) =>
+    s.href
+      ? `<a href="${escapeHtml(s.href)}" title="${escapeHtml(s.href)}" rel="noreferrer noopener">${escapeHtml(s.text)}</a>`
+      : escapeHtml(s.text)
+  )
+  return `来源：${rendered.join('、')}`
+}
+
 function riskItem(r, itemNames, sourceNames) {
   const ctx = r.rule_context ?? {}
+  const presented = presentRisk(r)
   const verification = ctx.verification_status ? lookup(VERIFICATION_STATUS, ctx.verification_status) : null
   const scopeNames = (r.related_item_ids ?? []).map((id) => itemNames.get(id)).filter(Boolean)
+  if (!scopeNames.length && presented.itemScope) {
+    scopeNames.push(presented.itemScope)
+  }
   const sourceIds = ctx.source_ids ?? []
 
   const foot = [
-    r.rule_id ? `规则 ${r.rule_id}` : null,
-    r.rule_source ? `来源：${r.rule_source}` : null,
-    r.destination_country ? `目的国 ${r.destination_country}` : null,
-    scopeNames.length ? `涉及商品：${scopeNames.join('、')}` : null,
+    r.rule_id ? escapeHtml(`规则 ${r.rule_id}`) : null,
+    formatRiskSourcesHtml(presented.sources),
+    r.destination_country ? escapeHtml(`目的国 ${r.destination_country}`) : null,
+    scopeNames.length ? escapeHtml(`涉及商品：${scopeNames.join('、')}`) : null,
   ].filter(Boolean)
 
   return `<li class="risk-item${r.rule_id ? '' : ' suggested'}">
 <div class="item-head">
 <span class="item-label">${escapeHtml(RISK_TYPE[r.type] ?? '其他提示')}</span>
+${scopeNames.length ? scopeNames.map((n) => `<span class="item-scope">${escapeHtml(n)}</span>`).join('') : ''}
 ${badge(lookup(SEVERITY, r.severity, '提示'))}
 ${verification ? badge(verification) : ''}
 </div>
-<div class="risk-title">${escapeHtml(r.title)}</div>
-<p class="risk-detail">${escapeHtml(r.detail)}</p>
+<div class="risk-title">${escapeHtml(presented.title)}</div>
+<p class="risk-detail">${escapeHtml(presented.detail)}</p>
 ${r.suggested_action ? `<p class="item-note">建议：${escapeHtml(r.suggested_action)}</p>` : ''}
 ${applicabilityNote(ctx.applicability)}
 ${sourceIds.length ? `<p class="item-note">关联来源：${escapeHtml(sourceIds.map((id) => sourceLabel(id, sourceNames)).join('、'))}</p>` : ''}
-${foot.length ? `<div class="risk-foot">${foot.map(escapeHtml).join(' · ')}</div>` : ''}
+${foot.length ? `<div class="risk-foot">${foot.join(' · ')}</div>` : ''}
 </li>`
 }
 

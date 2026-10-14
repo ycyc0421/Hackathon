@@ -7,8 +7,10 @@
  */
 import { computed, inject } from 'vue'
 import { formatTime, formatDuration, riskType, severity, processStatus, docType, taskStatus } from '../api/formatters.js'
+import { VERIFICATION_STATUS } from '../api/labels.js'
 import { buildConclusion, comparisonCounts } from '../utils/reportConclusion.js'
 import { needsReview } from '../utils/needsReview.js'
+import { presentRisk, visibleTaskErrors } from '../utils/riskPresentation.js'
 import StatusBadge from '../components/StatusBadge.vue'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
@@ -49,9 +51,47 @@ const failedDocs = computed(
     ) ?? []
 )
 
-/** 未经规则校验的风险与规则命中的风险分开显示，可信度不同 */
-const ruledRisks = computed(() => (task.value?.risks ?? []).filter((r) => r.rule_id))
-const suggestedRisks = computed(() => (task.value?.risks ?? []).filter((r) => !r.rule_id))
+/** 任务级是否带有 RULES_UNVERIFIED 标记（用于统一识别未核实状态并在错误列表中去重） */
+const hasUnverifiedRuleFlag = computed(
+  () => (task.value?.errors ?? []).some((e) => e?.code === 'RULES_UNVERIFIED')
+)
+
+/**
+ * 未经规则校验的风险与规则命中的风险分开显示，可信度不同。
+ * 统一通过 presentRisk 剥离重复堆叠的免责前后缀、拆出商品归属胶囊并解析来源链接。
+ */
+const ruledRisks = computed(() =>
+  (task.value?.risks ?? [])
+    .filter((r) => r.rule_id)
+    .map((r) => {
+      const p = presentRisk(r, { taskHasUnverifiedError: hasUnverifiedRuleFlag.value })
+      return {
+        ...r,
+        ...p,
+        verificationBadge: p.unverified ? VERIFICATION_STATUS.UNVERIFIED : null,
+      }
+    })
+)
+
+const suggestedRisks = computed(() =>
+  (task.value?.risks ?? [])
+    .filter((r) => !r.rule_id)
+    .map((r) => {
+      const p = presentRisk(r)
+      return {
+        ...r,
+        ...p,
+      }
+    })
+)
+
+/**
+ * 错误记录：当页面已展示「依据规则的提示」及其未核实状态时，
+ * 不再把 RULES_UNVERIFIED 当作系统错误重复列出（与导出报告 report_content.py 一致）。
+ */
+const displayedErrors = computed(() =>
+  visibleTaskErrors(task.value?.errors, { hasRuledRisks: ruledRisks.value.length > 0 })
+)
 
 /**
  * 「没有风险提示」正向空状态仅在到达终态、无请求错误且确实零风险时显示。
@@ -309,16 +349,37 @@ const severityOf = severity
       </section>
 
       <section v-if="ruledRisks.length" class="card">
-        <h2 class="card-title">依据规则的提示</h2>
+        <h2 class="card-title">依据规则的提示 <span class="title-num">{{ ruledRisks.length }}</span></h2>
+        <p class="card-sub">规则适用条件未经人工核实时，以下提示仅供复核参考，不代表合规结论。</p>
         <ul class="risk-list">
           <li v-for="r in ruledRisks" :key="r.risk_id" class="risk-item">
             <div class="risk-head">
               <span class="risk-type">{{ riskType(r.type) }}</span>
+              <span v-if="r.itemScope" class="issue-scope">{{ r.itemScope }}</span>
               <StatusBadge :status="severityOf(r.severity)" />
+              <StatusBadge v-if="r.verificationBadge" :status="r.verificationBadge" />
             </div>
             <div class="risk-title">{{ r.title }}</div>
             <p class="risk-detail">{{ r.detail }}</p>
-            <div class="risk-foot">规则 {{ r.rule_id }}<template v-if="r.rule_source"> · {{ r.rule_source }}</template></div>
+            <div class="risk-foot">
+              <span>规则 {{ r.rule_id }}</span>
+              <template v-if="r.sources?.length">
+                <span aria-hidden="true"> · </span>
+                <span>来源：</span>
+                <template v-for="(s, idx) in r.sources" :key="idx">
+                  <span v-if="idx > 0" aria-hidden="true">、</span>
+                  <a
+                    v-if="s.href"
+                    :href="s.href"
+                    :title="s.href"
+                    class="risk-source-link"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >{{ s.text }}</a>
+                  <span v-else>{{ s.text }}</span>
+                </template>
+              </template>
+            </div>
             <!-- 后端的处理建议（可选）。建议不代替结论，用次要文本呈现 -->
             <p v-if="r.suggested_action" class="risk-detail">建议：{{ r.suggested_action }}</p>
           </li>
@@ -326,12 +387,13 @@ const severityOf = severity
       </section>
 
       <section v-if="suggestedRisks.length" class="card">
-        <h2 class="card-title">未经规则校验的提示</h2>
+        <h2 class="card-title">未经规则校验的提示 <span class="title-num">{{ suggestedRisks.length }}</span></h2>
         <p class="card-sub">以下提示没有对应的规则编号，仅供参考，不作为合规结论。</p>
         <ul class="risk-list">
           <li v-for="r in suggestedRisks" :key="r.risk_id" class="risk-item suggested">
             <div class="risk-head">
               <span class="risk-type">{{ riskType(r.type) }}</span>
+              <span v-if="r.itemScope" class="issue-scope">{{ r.itemScope }}</span>
               <StatusBadge :status="severityOf(r.severity)" />
             </div>
             <div class="risk-title">{{ r.title }}</div>
@@ -342,10 +404,10 @@ const severityOf = severity
         </ul>
       </section>
 
-      <section v-if="task.errors?.length" class="card">
-        <h2 class="card-title">错误记录</h2>
+      <section v-if="displayedErrors.length" class="card">
+        <h2 class="card-title">错误记录 <span class="title-num">{{ displayedErrors.length }}</span></h2>
         <ul class="err-list">
-          <li v-for="(e, i) in task.errors" :key="i" class="err-item">
+          <li v-for="(e, i) in displayedErrors" :key="i" class="err-item">
             <span class="err-code">{{ e.code }}</span>
             <span class="err-msg">{{ e.message }}</span>
           </li>
