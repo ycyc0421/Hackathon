@@ -2192,6 +2192,7 @@ textarea {
 /* 块级模式（表单场景）：宽度撑满，外观对齐 .input */
 .app-select.block {
   display: block;
+  min-width: 0;
 }
 
 .app-select.block .app-select-trigger {
@@ -2200,6 +2201,17 @@ textarea {
   padding: var(--space-2) var(--space-3);
   background: var(--surface-raised);
   font-size: var(--text-sm);
+}
+
+/* 表单选项可能包含长文件名，收起与展开时都应保持在字段宽度内。 */
+.app-select.block .app-select-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+
+.app-select.block .app-select-list {
+  width: 100%;
 }
 
 .app-select-list {
@@ -2232,6 +2244,8 @@ textarea {
 .app-select.block .app-select-option {
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .app-select-option.active {

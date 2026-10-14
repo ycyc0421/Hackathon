@@ -235,6 +235,11 @@ form {
   margin-top: var(--space-5);
 }
 
+/* 避免长文件名以最小内容宽度撑开表单栅格。 */
+.field {
+  min-width: 0;
+}
+
 /* 表单里只有一个提交按钮：靠栅格间距即可，不再叠加 .actions 的上边距，
    并避免按钮在栅格里被拉伸成整行宽 */
 .workflow-submit {
