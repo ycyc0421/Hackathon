@@ -4,26 +4,50 @@
   "title": "Evaluation",
   "description": "评测结果。GET /api/v1/evaluation/latest 的返回体。设计上就支持『尚未评测』，避免看板被迫填假数字。",
   "type": "object",
-  "required": ["status", "dataset_version", "sample_count", "model_version", "metrics", "run_at"],
+  "required": [
+    "status",
+    "dataset_version",
+    "sample_count",
+    "model_version",
+    "metrics",
+    "run_at"
+  ],
   "additionalProperties": false,
   "properties": {
     "status": {
       "type": "string",
-      "enum": ["NOT_RUN", "RUNNING", "DONE", "FAILED"]
+      "enum": [
+        "NOT_RUN",
+        "RUNNING",
+        "DONE",
+        "FAILED"
+      ]
     },
     "dataset_version": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "金标集版本标识，如 golden-v1"
     },
     "sample_count": {
       "type": "integer",
       "minimum": 0
     },
-    "model_version": { "type": ["string", "null"] },
+    "model_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "metrics": {
       "oneOf": [
-        { "$ref": "#/$defs/Metrics" },
-        { "type": "null" }
+        {
+          "$ref": "#/$defs/Metrics"
+        },
+        {
+          "type": "null"
+        }
       ],
       "description": "status 非 DONE 时为 null"
     },
@@ -31,9 +55,14 @@
       "oneOf": [
         {
           "type": "object",
-          "additionalProperties": { "type": "integer", "minimum": 0 }
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
         },
-        { "type": "null" }
+        {
+          "type": "null"
+        }
       ],
       "description": "错例分类计数，键为分类名"
     },
@@ -43,53 +72,213 @@
           "type": "string",
           "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"
         },
-        { "type": "null" }
+        {
+          "type": "null"
+        }
       ]
+    },
+    "scope": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/EvaluationScope"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "可选评测范围与计分依据；旧结果可缺省，不能据缺省推断为完整模型评测。"
     }
   },
   "allOf": [
     {
       "description": "只有 DONE 才能有 metrics",
       "if": {
-        "properties": { "status": { "enum": ["NOT_RUN", "RUNNING", "FAILED"] } },
-        "required": ["status"]
+        "properties": {
+          "status": {
+            "enum": [
+              "NOT_RUN",
+              "RUNNING",
+              "FAILED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
       },
-      "then": { "properties": { "metrics": { "type": "null" } } }
+      "then": {
+        "properties": {
+          "metrics": {
+            "type": "null"
+          }
+        }
+      }
     },
     {
       "description": "NOT_RUN 时不应有样本数和运行时间",
       "if": {
-        "properties": { "status": { "const": "NOT_RUN" } },
-        "required": ["status"]
+        "properties": {
+          "status": {
+            "const": "NOT_RUN"
+          }
+        },
+        "required": [
+          "status"
+        ]
       },
       "then": {
         "properties": {
-          "run_at": { "type": "null" },
-          "metrics": { "type": "null" }
+          "run_at": {
+            "type": "null"
+          },
+          "metrics": {
+            "type": "null"
+          }
         }
       }
     }
   ],
-
   "$defs": {
     "PRF": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "precision": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
-        "recall": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
-        "f1": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+        "precision": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "recall": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "f1": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
       },
       "description": "指标口径需与提供评测结果的一方确认，此处不预设阈值，也不设目标值"
     },
-
     "Metrics": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "field_extraction": { "$ref": "#/$defs/PRF" },
-        "conflict_detection": { "$ref": "#/$defs/PRF" },
-        "risk_hint": { "$ref": "#/$defs/PRF" }
+        "field_extraction": {
+          "$ref": "#/$defs/PRF"
+        },
+        "conflict_detection": {
+          "$ref": "#/$defs/PRF"
+        },
+        "risk_hint": {
+          "$ref": "#/$defs/PRF"
+        }
+      }
+    },
+    "MetricCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tp",
+        "fp",
+        "fn"
+      ],
+      "properties": {
+        "tp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fn": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "EvaluationScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dataset_kind",
+        "input_kind",
+        "split",
+        "code_revision",
+        "scorer_version",
+        "dataset_sha256",
+        "document_count",
+        "limitations",
+        "metric_definitions",
+        "counts"
+      ],
+      "properties": {
+        "dataset_kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "split": {
+          "type": "string",
+          "minLength": 1
+        },
+        "code_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scorer_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataset_sha256": {
+          "type": "string",
+          "minLength": 1
+        },
+        "document_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metric_definitions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "field_extraction": {
+              "$ref": "#/$defs/MetricCounts"
+            },
+            "conflict_detection": {
+              "$ref": "#/$defs/MetricCounts"
+            },
+            "risk_hint": {
+              "$ref": "#/$defs/MetricCounts"
+            }
+          }
+        }
       }
     }
   }

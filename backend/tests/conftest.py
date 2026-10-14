@@ -40,6 +40,7 @@ def isolated_backend(tmp_path, monkeypatch):
     from app.pipeline import runner
 
     monkeypatch.setenv("TASK_DB_PATH", str(tmp_path / "tasks.db"))
+    monkeypatch.setenv("EVALUATION_RESULT_PATH", str(tmp_path / "evaluation.json"))
     monkeypatch.setenv("RULE_SOURCE_DIR", "")
     for module in (config, sqlite_store):
         monkeypatch.setattr(module, "DATA_DIR", tmp_path)
