@@ -40,6 +40,16 @@ def test_wrong_values_and_missed_conflict_reduce_scores():
     assert result['conflict_detection'] == {'tp': 0, 'fp': 0, 'fn': 1}
 
 
+def test_gold_without_item_codes_fails_instead_of_scoring_low():
+    """金标缺行级货号时，商品行永远与预测对不上并同时计 FP/FN，
+    一份完全正确的预测也会得到很低的分。这类分数会静默失真，必须显式失败。"""
+    gold = task()
+    gold['extractions'][0]['fields'] = [f for f in gold['extractions'][0]['fields']
+                                        if f['field_key'] != 'item_code']
+    with pytest.raises(ValueError, match='货号'):
+        score_task(gold, deepcopy(gold))
+
+
 def test_failed_tasks_keep_all_expected_facts_in_denominator():
     result = score_task(task(), {'status': 'FAILED'})['counts']
     assert result['field_extraction'] == {'tp': 0, 'fp': 0, 'fn': 2}
