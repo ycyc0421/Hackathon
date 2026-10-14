@@ -19,6 +19,37 @@ export const TASK_STATUS = {
 }
 
 /**
+ * 评测范围里的数据划分（scope.split）。取值来自 backend/tools/evaluate_dataset.py
+ * 的 --split，跑分脚本只产出这四种。
+ * 「全部划分」不是正式测试集——数据集已用于开发和历史回归，所以注明是开发回归基线。
+ */
+export const EVALUATION_SPLITS = {
+  train: '训练划分',
+  validation: '验证划分',
+  test: '测试划分',
+  all: '全部划分（开发回归基线）',
+}
+
+/** 指标中文名。键同时用于 metrics、scope.counts 与 scope.metric_definitions（三处同名） */
+export const EVALUATION_METRICS = {
+  field_extraction: '字段抽取',
+  conflict_detection: '冲突检出',
+  risk_hint: '风险提示',
+}
+
+/** 评测页的说明性文案（与 EDI_CAPABILITY / SOURCE_PREVIEW_TEXT 同类） */
+export const EVALUATION_TEXT = {
+  /** 范围缺失时的说明：旧结果没有范围记录，不能说成"完整评测" */
+  scopeMissing: '本批次未记录评测范围：数据来源、输入通道与计分版本无从确认，不据此推断模型能力。',
+  /** 比例与计数的关系。口径来自 docs/评测运行.md「计分」一节，改动要同步该文档 */
+  formula: '比例由计数换算：precision=TP/(TP+FP)，recall=TP/(TP+FN)，F1=2TP/(2TP+FP+FN)；分母为零显示「—」，不补 100%。',
+  /** 错误分类的口径提醒，避免被当成错误总数 */
+  breakdownNote: '错误分类之间可能重叠，不可直接相加当作错误总数。',
+  /** 指纹的用途，避免被读成"单证内容的哈希" */
+  evidenceNote: '数据集指纹由输入与金标清单计算，用于确认两次运行使用的是同一份数据，不包含单证正文。',
+}
+
+/**
  * 任务分阶段进度。契约里没有显式的 stage 字段（schema 的 TaskStatus 只有五种），
  * 上传页按 task.status 与逐文件 process_status 推断当前处于哪一阶段，
  * 文案集中在这一张表里，与其他状态文案同一出处。

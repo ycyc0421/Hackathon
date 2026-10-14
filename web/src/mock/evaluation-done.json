@@ -1,20 +1,43 @@
 {
-  "_comment": "mock 评测结果（DONE）。数值刻意不满分、各分项有强有弱，形态对齐真实跑分：冲突检出与风险提示明显难于字段抽取。仅用于演示评测页有数据时的样子，不代表真实能力。结构须与 docs/schema/evaluation.schema.json 一致。",
+  "_comment": "mock 评测结果（DONE）。数值刻意不满分、各分项有强有弱，形态对齐真实跑分：冲突检出明显难于字段抽取。仅用于演示评测页有数据时的样子，不代表真实能力。结构须与 docs/schema/evaluation.schema.json 一致；counts 与 metrics 必须互相算得出来（tests/eval-mock-schema.test.mjs 固定住这条）。scope 为合成占位：code_revision 与 dataset_sha256 都不是真实提交号或数据指纹，document_count 按数据包 3 份文件/票的比例推算；真实跑分当前只计字段抽取与冲突检出两项，风险提示不计分，因此这里也不含 risk_hint。",
   "status": "DONE",
   "dataset_version": "golden-v1",
   "sample_count": 132,
   "model_version": "extract-pipeline-0.4.2",
   "metrics": {
     "field_extraction": { "precision": 0.912, "recall": 0.883, "f1": 0.897 },
-    "conflict_detection": { "precision": 0.847, "recall": 0.792, "f1": 0.819 },
-    "risk_hint": { "precision": 0.778, "recall": 0.694, "f1": 0.734 }
+    "conflict_detection": { "precision": 0.847, "recall": 0.792, "f1": 0.819 }
   },
   "error_breakdown": {
-    "扫描件 OCR 误识": 17,
-    "版式解析错位": 12,
-    "多品名归因错误": 7,
-    "单位换算遗漏": 5,
-    "表格跨页断行": 4
+    "字段漏读或值不符": 254,
+    "字段多读或值不符": 185,
+    "冲突漏检": 317,
+    "冲突误报": 218,
+    "未完整完成的货票": 0
   },
-  "run_at": "2026-10-09T14:32:07Z"
+  "run_at": "2026-10-09T14:32:07Z",
+  "scope": {
+    "dataset_kind": "合成数据，单一英文版式",
+    "input_kind": "文本 PDF（非 OCR）",
+    "split": "test",
+    "document_count": 396,
+    "code_revision": "0f1e2d3c4b5a69788796a5b4c3d2e1f0a1b2c3d4",
+    "scorer_version": "synthetic-exact-v1",
+    "dataset_sha256": "9f2c7a1d4e6b8f0a3c5d7e9b1f2a4c6d8e0f1a3b5c7d9e1f2a4b6c8d0e2f4a6b",
+    "limitations": [
+      "本数据集曾用于开发和回归，不能视为未见测试集或泛化准确率。",
+      "仅计入当前输入通道；派生扫描件与文本 PDF 不是独立业务样本，不合并计算总体分数。",
+      "金标为数据包生成预期；包含尚未实现的字段，未按支持范围删减分母。",
+      "字符串仅做 Unicode、大小写和空白归一；不自动等同中英品名或业务近义词。",
+      "目的国规则未核实；字段错误可能同时计为漏读与多读，分类不可直接相加。"
+    ],
+    "metric_definitions": {
+      "field_extraction": "以文件名、货号、字段键、归一值和单位组成事实，多重集合微平均；错误值计 FP 和 FN。只评分金标定义的字段键，不评分页码坐标。",
+      "conflict_detection": "以货号和字段键标识冲突；CONFLICT 为正类，漏检或未检查计 FN，多报计 FP；内部风险不充作冲突。"
+    },
+    "counts": {
+      "field_extraction": { "tp": 1917, "fp": 185, "fn": 254 },
+      "conflict_detection": { "tp": 1207, "fp": 218, "fn": 317 }
+    }
+  }
 }
