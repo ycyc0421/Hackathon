@@ -11,6 +11,7 @@ export default { inheritAttrs: false }
  * 交互：
  * - 点击按钮或 Enter/Space/↑/↓ 展开；点击选项选中并收起
  * - 点击组件外部或 Esc 收起；↑/↓ 移动高亮，Enter 选中高亮项
+ * - disabled 时不展开、不可聚焦；中途被禁用会收起已展开的浮层
  * - aria：按钮 aria-haspopup="listbox"，浮层 role="listbox"，
  *   选项 role="option"；焦点始终留在按钮上，用 aria-activedescendant 指路
  *
@@ -24,6 +25,8 @@ const props = defineProps({
   options: { type: Array, required: true },
   /** 块级模式：宽度 100%，外观对齐 .input（表单场景） */
   block: { type: Boolean, default: false },
+  /** 禁用：不接受展开与键盘操作（如提交中的表单字段） */
+  disabled: { type: Boolean, default: false },
 })
 const emit = defineEmits(['update:modelValue', 'change'])
 
@@ -47,7 +50,7 @@ const activeDescendant = computed(() =>
 )
 
 function openList() {
-  if (open.value) return
+  if (props.disabled || open.value) return
   open.value = true
   activeIndex.value = Math.max(
     props.options.findIndex((o) => o.value === props.modelValue),
@@ -81,6 +84,9 @@ watch(activeIndex, async (i) => {
   await nextTick()
   listRef.value?.children[i]?.scrollIntoView({ block: 'nearest' })
 })
+
+/** 中途被禁用（如表单开始提交）时收起浮层，不留一个点不动的弹层 */
+watch(() => props.disabled, (d) => { if (d) closeList() })
 
 function onKeydown(ev) {
   switch (ev.key) {
@@ -138,6 +144,7 @@ onBeforeUnmount(() => document.removeEventListener('pointerdown', onOutsidePoint
       aria-haspopup="listbox"
       :aria-expanded="open"
       :aria-activedescendant="activeDescendant"
+      :disabled="disabled"
       v-bind="$attrs"
       @click="open ? closeList() : openList()"
       @keydown="onKeydown"
