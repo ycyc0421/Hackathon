@@ -24,8 +24,8 @@ export const BACKEND_ERROR_TEXT = {
   // 405
   METHOD_NOT_ALLOWED: '请求方式不被支持，请刷新页面后重试。',
   // 500
-  CONTRACT_VIOLATION: '后端返回的数据与约定格式不一致，请联系后端同学排查。',
-  INTERNAL_ERROR: '后端处理时出现错误，请稍后重试。',
+  CONTRACT_VIOLATION: '返回结果格式异常，请稍后重试。',
+  INTERNAL_ERROR: '服务端处理时出现错误，请稍后重试。',
 }
 
 /**

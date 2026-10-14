@@ -1,37 +1,30 @@
-# T 恤扫描原件：Issue #38 补充验证材料
+# T 恤组扫描单证样本与人工金标
 
-用户于 2026-10-12 补齐此前 T 恤组的形式发票、商业发票和装箱单原始 PDF。三份文件原样保存，未重新生成、OCR 转写或修改 PDF。本包供后端复现、数据侧确认金标及前端核验展示。
+本目录包含同一票出口货物的三份扫描版 PDF 样本（形式发票、商业发票、装箱单）及人工核对金标 [`golden-fields.json`](golden-fields.json)，用于验证 `PaddleOCR-VL-1.6` 对内嵌图像 PDF 的版面识别与跨单证比对能力。
 
-**状态：原件已核对，接口复测尚未执行（NOT_RUN）。补齐原件不代表此前故障已修复或验收通过。** 先前报告因缺少这组原件而未能完成验收，本材料补齐该输入缺口；历史报告保持原记录。
+---
 
-## 原件与人工核对值
+## 1. 样本文件与核心字段金标
 
-| 文件 | 单据自身编号 | 数量 | 金额/装箱数据 |
-|---|---|---|---|
-| [形式发票](exportdoc-proforma-invoice-sample.pdf) | PI-20260830-08300186 | 500 PCS | USD 1,400.00；单价 USD 2.80 |
-| [商业发票](exportdoc-commercial-invoice-sample.pdf) | CI-20260830-08300186 | 500 PCS | USD 1,400.00；单价 USD 2.80 |
-| [装箱单](exportdoc-packing-list-sample.pdf) | PL-20260830-08300186 | 500 PCS | PKGS 20；净重 150.00 KG；毛重 170.00 KG；体积 1.680 CBM；未载明金额 |
+| 单证类型 | 文件名 | 单据自身编号（`document_no`） | 商品数量 | 金额 / 包装与重量数据 |
+|---|---|---|---|---|
+| **形式发票（PI）** | [`exportdoc-proforma-invoice-sample.pdf`](exportdoc-proforma-invoice-sample.pdf) | `PI-20260830-08300186` | `500 PCS` | 总金额 `USD 1,400.00`；单价 `USD 2.80` |
+| **商业发票（CI）** | [`exportdoc-commercial-invoice-sample.pdf`](exportdoc-commercial-invoice-sample.pdf) | `CI-20260830-08300186` | `500 PCS` | 总金额 `USD 1,400.00`；单价 `USD 2.80` |
+| **装箱单（PL）** | [`exportdoc-packing-list-sample.pdf`](exportdoc-packing-list-sample.pdf) | `PL-20260830-08300186` | `500 PCS` | 包装 `20 PKGS`；净重 `150.00 KGS`；毛重 `170.00 KGS`；体积 `1.680 CBM`（无金额列） |
 
-三份均为第 1 页，商品 SKU `CT-2408`，品名 `100% Cotton T-shirt, unisex, assorted colors`；卖方 `Ningbo Qihang Export Co., Ltd.`，买方 `Global Fashion Inc.`。PI/CI 的 HS 为 `6109.10`。表头日期为 `2026-08-30`，不能直接当作装运日期。
+- **共同商品信息**：SKU `CT-2408`，品名 `100% Cotton T-shirt, unisex, assorted colors`，HS 编码 `6109.10`（PI/CI），卖方 `Ningbo Qihang Export Co., Ltd.`，买方 `Global Fashion Inc.`。
+- **关键核验点**：
+  1. 三份 PDF 均仅含页码文本层（`1 / 1`），正文全部为嵌入扫描图像，必须触发 OCR 通道完成抽取。
+  2. 装箱单虽印有 `CURRENCY USD` 字样但无金额数值，系统须保持金额为 `NOT_IN_DOC`，不将数量 `500` 误拼为金额。
+  3. 各单证自身的编号（`PI-...` / `CI-...` / `PL-...`）记录于 `document_no`，不作跨单证相等比较。
 
-装箱单正文确实有 `CURRENCY USD`，但没有单价、金额列或总金额。币种与数量 500 均不能用于生成 USD 500 金额。`PKGS` 未印 CARTON 单位，此前问题报告称为 20 箱；金标保留原标签。表格行与 TOTAL 同为该批货合计，不重复加总。不同类型单据的自身编号不要求相同。
+---
 
-三份各 1 页；文本层只包含页码 `1 / 1`，业务正文为嵌入图像。原件页首标有 `DEMO — NOT FOR TRADE`。这里仅验收系统正确性，不评价法规符合性。
+## 2. 运行验证命令
 
-## 建议复现与验收
+在已启用本地 `PaddleOCR-VL-1.6` 服务的环境下执行：
 
-将这三份原始 PDF 一起作为同一任务输入，在隔离测试环境保留完整请求/响应、解析中间输出和修复提交 SHA。目的国按团队测试配置记录，不能据买方地址自行补为本次实际请求参数。
-
-- 三份都应成功解析；若任一失败，保留文件已上传和解析失败状态，不能声称“未提供商业发票”。
-- 返回上表数量、金额、包装件数、净毛重、体积以及实际公司名；`QTY`、`SKU`、`/ EXPORTER`、`/ IMPORTER` 等标签不能成为字段值。
-- PL 金额保持未载明/不适用，不能生成 USD 500 或 0；净重、毛重不互换。
-- 共同字段按 SKU 对齐，展示比较是否完成；“0 冲突”不能替代未完成比较的结论。
-- 保留文件名、页码和原文证据；每份独立的 `document_no` 不做跨单据相等比较。
-
-人工金标初稿见 [golden-fields.json](golden-fields.json)，字段均标源文件及第 1 页。本 JSON 是验证参考，不是伪造的接口响应，也未新增契约单证类型枚举。
-
-此前用户报告的任务为 `tsk_20261012_0014_aa78b6cf5b63`：PI/CI 解析失败，PL 数量/重量/体积错读并误生成 USD 500。本次用户指认原件与之对应；因缺少历史上传哈希，未证明旧任务输入与本次文件字节一致。
-
-## 校验与下载
-
-PDF 原始 SHA-256、大小、页数统一记录在 [golden-fields.json](golden-fields.json) 的 documents 中。三个 PDF 可通过上表分别下载；本目录不提供额外压缩包或重复校验清单。
+```sh
+python backend/tools/test_shirt_originals.py
+python backend/tools/accept_paddle_vl.py
+```

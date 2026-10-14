@@ -56,7 +56,7 @@ export async function requestOnce(path, options = {}, { base = '', timeoutMs = R
       // 其余（直连不通、DNS 失败、CORS 被拦）归 NETWORK，
       // 明确区分于"后端返回了错误"，因为排查方向完全不同。
       if (ctrl.signal.aborted) throw abortError()
-      throw new ApiError('无法连接后端，请确认服务已启动、代理配置正确', { kind: 'NETWORK' })
+      throw new ApiError('无法连接服务器，请检查网络或服务状态后重试', { kind: 'NETWORK' })
     }
 
     if (!res.ok) {
@@ -79,7 +79,7 @@ export async function requestOnce(path, options = {}, { base = '', timeoutMs = R
         /* 错误体不是 JSON，用默认文案 */
       }
       if (res.status >= 500 && !hasContractError) {
-        throw new ApiError('无法连接后端，请确认服务已启动、代理配置正确', {
+        throw new ApiError('无法连接服务器，请检查网络或服务状态后重试', {
           kind: 'NETWORK',
           code,
           status: res.status,
@@ -92,7 +92,7 @@ export async function requestOnce(path, options = {}, { base = '', timeoutMs = R
       return await (responseType === 'blob' ? res.blob() : res.json())
     } catch {
       if (ctrl.signal.aborted) throw abortError()
-      throw new ApiError(responseType === 'blob' ? '读取报告文件失败' : '后端返回的内容不是合法 JSON', { kind: 'PARSE', status: res.status })
+      throw new ApiError(responseType === 'blob' ? '读取报告文件失败' : '响应内容格式异常，无法解析', { kind: 'PARSE', status: res.status })
     }
   } finally {
     clearTimeout(timer)
@@ -191,7 +191,7 @@ export function requestWithUploadProgress(
         if (body && typeof body === 'object') {
           resolve(body)
         } else {
-          reject(new ApiError('后端返回的内容不是合法 JSON', { kind: 'PARSE', status: xhr.status }))
+          reject(new ApiError('响应内容格式异常，无法解析', { kind: 'PARSE', status: xhr.status }))
         }
         return
       }
@@ -208,7 +208,7 @@ export function requestWithUploadProgress(
       if (body?.error?.code) code = body.error.code
       if (xhr.status >= 500 && !hasContractError) {
         reject(
-          new ApiError('无法连接后端，请确认服务已启动、代理配置正确', {
+          new ApiError('无法连接服务器，请检查网络或服务状态后重试', {
             kind: 'NETWORK',
             code,
             status: xhr.status,
@@ -220,7 +220,7 @@ export function requestWithUploadProgress(
     }
 
     xhr.onerror = () => {
-      reject(new ApiError('无法连接后端，请确认服务已启动、代理配置正确', { kind: 'NETWORK' }))
+      reject(new ApiError('无法连接服务器，请检查网络或服务状态后重试', { kind: 'NETWORK' }))
     }
 
     xhr.ontimeout = () => {

@@ -21,14 +21,14 @@ export const SCENARIO_NAMES = {
  * ok / warn / bad / muted），说明文字取自各 mock 样例的注释口径。
  */
 export const SCENARIO_HINTS = {
-  'single-item': { desc: '三份单证件数对不上，演示主路径', tone: 'bad', outcome: '1 处冲突' },
+  'single-item': { desc: '三份单证件数对不上，演示主路径', tone: 'bad', outcome: '1 处不一致' },
   'partial-fail': { desc: '一份文件处理失败，其余照常比对', tone: 'warn', outcome: '部分完成' },
-  'multi-item': { desc: '一票两种商品，按商品分组比对', tone: 'bad', outcome: '分组冲突' },
-  clean: { desc: '所有字段一致、零风险的干净任务', tone: 'ok', outcome: '无冲突' },
-  'edi-only': { desc: '只有一份 EDI 报文，无可交叉项', tone: 'muted', outcome: '单份' },
-  'edi-mixed': { desc: 'EDI 与 PDF、图片混合上传', tone: 'bad', outcome: '数量冲突' },
-  'edi-multi-item': { desc: 'EDI 双商品，顺序不同且有缺失', tone: 'bad', outcome: '缺失' },
+  'multi-item': { desc: '一票两种商品，按商品分组比对', tone: 'bad', outcome: '分组不一致' },
+  clean: { desc: '所有比对条目一致、零风险提示', tone: 'ok', outcome: '全部一致' },
+  'edi-only': { desc: '只有一份 EDI 报文，无可交叉项', tone: 'muted', outcome: '仅一份文件' },
+  'edi-mixed': { desc: 'EDI 与 PDF、图片混合上传', tone: 'bad', outcome: '数量不一致' },
+  'edi-multi-item': { desc: 'EDI 双商品，顺序不同且有缺失', tone: 'bad', outcome: '部分缺失' },
   'edi-partial': { desc: '有效报文与截断报文并存', tone: 'warn', outcome: '部分完成' },
-  'edi-unsupported': { desc: '后端暂不支持该报文类型', tone: 'bad', outcome: '整票失败' },
-  'edi-failed': { desc: '报文被截断，解析失败', tone: 'bad', outcome: '解析失败' },
+  'edi-unsupported': { desc: '暂不支持该报文类型', tone: 'bad', outcome: '处理失败' },
+  'edi-failed': { desc: '报文被截断，解析失败', tone: 'bad', outcome: '处理失败' },
 }

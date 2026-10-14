@@ -33,8 +33,7 @@ function reload() {
       <div class="error-boundary-icon" aria-hidden="true">!</div>
       <h1 class="error-boundary-title">页面出现了一些问题</h1>
       <p class="error-boundary-detail">
-        界面渲染时发生未预期的错误，已停止显示。重新加载通常可以恢复；
-        若反复出现，请把当前操作步骤反馈给开发同学排查。
+        界面渲染时发生未预期的错误，已停止显示。重新加载通常可以恢复。
       </p>
       <button class="btn primary" @click="reload">重新加载</button>
     </div>

@@ -175,9 +175,9 @@ async function downloadArchive() {
 <template>
   <section class="card workflow-actions">
     <h2 class="card-title">报告导出与人工修正</h2>
-    <p v-if="isMock()" class="workflow-note">示例任务不支持服务端导出或修正。请切换真实后端并上传单证。</p>
+    <p v-if="isMock()" class="workflow-note">示例数据模式下不支持报告导出与人工修正。请切换真实后端并上传单证。</p>
     <template v-else>
-      <p class="workflow-note">处理完成不代表合规通过。报告包含原始证据、警告、未检查项和修正记录；HTML 报告可在浏览器打印为 PDF。</p>
+      <p class="workflow-note">处理完成不代表合规通过。报告保留原始证据、未校验项与修正记录；HTML 报告可在浏览器中打印为 PDF。</p>
       <div class="actions">
         <button class="btn primary" :disabled="!available || busy" @click="downloadHtml">导出 HTML 报告</button>
         <button class="btn" :disabled="!available || busy" @click="downloadArchive">导出归档 JSON</button>
@@ -185,7 +185,7 @@ async function downloadArchive() {
       <!-- 两个出口的区别要说清楚，否则用户不知道该点哪个 -->
       <p class="foot-note">归档 JSON 保留完整抽取结构与修正审计，供离线核对；默认报告正文不含这些明细。</p>
       <form v-if="editable" @submit.prevent="revise">
-        <p class="workflow-note">修正有效抽取值后重新比对，不重跑 OCR。原始读数保持不变；当前署名为未认证操作者。</p>
+        <p class="workflow-note">修正有效抽取值后重新比对，不重跑识别；原始读数保留不变（当前署名为未认证操作者）。</p>
         <!-- 不把 AppSelect 包进原生 <label>：label 的激活行为会对触发按钮合成 click，
              刚收起的浮层又被展开（见 DESIGN.md「下拉选择」）。用 aria-labelledby 关联标签 -->
         <div class="field">

@@ -53,7 +53,7 @@ async function load() {
         ? e.kind === 'SERVER'
           ? backendErrorText(e)
           : e.message
-        : '获取评测结果失败：前端与后端之间的请求未成功完成'
+        : '获取评测结果失败，请检查网络或服务状态后重试'
   } finally {
     loading.value = false
   }
@@ -180,7 +180,7 @@ const maxErrCount = computed(() =>
           key="failed"
           tone="bad"
           title="评测失败"
-          detail="本次结果无法读取或校验失败，暂不展示指标。请检查后端评测文件。"
+          detail="本次评测结果无法读取或未通过校验，暂不展示指标。"
         />
 
         <div v-else-if="isDone" key="done" class="eval-done">
