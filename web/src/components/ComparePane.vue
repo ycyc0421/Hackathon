@@ -12,13 +12,11 @@
  * - page 为 null 时不显示页码，也不拼 #page 锚；
  * - normalized_value 为 null 显示「—」，不用任何默认值冒充。
  */
-import { computed, inject, onBeforeUnmount } from 'vue'
+import { computed, inject } from 'vue'
 import { formatValue, fieldStatus } from '../api/formatters.js'
 import { divergenceInfo } from '../utils/divergence.js'
 import { evidenceRawText } from '../utils/evidence.js'
-import { isEdiName } from '../api/uploadLimits.js'
 import StatusBadge from './StatusBadge.vue'
-import EdiSourceView from './EdiSourceView.vue'
 
 const props = defineProps({
   comparison: { type: Object, required: true },
@@ -28,8 +26,11 @@ const props = defineProps({
 
 const sourceFiles = inject('sourceFiles')
 
-/** 本次会话内创建的 objectURL，组件卸载时统一回收 */
-const objectUrls = new Set()
+/**
+ * 原文预览入口由差异页持有：全页只有一个抽屉实例，任何一张卡片点开的
+ * 都是同一张纸。若把状态留在本组件，多张卡片会各自开一个抽屉叠在一起。
+ */
+const openSourcePreview = inject('openSourcePreview')
 
 function valueText(v) {
   const { main, sub } = formatValue(v.normalized_value, props.comparison.value_type, props.comparison.unit)
@@ -74,28 +75,12 @@ function isPdf(file) {
   return file.name.split('.').pop()?.toUpperCase() === 'PDF'
 }
 
-/**
- * 新窗口打开原文。PDF 且知道页码时拼 #page= 锚，浏览器自带 viewer 会跳到该页；
- * 图片等非 PDF 直接开 objectURL（#page 对它们无意义）。
- * objectURL 延迟回收：新窗口加载需要时间，立刻 revoke 会打开空白页。
- */
-function openSource(v) {
+/** 交给差异页的抽屉：把原件与页码一起递过去，页码不沿用上一份文件的 */
+function openSource(v, ev) {
   const file = sourceFileOf(v)
   if (!file) return
-  let url = URL.createObjectURL(file)
-  objectUrls.add(url)
-  if (isPdf(file) && v.page != null) url += `#page=${v.page}`
-  window.open(url, '_blank', 'noopener')
-  setTimeout(() => {
-    URL.revokeObjectURL(url.split('#')[0])
-    objectUrls.delete(url.split('#')[0])
-  }, 60_000)
+  openSourcePreview(file, v.page ?? null, ev?.currentTarget ?? null)
 }
-
-onBeforeUnmount(() => {
-  for (const url of objectUrls) URL.revokeObjectURL(url)
-  objectUrls.clear()
-})
 </script>
 
 <template>
@@ -124,19 +109,16 @@ onBeforeUnmount(() => {
 
         <div class="compare-foot">
           <StatusBadge :status="fileStatusOf(v)" />
-          <!-- EDI 走共享查看组件：纯文本 + 下载，不拼 #page、不新开窗口（#40）；
-               PDF/图片保持原有的新窗口 objectURL 路径 -->
-          <EdiSourceView
-            v-if="sourceFileOf(v) && isEdiName(v.file_name)"
-            :file="sourceFileOf(v)"
-            class="compare-foot-source"
-          />
+          <!-- 原件入口统一走右侧预览抽屉（DiffPage 持有唯一实例）：
+               PDF 拼 #page 锚交给内置阅读器跳页，图片直出，EDI/JSON 按纯文本呈现。
+               原先 PDF/图片新开标签页、EDI 就地展开，两套动作不一致；
+               现在「查看原文」在全站都是同一个动作：在页面内起一张纸。 -->
           <button
-            v-else-if="sourceFileOf(v)"
+            v-if="sourceFileOf(v)"
             class="link-btn"
-            @click="openSource(v)"
+            @click="openSource(v, $event)"
           >
-            查看原文{{ v.page != null && isPdf(sourceFileOf(v)) ? `第 ${v.page} 页` : '' }} ↗
+            查看原文{{ v.page != null && isPdf(sourceFileOf(v)) ? `第 ${v.page} 页` : '' }}
           </button>
         </div>
       </div>
