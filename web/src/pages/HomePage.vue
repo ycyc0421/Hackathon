@@ -37,26 +37,26 @@ const FEATURES = [
   {
     kind: 'ocr',
     title: 'OCR 智能识别',
-    desc: '支持文本层 PDF、图片单证与扫描件，识别方式取决于后端部署配置。保留可用的原始读数与定位信息，识别失败时如实提示。',
-    points: ['文本层 PDF 直读，扫描件依赖识别服务', '有页码与坐标时，可回溯到原文'],
+    desc: '支持文本层 PDF、图片单证与扫描件。保留原始读数与页码定位，无法识别时如实提示，不伪造结果。',
+    points: ['文本层 PDF 直读，图片与扫描件走 OCR 识别', '有页码与坐标时，可回溯到原件位置'],
   },
   {
     kind: 'compare',
     title: '多文件交叉比对',
-    desc: '同时上传发票、装箱单、提单和 EDI 报文，逐字段归一化后精确对照。多商品行按货号分组对齐，行序变化不影响结果。',
-    points: ['件数、重量、金额、币种、HS 编码', '冲突与缺失分开标注，不混为一谈'],
+    desc: '同时上传商业发票、装箱单、提单和 EDI 报文，逐字段归一化后精确对照。多商品行按货号分组对齐，行序变化不影响结果。',
+    points: ['件数、重量、金额、币种、HS 编码', '不一致与部分缺失分开标注，不混为一谈'],
   },
   {
     kind: 'rules',
     title: '规则合规提示',
-    desc: '根据目的国与商品编码提示待复核事项，并展示后端给出的规则依据。规则标注为演示性质，不替代正式合规审查。',
-    points: ['覆盖 US / DE / NL / FR / GB 演示规则', '规则命中的风险与未校验的提示分开呈现'],
+    desc: '根据目的国与商品编码提示待复核事项，并附带规则依据。演示规则仅作辅助参考，不替代正式合规审查。',
+    points: ['覆盖美、德、荷、法、英五国演示规则', '依据规则的提示与未经规则校验的建议分开呈现'],
   },
   {
     kind: 'report',
     title: '可存档报告',
-    desc: '汇总冲突、缺失与风险提示，保留可用的原文证据与来源文件。真实任务可导出 HTML 报告或归档 JSON，HTML 可在浏览器打印为 PDF。',
-    points: ['结论先于统计数字，一眼可见', '来源可溯，问题可跳转到差异页定位'],
+    desc: '汇总不一致、缺失与风险提示，保留原文证据与来源文件。支持导出自包含 HTML 报告（可打印为 PDF）或完整归档 JSON。',
+    points: ['结论先于统计数字，一眼可见', '来源可溯，问题可直达差异页定位'],
   },
 ]
 
@@ -65,7 +65,7 @@ const STEPS = [
   {
     num: '01',
     title: '上传',
-    desc: '拖入同一票货物的发票、箱单、提单或 EDI 报文。',
+    desc: '拖入同一票货物的发票、装箱单、提单或 EDI 报文。',
     icon: 'M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3',
   },
   {
@@ -77,7 +77,7 @@ const STEPS = [
   {
     num: '03',
     title: '报告',
-    desc: '汇总冲突与风险提示，输出可存档的检查结论。',
+    desc: '汇总差异与风险提示，输出可存档的检查结论。',
     icon: 'M7 3h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm7 0v5h5M9 13l2 2 4-4',
   },
 ]
@@ -353,7 +353,7 @@ onBeforeUnmount(() => observer?.disconnect())
           <template v-else-if="f.kind === 'compare'">
             <div class="illus-node" />
             <span class="illus-sheet s-a">发票</span>
-            <span class="illus-sheet s-b">箱单</span>
+            <span class="illus-sheet s-b">装箱单</span>
             <span class="illus-sheet s-c">提单</span>
             <span class="illus-link l-a" /><span class="illus-link l-b" /><span class="illus-link l-c" />
           </template>

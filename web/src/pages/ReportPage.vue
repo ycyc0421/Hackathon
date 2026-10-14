@@ -6,7 +6,7 @@
  * 真实任务可导出报告并创建人工修正版本。
  */
 import { computed, inject } from 'vue'
-import { formatTime, formatDuration, riskType, severity, processStatus, taskStatus } from '../api/formatters.js'
+import { formatTime, formatDuration, riskType, severity, processStatus, docType, taskStatus } from '../api/formatters.js'
 import { buildConclusion, comparisonCounts } from '../utils/reportConclusion.js'
 import { needsReview } from '../utils/needsReview.js'
 import StatusBadge from '../components/StatusBadge.vue'
@@ -251,7 +251,7 @@ const severityOf = severity
             <span class="doc-chip-main">
               <span class="doc-chip-dot" :class="`tone-${docTone(d)}`" aria-hidden="true"></span>
               <span class="doc-chip-name">{{ d.file_name }}</span>
-              <span class="doc-chip-type">{{ d.doc_type || '类型未识别' }}</span>
+              <span class="doc-chip-type">{{ docType(d.doc_type) }}</span>
             </span>
             <!-- 该文件自身的单据编号（document_no）：按 file_id 关联抽取层，无编号时整行隐藏 -->
             <DocumentNumbers :document="d" :extractions="task.extractions" />

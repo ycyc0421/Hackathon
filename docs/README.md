@@ -1,41 +1,32 @@
 # 文档索引
 
-项目包含前端、后端、OCR、独立数据层和整站发布流程。本目录不再只是前端提出的接口草案。
+本目录汇总项目的产品说明、接口契约、评测口径、架构设计与运维指南。
 
-## 按任务阅读
+---
 
-| 想做什么 | 阅读入口 |
-|---|---|
-| 了解项目并打开线上应用 | [根 README](../README.md) |
-| 确认哪些能力已交付 | [项目现状与计划](项目现状与计划.md) |
-| 走一遍演示、复现回归 | [演示与验证](演示与验证.md) |
-| 验收 EDI 前端兼容 | [EDI 合成输入、返回夹具与验收矩阵](fixtures/edi/README.md) |
-| 启动后端或配置 OCR | [后端 README](../backend/README.md) |
-| 开发页面或切换数据源 | [前端 README](../web/README.md)、[设计系统](../web/DESIGN.md) |
-| 对接接口、排查字段语义 | [数据契约](数据契约.md)、[Schema 使用说明](schema/README.md) |
-| 跑评测、看分数口径与范围 | [系统评测与持久化](评测运行.md) |
-| 初始化独立 SQLite 测试库 | [数据层 README](../data/README.md) |
-| 配置 GitHub 自动部署 | [CI/CD 工作流](../.github/workflows/README.md) |
-| 查线上版本、回退、排障 | [部署运维](部署运维.md) |
-| 确认未决事项与交付要求 | [待确认问题](待确认问题.md)、[项目要求](项目要求.md) |
+## 按主题导航
 
-## 事实来源与更新规则
-
-1. **对外数据结构**以 [CheckTask Schema](schema/check-task.schema.json) 和 [Evaluation Schema](schema/evaluation.schema.json) 为准。[数据契约](数据契约.md)解释其语义，不另造一套字段。
-2. **实际行为**核对当前分支代码；后端内部模型、数据库表和对外 JSON 不是一一相同的对象。
-3. **线上状态**看对应提交的部署运行及公网验证，不以 PR 描述、CI 构建产物或本地修改推断已上线。
-4. **状态快照**集中在[项目现状与计划](项目现状与计划.md)，标明日期与基线。功能合并后同时更新限制和待办，避免到处复制易过期的测试数量。
-5. **环境值和凭据**不写入公开文档；配置表使用占位示例。文档不引用本地私人资料路径。
-
-新增或变更契约时，先改 Schema、校验 fixtures，再同步可读文档、前后端与数据层；破坏性变更须先在 Issue 协调。仅纠正文档与已存在 Schema 的差异，不需要改写 Schema。
-
-## 验证材料
-
-| 目录 | 用途 | 不代表什么 |
+| 主题 | 阅读入口 | 内容说明 |
 |---|---|---|
-| [fixtures/result](fixtures/result/)、[fixtures/raw](fixtures/raw/) | API 返回和单文件抽取结构示例 | 不是原始上传文件 |
-| [fixtures/edi](fixtures/edi/) | EDI 兼容测试的合成上传文件与验收说明 | 不是后端已支持 EDI 的证据或实际业务金标 |
-| [backend/samples](../backend/samples/) | 合成单证、挑战样例及预期结果 | 不是实际业务准确率评测 |
-| [data/generated](../data/generated/) | 字段级结构化测试输入 | 不是原始 OCR 图片，也不一定可直接提交 API |
+| **项目概览** | [根目录 README](../README.md) · [项目现状与路线图](项目现状与计划.md) | 系统定位、核心能力矩阵、在线入口与整体进展 |
+| **使用与验收** | [演示与验证指南](演示与验证.md) · [工作流与修正验收](workflow-acceptance.md) | 推荐测试样例、预期核对结果、页面检查清单与回归命令 |
+| **接口与数据契约** | [数据契约说明](数据契约.md) · [报告内容接口 v2](report-content-api.md) · [JSON Schema 目录](schema/README.md) | CheckTask、ReportContent 与 Evaluation 的字段定义与校验规则 |
+| **系统评测** | [系统评测与持久化](评测运行.md) | 评测数据集范围、精确率/召回率/F1 计分口径、离线运行与持久化机制 |
+| **模块开发文档** | [前端说明](../web/README.md) · [前端设计系统](../web/DESIGN.md) · [后端说明](../backend/README.md) · [数据层说明](../data/README.md) | 前后端与 SQLite 数据层的目录结构、开发联调与设计规范 |
+| **工作流与规则监测** | [人工修正、报告与规则库](workflow-and-rules.md) · [官方规则来源动态监测](dynamic-rule-monitor.md) | 派生修正审计、结构化交换输入与官方来源定时抓取机制 |
+| **部署与模型交付** | [部署运维手册](部署运维.md) · [CI/CD 工作流](../.github/workflows/README.md) · [OCR 主模型交付](PADDLE_VL_DELIVERY.md) · [SQLite 持久化接入](../SQLITE_INTEGRATION.md) | 同源整站发布、自动回退、PaddleOCR-VL-1.6 部署配置与数据备份 |
+| **背景与专项材料** | [赛题要求说明](项目要求.md) · [待确认事项与边界](待确认问题.md) · [EDI 兼容样例](fixtures/edi/README.md) · [多表与金额修正记录](review38-fixes.md) | 赛题原始要求、能力边界与专项测试数据集说明 |
 
-多品名 `items[]` 与 `item_id + field_key` 已在当前接口实现。评测的计分口径与运行范围见[系统评测](评测运行.md)；仍待决策的是正式适用规则及新增业务范围，不应再把多品名结构写成未确定。
+---
+
+## 数据契约与测试材料边界
+
+1. **唯一事实来源**：对外 JSON 结构以 [`schema/check-task.schema.json`](schema/check-task.schema.json)、[`schema/report-content.schema.json`](schema/report-content.schema.json) 和 [`schema/evaluation.schema.json`](schema/evaluation.schema.json) 为准；任何字段或枚举改动须先通过 `npm run validate` 校验。
+2. **测试材料分工**：
+
+| 目录 | 用途 | 适用边界 |
+|---|---|---|
+| [`fixtures/result/`](fixtures/result/) · [`fixtures/raw/`](fixtures/raw/) · [`fixtures/report/`](fixtures/report/) | API 响应与单文件抽取的契约校验夹具 | 用于校验 JSON Schema 与前端渲染，非原始上传单证 |
+| [`fixtures/edi/`](fixtures/edi/) · [`backend/samples/edi/`](../backend/samples/edi/) | EDI 前端兼容测试与 EDIFACT 合成报文 | 供界面兼容验收与解析器预研，不代表生产后端已启用 EDI 解析 |
+| [`backend/samples/`](../backend/samples/) | 01–11 合成单证、挑战集与真实版式回归样本 | 用于端到端上传、OCR 探针与比对逻辑回归 |
+| [`data/generated/`](../data/generated/) | 字段级结构化合成测试数据 | 用于数据库与比对规则单元测试，非 CheckTask API 响应 |
