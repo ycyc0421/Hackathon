@@ -13,6 +13,9 @@
  *   before/after。默认报告正文不含这些内容，所以必须留一个能拿到它的出口，
  *   否则完整证据就没有访问路径了。
  *
+ * 界面一律用全站控件（`.btn` / `.input` / `textarea` / AppSelect / NoticeBar）：
+ * 这个卡片曾经自带一套按钮与输入框样式，深色主题下会和全站控件分叉。
+ *
  * 关键语义（见交付说明 F2）：
  * - source_hash 来自 GET corrections 的 result_hash，不对公开 getCheck JSON 自算；
  * - 同一次修正的网络重试复用同一 request_id 与载荷（幂等）；修改选择/值/原因或
@@ -24,6 +27,8 @@
 import { computed, inject, onBeforeUnmount, ref, watch } from 'vue'
 import { isMock, getCorrections, createCorrection, getReportContent, exportReportArchive } from '../api/index.js'
 import { buildReportHtml, reportFileName } from '../report/document.js'
+import AppSelect from './AppSelect.vue'
+import NoticeBar from './NoticeBar.vue'
 
 const task = inject('task')
 const taskError = inject('taskError', null)
@@ -66,6 +71,9 @@ const options = computed(() => {
   })))
 })
 const chosen = computed(() => options.value.find(o => o.id === selection.value))
+
+/** AppSelect 选项：值与原生 select 的 option 一致，只是换成全站组件渲染 */
+const fieldOptions = computed(() => options.value.map(o => ({ value: o.id, label: o.label })))
 
 /** 输入变化 → 作废旧载荷，下次提交重新读取上下文与新 request_id */
 watch([selection,value,reason], () => { pending = null })
@@ -167,44 +175,74 @@ async function downloadArchive() {
 <template>
   <section class="card workflow-actions">
     <h2 class="card-title">报告导出与人工修正</h2>
-    <p v-if="isMock()">示例任务不支持服务端导出或修正。请切换真实后端并上传单证。</p>
+    <p v-if="isMock()" class="workflow-note">示例任务不支持服务端导出或修正。请切换真实后端并上传单证。</p>
     <template v-else>
-      <p>处理完成不代表合规通过。报告包含原始证据、警告、未检查项和修正记录；HTML 报告可在浏览器打印为 PDF。</p>
-      <div class="workflow-buttons">
-        <button :disabled="!available || busy" @click="downloadHtml">导出 HTML 报告</button>
-        <button :disabled="!available || busy" @click="downloadArchive">导出归档 JSON</button>
+      <p class="workflow-note">处理完成不代表合规通过。报告包含原始证据、警告、未检查项和修正记录；HTML 报告可在浏览器打印为 PDF。</p>
+      <div class="actions">
+        <button class="btn primary" :disabled="!available || busy" @click="downloadHtml">导出 HTML 报告</button>
+        <button class="btn" :disabled="!available || busy" @click="downloadArchive">导出归档 JSON</button>
       </div>
-      <p class="workflow-hint">归档 JSON 保留完整抽取结构与修正审计，供离线核对；默认报告正文不含这些明细。</p>
+      <!-- 两个出口的区别要说清楚，否则用户不知道该点哪个 -->
+      <p class="foot-note">归档 JSON 保留完整抽取结构与修正审计，供离线核对；默认报告正文不含这些明细。</p>
       <form v-if="editable" @submit.prevent="revise">
-        <p>修正有效抽取值后重新比对，不重跑 OCR。原始读数保持不变；当前署名为未认证操作者。</p>
-        <label>选择已有字段
-          <select v-model="selection" :disabled="busy" required>
-            <option value="">请选择文件与字段</option>
-            <option v-for="option in options" :key="option.id" :value="option.id">{{ option.label }}</option>
-          </select>
+        <p class="workflow-note">修正有效抽取值后重新比对，不重跑 OCR。原始读数保持不变；当前署名为未认证操作者。</p>
+        <!-- 不把 AppSelect 包进原生 <label>：label 的激活行为会对触发按钮合成 click，
+             刚收起的浮层又被展开（见 DESIGN.md「下拉选择」）。用 aria-labelledby 关联标签 -->
+        <div class="field">
+          <span id="revise-field-label" class="field-label">选择已有字段</span>
+          <AppSelect
+            v-model="selection"
+            block
+            :options="fieldOptions"
+            :disabled="busy || !fieldOptions.length"
+            aria-labelledby="revise-field-label"
+          />
+        </div>
+        <p v-if="!fieldOptions.length" class="workflow-note">没有可修正的字段：至少需要一份成功抽取的单证。</p>
+        <p v-if="chosen" class="workflow-note">原始读数：{{ chosen.field.raw_value ?? '未读取' }}；当前有效值：{{ chosen.field.normalized_value ?? '未归一' }} {{ chosen.field.unit ?? '' }}</p>
+        <label class="field">
+          <span class="field-label">修正值</span>
+          <input v-model="value" class="input" :disabled="busy" maxlength="2000" required placeholder="数值可带原单位；金额仅填数字，币种单独修改" />
         </label>
-        <p v-if="chosen">原始读数：{{ chosen.field.raw_value ?? '未读取' }}；当前有效值：{{ chosen.field.normalized_value ?? '未归一' }} {{ chosen.field.unit ?? '' }}</p>
-        <label>修正值<input v-model="value" :disabled="busy" maxlength="2000" required placeholder="数值可带原单位；金额仅填数字，币种单独修改" /></label>
-        <label>修正原因<textarea v-model="reason" :disabled="busy" maxlength="1000" required placeholder="说明核对的原件与修改依据" /></label>
-        <button type="submit" :disabled="busy || !chosen || !value.trim() || !reason.trim()">{{ busy ? '正在处理…' : '保存修正并重算' }}</button>
+        <label class="field">
+          <span class="field-label">修正原因</span>
+          <textarea v-model="reason" :disabled="busy" maxlength="1000" required placeholder="说明核对的原件与修改依据" />
+        </label>
+        <button type="submit" class="btn primary workflow-submit" :disabled="busy || !chosen || !value.trim() || !reason.trim()">{{ busy ? '正在处理…' : '保存修正并重算' }}</button>
       </form>
-      <p v-else-if="!terminal">任务结束后可导出报告并修正字段。</p>
-      <p v-else-if="task?.status === 'FAILED'">检查失败的任务不可修正，但可导出失败明细留档。</p>
+      <p v-else-if="!terminal" class="foot-note">任务结束后可导出报告并修正字段。</p>
+      <p v-else-if="task?.status === 'FAILED'" class="foot-note">检查失败的任务不可修正，但可导出失败明细留档。</p>
     </template>
-    <p v-if="error" role="alert" class="workflow-error">{{ error }}</p>
-    <p v-if="message" role="status">{{ message }}</p>
+    <!-- 失败与成功都用全站提示条：导出/修正的结果必须显式呈现，不能只留一行小字 -->
+    <NoticeBar v-if="error" role="alert" tone="bad" :title="error" />
+    <NoticeBar v-else-if="message" role="status" tone="ok" :title="message" />
   </section>
 </template>
 
 <style scoped>
-.workflow-actions p { margin: 12px 0; line-height: 1.6; }
-.workflow-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-/* 两个出口的区别要说清楚，否则用户不知道该点哪个 */
-.workflow-hint { margin-top: 8px; color: var(--text-muted); font-size: var(--text-xs); }
-form { display: grid; gap: 12px; margin-top: 20px; }
-label { display: grid; gap: 6px; }
-input, select, textarea { font: inherit; width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #bbb; border-radius: 6px; background: var(--surface, white); color: inherit; }
-button { font: inherit; padding: 10px 16px; border: 1px solid #888; border-radius: 6px; cursor: pointer; }
-button:disabled { opacity: .5; cursor: default; }
-.workflow-error { color: #b42318; }
+/* 本卡只负责排布：控件外观一律用全站类与组件（.btn / .input / textarea /
+   AppSelect / NoticeBar），不在这里重定义按钮、输入框的样子。 */
+.workflow-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+/* 表单纵向节奏：字段各自成行，间距由栅格统一给 */
+form {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+/* 表单里只有一个提交按钮：靠栅格间距即可，不再叠加 .actions 的上边距，
+   并避免按钮在栅格里被拉伸成整行宽 */
+.workflow-submit {
+  justify-self: start;
+}
+
+/* 结果提示条（NoticeBar）与上方内容拉开间距：它可能紧跟按钮或表单出现 */
+.workflow-actions :deep(.notice) {
+  margin-top: var(--space-4);
+}
 </style>

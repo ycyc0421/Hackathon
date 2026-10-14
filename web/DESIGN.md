@@ -310,7 +310,9 @@ label 在输入框上方。错误：红色边框 + 下方错误文案。
 ### 下拉选择（AppSelect）
 
 自定义下拉：触发按钮 + 浮层 listbox，焦点始终在按钮上，
-`aria-activedescendant` 指路。块级模式（`block`）外观对齐 `.input`，用于表单。
+`aria-activedescendant` 指路。块级模式（`block`）外观对齐 `.input`，用于表单；
+`disabled` 时触发按钮不可聚焦、不展开（提交中的表单字段用），
+禁用态样式与 `.input:disabled` 同一套（压暗 + `not-allowed`）。
 
 **使用注意**：勿把组件包在原生 `<label>` 内——点选 `<li>` 会触发 label 的
 激活行为，浏览器对触发按钮合成一次 click，刚收起的浮层会被重新展开。
@@ -440,6 +442,9 @@ label 在输入框上方。错误：红色边框 + 下方错误文案。
 rect `dashoffset 100→0` 描一圈，描边 transitionend 后再给按钮一次轻微脉冲
 （一次即停）。属入口级动画：**全程只播一次**，引导用户发现出口，不循环。
 
+- **触发条件是任务成功到终态**（COMPLETED / PARTIAL），与有没有待复核项无关：
+  引导的是「结果出来了、可以去看」这个出口。处理中与失败不播——按钮那时
+  还是灰色禁用态，描边没有指向。
 - **触发时机**在 `collapseHooks` 展开结束之后——按钮还在「长高」的过程中
   播描边会一半被 overflow 裁掉，必须等容器展开完成。
 - reduced-motion 下全局压零 transition 使描边动画不播放、描边始终不可见，

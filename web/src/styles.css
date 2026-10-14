@@ -658,6 +658,18 @@ textarea:focus {
   box-shadow: 0 0 0 3px oklch(from var(--danger) l c h / 0.1);
 }
 
+/* 禁用态与 .btn 同一套表达：整体压暗 + not-allowed，不做单独的灰底变体 */
+.input:disabled,
+textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input:disabled:hover,
+textarea:disabled:hover {
+  border-color: var(--border);
+}
+
 textarea {
   min-height: 80px;
   resize: vertical;
@@ -2159,6 +2171,14 @@ textarea {
   box-shadow: 0 0 0 3px oklch(from var(--color-primary) l c h / 0.1);
 }
 
+/* 禁用态与 .input/.btn 一致：压暗 + not-allowed，悬停不再提亮边框 */
+.app-select-trigger:disabled,
+.app-select-trigger:disabled:hover {
+  border-color: var(--border);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .app-select-caret {
   color: var(--text-muted);
   font-size: var(--text-2xs);
@@ -3348,9 +3368,13 @@ textarea {
    两张纸的层次现在由各自的投影与缩放表达，不需要额外的暗层。 */
 
 /* ========== 上传完成引导 ========== */
-/* 任务达终态后，「查看比对结果」按钮的一次性描边引导 + 轻微脉冲。
-   启动时机在 UploadPage.onNextActionsEnter：collapseHooks 高度展开结束后
-   才加 .playing，避免与高度动画同帧被 overflow 裁切。 */
+/* 任务到终态后，「查看比对结果」按钮的一次性描边引导 + 轻微脉冲。
+   启动时机在 UploadPage.onStatusRowEnter：status-row 的收合展开结束后
+   才加 .playing，避免与高度动画同帧被 overflow 裁切。
+
+   描边颜色取 --on-primary（主按钮上的前景色），不是 --color-primary：
+   这个按钮到终态就是主色实底，用主色描边等于在同色底上画同色线，
+   浅色下是蓝压蓝、暗色下是绿压绿，完全看不见。 */
 
 /* 按钮作为 SVG 的定位壳；不改按钮原有盒模型 */
 .cta-trace {
@@ -3362,7 +3386,7 @@ textarea {
   inset: 0;
   width: 100%;
   height: 100%;
-  /* 初始不可见；prefers-reduced-motion 下 JS 不启动（onNextActionsEnter
+  /* 初始不可见；prefers-reduced-motion 下 JS 不启动（onStatusRowEnter
      直接 return），描边始终不出现——全局规则只压时长不压状态，
      靠它降级会留下瞬间到终态的描边环 */
   opacity: 0;
@@ -3370,7 +3394,7 @@ textarea {
 }
 
 .cta-trace-rect {
-  stroke: var(--color-primary);
+  stroke: var(--on-primary);
   stroke-width: 2;
   stroke-dasharray: 100;
   stroke-dashoffset: 100;

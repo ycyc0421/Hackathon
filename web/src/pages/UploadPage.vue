@@ -457,7 +457,7 @@ const statusRow = ref(null)
 let guidedTaskId = null
 
 // 任务头通常在处理中就已进入页面，终态更新不会再次触发 after-enter。
-watch([taskDone, reviewCount], () => onStatusRowEnter(statusRow.value), { flush: 'post' })
+watch(taskDone, () => onStatusRowEnter(statusRow.value), { flush: 'post' })
 
 /**
  * 「查看比对结果」一次性描边引导的启动时机。
@@ -465,7 +465,9 @@ watch([taskDone, reviewCount], () => onStatusRowEnter(statusRow.value), { flush:
  * 描边引导从 status-row 的 @after-enter 触发（任务头部展开完成时），
  * 而不是从 next-actions 区块：按钮已常驻在 status-row 右上角，
  * 不再随 next-actions 的高度展开入场，不存在被 overflow 裁掉的问题。
- * 只在有待复核项（reviewCount > 0）且任务刚到终态时触发，灰色禁用态不播。
+ * 任务成功到终态（COMPLETED / PARTIAL）即播，与有没有待复核项无关——
+ * 引导的是「结果出来了、可以去看」这个出口本身；处理中与失败都不播，
+ * 灰色禁用态上描边没有意义。
  *
  * 描边 transitionend 后给按钮一次轻微脉冲（一次即停）。全程只播一次。
  */
@@ -473,9 +475,8 @@ function onStatusRowEnter(el) {
   const btn = el?.querySelector('.cta-trace')
   const rect = el?.querySelector('.cta-trace-rect')
   if (!btn || !rect) return
-  // 只有任务完成且有待复核项时才播引导
-  const taskDone = task.value?.status === 'COMPLETED' || task.value?.status === 'PARTIAL'
-  if (!taskDone || reviewCount.value === 0) return
+  // 只有任务成功到终态才播引导
+  if (!taskDone.value) return
   if (guidedTaskId === task.value.task_id) return
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
   guidedTaskId = task.value.task_id
@@ -682,10 +683,10 @@ const showEdiNote = computed(() => !isMock() && files.value.some((f) => isEdiNam
                 <span v-if="duration" class="status-meta">耗时 {{ duration }}</span>
               </Transition>
               <span class="status-meta">创建于 {{ formatTime(task.created_at) }}</span>
-              <!-- 常驻右上角按钮：灰色=不可用，蓝色=可跳转；有待复核项时到终态后描边引导一次 -->
+              <!-- 常驻右上角按钮：灰色=不可用，蓝色=可跳转；任务到终态后描边引导一次 -->
               <button
                 class="btn cta-trace status-cta"
-                :class="{ primary: taskDone, 'status-cta--active': taskDone && reviewCount > 0 }"
+                :class="{ primary: taskDone }"
                 :disabled="!taskDone"
                 @click="navigate.go('diff')"
               >
