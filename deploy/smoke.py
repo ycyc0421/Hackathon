@@ -46,6 +46,25 @@ def ocr_uploads(scan=False):
     return files
 
 
+def save_task_diagnostic(output, name, task, task_id):
+    """Persist bounded probe evidence without extracted document text or file paths."""
+    diagnostic = {
+        'case': name,
+        'task_id': task_id,
+        'status': task.get('status'),
+        'error_codes': [error.get('code') for error in task.get('errors', [])],
+        'documents': [
+            {'process_status': document.get('process_status'),
+             'error_code': document.get('error_code')}
+            for document in task.get('documents', [])
+        ],
+        'parse_methods': [extraction.get('parse_method') for extraction in task.get('extractions', [])],
+        'item_count': len(task.get('items', [])),
+    }
+    (output / f'{name}.diagnostic.json').write_text(
+        json.dumps(diagnostic, ensure_ascii=False), encoding='utf-8')
+
+
 def run(base, origin, output, ocr_enabled=False):
     output.mkdir(parents=True, exist_ok=True)
     with httpx.Client(headers={'Origin': origin}, timeout=30) as client:
@@ -81,6 +100,7 @@ def run(base, origin, output, ocr_enabled=False):
             deadline = time.monotonic() + (1800 if is_ocr else 90)
             while True:
                 task = request_json(f'/checks/{quote(created["task_id"], safe="")}')
+                save_task_diagnostic(output, name, task, created['task_id'])
                 if task['status'] not in ('PENDING', 'PROCESSING'):
                     break
                 assert time.monotonic() < deadline, '任务轮询超时'

@@ -140,12 +140,32 @@ jobs:
           import json, os
           print(json.dumps({"SITE_ORIGIN": os.environ["SITE_ORIGIN"]}))
           PY
+
+      - name: 收集公网探针诊断
+        if: always() && steps.backend.outcome == 'success' && steps.smoke.outcome != 'skipped'
+        id: smoke-evidence
+        env:
+          SMOKE_OUTPUT_DIR: ${{ runner.temp }}/backend-smoke
+        run: |
           mkdir -p "$SMOKE_OUTPUT_DIR"
+          ssh_options=(-i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=20 -o ServerAliveCountMax=6 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts")
+          target="$BACKEND_SSH_USER@$BACKEND_SSH_HOST"
           scp "${ssh_options[@]}" "$target:app/releases/$RELEASE_ID/smoke-output/*.json" "$SMOKE_OUTPUT_DIR/"
+          if [ "${{ steps.smoke.outcome }}" = 'success' ]; then
           node backend/tools/validate_outputs.mjs "$SMOKE_OUTPUT_DIR"
+          fi
+
+      - name: 保存失败探针证据
+        if: always() && steps.backend.outcome == 'success' && (steps.smoke.outcome == 'failure' || steps.smoke-evidence.outcome == 'failure')
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-smoke-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/backend-smoke/*.diagnostic.json
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: 公网联调失败时回退整站
-        if: failure() && steps.backend.outcome == 'success' && steps.smoke.outcome == 'failure'
+        if: failure() && steps.backend.outcome == 'success' && (steps.smoke.outcome == 'failure' || steps.smoke-evidence.outcome == 'failure')
         run: |
           ssh -i "$RUNNER_TEMP/backend_key" -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=20 -o ServerAliveCountMax=6 -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$RUNNER_TEMP/backend_known_hosts" "$BACKEND_SSH_USER@$BACKEND_SSH_HOST" "python3 - $RELEASE_ID --rollback" < deploy/backend.py
 

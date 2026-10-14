@@ -17,7 +17,7 @@ if (!existsSync(outDir)) {
 const ajv = new Ajv2020({ allErrors: true, strict: false })
 const validateTask = ajv.compile(JSON.parse(readFileSync(join(schemaDir, 'check-task.schema.json'), 'utf8')))
 const validateEval = ajv.compile(JSON.parse(readFileSync(join(schemaDir, 'evaluation.schema.json'), 'utf8')))
-const files = readdirSync(outDir).filter((name) => name.endsWith('.json')).sort()
+const files = readdirSync(outDir).filter((name) => name.endsWith('.json') && !name.endsWith('.diagnostic.json')).sort()
 if (files.length === 0) {
   console.error(`目录里没有 JSON：${outDir}`)
   process.exit(1)

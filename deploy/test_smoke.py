@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from io import BytesIO
+import json
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -50,11 +51,20 @@ class PublicSmokeTests(unittest.TestCase):
                 return httpx.Response(200, headers=headers)
             if request.method == 'POST':
                 return httpx.Response(201, headers=headers, json={'task_id': 'probe'})
-            return httpx.Response(200, headers=headers, json={'status': 'FAILED'})
+            return httpx.Response(200, headers=headers, json={
+                'status': 'PARTIAL', 'errors': [{'code': 'OCR_UNAVAILABLE', 'message': 'private detail'}],
+                'documents': [{'process_status': 'FAILED', 'filename': 'private.png'}],
+                'extractions': [{'parse_method': 'OCR', 'text': 'private document text'}],
+            })
 
         with self.assertRaisesRegex(AssertionError, '任务未完成'):
             self.run_probe(handler)
-        self.assertEqual(list(self.output.iterdir()), [])
+        self.assertFalse((self.output / '01_us_consistent.json').exists())
+        diagnostic = json.loads((self.output / '01_us_consistent.diagnostic.json').read_text(encoding='utf-8'))
+        self.assertEqual(diagnostic['status'], 'PARTIAL')
+        self.assertEqual(diagnostic['task_id'], 'probe')
+        self.assertEqual(diagnostic['error_codes'], ['OCR_UNAVAILABLE'])
+        self.assertNotIn('private', json.dumps(diagnostic))
 
     def test_scan_uploads_have_images_and_no_pdf_text_layer(self):
         from pypdf import PdfReader
