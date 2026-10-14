@@ -17,8 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class WorkflowTests(unittest.TestCase):
     def setUp(self):
-        (ROOT/'backend/.out').mkdir(parents=True,exist_ok=True)
-        self.tmp = TemporaryDirectory(dir=ROOT/'backend/.out')
+        self.tmp = TemporaryDirectory()
         self.store = TaskStore(Path(self.tmp.name)/'tasks.db',Path(self.tmp.name)/'legacy')
         self.task = json.loads((ROOT/'docs/fixtures/result/check-completed.json').read_text(encoding='utf-8'))
         self.task.pop('_comment',None)

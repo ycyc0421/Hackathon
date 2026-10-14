@@ -241,6 +241,8 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(venv[0], "/opt/python312/bin/python")
         self.assertTrue(any("paddlepaddle==3.2.0" in args for args in calls))
         self.assertTrue(any(str(args[-1]).endswith("requirements-ocr.txt") for args in calls))
+        self.assertTrue(any(str(args[1]).endswith("backend/tests/test_paddle_adapter.py") for args in calls if len(args) > 1))
+        self.assertTrue(any(str(args[1]).endswith("backend/tools/selftest.py") for args in calls if len(args) > 1))
         probes = [call for call in run.call_args_list if "run_ocr_probe.py" in str(call.args)]
         self.assertEqual(len(probes), 1)
         self.assertEqual(probes[0].kwargs["env"]["PADDLE_OCR_ENABLED"], "1")

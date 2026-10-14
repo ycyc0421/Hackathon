@@ -219,7 +219,8 @@ def deploy(root, release_id):
            "PADDLE_OCR_ENABLED": "0", "PYTHONDONTWRITEBYTECODE": "1"}
     for script, args in (("test_review38.py", []), ("test_rule_monitor.py", []), ("test_workflow.py", []), ("test_trade_json.py", []), ("test_static_rules.py", []), ("test_sqlite_store.py", []), ("test_compare.py", []), ("test_review_regressions.py", []),
                          ("test_paddle_adapter.py", []), ("test_paddle_vl.py", []), ("test_vl_service.py", []), ("test_delivery_boundaries.py", []), ("selftest.py", ["--no-node"]), ("run_challenge.py", [])):
-        run(python, str(release / "backend/tools" / script), *args, cwd=release, env=env)
+        directory = "backend/tests" if script.startswith("test_") else "backend/tools"
+        run(python, str(release / directory / script), *args, cwd=release, env=env)
     if ocr_enabled:
         # 在切换服务前加载真实模型并验证图片；使用候选版本的临时任务数据。
         probe_env = {**env, **{key: value for key, value in settings.items() if key.startswith("PADDLE_")}}
