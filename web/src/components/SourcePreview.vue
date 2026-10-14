@@ -76,7 +76,9 @@ async function load(file) {
   if (!file) return
   const k = sourceKind(file.name)
   if (k === 'pdf' || k === 'image') {
-    objectUrl.value = URL.createObjectURL(file)
+    // PDF 的本地 MIME 可能为空；只给预览副本声明类型，下载仍使用原始 File。
+    const source = k === 'pdf' ? file.slice(0, file.size, 'application/pdf') : file
+    objectUrl.value = URL.createObjectURL(source)
     return
   }
   if (k === 'text') {
@@ -93,27 +95,28 @@ async function load(file) {
 
 watch(
   () => props.file,
-  async (file) => {
-    await load(file)
-    if (!file) return
-    // 打开后把焦点交给关闭按钮：键盘用户进来就有明确出口
-    await nextTick()
-    closeRef.value?.focus()
-  },
+  load,
   { immediate: true }
 )
 
-/** Esc 关闭。挂在 window 上：焦点进了 iframe（浏览器内置 PDF 阅读器）后，
- *  元素自身收不到按键。本组件全站同时只有一个实例，不与兄弟实例抢键。 */
+/** 页面内 Esc 关闭；PDF 阅读器有独立的按键上下文，焦点在其中时请用关闭按钮。 */
 function onWindowKeydown(e) {
   if (e.key === 'Escape') emit('close')
 }
 
 watch(
   open,
-  (isOpen) => {
-    if (isOpen) window.addEventListener('keydown', onWindowKeydown)
-    else window.removeEventListener('keydown', onWindowKeydown)
+  async (isOpen, _wasOpen, onCleanup) => {
+    if (!isOpen) {
+      window.removeEventListener('keydown', onWindowKeydown)
+      return
+    }
+    window.addEventListener('keydown', onWindowKeydown)
+    // 焦点只随打开动作迁移，不等待文本读取，也不被旧读取结果抢回。
+    let cancelled = false
+    onCleanup(() => { cancelled = true })
+    await nextTick()
+    if (!cancelled) closeRef.value?.focus()
   },
   { immediate: true }
 )
@@ -123,6 +126,7 @@ function download() {
 }
 
 onBeforeUnmount(() => {
+  ++textLoadSeq
   window.removeEventListener('keydown', onWindowKeydown)
   releaseUrl()
   pool.dispose()
@@ -158,7 +162,7 @@ onBeforeUnmount(() => {
               type="button"
               class="source-drawer-close"
               :aria-label="SOURCE_PREVIEW_TEXT.close"
-              :title="SOURCE_PREVIEW_TEXT.closeTitle"
+              :title="kind === 'pdf' ? SOURCE_PREVIEW_TEXT.close : SOURCE_PREVIEW_TEXT.closeTitle"
               @click="emit('close')"
             >
               <span aria-hidden="true">✕</span>
