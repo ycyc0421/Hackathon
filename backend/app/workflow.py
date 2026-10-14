@@ -60,6 +60,9 @@ def _normalize(key, text, field):
         value = N.to_port(text)
     elif key == 'destination_country':
         value = N.to_country(text)
+    elif key in {'shipper_address', 'consignee_address'}:
+        from .pipeline.addresses import normalize_address
+        value = normalize_address(text)
     else:
         value = N.to_text(text)
     if value is None or isinstance(value, (int, float)) and (not math.isfinite(value) or value < 0):
