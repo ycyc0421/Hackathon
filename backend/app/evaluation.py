@@ -7,8 +7,9 @@ import os
 from pathlib import Path
 
 from .models import Evaluation, dump, not_run_evaluation
+from .config import DATA_DIR
 
-DEFAULT_RESULT = Path(__file__).resolve().parents[1] / 'evaluation/latest.json'
+DEFAULT_RESULT = DATA_DIR / 'evaluation/latest.json'
 
 
 def scores(counts):
@@ -52,3 +53,18 @@ def latest():
     except (OSError, ValueError, TypeError):
         logging.getLogger(__name__).exception('读取评测文件失败')
         return dump(Evaluation(status='FAILED', sample_count=0, metrics=None))
+
+
+def history():
+    directory = Path(os.environ.get('EVALUATION_RESULT_PATH') or DEFAULT_RESULT).parent / 'runs'
+    results = []
+    for path in sorted(directory.glob('*.json'), reverse=True)[:30]:
+        try:
+            data = dump(validate_result(json.loads(path.read_text(encoding='utf-8'))))
+            if data['metrics'] is not None:
+                data['metrics'] = {key: value for key, value in data['metrics'].items() if value is not None}
+            results.append(data)
+        except (OSError, ValueError, TypeError):
+            logging.getLogger(__name__).exception('读取历史评测文件失败')
+            results.append(dump(Evaluation(status='FAILED', sample_count=0, metrics=None)))
+    return results

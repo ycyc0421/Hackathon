@@ -353,6 +353,11 @@ def latest_evaluation() -> dict:
     return evaluation.latest()
 
 
+@app.get("/api/v1/evaluation/runs")
+def evaluation_history() -> list:
+    return evaluation.history()
+
+
 @app.get("/")
 def index() -> dict:
     return {
