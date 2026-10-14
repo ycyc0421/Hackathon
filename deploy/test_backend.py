@@ -76,6 +76,122 @@ class ModelReadinessTests(unittest.TestCase):
                     backend.wait_model_healthy()
 
 
+class EnvironmentReuseTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name) / 'app'
+        self.root.mkdir()
+        self.identity = 'python312-cpu'
+        self.releases = []
+        runner = patch('backend.run', side_effect=self.command)
+        self.run = runner.start()
+        self.addCleanup(runner.stop)
+
+    def command(self, *args, **kwargs):
+        if 'venv' in args:
+            binary = Path(args[-1]) / 'bin/python'
+            binary.parent.mkdir()
+            binary.touch()
+        if 'freeze' in args:
+            kwargs['stdout'].write('fastapi==0.115.0\n')
+        return subprocess.CompletedProcess(args, 0, stdout=self.identity)
+
+    def release(self):
+        release = self.root / 'releases' / str(len(self.releases))
+        (release / 'backend').mkdir(parents=True)
+        (release / 'backend/requirements.txt').write_text('fastapi==0.115.0\n')
+        (release / 'backend/requirements-ocr.txt').write_text('-r requirements.txt\npaddleocr==3.7.0\n')
+        self.releases.append(release)
+        return release
+
+    def prepare(self, release, ocr=True):
+        return backend.prepare_environment(self.root, release, '/opt/python312', ocr)
+
+    def test_same_inputs_reuse_completed_environment_without_installing(self):
+        first = self.release()
+        self.prepare(first)
+        environment = (first / '.venv').resolve()
+        lock = (environment / 'requirements.lock').read_bytes()
+        self.run.reset_mock()
+        second = self.release()
+        python = self.prepare(second)
+        self.assertEqual((second / '.venv').resolve(), environment)
+        self.assertEqual(python, str(second / '.venv/bin/python'))
+        self.assertFalse(any('install' in call.args or 'venv' in call.args or 'freeze' in call.args
+                             for call in self.run.call_args_list))
+        self.assertTrue(any('check' in call.args for call in self.run.call_args_list))
+        self.assertEqual((first / 'requirements.lock').read_bytes(), lock)
+        self.assertEqual((second / 'requirements.lock').read_bytes(), lock)
+        self.assertEqual((environment / 'requirements.lock').read_bytes(), lock)
+
+    def test_dependency_python_and_ocr_changes_get_separate_environments(self):
+        first = self.release()
+        self.prepare(first)
+        original = (first / '.venv').resolve()
+        for change in ('base', 'ocr', 'python', 'disabled', 'paddle'):
+            with self.subTest(change=change):
+                release = self.release()
+                if change in ('base', 'ocr'):
+                    name = 'requirements.txt' if change == 'base' else 'requirements-ocr.txt'
+                    path = release / 'backend' / name
+                    path.write_text(path.read_text() + 'Pillow==11.0.0\n')
+                self.identity = 'python312-new' if change == 'python' else 'python312-cpu'
+                with patch('backend.PADDLE_PACKAGE', 'paddlepaddle==3.3.0' if change == 'paddle' else backend.PADDLE_PACKAGE):
+                    self.prepare(release, ocr=change != 'disabled')
+                self.assertNotEqual((release / '.venv').resolve(), original)
+                self.assertTrue((original / '.complete').exists())
+                self.assertEqual((first / '.venv').resolve(), original)
+
+    def test_failed_install_is_not_published_or_reused(self):
+        first = self.release()
+        def fail_install(*args, **kwargs):
+            if 'install' in args:
+                raise subprocess.CalledProcessError(1, args)
+            return self.command(*args, **kwargs)
+        self.run.side_effect = fail_install
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.prepare(first)
+        self.assertFalse((first / '.venv').is_symlink())
+        self.assertEqual(list((self.root / 'shared/python-envs').iterdir()), [])
+        self.run.side_effect = self.command
+        second = self.release()
+        self.prepare(second)
+        self.assertTrue((second / '.venv/.complete').is_file())
+
+    def test_interrupted_incomplete_environment_is_rebuilt(self):
+        first = self.release()
+        self.prepare(first)
+        environment = (first / '.venv').resolve()
+        # 模拟安装完成标记尚未写入、也尚未供版本引用时中断。
+        (first / '.venv').unlink()
+        (environment / '.complete').unlink()
+        (environment / 'partial').touch()
+        self.run.reset_mock()
+        second = self.release()
+        self.prepare(second)
+        self.assertFalse((environment / 'partial').exists())
+        self.assertTrue(any('install' in call.args for call in self.run.call_args_list))
+
+    def test_broken_completed_environment_is_not_repaired_in_place(self):
+        first = self.release()
+        self.prepare(first)
+        environment = (first / '.venv').resolve()
+        def fail_check(*args, **kwargs):
+            if 'check' in args:
+                raise subprocess.CalledProcessError(1, args)
+            return self.command(*args, **kwargs)
+        self.run.reset_mock()
+        self.run.side_effect = fail_check
+        second = self.release()
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.prepare(second)
+        self.assertFalse((second / '.venv').is_symlink())
+        self.assertTrue((environment / '.complete').exists())
+        self.assertEqual((first / '.venv').resolve(), environment)
+        self.assertFalse(any('install' in call.args for call in self.run.call_args_list))
+
+
 class DeploymentTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -211,6 +327,21 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual((self.root / "current").resolve(), self.old)
         self.assert_shared_unchanged()
 
+    @patch("backend.wait_healthy")
+    @patch("backend.run")
+    def test_rollback_preserves_shared_environment_used_by_both_releases(self, run, health):
+        environment = self.root / 'shared/python-envs/complete'
+        environment.parent.mkdir()
+        (self.old / '.venv').rename(environment)
+        (self.old / '.venv').symlink_to(environment, target_is_directory=True)
+        (self.new / '.venv').symlink_to(environment, target_is_directory=True)
+        backend.activate(self.root, self.new)
+        backend.rollback(self.root, self.new)
+        self.assertEqual((self.root / 'current').resolve(), self.old)
+        self.assertEqual((self.old / '.venv').resolve(), environment)
+        self.assertEqual((self.new / '.venv').resolve(), environment)
+        self.assert_shared_unchanged()
+
     @patch("backend.run")
     def test_missing_bootstrap_stops_before_install_or_switch(self, run):
         with self.assertRaisesRegex(RuntimeError, "预先初始化"):
@@ -225,6 +356,8 @@ class DeploymentTests(unittest.TestCase):
         (self.root / "venv/bin/python").touch()
         (self.root / "incoming").mkdir()
         (self.new / "backend").mkdir()
+        (self.new / "backend/requirements.txt").write_text('fastapi==0.115.0\n')
+        (self.new / "backend/requirements-ocr.txt").write_text('-r requirements.txt\npaddleocr==3.7.0\n')
         release_id = "a" * 40 + "-1-1"
         with tarfile.open(self.root / "incoming" / f"{release_id}.tar.gz", "w:gz") as archive:
             archive.add(self.new, arcname="")
@@ -233,6 +366,7 @@ class DeploymentTests(unittest.TestCase):
     @patch("backend.activate")
     @patch("backend.run")
     def test_enabled_ocr_uses_selected_python_and_verifies_before_activation(self, run, activate):
+        run.return_value.stdout = 'python312'
         settings = 'BACKEND_PYTHON="/opt/python312/bin/python"\nPADDLE_OCR_ENABLED=1\n'
         release_id = self.prepare_archive(settings)
         backend.deploy(self.root, release_id)
@@ -241,6 +375,8 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(venv[0], "/opt/python312/bin/python")
         self.assertTrue(any("paddlepaddle==3.2.0" in args for args in calls))
         self.assertTrue(any(str(args[-1]).endswith("requirements-ocr.txt") for args in calls))
+        self.assertTrue(any(str(args[1]).endswith("backend/tests/test_paddle_adapter.py") for args in calls if len(args) > 1))
+        self.assertTrue(any(str(args[1]).endswith("backend/tools/selftest.py") for args in calls if len(args) > 1))
         probes = [call for call in run.call_args_list if "run_ocr_probe.py" in str(call.args)]
         self.assertEqual(len(probes), 1)
         self.assertEqual(probes[0].kwargs["env"]["PADDLE_OCR_ENABLED"], "1")
@@ -254,6 +390,7 @@ class DeploymentTests(unittest.TestCase):
     @patch("backend.activate")
     @patch("backend.run")
     def test_disabled_ocr_keeps_text_only_deployment(self, run, activate):
+        run.return_value.stdout = 'python312'
         release_id = self.prepare_archive("PADDLE_OCR_ENABLED=0\n")
         backend.deploy(self.root, release_id)
         calls = [call.args for call in run.call_args_list]
@@ -279,6 +416,7 @@ class DeploymentTests(unittest.TestCase):
         def fail_probe(*args, **kwargs):
             if "run_ocr_probe.py" in str(args):
                 raise subprocess.CalledProcessError(1, args)
+            return subprocess.CompletedProcess(args, 0, stdout='python312')
         run.side_effect = fail_probe
         with self.assertRaises(subprocess.CalledProcessError):
             backend.deploy(self.root, release_id)
@@ -306,6 +444,7 @@ class DeploymentTests(unittest.TestCase):
     @patch("backend.activate")
     @patch("backend.run")
     def test_vl_version_mismatch_never_activates(self, run, activate, urlopen):
+        run.return_value.stdout = 'python312'
         from io import BytesIO
         urlopen.return_value = BytesIO(b'{"status":"ok","pipeline_version":"v1.5","busy":false}')
         release_id = self.prepare_archive("PADDLE_OCR_ENABLED=1\nPADDLE_OCR_ENGINE=vl\nPADDLE_VL_SERVICE_URL=http://127.0.0.1:18082\n")
@@ -318,6 +457,7 @@ class DeploymentTests(unittest.TestCase):
     @patch("backend.activate")
     @patch("backend.run")
     def test_vl_preflight_requires_recognition_before_probe(self, run, activate, urlopen, readiness):
+        run.return_value.stdout = 'python312'
         urlopen.return_value = BytesIO(b'{"status":"ok","pipeline_version":"v1.6","rec_backend":"llama-cpp-server","busy":false}')
         release_id = self.prepare_archive(
             "PADDLE_OCR_ENABLED=1\nPADDLE_OCR_ENGINE=vl\nPADDLE_VL_SERVICE_URL=http://127.0.0.1:18082\n")

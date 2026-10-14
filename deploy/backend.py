@@ -2,6 +2,7 @@
 
 import argparse
 import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -17,6 +18,8 @@ from urllib.request import urlopen
 
 SERVICE = "hackathon-backend.service"
 MODEL_SERVICES = ('hackathon-vl-rec.service', 'hackathon-paddle-vl.service')
+PADDLE_PACKAGE = 'paddlepaddle==3.2.0'
+PADDLE_INDEX = 'https://www.paddlepaddle.org.cn/packages/stable/cpu/'
 
 
 def wait_model_healthy():
@@ -119,6 +122,55 @@ def prepare_frontend(release):
         path.chmod(0o755 if path.is_dir() else 0o644)
 
 
+def prepare_environment(root, release, interpreter, ocr_enabled):
+    """按安装输入复用完整环境；已发布环境只读，新依赖另建目录。"""
+    started = time.monotonic()
+    identity = run(interpreter, '-c',
+                   'import json, platform, sys; '
+                   'assert sys.version_info[:2] == (3, 12), "发布环境需要 Python 3.12"; '
+                   'print(json.dumps([sys.executable, sys.version, sys.implementation.cache_tag, '
+                   'platform.machine(), platform.platform()]))',
+                   capture_output=True, text=True).stdout.strip()
+    requirements = 'requirements-ocr.txt' if ocr_enabled else 'requirements.txt'
+    names = ['requirements.txt', 'requirements-ocr.txt'] if ocr_enabled else ['requirements.txt']
+    inputs = {'format': 1, 'python': identity,
+              'requirements': {name: (release / 'backend' / name).read_text() for name in names},
+              'paddle': [PADDLE_PACKAGE, PADDLE_INDEX] if ocr_enabled else None}
+    key = hashlib.sha256(json.dumps(inputs, sort_keys=True).encode()).hexdigest()
+    environment = root / 'shared/python-envs' / key
+    ready = environment / '.complete'
+    installer = str(root / 'venv/bin/python')
+    python = str(environment / 'bin/python')
+    reused = ready.is_file()
+    if not reused:
+        # 未写完成标记的目录从未交给版本使用，可清理被中断的安装。
+        if environment.exists():
+            shutil.rmtree(environment)
+        environment.mkdir(parents=True)
+        try:
+            run(interpreter, '-m', 'venv', '--without-pip', str(environment))
+            run(installer, '-m', 'pip', '--python', python, 'install', '-r',
+                str(release / 'backend' / requirements))
+            if ocr_enabled:
+                run(installer, '-m', 'pip', '--python', python, 'install',
+                    PADDLE_PACKAGE, '--index-url', PADDLE_INDEX)
+            run(installer, '-m', 'pip', '--python', python, 'check')
+            with (environment / 'requirements.lock').open('w') as lock:
+                run(installer, '-m', 'pip', '--python', python, 'freeze', stdout=lock)
+            ready.write_text(key + '\n')
+        except BaseException:
+            shutil.rmtree(environment)
+            raise
+    else:
+        # 命中也检查依赖一致性；异常时拒绝发布，不原地修补正在使用的环境。
+        run(installer, '-m', 'pip', '--python', python, 'check')
+    (release / '.venv').symlink_to(environment, target_is_directory=True)
+    shutil.copyfile(environment / 'requirements.lock', release / 'requirements.lock')
+    action = '复用' if reused else '新建'
+    print(f'依赖环境：{action} {key[:12]}，耗时 {time.monotonic() - started:.1f} 秒', flush=True)
+    return str(release / '.venv/bin/python')
+
+
 def activate(root, release):
     current = root / "current"
     previous = current.resolve(strict=True)
@@ -193,7 +245,6 @@ def deploy(root, release_id):
     settings = deployment_settings(root)
     ocr_enabled = settings["PADDLE_OCR_ENABLED"] == "1"
     interpreter = str(Path(settings["BACKEND_PYTHON"]).expanduser())
-    run(interpreter, "-c", "import sys; assert sys.version_info[:2] == (3, 12), '发布环境需要 Python 3.12'")
     archive = root / "incoming" / f"{release_id}.tar.gz"
     release = root / "releases" / release_id
     release.mkdir()
@@ -201,26 +252,18 @@ def deploy(root, release_id):
         source.extractall(release, filter="data")
     prepare_frontend(release)
 
-    # 每个版本使用独立依赖，失败时不会污染仍在运行的旧环境。
-    run(interpreter, "-m", "venv", "--without-pip", str(release / ".venv"))
-    installer = str(root / "venv/bin/python")
-    python = str(release / ".venv/bin/python")
-    requirements = "requirements-ocr.txt" if ocr_enabled else "requirements.txt"
-    run(installer, "-m", "pip", "--python", python, "install", "-r", str(release / "backend" / requirements))
-    if ocr_enabled:
-        run(installer, "-m", "pip", "--python", python, "install", "paddlepaddle==3.2.0",
-            "--index-url", "https://www.paddlepaddle.org.cn/packages/stable/cpu/")
-    run(installer, "-m", "pip", "--python", python, "check")
-    with (release / "requirements.lock").open("w") as lock:
-        run(installer, "-m", "pip", "--python", python, "freeze", stdout=lock)
+    python = prepare_environment(root, release, interpreter, ocr_enabled)
 
     # 候选版本先用自己的临时数据自检，避免测试读写共享的运行中任务。
     env = {**os.environ, "LLM_BASE_URL": "", "LLM_API_KEY": "", "LLM_MODEL": "",
            "PADDLE_OCR_ENABLED": "0", "PYTHONDONTWRITEBYTECODE": "1"}
     for script, args in (("test_review38.py", []), ("test_rule_monitor.py", []), ("test_workflow.py", []), ("test_trade_json.py", []), ("test_static_rules.py", []), ("test_sqlite_store.py", []), ("test_compare.py", []), ("test_review_regressions.py", []),
                          ("test_paddle_adapter.py", []), ("test_paddle_vl.py", []), ("test_vl_service.py", []), ("test_delivery_boundaries.py", []), ("selftest.py", ["--no-node"]), ("run_challenge.py", [])):
-        run(python, str(release / "backend/tools" / script), *args, cwd=release, env=env)
+        directory = "backend/tests" if script.startswith("test_") else "backend/tools"
+        run(python, str(release / directory / script), *args, cwd=release, env=env)
     if ocr_enabled:
+        probe_started = time.monotonic()
+        print('开始真实 OCR 预检。', flush=True)
         # 在切换服务前加载真实模型并验证图片；使用候选版本的临时任务数据。
         probe_env = {**env, **{key: value for key, value in settings.items() if key.startswith("PADDLE_")}}
         if settings["PADDLE_OCR_ENGINE"] == "vl":
@@ -233,6 +276,7 @@ def deploy(root, release_id):
         else:
             run(python, str(release / "backend/tools/run_ocr_probe.py"), "11_de_multiitem_mixed",
                 cwd=release, env=probe_env, timeout=900)
+        print(f'真实 OCR 预检通过，耗时 {time.monotonic() - probe_started:.1f} 秒', flush=True)
     temporary_data = release / "backend/.data"
     if temporary_data.exists():
         shutil.rmtree(temporary_data)

@@ -49,8 +49,8 @@ file_id、item_id、comparison_id、risk_id 和原枚举保持稳定。`SINGLE_S
 
 ```sh
 node backend/tools/validate_reports.mjs
-python backend/tools/test_workflow.py
-python backend/tools/test_rule_monitor.py
+python -m pytest backend/tests/test_workflow.py
+python -m pytest backend/tests/test_rule_monitor.py
 python backend/tools/accept_workflow.py
 ```
 

@@ -3,20 +3,32 @@ run-name: CI 验证（不部署）· ${{ github.head_ref || github.ref_name }}
 
 on:
   push:
-    branches: [main, web/*]
+    branches: [main]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   backend-regression:
     name: 后端语义与契约回归
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            requirements-test.txt
 
       - uses: actions/setup-node@v4
         with:
@@ -25,40 +37,65 @@ jobs:
 
       - name: 安装依赖
         run: |
-          python -m pip install -r backend/requirements.txt
+          python -m pip install -r backend/requirements.txt -r requirements-test.txt
           npm ci
 
-      - name: 比对及审查边界
+      - name: 自动发现后端测试（含接口、样例金标和契约）
         run: |
-          python backend/tools/test_compare.py
-          python backend/tools/test_review_regressions.py
-          python backend/tools/test_paddle_adapter.py
-          python backend/tools/test_paddle_vl.py
-          python backend/tools/test_vl_service.py
-          python backend/tools/test_delivery_boundaries.py
-          python backend/tools/test_sqlite_store.py
-          python backend/tools/test_workflow.py
-          python backend/tools/test_trade_json.py
-          python backend/tools/test_static_rules.py
-          python backend/tools/test_rule_monitor.py
-          python backend/tools/test_review38.py
-          python backend/tools/test_reader_pages.py
-          python backend/tools/test_file_access.py
-          python backend/tools/test_unaligned_evidence.py
-          python backend/tools/accept_workflow.py
+          mkdir -p backend/.out
+          python -m pytest \
+            --junitxml=backend/.out/junit.xml \
+            --basetemp=backend/.out/pytest-tmp \
+            --durations=10
 
-      - name: 接口与金标
-        run: |
-          python backend/tools/selftest.py
-          python backend/tools/run_challenge.py
+      - name: 保留测试报告与接口返回
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: |
+            backend/.out/junit.xml
+            backend/.out/pytest-tmp/**/*.json
+          include-hidden-files: true
+          retention-days: 7
 
-      - name: 数据层回归
-        run: python -m unittest discover -s data -p 'test_*.py' -v
+  python-support-tests:
+    name: Python 支持回归（${{ matrix.suite }}）
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [data, deploy]
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: 部署脚本与回退单元测试（不发布服务）
-        run: |
-          python -m unittest discover -s deploy -p 'test_*.py' -v
-          python -m py_compile deploy/smoke.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements-test.txt
+            backend/requirements.txt
+
+      - name: 安装测试工具
+        run: python -m pip install -r requirements-test.txt
+
+      - name: 安装部署探针使用的运行依赖
+        if: matrix.suite == 'deploy'
+        run: python -m pip install -r backend/requirements.txt
+
+      - name: 数据层或部署脚本回归（不发布服务）
+        run: python -m pytest ${{ matrix.suite }} --junitxml=.out/${{ matrix.suite }}.xml
+
+      - name: 保留测试报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.suite }}-test-results
+          path: .out/${{ matrix.suite }}.xml
+          include-hidden-files: true
+          retention-days: 7
 
   validate-contract:
     name: 验证数据契约
