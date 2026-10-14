@@ -47,6 +47,21 @@ python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
 
 ---
 
+## 标准 EDIFACT（`INVOIC:D:96A:UN`）解析支持
+
+`.edi` / `.EDI` 文件走独立的確定性解析器 `app/pipeline/edifact.py`（不经过 PDF 抽取、OCR 或通用 LLM）：
+
+- **支持范围**：当前支持单个 `INVOIC:D:96A:UN`（语法版本 3）的选定字段子集，编码为 ASCII 或严格 UTF-8（可带 BOM），单文件上限 1 MiB、商品行上限 200 行。
+- **信封校验与字段映射**：
+  - 校验 `UNB/UNZ` 交换信封、`UNH/UNT` 报文引用与段计数、`CNT` 商品行数，支持默认或 `UNA` 声明的服务字符、`?` 转义序列及点/逗号十进制小数。
+  - 提取发票编号、买卖/收发主体、装运日期、币种、整票包装/毛净重/体积/总额，以及商品行（`LIN/PIA/IMD/QTY/MEA/MOA/PRI/PAC`）的货号、品名、HS 编码、数量、毛净重、金额、单价与包装件数。
+  - 单位按明确限定符归一：`PCE → PCS`、`KGM → KGS`、`CT → CARTON`、`MTQ → CBM`；每个有效字段均保留原始 EDI 段作为 `raw_text`（`page`、`bbox`、`confidence` 为 `null`）。
+- **降级与错误边界**：
+  - `DESADV`、多报文信封、X12、其他目录版本或未知业务段显式返回 `UNSUPPORTED`；
+  - 信封缺失、`UNT/UNZ` 段数不符或转义损坏返回 `FAILED / DOC_PARSE_FAILED`；与 PDF/图片混合上传时保留成功文件并返回 `PARTIAL`。
+
+---
+
 ## 处理流水线与结果语义
 
 1. **逐文件增量进度**：任务创建后按上传顺序逐份解析文件。每份文件开始解析时写入 `PARSING` 快照，完成后更新为 `EXTRACTED`、`FAILED` 或 `UNSUPPORTED`，并实时提交至 SQLite，供前端平稳展示真实进度。
@@ -73,8 +88,8 @@ backend/
 │   ├── evaluation.py       评测结果读取与计分一致性校验
 │   ├── store.py            SQLite 任务持久化、修正审计与旧版 JSON 兼容导出
 │   ├── rules/              目的国规则配置、官方来源目录与监测读取
-│   └── pipeline/           PDF/OCR 解析、字段抽取、归一化、行对齐与交叉比对
-├── samples/                01–11 合成单证、challenge 挑战集与专项回归材料
+│   └── pipeline/           PDF/OCR/EDIFACT 解析、字段抽取、归一化、行对齐与交叉比对
+├── samples/                01–11 合成单证、challenge 挑战集、EDI 样本与专项回归材料
 ├── tools/                  数据集评测（evaluate_dataset.py）、OCR 探针与验收脚本
 ├── tests/                  pytest 自动化测试套件
 ├── requirements.txt        核心服务运行依赖
@@ -102,10 +117,11 @@ backend/
 ```sh
 python -m pip install -r backend/requirements.txt -r requirements-test.txt
 npm ci
-python -m pytest                       # 运行全部后端回归（含接口、样例与 Schema 校验）
-python -m pytest -m "not integration"  # 仅运行快速单元测试
-python -m pytest data                  # 运行 SQLite 数据层测试
-python -m pytest deploy                # 运行部署与回退逻辑测试
+python -m pytest                               # 运行全部后端回归（含接口、EDIFACT、样例与 Schema 校验）
+python -m pytest backend/tests/test_edifact.py # 单独运行 EDIFACT 解析与混合比对回归
+python -m pytest -m "not integration"          # 仅运行快速单元测试
+python -m pytest data                          # 运行 SQLite 数据层测试
+python -m pytest deploy                        # 运行部署与回退逻辑测试
 ```
 
 默认测试环境自动隔离临时 SQLite 数据库与上传目录，并关闭外部 OCR/LLM 调用以确保确定性。如需针对真实 OCR 通道运行探针：

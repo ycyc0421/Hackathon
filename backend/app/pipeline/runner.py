@@ -133,21 +133,21 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
         doc_entry['process_status'] = 'PARSING'
         publish_documents()
 
-        # 暂不支持的格式（如 EDI、Word）显式标出，不静默丢弃
+        # 暂不支持的格式（如 X12、Word）显式标出，不静默丢弃
         if file_type.value == "OTHER":
             doc_entry.update(
                 {
                     "doc_type": None,
                     "process_status": "UNSUPPORTED",
                     "page_count": None,
-                    "error_message": "支持 PDF、图片及 hackathon-trade-json-v1 项目 JSON；标准 EDIFACT/X12 尚不支持",
+                    "error_message": "支持 PDF、图片、项目 JSON 及首批 INVOIC D96A EDI；此文件格式尚不支持",
                 }
             )
             publish_documents()
             errors.append(
                 {
                     "code": "UNSUPPORTED_FILE_TYPE",
-                    "message": f"{filename} 暂不支持：支持 PDF、图片及项目交换 JSON，标准 EDIFACT/X12 尚不支持",
+                    "message": f"{filename} 暂不支持：支持 PDF、图片、项目 JSON 及首批 INVOIC D96A EDI",
                     "level": "WARNING",
                     "file_ids": [file_id],
                 }
@@ -168,7 +168,7 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
             doc_entry.update(
                 {
                     "doc_type": None,
-                    "process_status": "FAILED",
+                    "process_status": "UNSUPPORTED" if result.unsupported else "FAILED",
                     "page_count": result.page_count,
                     "error_message": result.error_message,
                 }
@@ -176,9 +176,9 @@ def _run(task_id: str, uploads: list[tuple[str, bytes]]) -> None:
             publish_documents()
             errors.append(
                 {
-                    "code": "DOC_PARSE_FAILED",
+                    "code": "UNSUPPORTED_FILE_TYPE" if result.unsupported else "DOC_PARSE_FAILED",
                     "message": f"{filename} 解析失败：{result.error_message}",
-                    "level": "ERROR",
+                    "level": "WARNING" if result.unsupported else "ERROR",
                     "file_ids": [file_id],
                 }
             )
