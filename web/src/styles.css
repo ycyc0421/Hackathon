@@ -4370,3 +4370,34 @@ textarea {
   .app::before, .app::after, .desk-glow { display: none; }
   .reveal--armed { opacity: 1; transform: none; }
 }
+
+/* ==========================================================================
+   报告页风险提示卡片衔接优化（ReportPage .risk-head / .risk-foot）
+   与导出报告对齐：支持商品归属胶囊与核实徽章折行排列，来源 URL 呈现为可点击外链。
+   ========================================================================== */
+
+.risk-head {
+  flex-wrap: wrap;
+}
+
+.risk-foot {
+  overflow-wrap: anywhere;
+}
+
+.risk-source-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--duration-fast) var(--ease);
+}
+
+.risk-source-link:hover {
+  color: var(--color-primary-hover, var(--color-primary));
+}
+
+.risk-source-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+

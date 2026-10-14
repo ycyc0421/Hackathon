@@ -289,7 +289,7 @@
       "related_file_ids": [],
       "destination_country": "DE",
       "rule_id": "DE-IMP-004",
-      "rule_source": "团队配置的目的国规则集 v1"
+      "rule_source": "内置目的国规则集 v1"
     }
   ],
 

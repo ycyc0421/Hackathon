@@ -511,6 +511,11 @@ body::before {
 .risk-title { font-weight: 600; margin-top: var(--space-2); }
 .risk-detail { margin: var(--space-1) 0 0; font-size: var(--text-13); }
 .risk-foot { margin-top: var(--space-2); color: var(--text-muted); font-size: var(--text-xs); overflow-wrap: anywhere; }
+.risk-foot a {
+  color: var(--color-primary, oklch(52% 0.14 240));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 
 .err-item {
   display: flex;
