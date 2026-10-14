@@ -1,0 +1,58 @@
+{
+  "status": "DONE",
+  "dataset_version": "synthetic-hackathon-v2",
+  "sample_count": 100,
+  "model_version": "text-layer-pipeline@7e73a97a0b90（未运行 OCR）",
+  "metrics": {
+    "field_extraction": {
+      "precision": 0.7731181373197513,
+      "recall": 0.4785456927612185,
+      "f1": 0.5911688837185777
+    },
+    "conflict_detection": {
+      "precision": 1.0,
+      "recall": 0.7142857142857143,
+      "f1": 0.8333333333333334
+    }
+  },
+  "error_breakdown": {
+    "字段漏读或值不符": 6368,
+    "字段多读或值不符": 1715,
+    "冲突漏检": 20,
+    "冲突误报": 0,
+    "未完整完成的货票": 0
+  },
+  "run_at": "2026-10-14T02:43:17.440621+00:00",
+  "scope": {
+    "dataset_kind": "合成数据，单一英文版式",
+    "input_kind": "文本 PDF（非 OCR）",
+    "split": "all",
+    "document_count": 300,
+    "code_revision": "7e73a97a0b90c762bbadc907a30b46f50d4d5d00",
+    "scorer_version": "synthetic-exact-v1",
+    "dataset_sha256": "493059f56d152ee5c7393a1a087624d3d552c8db061a22c41192c24cc193e8c2",
+    "limitations": [
+      "本数据集曾用于开发和回归，不能视为未见测试集或泛化准确率。",
+      "仅计入当前输入通道；派生扫描件与文本 PDF 不是独立业务样本，不合并计算总体分数。",
+      "金标为数据包生成预期；包含尚未实现的字段，未按支持范围删减分母。",
+      "字符串仅做 Unicode、大小写和空白归一；不自动等同中英品名或业务近义词。",
+      "目的国规则未核实，风险提示未评分；字段错误可能同时计为漏读与多读，分类不可直接相加。"
+    ],
+    "metric_definitions": {
+      "field_extraction": "以文件名、货号、字段键、归一值和单位组成事实，多重集合微平均；错误值计 FP 和 FN。只评分金标定义的字段键，不评分页码坐标。",
+      "conflict_detection": "以货号和字段键标识冲突；CONFLICT 为正类，漏检或未检查计 FN，多报计 FP；内部风险不充作冲突。"
+    },
+    "counts": {
+      "field_extraction": {
+        "tp": 5844,
+        "fp": 1715,
+        "fn": 6368
+      },
+      "conflict_detection": {
+        "tp": 50,
+        "fp": 0,
+        "fn": 20
+      }
+    }
+  }
+}

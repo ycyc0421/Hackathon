@@ -55,6 +55,17 @@ for (const name of readdirSync(join(root, 'docs/fixtures/result')).filter((f) =>
   })
 }
 
+// 评测结果 → Evaluation。跑分脚本用同一份 schema 自校验后才发布，
+// 这里校验的是提交进仓库的样例，保证契约改动不会悄悄破坏既有结果形状。
+for (const name of readdirSync(join(root, 'docs/fixtures/evaluation')).filter((f) => f.endsWith('.json'))) {
+  cases.push({
+    label: `docs/fixtures/evaluation/${name}`,
+    data: stripComments(load(`docs/fixtures/evaluation/${name}`)),
+    validate: validateEval,
+    schemaName: 'Evaluation',
+  })
+}
+
 // 单文件抽取结果 → 直接复用主 schema 的 $defs.Extraction
 const extractionSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
