@@ -2498,10 +2498,10 @@ textarea {
    列表与对照面板三处的 EDI 原件查看/下载入口与纯文本预览。
    ========================================================================== */
 
-/* 原件区域随宿主宽度收缩，按钮与文本纵向排列，避免窄屏被长报文撑开 */
+/* 原件区域随宿主宽度收缩，按钮与文本纵向排列，避免窄屏被长报文撑开
+   （对照面板的原件入口已改为右侧预览抽屉，此处的宿主只剩上传列表两处） */
 .file-item-source,
-.doc-item-source,
-.compare-foot-source {
+.doc-item-source {
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -4030,6 +4030,191 @@ textarea {
   color: var(--text-body);
   text-align: center;
   font-size: var(--text-xs);
+}
+
+/* ==========================================================================
+   原文预览抽屉（SourcePreview）
+   --------------------------------------------------------------------------
+   在页面主体右侧起一张纸，就地查看单证原件。切入方式与切页的纸张层叠
+   同源（--duration-page / --ease-page，从右侧整张滑入），读起来是同一套
+   动作而不是新发明的一种。与切页一致，不加遮罩压暗桌面——层次由纸自身
+   的投影与左缘边界表达（DESIGN.md：切页时页面变暗是他明确否掉过的）。
+   ========================================================================== */
+
+/* 抽屉本体：一张贴在视口右侧的纸。fixed + Teleport 到 body，
+   不受 .page-inner 切页 transform 的包含块影响 */
+.source-drawer {
+  position: fixed;
+  top: 16px;
+  bottom: 16px;
+  right: 16px;
+  z-index: 30; /* 顶栏(10)/下拉浮层(20)之上，原件是此刻最重要的一张纸 */
+  display: flex;
+  flex-direction: column;
+  width: min(480px, calc(100vw - 32px));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg); /* 纸的圆角档，不是卡内子块 */
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden; /* 圆角裁掉内容直角，头部与预览区不出框 */
+}
+
+/* 进出场：复用切页的纸张语言，从右侧整张滑入/滑出 */
+.source-drawer-enter-active,
+.source-drawer-leave-active {
+  transition: transform var(--duration-page) var(--ease-page),
+              opacity var(--duration-page) var(--ease-page);
+  will-change: transform, opacity;
+}
+
+.source-drawer-enter-from,
+.source-drawer-leave-to {
+  transform: translateX(calc(100% + 16px)); /* 完全滑出右缘，含 16px 的纸边距 */
+  opacity: 0;
+}
+
+/* 头部：文件名 + 页码在左，下载与关闭在右 */
+.source-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border); /* 纸头部与预览区的分界 */
+  background: var(--surface-sunken); /* 头部略沉，与纸面分层 */
+  flex: none;
+}
+
+.source-drawer-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* 文件名是抽屉的身份：等宽、可截断，title 放全名 */
+.source-drawer-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.source-drawer-page {
+  flex: none;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.source-drawer-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+}
+
+/* 关闭按钮：与主题切换同款的小方块图标按钮（32px 命中面积） */
+.source-drawer-close {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease),
+    border-color var(--duration-fast) var(--ease),
+    color var(--duration-fast) var(--ease);
+}
+
+.source-drawer-close:hover {
+  background: var(--gray-50);
+  border-color: var(--border-hover);
+  color: var(--text-body);
+}
+
+.source-drawer-close:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* 预览区：占满头部以下的全部空间，各自内容可滚 */
+.source-drawer-body {
+  flex: 1;
+  min-height: 0; /* flex 子项溢出收缩，pre/iframe 才能被裁在纸内 */
+  overflow: auto; /* 长图片保留原比例，超出部分可滚动查看 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* PDF：浏览器内置阅读器铺满预览区 */
+.source-drawer-frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: var(--surface-sunken); /* 阅读器加载期间不是一块突兀的白 */
+}
+
+/* 图片：等比缩放适配预览区宽度，超高时滚动 */
+.source-drawer-image {
+  display: block;
+  flex: none;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* 纯文本（EDI / JSON）：等宽原文，保留换行与连续空格（与 .edi-source-text 同一口径） */
+.source-drawer-text {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  flex: 1;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.6; /* 字阶外特例：等宽原文块（同 .edi-source-text） */
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* 提示文案（读取中 / 解码失败 / 不支持的格式） */
+.source-drawer-note {
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--text-13);
+}
+
+/* 窄屏：纸边距收窄、近乎全幅，原件在手机上尽量占大 */
+@media (max-width: 640px) {
+  .source-drawer {
+    top: 8px;
+    bottom: 8px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+  }
+
+  .source-drawer-enter-from,
+  .source-drawer-leave-to {
+    transform: translateX(calc(100% + 8px));
+  }
+}
+
+/* 抽屉是屏幕上的临时纸，打印不参与（打印走报告页） */
+@media print {
+  .source-drawer { display: none; }
 }
 
 /* 暗色是屏幕偏好，打印仍使用浅色纸面和深色文字。 */

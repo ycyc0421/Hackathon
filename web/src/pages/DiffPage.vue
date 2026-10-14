@@ -7,7 +7,7 @@
  * - MATCH 之外的每种状态都要显示，尤其 NOT_CHECKED（未校验）——
  *   它必须与「没有问题」在视觉上区分开。
  */
-import { ref, computed, inject, onMounted, nextTick } from 'vue'
+import { ref, computed, inject, provide, onMounted, nextTick } from 'vue'
 import {
   comparisonStatus,
   fieldStatus,
@@ -25,6 +25,7 @@ import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import EmptyState from '../components/EmptyState.vue'
 import ComparePane from '../components/ComparePane.vue'
+import SourcePreview from '../components/SourcePreview.vue'
 import ViewSwitch from '../components/ViewSwitch.vue'
 
 /** 视图切换分段控件的选项，值与 views Map 里存的 key 一致 */
@@ -146,6 +147,31 @@ const docCount = computed(() => task.value?.documents?.length ?? 0)
  * 赋值保持响应式），切页返回时各卡片的选择保留。
  */
 const views = inject('diffViews')
+
+/**
+ * 原文预览抽屉：全页唯一实例，状态放在这里而不是 ComparePane 里——
+ * 每张比对卡片都是一个 ComparePane，状态若留在卡片内，点开多个会叠出多个抽屉。
+ * 通过 provide 把开合入口下发给所有卡片，抽屉本体只在本页渲染一次。
+ *
+ * 一次只看一份原件，因此只存一份 { file, page }；页码跟着文件一起换，
+ * 不沿用上一份的（否则点开装箱单会跳到发票的页）。
+ */
+const preview = ref(null)
+/** 触发预览的那颗按钮，关闭时把焦点还回去，键盘用户不丢位置 */
+let previewTrigger = null
+
+function openSourcePreview(file, page, trigger) {
+  previewTrigger = trigger ?? null
+  preview.value = { file, page: page ?? null }
+}
+
+function closeSourcePreview() {
+  preview.value = null
+  previewTrigger?.focus()
+  previewTrigger = null
+}
+
+provide('openSourcePreview', openSourcePreview)
 
 function viewOf(c) {
   // 窄屏（移动端）只有对照单视图：切换器被 CSS 隐藏，行为层同样锁定，
@@ -403,5 +429,15 @@ onMounted(async () => {
         />
       </section>
     </template>
+
+    <!--
+      原文预览抽屉：整页唯一实例，挂在页面根节点下、与内容并列。
+      卡片里的「查看原文」通过 provide 的 openSourcePreview 驱动它。
+    -->
+    <SourcePreview
+      :file="preview?.file ?? null"
+      :page="preview?.page ?? null"
+      @close="closeSourcePreview"
+    />
   </div>
 </template>
