@@ -39,6 +39,8 @@ IDENTIFIERS: list[FieldSpec] = [
     FieldSpec("container_no", "集装箱号", "STRING", None),
     FieldSpec("shipper", "发货人", "STRING", None),
     FieldSpec("consignee", "收货人", "STRING", None),
+    FieldSpec("shipper_address", "发货人地址", "STRING", None),
+    FieldSpec("consignee_address", "收货人地址", "STRING", None),
     FieldSpec("port_of_loading", "起运港", "STRING", None),
     FieldSpec("port_of_discharge", "目的港", "STRING", None),
     FieldSpec("destination_country", "目的国", "STRING", None),
