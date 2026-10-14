@@ -7,12 +7,14 @@
  * 契约里 Evaluation.status 的 NOT_RUN 就是为这一点设计的。
  */
 import { ref, computed, inject, onMounted } from 'vue'
-import { getEvaluation, isMock, ApiError } from '../api/index.js'
+import { getEvaluation, getEvaluationRuns, isMock, ApiError } from '../api/index.js'
 import { backendErrorText } from '../api/errors.js'
 import { formatTime } from '../api/formatters.js'
+import { EVALUATION_SPLITS } from '../api/labels.js'
 import NoticeBar from '../components/NoticeBar.vue'
 import SkeletonBlock from '../components/SkeletonBlock.vue'
 import EmptyState from '../components/EmptyState.vue'
+import AppSelect from '../components/AppSelect.vue'
 
 // 评测数据缓存由 App 层持有：切页重挂载时直接复用，不重复请求
 const evaluation = inject('evaluation')
@@ -23,13 +25,27 @@ const mock = ref(isMock())
 
 const loading = ref(false)
 const error = ref(null)
+const runs = ref([])
+const selectedRun = ref('')
+const scope = computed(() => evaluation.value?.scope)
+const runOptions = computed(() => runs.value.map((run, index) => ({
+  value: String(index),
+  label: [run.scope?.input_kind ?? '范围未记录', run.sample_count + ' 票', formatTime(run.run_at)].join(' · '),
+})))
+
+function chooseRun(index) {
+  evaluation.value = runs.value[Number(index)]
+}
 
 async function load() {
   if (loading.value) return
   loading.value = true
   error.value = null
   try {
-    evaluation.value = await getEvaluation()
+    const [latest, history] = await Promise.all([getEvaluation(), getEvaluationRuns()])
+    evaluation.value = latest
+    runs.value = history
+    selectedRun.value = String(history.findIndex((run) => run.run_at === latest.run_at))
     evaluationLoaded.value = true
   } catch (e) {
     error.value =
@@ -43,10 +59,8 @@ async function load() {
   }
 }
 
-// 只在首次进入（从未成功加载过）时自动请求；之后切回来复用缓存
-onMounted(() => {
-  if (!evaluationLoaded.value) load()
-})
+// 保留旧摘要作为读取占位，每次进入重新读取批次，接收后端新发布的结果。
+onMounted(load)
 
 const isNotRun = computed(() => !evaluation.value || evaluation.value.status === 'NOT_RUN')
 const isDone = computed(() => evaluation.value?.status === 'DONE')
@@ -65,8 +79,11 @@ const metricRows = computed(() => {
   const m = evaluation.value?.metrics
   if (!m) return []
   return METRIC_GROUPS.filter((g) => m[g.key]).map((g) => ({
+    key: g.key,
     label: g.label,
     ...m[g.key],
+    counts: scope.value?.counts?.[g.key],
+    definition: scope.value?.metric_definitions?.[g.key],
   }))
 })
 
@@ -90,10 +107,16 @@ const maxErrCount = computed(() =>
 <template>
   <div class="page">
     <div class="section-head">
-      <h2 class="section-title">评测结果</h2>
+      <h2 class="section-title">系统评测</h2>
       <button class="btn small" :disabled="loading" @click="load">
         {{ loading ? '读取中…' : '刷新' }}
       </button>
+    </div>
+    <p class="page-desc">查看固定数据集上的实测表现。普通上传不会启动评测；刷新只读取已保存的结果。</p>
+    <div v-if="runs.length" class="field">
+      <span id="evaluation-run-label" class="field-label">选择评测批次</span>
+      <AppSelect v-model="selectedRun" :options="runOptions" :disabled="loading" block
+        aria-labelledby="evaluation-run-label" @change="chooseRun" />
     </div>
 
     <!-- 内容主体固定为一张卡片：各状态在同一骨架里淡入淡出，刷新不再引起布局坍塌。
@@ -129,7 +152,7 @@ const maxErrCount = computed(() =>
           key="not-run"
           tone="info"
           title="尚未评测"
-          detail="尚无真实评测结果。本页在取得数据前不展示任何指标，以免与实际能力不符。"
+          detail="尚无已保存的评测结果。需要先对固定样本与金标运行评测，再由后端发布摘要；上传普通单证不会产生这里的分数。"
         />
 
         <EmptyState
@@ -145,23 +168,27 @@ const maxErrCount = computed(() =>
           key="failed"
           tone="bad"
           title="评测失败"
-          detail="本次跑分未产生结果。"
+          detail="本次结果无法读取或校验失败，暂不展示指标。请检查后端评测文件。"
         />
 
         <div v-else-if="isDone" key="done" class="eval-done">
+          <NoticeBar tone="info" :title="scope?.input_kind ?? '本批次未记录评测范围'"
+            :detail="scope ? scope.dataset_kind + '；完成跑分不代表达到质量要求。' : '请先核对数据来源和计分口径，不据此推断完整模型能力。'" />
           <h3 class="card-title">本次评测信息</h3>
           <dl class="meta-grid">
             <div><dt>测试集版本</dt><dd>{{ evaluation.dataset_version ?? '—' }}</dd></div>
-            <div><dt>样例数</dt><dd>{{ evaluation.sample_count }}</dd></div>
-            <div><dt>模型版本</dt><dd>{{ evaluation.model_version ?? '—' }}</dd></div>
+            <div><dt>货票数</dt><dd>{{ evaluation.sample_count }}</dd></div>
+            <div v-if="scope"><dt>文件数</dt><dd>{{ scope.document_count }}</dd></div>
+            <div><dt>被测流水线 / 模型</dt><dd>{{ evaluation.model_version ?? '—' }}</dd></div>
             <div><dt>运行时间</dt><dd>{{ formatTime(evaluation.run_at) }}</dd></div>
+            <div v-if="scope"><dt>数据划分</dt><dd>{{ EVALUATION_SPLITS[scope.split] ?? scope.split }}</dd></div>
           </dl>
 
           <h3 class="card-title eval-section-title">指标</h3>
           <!-- 每个指标一组：三项各自一条比例条 + 数值。
                条形只表示 0–100% 的比例，不画"达标线"——本页不设阈值。 -->
           <div class="metric-cards">
-            <article v-for="row in metricRows" :key="row.label" class="metric-card">
+            <article v-for="row in metricRows" :key="row.key" class="metric-card">
               <h4 class="metric-card-title">{{ row.label }}</h4>
               <div
                 v-for="m in [
@@ -182,11 +209,27 @@ const maxErrCount = computed(() =>
                 </span>
                 <span class="metric-value">{{ pct(m.value) }}</span>
               </div>
+              <p v-if="row.counts" class="foot-note">
+                正确 {{ row.counts.tp }} · 多报 {{ row.counts.fp }} · 漏报 {{ row.counts.fn }}<br />
+                预测项 {{ row.counts.tp + row.counts.fp }} · 金标项 {{ row.counts.tp + row.counts.fn }}
+              </p>
+              <p v-if="row.definition" class="foot-note">{{ row.definition }}</p>
             </article>
           </div>
           <p class="foot-note">
-            指标口径（采用哪几项、如何计算）需与提供评测结果的一方确认，本页不设达标阈值。
+            分母为零显示“—”；本页不设达标阈值。字段错值会同时计为多报与漏报，错误分类不可直接相加。
           </p>
+          <p v-if="!evaluation.metrics?.risk_hint" class="foot-note">风险提示：本批次未评测，不代表没有风险。</p>
+          <section v-if="scope" class="eval-section-title">
+            <h3 class="card-title">范围与局限</h3>
+            <ul><li v-for="limitation in scope.limitations" :key="limitation">{{ limitation }}</li></ul>
+            <details class="eval-provenance">
+              <summary>版本与数据指纹</summary>
+              <p>被测提交：{{ scope.code_revision }}</p>
+              <p>计分版本：{{ scope.scorer_version }}</p>
+              <p>数据指纹：{{ scope.dataset_sha256 }}</p>
+            </details>
+          </section>
 
           <template v-if="errorBreakdown.length">
             <h3 class="card-title eval-section-title">错误分类</h3>
@@ -213,3 +256,9 @@ const maxErrCount = computed(() =>
     />
   </div>
 </template>
+
+<style scoped>
+.meta-grid dd, .eval-provenance { overflow-wrap: anywhere; }
+.eval-provenance, .eval-section-title ul { font-size: var(--text-sm); color: var(--text-muted); }
+.eval-done > .notice { margin-bottom: var(--space-5); }
+</style>

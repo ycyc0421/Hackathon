@@ -230,6 +230,20 @@ export async function getEvaluation(options = {}) {
   }
 }
 
+/** 已持久化的评测摘要，旧后端尚无历史接口时保留最新结果。 */
+export async function getEvaluationRuns() {
+  if (isMock()) return []
+  try {
+    return await request('/evaluation/runs', {}, {
+      base: API_BASE, timeoutMs: REQUEST_TIMEOUT_MS,
+      retries: RETRY_MAX_ATTEMPTS, baseDelayMs: RETRY_BASE_DELAY_MS,
+    })
+  } catch (e) {
+    if (e.status === 404) return []
+    throw e
+  }
+}
+
 /**
  * 读取人工修正上下文。
  *

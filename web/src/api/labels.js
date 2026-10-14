@@ -18,6 +18,10 @@ export const TASK_STATUS = {
   FAILED: { text: '处理失败', tone: 'bad' },
 }
 
+export const EVALUATION_SPLITS = {
+  train: '训练划分', validation: '验证划分', test: '测试划分', all: '全部划分（开发回归基线）',
+}
+
 /**
  * 任务分阶段进度。契约里没有显式的 stage 字段（schema 的 TaskStatus 只有五种），
  * 上传页按 task.status 与逐文件 process_status 推断当前处于哪一阶段，
