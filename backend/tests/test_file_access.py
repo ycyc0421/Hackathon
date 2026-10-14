@@ -47,11 +47,13 @@ class FileAccessTests(unittest.TestCase):
             time.sleep(.02)
         self.fail('task did not finish')
 
-    def test_capabilities_do_not_claim_edifact_or_unconfigured_ocr(self):
+    def test_capabilities_limit_edifact_and_unconfigured_ocr(self):
         with patch.object(main, 'PADDLE_OCR_ENABLED', False), patch.object(main, 'llm_enabled', return_value=False):
             value = self.client.get('/api/v1/capabilities').json()
         formats = {item['format']: item for item in value['formats']}
-        self.assertFalse(formats['UN/EDIFACT']['supported'])
+        self.assertTrue(formats['UN/EDIFACT']['supported'])
+        self.assertIn('INVOIC D96A', formats['UN/EDIFACT']['reason'])
+        self.assertFalse(formats['X12']['supported'])
         self.assertFalse(formats['IMAGE']['supported'])
         self.assertFalse(formats['PDF']['scan_ocr_configured'])
         self.assertTrue(formats['hackathon-trade-json-v1']['supported'])
@@ -61,7 +63,7 @@ class FileAccessTests(unittest.TestCase):
         original = b"UNA:+.? '\nUNH+1+INVOIC:D:96A:UN'FTX+AAI+++A?+B?:C??D'"
         task = self.upload('INVOICE.EDI', original)
         self.assertEqual(task['status'], 'FAILED')
-        self.assertEqual(task['documents'][0]['process_status'], 'UNSUPPORTED')
+        self.assertEqual(task['documents'][0]['process_status'], 'FAILED')
         response = self.client.get(f"/api/v1/checks/{task['task_id']}/files/f1")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, original)

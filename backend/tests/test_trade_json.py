@@ -34,7 +34,8 @@ class TradeJsonTests(unittest.TestCase):
                 parse_trade_json(json.dumps(data).encode())
 
     def test_no_standard_edi_claim(self):
-        self.assertEqual(guess_file_type("standard.edi").value, "OTHER")
+        self.assertEqual(guess_file_type("standard.edi").value, "EDI")
+        self.assertEqual(guess_file_type("standard.x12").value, "OTHER")
         self.assertTrue(read_document("standard.edi", b"UNB+UNOC").failed)
         self.assertTrue(read_document("bad.json", b'{"format":"UN/EDIFACT"}').failed)
 
